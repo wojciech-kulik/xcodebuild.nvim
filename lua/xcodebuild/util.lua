@@ -102,4 +102,21 @@ function M.merge_array(lhs, rhs)
 	return result
 end
 
+function M.trim(str)
+	return string.match(str, "^%s*(.*)%s*$")
+end
+
+function M.select(tab, selector)
+	local result = {}
+	for _, value in ipairs(tab) do
+		table.insert(result, selector(value))
+	end
+
+	return result
+end
+
+function M.hasSuffix(text, suffix)
+  return string.sub(text, -#suffix) == suffix
+end
+
 return M

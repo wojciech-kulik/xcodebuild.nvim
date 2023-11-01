@@ -1,7 +1,6 @@
 local ui = require("xcodebuild.ui")
 local parser = require("xcodebuild.parser")
 local util = require("xcodebuild.util")
-local xchelper = require("xcodebuild.xchelper")
 local config = require("xcodebuild.config")
 
 local M = {}
@@ -9,23 +8,32 @@ local autogroup = vim.api.nvim_create_augroup("xctest", { clear = true })
 local testReport = {}
 
 function M.setup()
+	vim.api.nvim_create_user_command("XcodebuildSetup", function()
+		require("xcodebuild.pickers").select_device(function()
+			require("xcodebuild.pickers").select_project(function()
+				require("xcodebuild.pickers").select_scheme(function()
+					require("xcodebuild.pickers").select_testplan(function()
+						vim.defer_fn(function()
+							vim.print("xcodebuild configuration has been saved!")
+						end, 100)
+					end)
+				end)
+			end)
+		end)
+	end, { nargs = 0 })
+
 	vim.api.nvim_create_user_command("Test", function(opts)
 		config.load_settings()
 		local deviceId = config.settings().deviceId
-		local success, projectScheme = pcall(xchelper.get_project_scheme)
-		if not success then
-			vim.print("Scheme not found. Tests cancelled.")
-			return
-		end
-
-		local project = "Project.xcodeproj"
-		local testPlan = "TestPlan"
+		local projectCommand = config.settings().projectCommand
+		local scheme = config.settings().scheme
+		local testPlan = config.settings().testPlan
 		local command = "xcodebuild test -scheme "
-			.. projectScheme
+			.. scheme
 			.. " -destination 'id="
 			.. deviceId
-			.. "' -project "
-			.. project
+			.. "' "
+			.. projectCommand
 			.. " -testPlan "
 			.. testPlan
 

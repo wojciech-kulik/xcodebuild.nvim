@@ -30,4 +30,42 @@ function M.get_devices(runtimeId)
 	return result
 end
 
+function M.get_schemes(projectCommand)
+	local result = {}
+	local content = util.shell("xcodebuild " .. projectCommand .. " -list")
+	content = vim.split(content, "\n", { plain = true })
+
+	local foundSchemes = false
+	for _, line in ipairs(content) do
+		if foundSchemes and util.trim(line) == "" then
+			break
+		elseif foundSchemes then
+			table.insert(result, util.trim(line))
+		elseif string.find(util.trim(line), "Schemes") then
+			foundSchemes = true
+		end
+	end
+
+	return result
+end
+
+function M.get_testplans(projectCommand, scheme)
+	local result = {}
+	local content = util.shell("xcodebuild test " .. projectCommand .. " -scheme " .. scheme .. " -showTestPlans")
+	content = vim.split(content, "\n", { plain = true })
+
+	local foundTestPlans = false
+	for _, line in ipairs(content) do
+		if foundTestPlans and util.trim(line) == "" then
+			break
+		elseif foundTestPlans then
+			table.insert(result, util.trim(line))
+		elseif string.find(util.trim(line), "Test plans") then
+			foundTestPlans = true
+		end
+	end
+
+	return result
+end
+
 return M
