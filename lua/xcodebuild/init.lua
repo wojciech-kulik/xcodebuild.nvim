@@ -2,6 +2,7 @@ local ui = require("xcodebuild.ui")
 local parser = require("xcodebuild.parser")
 local util = require("xcodebuild.util")
 local xchelper = require("xcodebuild.xchelper")
+local config = require("xcodebuild.config")
 
 local M = {}
 local autogroup = vim.api.nvim_create_augroup("xctest", { clear = true })
@@ -9,7 +10,8 @@ local testReport = {}
 
 function M.setup()
 	vim.api.nvim_create_user_command("Test", function(opts)
-		local deviceId = xchelper.get_booted_device_id()
+		config.load_settings()
+		local deviceId = config.settings().deviceId
 		local success, projectScheme = pcall(xchelper.get_project_scheme)
 		if not success then
 			vim.print("Scheme not found. Tests cancelled.")
@@ -119,7 +121,5 @@ function M.setup()
 		end,
 	})
 end
-
--- M.setup()
 
 return M
