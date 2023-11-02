@@ -4,15 +4,15 @@ local util = require("xcodebuild.util")
 local config = require("xcodebuild.config")
 
 local M = {}
-local autogroup = vim.api.nvim_create_augroup("xctest", { clear = true })
+local autogroup = vim.api.nvim_create_augroup("xcodebuild.nvim", { clear = true })
 local testReport = {}
 
 function M.setup()
 	vim.api.nvim_create_user_command("XcodebuildSetup", function()
-		require("xcodebuild.pickers").select_device(function()
-			require("xcodebuild.pickers").select_project(function()
-				require("xcodebuild.pickers").select_scheme(function()
-					require("xcodebuild.pickers").select_testplan(function()
+		require("xcodebuild.pickers").select_project(function()
+			require("xcodebuild.pickers").select_scheme(function()
+				require("xcodebuild.pickers").select_testplan(function()
+					require("xcodebuild.pickers").select_destination(function()
 						vim.defer_fn(function()
 							vim.print("xcodebuild configuration has been saved!")
 						end, 100)
@@ -24,14 +24,14 @@ function M.setup()
 
 	vim.api.nvim_create_user_command("Test", function(opts)
 		config.load_settings()
-		local deviceId = config.settings().deviceId
+		local destination = config.settings().destination
 		local projectCommand = config.settings().projectCommand
 		local scheme = config.settings().scheme
 		local testPlan = config.settings().testPlan
 		local command = "xcodebuild test -scheme "
 			.. scheme
 			.. " -destination 'id="
-			.. deviceId
+			.. destination
 			.. "' "
 			.. projectCommand
 			.. " -testPlan "
@@ -55,7 +55,7 @@ function M.setup()
 			testReport = parser.parse_logs(log)
 			on_exit()
 		elseif opts.fargs[1] == "debug" then
-			for i = 1, 10 do
+			for i = 1, 12 do
 				local log = vim.fn.readfile("/Users/wkulik/Desktop/tests/tc" .. i .. ".log")
 				parser.clear()
 				testReport = parser.parse_logs(log)

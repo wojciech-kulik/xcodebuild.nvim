@@ -174,7 +174,7 @@ function M.refresh_diagnostics(bufnr, testClass, report)
 		return
 	end
 
-	local ns = vim.api.nvim_create_namespace("xctests-diagnostics")
+	local ns = vim.api.nvim_create_namespace("xcodebuild-diagnostics")
 	local diagnostics = {}
 
 	for _, test in ipairs(report.tests[testClass] or {}) do
@@ -184,7 +184,7 @@ function M.refresh_diagnostics(bufnr, testClass, report)
 				lnum = test.lineNumber - 1,
 				col = 0,
 				severity = vim.diagnostic.severity.ERROR,
-				source = "xcode-tests",
+				source = "xcodebuild",
 				message = table.concat(test.message, "\n"),
 				user_data = {},
 			})
@@ -200,7 +200,7 @@ function M.set_buf_marks(bufnr, testClass, tests)
 		return
 	end
 
-	local ns = vim.api.nvim_create_namespace("xctests-buf-marks")
+	local ns = vim.api.nvim_create_namespace("xcodebuild-marks")
 	local successSign = "✔"
 	local failureSign = "✖"
 	local bufLines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)

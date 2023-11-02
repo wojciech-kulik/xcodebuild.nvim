@@ -129,4 +129,41 @@ function M.select_testplan(callback)
 	end)
 end
 
+function M.select_destination(callback)
+	local projectCommand = config.settings().projectCommand
+	local scheme = config.settings().scheme
+	local destinations = util.filter(xcode.get_destinations(projectCommand, scheme), function(table)
+		return table.id ~= nil and (not table.name or not string.find(table.name, "^Any"))
+	end)
+
+	local destinationsName = util.select(destinations, function(table)
+		local name = table.name or ""
+		if table.platform and table.platform ~= "iOS Simulator" then
+			name = util.trim(name .. " " .. table.platform)
+		end
+		if table.platform == "macOS" and table.arch then
+			name = name .. " (" .. table.arch .. ")"
+		end
+		if table.os then
+			name = name .. " (" .. table.os .. ")"
+		end
+		if table.variant then
+			name = name .. " (" .. table.variant .. ")"
+		end
+		if table.error then
+			name = name .. " [error]"
+		end
+		return name
+	end)
+
+	M.show("Select Destination", destinationsName, function(_, index)
+		config.settings().destination = destinations[index].id
+		config.save_settings()
+
+		if callback then
+			callback()
+		end
+	end)
+end
+
 return M

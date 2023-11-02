@@ -55,6 +55,7 @@ end
 function M.find_all_swift_files()
 	local pwd = vim.api.nvim_exec2("pwd", { output = true })["output"]
 	local allFiles = vim.fn.system({ "find", pwd, "-iname", "*.swift" })
+	-- local allFiles = table.concat(vim.fn.readfile("/Users/wkulik/Desktop/tests/file_tree.txt"), "\n")
 
 	local map = {}
 
@@ -70,6 +71,7 @@ end
 
 function M.find_all_swift_files2()
 	local pwd = vim.api.nvim_exec2("pwd", { output = true })["output"]
+	-- local allFiles = table.concat(vim.fn.readfile("/Users/wkulik/Desktop/tests/file_tree.txt"), "\n")
 	local allFiles = vim.fn.system({ "find", pwd, "-iname", "*.swift" })
 
 	local map = {}
@@ -103,7 +105,7 @@ function M.merge_array(lhs, rhs)
 end
 
 function M.trim(str)
-	return string.match(str, "^%s*(.*)%s*$")
+	return string.match(str, "^%s*(.-)%s*$")
 end
 
 function M.select(tab, selector)
@@ -115,8 +117,19 @@ function M.select(tab, selector)
 	return result
 end
 
+function M.filter(tab, predicate)
+	local result = {}
+	for _, value in ipairs(tab) do
+		if predicate(value) then
+			table.insert(result, value)
+		end
+	end
+
+	return result
+end
+
 function M.hasSuffix(text, suffix)
-  return string.sub(text, -#suffix) == suffix
+	return string.sub(text, -#suffix) == suffix
 end
 
 return M

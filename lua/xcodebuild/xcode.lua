@@ -30,6 +30,36 @@ function M.get_devices(runtimeId)
 	return result
 end
 
+function M.get_destinations(projectCommand, scheme)
+	local result = {}
+	local content = util.shell("xcodebuild -showdestinations " .. projectCommand .. " -scheme " .. scheme)
+	content = vim.split(content, "\n", { plain = true })
+
+	local foundDestinations = false
+	for _, line in ipairs(content) do
+		if foundDestinations and util.trim(line) == "" then
+			break
+		elseif foundDestinations then
+			local trimmed = string.gsub(util.trim(line), ", ", "@")
+			local valuePattern = "%:%s*([^@}]-)%s*[@}]"
+			local destination = {
+				platform = string.match(trimmed, "platform" .. valuePattern),
+				variant = string.match(trimmed, "variant" .. valuePattern),
+				arch = string.match(trimmed, "arch" .. valuePattern),
+				id = string.match(trimmed, "id" .. valuePattern),
+				name = string.match(trimmed, "name" .. valuePattern),
+				os = string.match(trimmed, "OS" .. valuePattern),
+				error = string.match(trimmed, "error" .. valuePattern),
+			}
+			table.insert(result, destination)
+		elseif string.find(util.trim(line), "Available destinations") then
+			foundDestinations = true
+		end
+	end
+
+	return result
+end
+
 function M.get_schemes(projectCommand)
 	local result = {}
 	local content = util.shell("xcodebuild " .. projectCommand .. " -list")
