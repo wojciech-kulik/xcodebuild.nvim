@@ -133,7 +133,7 @@ function M.select_destination(callback)
 	local projectCommand = config.settings().projectCommand
 	local scheme = config.settings().scheme
 	local destinations = util.filter(xcode.get_destinations(projectCommand, scheme), function(table)
-		return table.id ~= nil and (not table.name or not string.find(table.name, "^Any"))
+		return table.id ~= nil and table.platform ~= "iOS" and (not table.name or not string.find(table.name, "^Any"))
 	end)
 
 	local destinationsName = util.select(destinations, function(table)
