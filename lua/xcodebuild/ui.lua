@@ -1,6 +1,14 @@
 local M = {}
 
 local util = require("xcodebuild.util")
+local appdata = require("xcodebuild.appdata")
+
+local add_summary_header = function(output)
+	table.insert(output, "-----------------------------")
+	table.insert(output, "-- xcodebuild.nvim summary --")
+	table.insert(output, "-----------------------------")
+	table.insert(output, "")
+end
 
 function M.show_progress(report, firstChunk)
 	if not next(report.tests) then
@@ -33,9 +41,9 @@ function M.show_logs(report)
 		return
 	end
 
-	vim.fn.writefile(output, "/tmp/logs.txt")
-	local prettyOutput = util.shell("cat /tmp/logs.txt | xcbeautify --disable-colored-output")
-	util.shell("rm -f /tmp/logs.txt")
+	appdata.write_original_logs(output)
+	local logs_filepath = appdata.get_original_logs_filepath()
+	local prettyOutput = util.shell("cat '" .. logs_filepath .. "' | xcbeautify --disable-colored-output")
 
 	if report.buildErrors and report.buildErrors[1] then
 		M.show_error_logs(prettyOutput, report.buildErrors)
@@ -48,6 +56,7 @@ function M.show_test_logs(report, prettyOutput)
 	local failedTestsSummary = {}
 
 	if report.failedTestsCount > 0 then
+		add_summary_header(failedTestsSummary)
 		table.insert(failedTestsSummary, "Failing Tests:")
 		for _, testsPerClass in pairs(report.tests) do
 			for _, test in ipairs(testsPerClass) do
@@ -69,47 +78,50 @@ end
 
 function M.show_error_logs(prettyOutput, buildErrors)
 	vim.print("Build Failed [" .. #buildErrors .. " error(s)]")
-	table.insert(prettyOutput, "--------------------------")
-	table.insert(prettyOutput, "")
-	table.insert(prettyOutput, "Build Errors:")
+	add_summary_header(prettyOutput)
+	table.insert(prettyOutput, "Errors:")
 	for _, error in ipairs(buildErrors) do
 		if error.filepath then
-			table.insert(
-				prettyOutput,
-				" ✖ " .. error.filepath .. ":" .. error.lineNumber .. ":" .. error.columnNumber
-			)
+			table.insert(prettyOutput, "✖ " .. error.filepath .. ":" .. error.lineNumber .. ":" .. error.columnNumber)
 		end
 
 		for index, message in ipairs(error.message) do
-			table.insert(prettyOutput, (index == 1 and not error.filepath) and " ✖ " .. message or message)
+			table.insert(prettyOutput, (index == 1 and not error.filepath) and "✖ " .. message or message)
 		end
 	end
+	table.insert(prettyOutput, "")
 
 	M.show_panel(prettyOutput)
 end
 
 function M.show_panel(lines)
-	local testBufferName = "xcode-tests.log"
+	local testBufferName = appdata.get_build_logs_filename()
 	local testBuffer = util.get_buf_by_name(testBufferName)
 
-	util.shell("mkdir -p logs")
-
 	if testBuffer and not next(vim.fn.win_findbuf(testBuffer)) then
-		vim.cmd("horizontal sb | b " .. testBuffer .. " | resize 20")
+		vim.cmd("bo split | resize 20 | b " .. testBuffer)
 	elseif not testBuffer then
 		vim.cmd("new")
 		vim.api.nvim_win_set_height(0, 20)
-		vim.api.nvim_buf_set_name(0, "logs/" .. testBufferName)
+		vim.api.nvim_buf_set_name(0, appdata.get_build_logs_filepath())
 	end
 
-	util.focus_buffer(testBuffer or 0)
-	vim.api.nvim_buf_set_lines(testBuffer or 0, 0, -1, false, lines)
+	testBuffer = testBuffer or 0
+
+	util.focus_buffer(testBuffer)
+	vim.api.nvim_buf_set_option(testBuffer, "modifiable", true)
+	vim.api.nvim_buf_set_option(testBuffer, "readonly", false)
+
+	vim.api.nvim_buf_set_lines(testBuffer, 0, -1, false, lines)
 	vim.api.nvim_win_set_cursor(0, { #lines, 0 })
+
 	vim.cmd("silent update!")
+	vim.api.nvim_buf_set_option(testBuffer, "modifiable", false)
+	vim.api.nvim_buf_set_option(testBuffer, "readonly", true)
 end
 
 function M.toggle_logs()
-	local testBufferName = "xcode-tests.log"
+	local testBufferName = appdata.get_build_logs_filename()
 	local testBuffer = util.get_buf_by_name(testBufferName, { returnNotLoaded = true })
 
 	if not testBuffer then
@@ -120,7 +132,7 @@ function M.toggle_logs()
 	if win then
 		vim.api.nvim_win_close(win, true)
 	else
-		vim.cmd("horizontal sb | b " .. testBuffer .. " | resize 20")
+		vim.cmd("bo split | resize 20 | b " .. testBuffer)
 		util.focus_buffer(testBuffer)
 	end
 end

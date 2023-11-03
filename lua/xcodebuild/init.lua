@@ -3,6 +3,7 @@ local parser = require("xcodebuild.parser")
 local util = require("xcodebuild.util")
 local config = require("xcodebuild.config")
 local xcode = require("xcodebuild.xcode")
+local appdata = require("xcodebuild.appdata")
 
 local M = {}
 local autogroup = vim.api.nvim_create_augroup("xcodebuild.nvim", { clear = true })
@@ -10,6 +11,8 @@ local testReport = {}
 
 function M.setup()
 	vim.api.nvim_create_user_command("XcodebuildSetup", function()
+		appdata.create_app_dir()
+
 		require("xcodebuild.pickers").select_project(function()
 			require("xcodebuild.pickers").select_scheme(function()
 				require("xcodebuild.pickers").select_testplan(function()
@@ -24,6 +27,7 @@ function M.setup()
 	end, { nargs = 0 })
 
 	vim.api.nvim_create_user_command("Build", function()
+		appdata.create_app_dir()
 		config.load_settings()
 		local destination = config.settings().destination
 		local projectCommand = config.settings().projectCommand
@@ -32,6 +36,7 @@ function M.setup()
 	end, { nargs = 0 })
 
 	vim.api.nvim_create_user_command("Test", function(opts)
+		appdata.create_app_dir()
 		config.load_settings()
 		local destination = config.settings().destination
 		local projectCommand = config.settings().projectCommand
@@ -56,11 +61,10 @@ function M.setup()
 				ui.set_quickfix(testReport)
 				ui.refresh_buf_diagnostics(testReport)
 			end
-			vim.fn.writefile(testReport.output, "/tmp/xctest.log")
 		end
 
 		if opts.fargs[1] == "last" then
-			local log = vim.fn.readfile("/tmp/xctest.log")
+			local log = appdata.read_original_logs()
 			parser.clear()
 			testReport = parser.parse_logs(log)
 			on_exit()
@@ -110,13 +114,19 @@ function M.setup()
 		end,
 	})
 
-	vim.api.nvim_create_autocmd({ "BufReadPost", "BufWritePost" }, {
+	vim.api.nvim_create_autocmd({ "BufReadPost" }, {
 		group = autogroup,
-		pattern = "*xcode-tests.log",
+		pattern = "*" .. appdata.get_build_logs_filename(),
 		callback = function(ev)
-			vim.api.nvim_set_option_value("filetype", "objc", { buf = ev.buf })
-			vim.api.nvim_set_option_value("wrap", false, { buf = ev.buf })
-			vim.api.nvim_set_option_value("spell", false, { buf = ev.buf })
+			local win = vim.fn.win_findbuf(ev.buf)[1]
+			vim.api.nvim_win_set_option(win, "wrap", false)
+			vim.api.nvim_win_set_option(win, "spell", false)
+			vim.api.nvim_buf_set_option(ev.buf, "filetype", "objc")
+			vim.api.nvim_buf_set_option(ev.buf, "buflisted", false)
+			vim.api.nvim_buf_set_option(ev.buf, "fileencoding", "utf-8")
+			vim.api.nvim_buf_set_option(ev.buf, "readonly", true)
+			vim.api.nvim_buf_set_option(ev.buf, "modifiable", false)
+			vim.api.nvim_buf_set_option(ev.buf, "modified", false)
 
 			vim.api.nvim_buf_set_keymap(ev.buf, "n", "q", "<cmd>close<cr>", {})
 			vim.api.nvim_buf_set_keymap(ev.buf, "n", "o", "", {
