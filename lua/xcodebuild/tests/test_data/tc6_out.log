@@ -1,0 +1,122 @@
+{
+  buildErrors = { {
+      columnNumber = 8,
+      filename = "AppAssembler",
+      filepath = "/Users/john/repositories/calendar-app-ios/DemoApp/CalendarAppDemo/AppAssembler.swift",
+      lineNumber = 9,
+      message = { "compiling for iOS 12.0, but module 'CalendarApp' has a minimum deployment target of iOS 14.0: /Users/john/Library/Developer/Xcode/DerivedData/CalendarAppDemo-gpxsuartkqsliqafuudvbkhotrhj/Build/Products/Debug-iphonesimulator/CalendarApp.swiftmodule/arm64-apple-ios-simulator.swiftmodule", "import CalendarApp", "       ^" }
+    }, {
+      columnNumber = 8,
+      filename = "AppAssembler",
+      filepath = "/Users/john/repositories/calendar-app-ios/DemoApp/CalendarAppDemo/AppAssembler.swift",
+      lineNumber = 9,
+      message = { "compiling for iOS 12.0, but module 'CalendarApp' has a minimum deployment target of iOS 14.0: /Users/john/Library/Developer/Xcode/DerivedData/CalendarAppDemo-gpxsuartkqsliqafuudvbkhotrhj/Build/Products/Debug-iphonesimulator/CalendarApp.swiftmodule/arm64-apple-ios-simulator.swiftmodule", "import CalendarApp", "       ^" }
+    }, {
+      columnNumber = 8,
+      filename = "AppAssembler",
+      filepath = "/Users/john/repositories/calendar-app-ios/DemoApp/CalendarAppDemo/AppAssembler.swift",
+      lineNumber = 9,
+      message = { "compiling for iOS 12.0, but module 'CalendarApp' has a minimum deployment target of iOS 14.0: /Users/john/Library/Developer/Xcode/DerivedData/CalendarAppDemo-gpxsuartkqsliqafuudvbkhotrhj/Build/Products/Debug-iphonesimulator/CalendarApp.swiftmodule/arm64-apple-ios-simulator.swiftmodule", "import CalendarApp", "       ^" }
+    }, {
+      columnNumber = 8,
+      filename = "AppAssembler",
+      filepath = "/Users/john/repositories/calendar-app-ios/DemoApp/CalendarAppDemo/AppAssembler.swift",
+      lineNumber = 9,
+      message = { "compiling for iOS 12.0, but module 'CalendarApp' has a minimum deployment target of iOS 14.0: /Users/john/Library/Developer/Xcode/DerivedData/CalendarAppDemo-gpxsuartkqsliqafuudvbkhotrhj/Build/Products/Debug-iphonesimulator/CalendarApp.swiftmodule/arm64-apple-ios-simulator.swiftmodule", "import CalendarApp", "       ^" }
+    }, {
+      columnNumber = 8,
+      filename = "AppAssembler",
+      filepath = "/Users/john/repositories/calendar-app-ios/DemoApp/CalendarAppDemo/AppAssembler.swift",
+      lineNumber = 9,
+      message = { "compiling for iOS 12.0, but module 'CalendarApp' has a minimum deployment target of iOS 14.0: /Users/john/Library/Developer/Xcode/DerivedData/CalendarAppDemo-gpxsuartkqsliqafuudvbkhotrhj/Build/Products/Debug-iphonesimulator/CalendarApp.swiftmodule/arm64-apple-ios-simulator.swiftmodule", "import CalendarApp", "       ^" }
+    }, {
+      columnNumber = 8,
+      filename = "AppAssembler",
+      filepath = "/Users/john/repositories/calendar-app-ios/DemoApp/CalendarAppDemo/AppAssembler.swift",
+      lineNumber = 9,
+      message = { "compiling for iOS 12.0, but module 'CalendarApp' has a minimum deployment target of iOS 14.0: /Users/john/Library/Developer/Xcode/DerivedData/CalendarAppDemo-gpxsuartkqsliqafuudvbkhotrhj/Build/Products/Debug-iphonesimulator/CalendarApp.swiftmodule/arm64-apple-ios-simulator.swiftmodule", "import CalendarApp", "       ^" }
+    }, {
+      columnNumber = 8,
+      filename = "AppAssembler",
+      filepath = "/Users/john/repositories/calendar-app-ios/DemoApp/CalendarAppDemo/AppAssembler.swift",
+      lineNumber = 9,
+      message = { "compiling for iOS 12.0, but module 'CalendarApp' has a minimum deployment target of iOS 14.0: /Users/john/Library/Developer/Xcode/DerivedData/CalendarAppDemo-gpxsuartkqsliqafuudvbkhotrhj/Build/Products/Debug-iphonesimulator/CalendarApp.swiftmodule/arm64-apple-ios-simulator.swiftmodule", "import CalendarApp", "       ^" }
+    }, {
+      columnNumber = 8,
+      filename = "AppAssembler",
+      filepath = "/Users/john/repositories/calendar-app-ios/DemoApp/CalendarAppDemo/AppAssembler.swift",
+      lineNumber = 9,
+      message = { "compiling for iOS 12.0, but module 'CalendarApp' has a minimum deployment target of iOS 14.0: /Users/john/Library/Developer/Xcode/DerivedData/CalendarAppDemo-gpxsuartkqsliqafuudvbkhotrhj/Build/Products/Debug-iphonesimulator/CalendarApp.swiftmodule/arm64-apple-ios-simulator.swiftmodule", "import CalendarApp", "       ^" }
+    }, {
+      columnNumber = 8,
+      filename = "AppAssembler",
+      filepath = "/Users/john/repositories/calendar-app-ios/DemoApp/CalendarAppDemo/AppAssembler.swift",
+      lineNumber = 9,
+      message = { "compiling for iOS 12.0, but module 'CalendarApp' has a minimum deployment target of iOS 14.0: /Users/john/Library/Developer/Xcode/DerivedData/CalendarAppDemo-gpxsuartkqsliqafuudvbkhotrhj/Build/Products/Debug-iphonesimulator/CalendarApp.swiftmodule/arm64-apple-ios-simulator.swiftmodule", "import CalendarApp", "       ^" }
+    }, {
+      columnNumber = 8,
+      filename = "AppAssembler",
+      filepath = "/Users/john/repositories/calendar-app-ios/DemoApp/CalendarAppDemo/AppAssembler.swift",
+      lineNumber = 9,
+      message = { "compiling for iOS 12.0, but module 'CalendarApp' has a minimum deployment target of iOS 14.0: /Users/john/Library/Developer/Xcode/DerivedData/CalendarAppDemo-gpxsuartkqsliqafuudvbkhotrhj/Build/Products/Debug-iphonesimulator/CalendarApp.swiftmodule/arm64-apple-ios-simulator.swiftmodule", "import CalendarApp", "       ^" }
+    }, {
+      columnNumber = 8,
+      filename = "AppAssembler",
+      filepath = "/Users/john/repositories/calendar-app-ios/DemoApp/CalendarAppDemo/AppAssembler.swift",
+      lineNumber = 9,
+      message = { "compiling for iOS 12.0, but module 'CalendarApp' has a minimum deployment target of iOS 14.0: /Users/john/Library/Developer/Xcode/DerivedData/CalendarAppDemo-gpxsuartkqsliqafuudvbkhotrhj/Build/Products/Debug-iphonesimulator/CalendarApp.swiftmodule/arm64-apple-ios-simulator.swiftmodule", "import CalendarApp", "       ^" }
+    }, {
+      columnNumber = 8,
+      filename = "AppAssembler",
+      filepath = "/Users/john/repositories/calendar-app-ios/DemoApp/CalendarAppDemo/AppAssembler.swift",
+      lineNumber = 9,
+      message = { "compiling for iOS 12.0, but module 'CalendarApp' has a minimum deployment target of iOS 14.0: /Users/john/Library/Developer/Xcode/DerivedData/CalendarAppDemo-gpxsuartkqsliqafuudvbkhotrhj/Build/Products/Debug-iphonesimulator/CalendarApp.swiftmodule/arm64-apple-ios-simulator.swiftmodule", "import CalendarApp", "       ^" }
+    }, {
+      columnNumber = 8,
+      filename = "AppAssembler",
+      filepath = "/Users/john/repositories/calendar-app-ios/DemoApp/CalendarAppDemo/AppAssembler.swift",
+      lineNumber = 9,
+      message = { "compiling for iOS 12.0, but module 'CalendarApp' has a minimum deployment target of iOS 14.0: /Users/john/Library/Developer/Xcode/DerivedData/CalendarAppDemo-gpxsuartkqsliqafuudvbkhotrhj/Build/Products/Debug-iphonesimulator/CalendarApp.swiftmodule/arm64-apple-ios-simulator.swiftmodule", "import CalendarApp", "       ^" }
+    }, {
+      columnNumber = 8,
+      filename = "AppAssembler",
+      filepath = "/Users/john/repositories/calendar-app-ios/DemoApp/CalendarAppDemo/AppAssembler.swift",
+      lineNumber = 9,
+      message = { "compiling for iOS 12.0, but module 'CalendarApp' has a minimum deployment target of iOS 14.0: /Users/john/Library/Developer/Xcode/DerivedData/CalendarAppDemo-gpxsuartkqsliqafuudvbkhotrhj/Build/Products/Debug-iphonesimulator/CalendarApp.swiftmodule/arm64-apple-ios-simulator.swiftmodule", "import CalendarApp", "       ^" }
+    }, {
+      columnNumber = 8,
+      filename = "AppAssembler",
+      filepath = "/Users/john/repositories/calendar-app-ios/DemoApp/CalendarAppDemo/AppAssembler.swift",
+      lineNumber = 9,
+      message = { "compiling for iOS 12.0, but module 'CalendarApp' has a minimum deployment target of iOS 14.0: /Users/john/Library/Developer/Xcode/DerivedData/CalendarAppDemo-gpxsuartkqsliqafuudvbkhotrhj/Build/Products/Debug-iphonesimulator/CalendarApp.swiftmodule/arm64-apple-ios-simulator.swiftmodule", "import CalendarApp", "       ^" }
+    }, {
+      columnNumber = 8,
+      filename = "AppAssembler",
+      filepath = "/Users/john/repositories/calendar-app-ios/DemoApp/CalendarAppDemo/AppAssembler.swift",
+      lineNumber = 9,
+      message = { "compiling for iOS 12.0, but module 'CalendarApp' has a minimum deployment target of iOS 14.0: /Users/john/Library/Developer/Xcode/DerivedData/CalendarAppDemo-gpxsuartkqsliqafuudvbkhotrhj/Build/Products/Debug-iphonesimulator/CalendarApp.swiftmodule/arm64-apple-ios-simulator.swiftmodule", "import CalendarApp", "       ^" }
+    }, {
+      columnNumber = 8,
+      filename = "AppAssembler",
+      filepath = "/Users/john/repositories/calendar-app-ios/DemoApp/CalendarAppDemo/AppAssembler.swift",
+      lineNumber = 9,
+      message = { "compiling for iOS 12.0, but module 'CalendarApp' has a minimum deployment target of iOS 14.0: /Users/john/Library/Developer/Xcode/DerivedData/CalendarAppDemo-gpxsuartkqsliqafuudvbkhotrhj/Build/Products/Debug-iphonesimulator/CalendarApp.swiftmodule/arm64-apple-ios-simulator.swiftmodule", "import CalendarApp", "       ^" }
+    }, {
+      columnNumber = 8,
+      filename = "AppAssembler",
+      filepath = "/Users/john/repositories/calendar-app-ios/DemoApp/CalendarAppDemo/AppAssembler.swift",
+      lineNumber = 9,
+      message = { "compiling for iOS 12.0, but module 'CalendarApp' has a minimum deployment target of iOS 14.0: /Users/john/Library/Developer/Xcode/DerivedData/CalendarAppDemo-gpxsuartkqsliqafuudvbkhotrhj/Build/Products/Debug-iphonesimulator/CalendarApp.swiftmodule/arm64-apple-ios-simulator.swiftmodule", "import CalendarApp", "       ^" }
+    }, {
+      columnNumber = 8,
+      filename = "AppAssembler",
+      filepath = "/Users/john/repositories/calendar-app-ios/DemoApp/CalendarAppDemo/AppAssembler.swift",
+      lineNumber = 9,
+      message = { "compiling for iOS 12.0, but module 'CalendarApp' has a minimum deployment target of iOS 14.0: /Users/john/Library/Developer/Xcode/DerivedData/CalendarAppDemo-gpxsuartkqsliqafuudvbkhotrhj/Build/Products/Debug-iphonesimulator/CalendarApp.swiftmodule/arm64-apple-ios-simulator.swiftmodule", "import CalendarApp", "       ^" }
+    } },
+  diagnostics = {},
+  failedTestsCount = 0,
+  output = {},
+  tests = {},
+  testsCount = 0
+}

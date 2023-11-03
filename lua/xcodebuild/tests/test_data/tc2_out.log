@@ -1,0 +1,20 @@
+{
+  buildErrors = { {
+      columnNumber = 11,
+      filename = "WindowController",
+      filepath = "/Users/john/repositories/calendar-app-ios/DemoApp/CalendarAppDemo/Helpers/WindowController.swift",
+      lineNumber = 42,
+      message = { "'WindowController' is only available in iOS 15 or newer", "extension WindowController: WindowControllerProtocol {", "          ^" }
+    }, {
+      columnNumber = 11,
+      filename = "WindowController",
+      filepath = "/Users/john/repositories/calendar-app-ios/DemoApp/CalendarAppDemo/Helpers/WindowController.swift",
+      lineNumber = 51,
+      message = { "'WindowController' is only available in iOS 15 or newer", "extension WindowController: DebugMenuDelegate {", "          ^" }
+    } },
+  diagnostics = {},
+  failedTestsCount = 0,
+  output = {},
+  tests = {},
+  testsCount = 0
+}

@@ -1,0 +1,11 @@
+{
+  buildErrors = { {
+      message = { "Could not resolve package dependencies:", "  Dependencies could not be resolved because no versions of 'swinjectautoregistration' match the requirement 20.8.3..<21.0.0 and 'calendarcalendarcore' depends on 'swinjectautoregistration' 20.8.3..<21.0.0." },
+      source = "xcodebuild"
+    } },
+  diagnostics = {},
+  failedTestsCount = 0,
+  output = {},
+  tests = {},
+  testsCount = 0
+}

@@ -1,0 +1,178 @@
+Command line invocation:
+    
+/Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild test -scheme CalendarAppDemo -destination id=4023268C-E64B-42D1-A373-71EF93A3E7CC -project DemoApp/CalendarAppDemo.xcodeproj -testPlan EventTests
+
+User defaults from command line:
+    IDEPackageSupportUseBuiltinSCM = YES
+
+Resolve Package Graph
+
+
+Updating from git@github.com:InnovationsCompany/CalendarUI.git
+
+
+
+Updating from https://github.com/pointfreeco/swift-snapshot-testing.git
+
+Updating from https://github.com/google/GoogleUtilities.git
+
+
+Updating from https://github.com/zendesk/core_sdk_ios
+
+
+
+Updating from git@github.com:InnovationsCompany/FlagKit.git
+
+Updating from https://github.com/google/gtm-session-fetcher.git
+
+
+Updating from https://github.com/zendesk/chat_sdk_ios
+
+
+Updating from https://github.com/firebase/leveldb.git
+
+Updating from https://github.com/zendesk/messagingapi_sdk_ios
+
+
+
+Updating from git@github.com:InnovationsCompany/CalendarNetworking.git
+
+
+Updating from git@github.com:InnovationsCompany/CalendarLinkHandler-iOS.git
+
+Updating from https://github.com/google/interop-ios-for-google-sdks.git
+
+
+Updating from https://github.com/zendesk/support_providers_sdk_ios
+
+
+
+Updating from git@github.com:InnovationsCompany/CalendarAnalytics-iOS.git
+
+Updating from https://github.com/zendesk/messaging_sdk_ios
+
+
+Updating from https://github.com/google/grpc-binary.git
+
+
+Updating from https://github.com/zendesk/chat_providers_sdk_ios
+
+Updating from https://github.com/firebase/nanopb.git
+
+Updating from https://github.com/firebase/firebase-ios-sdk
+
+Updating from https://github.com/apple/swift-syntax.git
+
+Updating from https://github.com/Swinject/Swinject.git
+
+Updating from https://github.com/stripe/stripe-ios.git
+
+Updating from https://github.com/google/abseil-cpp-binary.git
+
+Updating from https://github.com/zendesk/commonui_sdk_ios
+
+Updating from https://github.com/onevcat/Kingfisher
+
+Updating from https://github.com/zendesk/support_sdk_ios
+
+Updating from https://github.com/apple/swift-protobuf.git
+
+Updating from https://github.com/google/GoogleAppMeasurement.git
+
+Updating from https://github.com/zendesk/sdkconfigurations_sdk_ios
+
+Updating from https://github.com/Swinject/SwinjectAutoregistration.git
+
+Updating from https://github.com/google/GoogleDataTransport.git
+
+Updating from https://github.com/google/promises.git
+
+Updating from https://github.com/krzysztofzablocki/Difference.git
+
+Updating from https://github.com/marmelroy/PhoneNumberKit.git
+
+
+Updating from git@github.com:InnovationsCompany/CalendarPayment-iOS.git
+
+
+
+Updating from https://github.com/kasketis/netfox
+
+
+
+
+Resolved source packages:
+
+  PhoneNumberKit: https://github.com/marmelroy/PhoneNumberKit.git @ 3.7.4
+  gRPC: https://github.com/google/grpc-binary.git @ 1.49.1
+  WKLTestUtils: /Users/john/repositories/calendar-app-ios/CalendarAppSDK/PlatformFoundation/WKLTestUtils
+  CalendarAppSend: /Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppSend
+  CalendarUI: git@github.com:InnovationsCompany/CalendarUI.git @ 1.3.0
+  GoogleUtilities: https://github.com/google/GoogleUtilities.git @ 7.11.5
+  Difference: https://github.com/krzysztofzablocki/Difference.git @ 1.0.2
+  CalendarAppStorybook: /Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppStorybook
+  ZendeskMessagingAPISDK: https://github.com/zendesk/messagingapi_sdk_ios @ 5.0.0
+  CalendarAppBusinessLogic: /Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppBusinessLogic
+  CalendarAppDeeplinks: /Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppDeeplinks
+  SwinjectAutoregistration: https://github.com/Swinject/SwinjectAutoregistration.git @ 2.8.3
+  CalendarAppEventCode: /Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppEventCode
+  WKLExtensions: /Users/john/repositories/calendar-app-ios/CalendarAppSDK/PlatformFoundation/WKLExtensions
+  GoogleDataTransport: https://github.com/google/GoogleDataTransport.git @ 9.2.5
+  ZendeskChatProvidersSDK: https://github.com/zendesk/chat_providers_sdk_ios @ 4.0.1
+  leveldb: https://github.com/firebase/leveldb.git @ 1.22.2
+  CalendarLinkHandler: git@github.com:InnovationsCompany/CalendarLinkHandler-iOS.git @ 1.0.0
+  SwiftProtobuf: https://github.com/apple/swift-protobuf.git @ 1.24.0
+  GTMSessionFetcher: https://github.com/google/gtm-session-fetcher.git @ 3.1.1
+  CalendarAppNotifications: /Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppNotifications
+  netfox: https://github.com/kasketis/netfox @ 1.21.0
+  CalendarAppMenu: /Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppMenu
+  CalendarAppCreate: /Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate
+  Firebase: https://github.com/firebase/firebase-ios-sdk @ 10.16.0
+  CalendarAppTestMocks: /Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppTestMocks
+  CalendarPayment: git@github.com:InnovationsCompany/CalendarPayment-iOS.git @ 1.2.0
+  CalendarNetworking: git@github.com:InnovationsCompany/CalendarNetworking.git @ 0.7.0
+  CalendarAppDesignSystem: /Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppDesignSystem
+  ZendeskSupportSDK: https://github.com/zendesk/support_sdk_ios @ 7.0.0
+  ZendeskCoreSDK: https://github.com/zendesk/core_sdk_ios @ 4.0.0
+  ZendeskSDKConfigurationsSDK: https://github.com/zendesk/sdkconfigurations_sdk_ios @ 3.0.0
+  Stripe: https://github.com/stripe/stripe-ios.git @ 22.8.4
+  FlagKit: git@github.com:InnovationsCompany/FlagKit.git @ 2.5.0
+  ZendeskChatSDK: https://github.com/zendesk/chat_sdk_ios @ 4.0.1
+  CalendarAnalytics: git@github.com:InnovationsCompany/CalendarAnalytics-iOS.git @ 1.2.3
+  WKLNetworking: /Users/john/repositories/calendar-app-ios/CalendarAppSDK/PlatformFoundation/WKLNetworking
+  WKLLogger: /Users/john/repositories/calendar-app-ios/CalendarAppSDK/PlatformFoundation/WKLLogger
+  Promises: https://github.com/google/promises.git @ 2.3.1
+  InteropForGoogle: https://github.com/google/interop-ios-for-google-sdks.git @ 100.0.0
+  CalendarAppUser: /Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppUser
+  CalendarAppNotesHistory: /Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppNotesHistory
+  CalendarAppTerms: /Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppTerms
+  abseil: https://github.com/google/abseil-cpp-binary.git @ 1.2022062300.0
+  ZendeskMessagingSDK: https://github.com/zendesk/messaging_sdk_ios @ 5.0.0
+  Kingfisher: https://github.com/onevcat/Kingfisher @ 7.9.1
+  swift-snapshot-testing: https://github.com/pointfreeco/swift-snapshot-testing.git @ 1.14.1
+  CalendarAppHome: /Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppHome
+  CalendarAppOnboarding: /Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppOnboarding
+  CalendarAppCustomerSupport: /Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCustomerSupport
+  CalendarAppNetworking: /Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppNetworking
+  Swinject: https://github.com/Swinject/Swinject.git @ 2.8.4
+  CalendarAppCore: /Users/john/repositories/calendar-app-ios/CalendarAppSDK/Core/CalendarAppCore
+  CalendarApp: /Users/john/repositories/calendar-app-ios/CalendarAppSDK/CalendarApp
+  CalendarAppResources: /Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/Shared/CalendarAppResources
+  GoogleAppMeasurement: https://github.com/google/GoogleAppMeasurement.git @ 10.16.0
+  CalendarAppAnalytics: /Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/Shared/CalendarAppAnalytics
+  swift-syntax: https://github.com/apple/swift-syntax.git @ 509.0.0
+  nanopb: https://github.com/firebase/nanopb.git @ 2.30909.0
+  WKLUtils: /Users/john/repositories/calendar-app-ios/CalendarAppSDK/PlatformFoundation/WKLUtils
+  ZendeskCommonUISDK: https://github.com/zendesk/commonui_sdk_ios @ 8.0.0
+  WKLDebugMenu: /Users/john/repositories/calendar-app-ios/DemoApp/ExternalDependencies/WKLDebugMenu
+  ZendeskSupportProvidersSDK: https://github.com/zendesk/support_providers_sdk_ios @ 7.0.0
+
+
+2023-10-31 18:28:04.386 xcodebuild[76912:12819493] Writing error result bundle to /var/folders/c3/fn8391xj715ccg2w6bcv8s8w0000gn/T/ResultBundle_2023-31-10_18-28-0004.xcresult
+
+xcodebuild: error: Could not resolve package dependencies:
+  Dependencies could not be resolved because no versions of 'swinjectautoregistration' match the requirement 20.8.3..<21.0.0 and 'calendarcalendarcore' depends on 'swinjectautoregistration' 20.8.3..<21.0.0.
+
+
+
+

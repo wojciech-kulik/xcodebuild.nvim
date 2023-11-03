@@ -1,0 +1,10 @@
+{
+  buildErrors = { {
+      message = { "unable to read property list from file: /Users/john/repositories/calendar-app-ios/DemoApp/CalendarAppDemo/Resources/Info.plist: The operation couldn’t be completed. (XCBUtil.PropertyListConversionError error 2.) (in target 'CalendarAppDemo' from project 'CalendarAppDemo')" }
+    } },
+  diagnostics = {},
+  failedTestsCount = 0,
+  output = {},
+  tests = {},
+  testsCount = 0
+}

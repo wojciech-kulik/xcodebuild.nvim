@@ -40,3 +40,4 @@ luac.out
 *.hex
 
 .DS_Store
+lua/xcodebuild/tests/test_data/*.vim

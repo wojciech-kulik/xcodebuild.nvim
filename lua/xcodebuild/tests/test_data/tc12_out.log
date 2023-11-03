@@ -1,0 +1,22 @@
+{
+  buildErrors = {},
+  diagnostics = {},
+  failedTestsCount = 0,
+  output = {},
+  tests = {
+    ShortcutRecorderCrashTests = { {
+        class = "ShortcutRecorderCrashTests",
+        name = "testExample",
+        success = true,
+        testResult = "passed",
+        time = "0.001 seconds"
+      }, {
+        class = "ShortcutRecorderCrashTests",
+        name = "testPerformanceExample",
+        success = true,
+        testResult = "passed",
+        time = "0.535 seconds"
+      } }
+  },
+  testsCount = 2
+}

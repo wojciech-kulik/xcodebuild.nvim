@@ -1,0 +1,65 @@
+{
+  buildErrors = {},
+  diagnostics = {},
+  failedTestsCount = 6,
+  output = {},
+  tests = {
+    ShortcutRecorderCrashTests = { {
+        class = "ShortcutRecorderCrashTests",
+        message = { "Failed" },
+        name = "testCrash",
+        success = false,
+        testResult = "failed",
+        time = "0.000 seconds"
+      }, {
+        class = "ShortcutRecorderCrashTests",
+        message = { "Failed" },
+        name = "testExample",
+        success = false,
+        testResult = "failed",
+        time = "0.109 seconds"
+      }, {
+        class = "ShortcutRecorderCrashTests",
+        message = { "Failed" },
+        name = "testFail",
+        success = false,
+        testResult = "failed",
+        time = "0.001 seconds"
+      }, {
+        class = "ShortcutRecorderCrashTests",
+        name = "testOK",
+        success = true,
+        testResult = "passed",
+        time = "0.000 seconds"
+      } },
+    ViewModelTests = { {
+        class = "ViewModelTests",
+        message = { "Failed" },
+        name = "testSomething_ShouldCrash",
+        success = false,
+        testResult = "failed",
+        time = "0.000 seconds"
+      }, {
+        class = "ViewModelTests",
+        message = { "Failed" },
+        name = "testSomething_ShouldFail",
+        success = false,
+        testResult = "failed",
+        time = "0.105 seconds"
+      }, {
+        class = "ViewModelTests",
+        name = "testSomething_ShouldPass",
+        success = true,
+        testResult = "passed",
+        time = "0.000 seconds"
+      }, {
+        class = "ViewModelTests",
+        message = { "Failed" },
+        name = "testSomething_ShouldReturnFail",
+        success = false,
+        testResult = "failed",
+        time = "0.001 seconds"
+      } }
+  },
+  testsCount = 8
+}

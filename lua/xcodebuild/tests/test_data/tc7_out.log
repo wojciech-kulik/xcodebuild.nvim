@@ -1,0 +1,14 @@
+{
+  buildErrors = { {
+      columnNumber = 21,
+      filename = "SceneDelegate",
+      filepath = "/Users/john/repositories/calendar-app-ios/DemoApp/CalendarAppDemo/SceneDelegate.swift",
+      lineNumber = 27,
+      message = { "Force Try Violation: Force tries should be avoided (force_try)" }
+    } },
+  diagnostics = {},
+  failedTestsCount = 0,
+  output = {},
+  tests = {},
+  testsCount = 0
+}

@@ -1,0 +1,14 @@
+{
+  buildErrors = { {
+      columnNumber = 19,
+      filename = "EventCodeConfirmViewModel",
+      filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppEventCode/Sources/Modules/EventCodeConfirm/EventCodeConfirmViewModel.swift",
+      lineNumber = 73,
+      message = { "type 'AsyncStatus<()>' has no member 'inProgresss'", "        status = .inProgresss", "                 ~^~~~~~~~~~~" }
+    } },
+  diagnostics = {},
+  failedTestsCount = 0,
+  output = {},
+  tests = {},
+  testsCount = 0
+}
