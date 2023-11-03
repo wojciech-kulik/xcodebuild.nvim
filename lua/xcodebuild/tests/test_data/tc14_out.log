@@ -1,0 +1,21 @@
+{
+  buildErrors = {},
+  diagnostics = {},
+  failedTestsCount = 0,
+  output = {},
+  tests = {},
+  testsCount = 0,
+  warnings = { {
+      columnNumber = 13,
+      filename = "MainViewModel",
+      filepath = "/Users/john/repositories/calendar-app-ios/DemoApp/CalendarEventDemo/Modules/Main/MainViewModel.swift",
+      lineNumber = 41,
+      message = { "initialization of immutable value 'a' was never used; consider replacing with assignment to '_' or removing it", '        let a = ""', "        ~~~~^" }
+    }, {
+      columnNumber = 21,
+      filename = "MainViewModel",
+      filepath = "/Users/john/repositories/calendar-app-ios/DemoApp/CalendarEventDemo/Modules/Main/MainViewModel.swift",
+      lineNumber = 57,
+      message = { "string interpolation produces a debug description for an optional value; did you mean to make this explicit?", '        print("aa \\(b)")', "                    ^" }
+    } }
+}

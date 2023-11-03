@@ -1,16 +1,22 @@
 local assert = require("luassert")
 local parser = require("xcodebuild.parser")
 local cwd = vim.fn.getcwd()
+local recordSnapshots = false
 
 local mockSwiftFiles = function()
 	local filetree = table.concat(vim.fn.readfile(cwd .. "/lua/xcodebuild/tests/test_data/file_tree.txt"), "\n")
 	vim.fn.system = function()
 		return filetree
 	end
+
+	vim.fn.getcwd = function()
+		return "/Users/john/repositories/calendar-app-ios"
+	end
 end
 
 local runTestCase = function(caseId)
-	local expectedResult = vim.fn.readfile(cwd .. "/lua/xcodebuild/tests/test_data/tc" .. caseId .. "_out.log")
+	local expectedResultPath = cwd .. "/lua/xcodebuild/tests/test_data/tc" .. caseId .. "_out.log"
+	local exists, expectedResult = pcall(vim.fn.readfile, expectedResultPath)
 	local log = vim.fn.readfile(cwd .. "/lua/xcodebuild/tests/test_data/tc" .. caseId .. ".log")
 	mockSwiftFiles()
 	parser.clear()
@@ -18,6 +24,10 @@ local runTestCase = function(caseId)
 	local testReport = parser.parse_logs(log)
 	testReport.output = {}
 	local result = vim.split(vim.inspect(testReport), "\n", { plain = true })
+
+	if recordSnapshots or not exists then
+		vim.fn.writefile(result, expectedResultPath)
+	end
 
 	return expectedResult, result
 end
@@ -41,6 +51,11 @@ describe("ensure xcodebuild logs are processed correctly", function()
 			local expectedResult, result = runTestCase(10)
 			assert.are.same(expectedResult, result)
 		end)
+
+		it("should set 2 warnings and 2 tests failed", function()
+			local expectedResult, result = runTestCase(15)
+			assert.are.same(expectedResult, result)
+		end)
 	end)
 
 	--
@@ -55,6 +70,23 @@ describe("ensure xcodebuild logs are processed correctly", function()
 		it("should fill 3 diagnostics & set fail lineNumber at test header", function()
 			local expectedResult, result = runTestCase(4)
 			assert.are.same(expectedResult, result)
+		end)
+	end)
+
+	--
+	-- build succeeded
+	--
+	describe("when build passed", function()
+		describe("when warnings are available", function()
+			it("should set 3 warnings", function()
+				local expectedResult, result = runTestCase(13)
+				assert.are.same(expectedResult, result)
+			end)
+
+			it("should set 2 warnings", function()
+				local expectedResult, result = runTestCase(14)
+				assert.are.same(expectedResult, result)
+			end)
 		end)
 	end)
 

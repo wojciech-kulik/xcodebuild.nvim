@@ -3094,5 +3094,6 @@
         time = "0.065 seconds"
       } }
   },
-  testsCount = 377
+  testsCount = 377,
+  warnings = {}
 }

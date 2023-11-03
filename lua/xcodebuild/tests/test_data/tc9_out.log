@@ -7,5 +7,6 @@
   failedTestsCount = 0,
   output = {},
   tests = {},
-  testsCount = 0
+  testsCount = 0,
+  warnings = {}
 }

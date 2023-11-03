@@ -38,11 +38,16 @@ function M.show_logs(report, isTesting)
 	local logs_filepath = appdata.get_original_logs_filepath()
 	local prettyOutput = util.shell("cat '" .. logs_filepath .. "' | xcbeautify --disable-colored-output")
 
+	add_summary_header(prettyOutput)
+	M.show_warnings(prettyOutput, report.warnings)
+
 	if report.buildErrors and report.buildErrors[1] then
 		M.show_errors(prettyOutput, report.buildErrors)
 	elseif isTesting then
 		M.show_test_results(report, prettyOutput)
 	else
+		table.insert(prettyOutput, "  ✔ Build Succeeded")
+		table.insert(prettyOutput, "")
 		M.show_panel(prettyOutput)
 	end
 end
@@ -53,7 +58,6 @@ function M.show_test_results(report, prettyOutput)
 	local failedTestsSummary = {}
 
 	if report.failedTestsCount > 0 then
-		add_summary_header(failedTestsSummary)
 		table.insert(failedTestsSummary, "Failing Tests:")
 		for _, testsPerClass in pairs(report.tests) do
 			for _, test in ipairs(testsPerClass) do
@@ -73,10 +77,36 @@ function M.show_test_results(report, prettyOutput)
 	M.show_panel(summary)
 end
 
+function M.show_warnings(prettyOutput, warnings)
+	if not warnings or not next(warnings) then
+		return
+	end
+
+	table.insert(prettyOutput, "Warnings:")
+
+	for _, warning in ipairs(warnings) do
+		if warning.filepath then
+			table.insert(
+				prettyOutput,
+				"   " .. warning.filepath .. ":" .. warning.lineNumber .. ":" .. (warning.columnNumber or 0)
+			)
+		end
+
+		for index, message in ipairs(warning.message) do
+			table.insert(
+				prettyOutput,
+				(index == 1 and not warning.filepath) and "   " .. message or "    " .. message
+			)
+		end
+	end
+
+	table.insert(prettyOutput, "")
+end
+
 function M.show_errors(prettyOutput, buildErrors)
 	vim.print("Build Failed [" .. #buildErrors .. " error(s)]")
-	add_summary_header(prettyOutput)
 	table.insert(prettyOutput, "Errors:")
+
 	for _, error in ipairs(buildErrors) do
 		if error.filepath then
 			table.insert(

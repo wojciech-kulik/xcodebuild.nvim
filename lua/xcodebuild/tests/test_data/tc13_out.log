@@ -1,0 +1,27 @@
+{
+  buildErrors = {},
+  diagnostics = {},
+  failedTestsCount = 0,
+  output = {},
+  tests = {},
+  testsCount = 0,
+  warnings = { {
+      columnNumber = 1,
+      filename = "MainViewModel",
+      filepath = "/Users/john/repositories/calendar-app-ios/DemoApp/CalendarEventDemo/Modules/Main/MainViewModel.swift",
+      lineNumber = 54,
+      message = { "Vertical Whitespace Violation: Limit vertical whitespace to a single empty line; currently 2 (vertical_whitespace)" }
+    }, {
+      columnNumber = 1,
+      filename = "MainViewModel",
+      filepath = "/Users/john/repositories/calendar-app-ios/DemoApp/CalendarEventDemo/Modules/Main/MainViewModel.swift",
+      lineNumber = 54,
+      message = { "(consecutiveBlankLines) Replace consecutive blank lines with a single blank line." }
+    }, {
+      columnNumber = 1,
+      filename = "MainViewModel",
+      filepath = "/Users/john/repositories/calendar-app-ios/DemoApp/CalendarEventDemo/Modules/Main/MainViewModel.swift",
+      lineNumber = 54,
+      message = { "(indent) Indent code in accordance with the scope level.", "SwiftFormat completed in 0.2s.", "Source input did not pass lint check.", "1/747 files require formatting, 4 files skipped." }
+    } }
+}

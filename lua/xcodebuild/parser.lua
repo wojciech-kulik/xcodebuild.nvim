@@ -7,6 +7,7 @@ local BEGIN = "BEGIN"
 local TEST_START = "TEST_START"
 local TEST_ERROR = "TEST_ERROR"
 local BUILD_ERROR = "BUILD_ERROR"
+local BUILD_WARNING = "BUILD_WARNING"
 
 -- temp fields
 local allSwiftFiles = {}
@@ -20,6 +21,7 @@ local tests = {}
 local failedTestsCount = 0
 local output = {}
 local buildErrors = {}
+local warnings = {}
 local diagnostics = {}
 
 local flush_test = function(message)
@@ -44,6 +46,16 @@ local flush_error = function(line)
 	lineData = {}
 end
 
+local flush_warning = function(line)
+	if line then
+		table.insert(lineData.message, line)
+	end
+
+	table.insert(warnings, lineData)
+	lineType = BEGIN
+	lineData = {}
+end
+
 local flush_diagnostic = function(filepath, filename, lineNumber)
 	table.insert(diagnostics, {
 		filepath = filepath,
@@ -51,6 +63,16 @@ local flush_diagnostic = function(filepath, filename, lineNumber)
 		lineNumber = lineNumber,
 		message = lineData.message,
 	})
+end
+
+local flush = function(line)
+	if lineType == BUILD_ERROR then
+		flush_error(line)
+	elseif lineType == BUILD_WARNING then
+		flush_warning(line)
+	elseif lineType == TEST_ERROR then
+		flush_test(line)
+	end
 end
 
 local sanitize = function(message)
@@ -121,6 +143,20 @@ local parse_test_error = function(line)
 	end
 end
 
+local parse_warning = function(line)
+	local filepath, lineNumber, columnNumber, message =
+		string.match(line, "([^%s]*%.swift)%:(%d+)%:(%d*)%:? %w*%s*warning%: (.*)")
+
+	if filepath and message and util.hasPrefix(filepath, vim.fn.getcwd()) then
+		lineType = BUILD_WARNING
+		lineData.filepath = filepath
+		lineData.filename = util.get_filename(filepath)
+		lineData.message = { message }
+		lineData.lineNumber = tonumber(lineNumber) or 0
+		lineData.columnNumber = tonumber(columnNumber) or 0
+	end
+end
+
 local parse_test_finished = function(line)
 	if string.find(line, "^Test Case .*.%-") then
 		local testResult, time = string.match(line, "^Test Case .*.%-%[%w+%.%w+ %g+%]. (%w+)% %((.*)%)%.")
@@ -184,6 +220,7 @@ local process_line = function(line)
 
 	-- POSSIBLE PATHS:
 	-- BEGIN -> BUILD_ERROR -> BEGIN
+	-- BEGIN -> BUILD_WARNING -> BEGIN
 	-- BEGIN -> TEST_START -> passed -> BEGIN
 	-- BEGIN -> TEST_START -> TEST_ERROR -> (failed) -> BEGIN
 
@@ -192,26 +229,22 @@ local process_line = function(line)
 	elseif string.find(line, "^Test [Cc]ase.*passed") or string.find(line, "^Test [Cc]ase.*failed") then
 		parse_test_finished(line)
 	elseif string.find(line, "error%:") then
-		if lineType == BUILD_ERROR then
-			flush_error()
-		end
-
+		flush()
 		if lineType == TEST_START then
 			parse_test_error(line)
 		elseif testsCount == 0 and lineType == BEGIN then
 			parse_build_error(line)
 		end
-	elseif lineType == BUILD_ERROR and string.find(line, "^%s*$") then
-		flush_error()
-	elseif lineType == TEST_ERROR and string.find(line, "^%s*$") then
-		flush_test()
-	elseif lineType == BUILD_ERROR and (string.find(line, "^Linting") or string.find(line, "^note%:")) then
-		flush_error()
-	elseif lineType == BUILD_ERROR and string.find(line, "%s*~*%^~*%s*") then
-		flush_error(line)
-	elseif lineType == TEST_ERROR and string.find(line, "%s*~*%^~*%s*") then
-		flush_test(line)
-	elseif lineType == TEST_ERROR or lineType == BUILD_ERROR then
+	elseif string.find(line, "warning%:") then
+		flush()
+		parse_warning(line)
+	elseif string.find(line, "%s*~*%^~*%s*") then
+		flush(line)
+	elseif string.find(line, "^%s*$") then
+		flush()
+	elseif string.find(line, "^Linting") or string.find(line, "^note%:") then
+		flush()
+	elseif lineType == TEST_ERROR or lineType == BUILD_ERROR or lineType == BUILD_WARNING then
 		table.insert(lineData.message, line)
 	end
 end
@@ -227,6 +260,7 @@ function M.clear()
 	failedTestsCount = 0
 	output = {}
 	buildErrors = {}
+	warnings = {}
 	diagnostics = {}
 end
 
@@ -241,6 +275,7 @@ function M.parse_logs(logLines)
 		testsCount = testsCount,
 		failedTestsCount = failedTestsCount,
 		buildErrors = buildErrors,
+		warnings = warnings,
 		diagnostics = diagnostics,
 	}
 end

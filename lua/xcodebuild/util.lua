@@ -132,4 +132,8 @@ function M.hasSuffix(text, suffix)
 	return string.sub(text, -#suffix) == suffix
 end
 
+function M.hasPrefix(text, prefix)
+	return string.sub(text, 1, #prefix) == prefix
+end
+
 return M

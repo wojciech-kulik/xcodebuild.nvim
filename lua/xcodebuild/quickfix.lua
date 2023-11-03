@@ -5,7 +5,7 @@ local M = {}
 local set_build_errors = function(list, errors)
 	local duplicates = {}
 
-	for _, error in ipairs(errors or {}) do
+	for _, error in ipairs(errors) do
 		if error.filepath then
 			local line = error.lineNumber or 0
 			local col = error.columnNumber or 0
@@ -39,6 +39,20 @@ local set_failing_tests = function(list, tests)
 	end
 end
 
+local set_warnings = function(list, warnings)
+	for _, warning in ipairs(warnings) do
+		if warning.filepath and warning.lineNumber then
+			table.insert(list, {
+				filename = warning.filepath,
+				lnum = warning.lineNumber,
+				col = warning.columnNumber or 0,
+				text = warning.message[1],
+				type = "W",
+			})
+		end
+	end
+end
+
 local set_diagnostics_for_test_errors = function(list, diagnostics)
 	local allSwiftFiles = util.find_all_swift_files2()
 	for _, diagnostic in ipairs(diagnostics) do
@@ -61,15 +75,12 @@ local set_diagnostics_for_test_errors = function(list, diagnostics)
 end
 
 function M.set(report)
-	if not report.tests then
-		vim.print("Missing xcode tests")
-		return
-	end
-
 	local quickfix = {}
-	set_build_errors(quickfix, report.buildErrors)
-	set_failing_tests(quickfix, report.tests)
-	set_diagnostics_for_test_errors(quickfix, report.diagnostics)
+
+	set_build_errors(quickfix, report.buildErrors or {})
+	set_warnings(quickfix, report.warnings or {})
+	set_failing_tests(quickfix, report.tests or {})
+	set_diagnostics_for_test_errors(quickfix, report.diagnostics or {})
 
 	vim.fn.setqflist(quickfix, "r")
 end

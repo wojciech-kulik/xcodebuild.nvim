@@ -61,5 +61,6 @@
         time = "0.001 seconds"
       } }
   },
-  testsCount = 8
+  testsCount = 8,
+  warnings = {}
 }
