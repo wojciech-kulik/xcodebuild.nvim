@@ -1,6 +1,7 @@
 local util = require("xcodebuild.util")
 local parser = require("xcodebuild.parser")
 local ui = require("xcodebuild.ui")
+local quickfix = require("xcodebuild.quickfix")
 
 local M = {}
 
@@ -134,12 +135,12 @@ function M.build_project(projectCommand, scheme, destination, callback)
 			report = parser.parse_logs(output)
 		end,
 		on_exit = function()
-			ui.show_logs(report)
+			ui.show_logs(report, false)
 			if not report.buildErrors or not report.buildErrors[1] then
 				vim.print("BUILD SUCCEEDED")
 			end
-			ui.set_build_quickfix(report)
-			callback()
+			quickfix.set(report)
+			callback(report)
 		end,
 	})
 end

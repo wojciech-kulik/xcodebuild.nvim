@@ -10,7 +10,7 @@ local add_summary_header = function(output)
 	table.insert(output, "")
 end
 
-function M.show_progress(report, firstChunk)
+function M.show_tests_progress(report, firstChunk)
 	if not next(report.tests) then
 		if firstChunk then
 			vim.print("Building Project...")
@@ -22,7 +22,7 @@ function M.show_progress(report, firstChunk)
 	end
 end
 
-function M.print_summary(report)
+function M.print_tests_summary(report)
 	if report.testsCount == 0 then
 		vim.print("Tests Failed [Executed: 0]")
 	else
@@ -33,26 +33,23 @@ function M.print_summary(report)
 	end
 end
 
-function M.show_logs(report)
-	local output = report.output
-
-	if not output then
-		vim.print("Missing xcode test output")
-		return
-	end
-
-	appdata.write_original_logs(output)
+function M.show_logs(report, isTesting)
+	appdata.write_original_logs(report.output)
 	local logs_filepath = appdata.get_original_logs_filepath()
 	local prettyOutput = util.shell("cat '" .. logs_filepath .. "' | xcbeautify --disable-colored-output")
 
 	if report.buildErrors and report.buildErrors[1] then
-		M.show_error_logs(prettyOutput, report.buildErrors)
+		M.show_errors(prettyOutput, report.buildErrors)
+	elseif isTesting then
+		M.show_test_results(report, prettyOutput)
 	else
-		M.show_test_logs(report, prettyOutput)
+		M.show_panel(prettyOutput)
 	end
 end
 
-function M.show_test_logs(report, prettyOutput)
+function M.show_test_results(report, prettyOutput)
+	M.print_tests_summary(report)
+
 	local failedTestsSummary = {}
 
 	if report.failedTestsCount > 0 then
@@ -76,7 +73,7 @@ function M.show_test_logs(report, prettyOutput)
 	M.show_panel(summary)
 end
 
-function M.show_error_logs(prettyOutput, buildErrors)
+function M.show_errors(prettyOutput, buildErrors)
 	vim.print("Build Failed [" .. #buildErrors .. " error(s)]")
 	add_summary_header(prettyOutput)
 	table.insert(prettyOutput, "Errors:")
@@ -138,74 +135,6 @@ function M.toggle_logs()
 		vim.cmd("bo split | resize 20 | b " .. testBuffer)
 		util.focus_buffer(testBuffer)
 	end
-end
-
-function M.set_quickfix(report)
-	if not report.tests then
-		vim.print("Missing xcode tests")
-		return
-	end
-
-	local quickfix = {}
-
-	for _, testsPerClass in pairs(report.tests) do
-		for _, test in ipairs(testsPerClass) do
-			if not test.success and test.filepath and test.lineNumber then
-				table.insert(quickfix, {
-					filename = test.filepath,
-					lnum = test.lineNumber,
-					text = test.message[1],
-					type = "E",
-				})
-			end
-		end
-	end
-
-	local allSwiftFiles = util.find_all_swift_files2()
-	for _, diagnostic in ipairs(report.diagnostics) do
-		for _, filepath in ipairs(allSwiftFiles) do
-			local filepathPattern = string.gsub(diagnostic.filepath, "/", "/.*/")
-			filepathPattern = string.gsub(filepathPattern, "Tests/", "/")
-			if string.find(filepath, filepathPattern) then
-				diagnostic.filepath = filepath
-				diagnostic.filename = util.get_filename(filepath)
-
-				table.insert(quickfix, {
-					filename = filepath,
-					lnum = diagnostic.lineNumber,
-					text = diagnostic.message[1],
-					type = "E",
-				})
-			end
-		end
-	end
-
-	vim.fn.setqflist(quickfix, "r")
-end
-
-function M.set_build_quickfix(report)
-	local quickfix = {}
-	local duplicates = {}
-
-	for _, error in ipairs(report.buildErrors or {}) do
-		if error.filepath then
-			local line = error.lineNumber or 0
-			local col = error.columnNumber or 0
-
-			if not duplicates[error.filepath .. line .. col] then
-				table.insert(quickfix, {
-					filename = error.filepath,
-					lnum = line,
-					col = col,
-					text = error.message[1],
-					type = "E",
-				})
-				duplicates[error.filepath .. line .. col] = true
-			end
-		end
-	end
-
-	vim.fn.setqflist(quickfix, "r")
 end
 
 function M.refresh_diagnostics(bufnr, testClass, report)
@@ -278,6 +207,10 @@ function M.set_buf_marks(bufnr, testClass, tests)
 end
 
 function M.refresh_buf_diagnostics(report)
+	if not report.buildErrors or not report.buildErrors[1] then
+		return
+	end
+
 	local buffers = util.get_bufs_by_name_matching(".*/.*[Tt]est[s]?%.swift$")
 
 	for _, buffer in ipairs(buffers or {}) do

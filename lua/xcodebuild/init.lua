@@ -4,6 +4,7 @@ local util = require("xcodebuild.util")
 local config = require("xcodebuild.config")
 local xcode = require("xcodebuild.xcode")
 local appdata = require("xcodebuild.appdata")
+local quickfix = require("xcodebuild.quickfix")
 
 local M = {}
 local autogroup = vim.api.nvim_create_augroup("xcodebuild.nvim", { clear = true })
@@ -32,7 +33,10 @@ function M.setup()
 		local destination = config.settings().destination
 		local projectCommand = config.settings().projectCommand
 		local scheme = config.settings().scheme
-		xcode.build_project(projectCommand, scheme, destination, function() end)
+		xcode.build_project(projectCommand, scheme, destination, function(report)
+			ui.show_logs(report, false)
+			quickfix.set(report)
+		end)
 	end, { nargs = 0 })
 
 	vim.api.nvim_create_user_command("Test", function(opts)
@@ -54,13 +58,9 @@ function M.setup()
 
 		vim.print("Starting Tests...")
 		local on_exit = function()
-			ui.show_logs(testReport)
-
-			if not testReport.buildErrors or not testReport.buildErrors[1] then
-				ui.print_summary(testReport)
-				ui.set_quickfix(testReport)
-				ui.refresh_buf_diagnostics(testReport)
-			end
+			ui.show_logs(testReport, true)
+			quickfix.set(testReport)
+			ui.refresh_buf_diagnostics(testReport)
 		end
 
 		if opts.fargs[1] == "last" then
@@ -92,7 +92,7 @@ function M.setup()
 						parser.clear()
 					end
 					testReport = parser.parse_logs(output)
-					ui.show_progress(testReport, isFirstChunk)
+					ui.show_tests_progress(testReport, isFirstChunk)
 					ui.refresh_buf_diagnostics(testReport)
 					isFirstChunk = false
 				end,
@@ -114,7 +114,7 @@ function M.setup()
 		end,
 	})
 
-	vim.api.nvim_create_autocmd({ "BufReadPost" }, {
+	vim.api.nvim_create_autocmd({ "BufReadPost", "BufWritePost" }, {
 		group = autogroup,
 		pattern = "*" .. appdata.get_build_logs_filename(),
 		callback = function(ev)
@@ -137,15 +137,27 @@ function M.setup()
 		end,
 	})
 
+	vim.api.nvim_create_autocmd({ "VimEnter" }, {
+		group = autogroup,
+		pattern = "*",
+		once = true,
+		callback = function()
+			local success, log = pcall(appdata.read_original_logs)
+			if success then
+				parser.clear()
+				testReport = parser.parse_logs(log)
+				quickfix.set(testReport)
+			end
+		end,
+	})
+
 	vim.api.nvim_create_autocmd({ "BufReadPost" }, {
 		group = autogroup,
 		pattern = "*Tests.swift",
 		callback = function(ev)
-			if testReport then
-				local testClass = util.get_filename(ev.file)
-				ui.refresh_diagnostics(ev.buf, testClass, testReport)
-				ui.set_buf_marks(ev.buf, testClass, testReport.tests)
-			end
+			local testClass = util.get_filename(ev.file)
+			ui.refresh_diagnostics(ev.buf, testClass, testReport)
+			ui.set_buf_marks(ev.buf, testClass, testReport.tests)
 		end,
 	})
 end
