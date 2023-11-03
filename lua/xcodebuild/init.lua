@@ -37,14 +37,15 @@ function M.setup()
 		local projectCommand = config.settings().projectCommand
 		local scheme = config.settings().scheme
 		local testPlan = config.settings().testPlan
-		local command = "xcodebuild test -scheme "
+		local command = "xcodebuild test -scheme '"
 			.. scheme
-			.. " -destination 'id="
+			.. "' -destination 'id="
 			.. destination
 			.. "' "
 			.. projectCommand
-			.. " -testPlan "
+			.. " -testPlan '"
 			.. testPlan
+			.. "'"
 
 		vim.print("Starting Tests...")
 		local on_exit = function()

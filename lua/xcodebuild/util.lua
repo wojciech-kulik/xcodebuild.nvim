@@ -89,10 +89,10 @@ function M.shell(cmd)
 	if handle ~= nil then
 		local result = handle:read("*a")
 		handle:close()
-		return result
+		return vim.split(result, "\n", { plain = true })
 	end
 
-	return ""
+	return {}
 end
 
 function M.merge_array(lhs, rhs)

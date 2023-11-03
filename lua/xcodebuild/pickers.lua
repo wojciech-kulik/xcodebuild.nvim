@@ -62,14 +62,10 @@ function M.select_device(callback)
 end
 
 function M.select_project(callback)
-	local files = vim.split(
-		util.shell(
-			"find '"
-				.. vim.fn.getcwd()
-				.. "' \\( -iname '*.xcodeproj' -o -iname '*.xcworkspace' \\) -not -path '*/.*' -not -path '*xcodeproj/project.xcworkspace'"
-		),
-		"\n",
-		{ plain = true }
+	local files = util.shell(
+		"find '"
+			.. vim.fn.getcwd()
+			.. "' \\( -iname '*.xcodeproj' -o -iname '*.xcworkspace' \\) -not -path '*/.*' -not -path '*xcodeproj/project.xcworkspace'"
 	)
 	local sanitizedFiles = {}
 

@@ -1,4 +1,7 @@
 local util = require("xcodebuild.util")
+local parser = require("xcodebuild.parser")
+local ui = require("xcodebuild.ui")
+
 local M = {}
 
 function M.get_runtimes()
@@ -32,8 +35,7 @@ end
 
 function M.get_destinations(projectCommand, scheme)
 	local result = {}
-	local content = util.shell("xcodebuild -showdestinations " .. projectCommand .. " -scheme " .. scheme)
-	content = vim.split(content, "\n", { plain = true })
+	local content = util.shell("xcodebuild -showdestinations " .. projectCommand .. " -scheme '" .. scheme .. "'")
 
 	local foundDestinations = false
 	for _, line in ipairs(content) do
@@ -63,7 +65,6 @@ end
 function M.get_schemes(projectCommand)
 	local result = {}
 	local content = util.shell("xcodebuild " .. projectCommand .. " -list")
-	content = vim.split(content, "\n", { plain = true })
 
 	local foundSchemes = false
 	for _, line in ipairs(content) do
@@ -81,8 +82,7 @@ end
 
 function M.get_testplans(projectCommand, scheme)
 	local result = {}
-	local content = util.shell("xcodebuild test " .. projectCommand .. " -scheme " .. scheme .. " -showTestPlans")
-	content = vim.split(content, "\n", { plain = true })
+	local content = util.shell("xcodebuild test " .. projectCommand .. " -scheme '" .. scheme .. "' -showTestPlans")
 
 	local foundTestPlans = false
 	for _, line in ipairs(content) do

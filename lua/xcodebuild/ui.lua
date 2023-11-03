@@ -34,8 +34,7 @@ function M.show_logs(report)
 	end
 
 	vim.fn.writefile(output, "/tmp/logs.txt")
-	local pretty = util.shell("cat /tmp/logs.txt | xcbeautify --disable-colored-output")
-	local prettyOutput = vim.split(pretty, "\n", { plain = true })
+	local prettyOutput = util.shell("cat /tmp/logs.txt | xcbeautify --disable-colored-output")
 	util.shell("rm -f /tmp/logs.txt")
 
 	if report.buildErrors and report.buildErrors[1] then
