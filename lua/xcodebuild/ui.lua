@@ -169,6 +169,31 @@ function M.set_quickfix(report)
 	vim.fn.setqflist(quickfix, "r")
 end
 
+function M.set_build_quickfix(report)
+	local quickfix = {}
+	local duplicates = {}
+
+	for _, error in ipairs(report.buildErrors or {}) do
+		if error.filepath then
+			local line = error.lineNumber or 0
+			local col = error.columnNumber or 0
+
+			if not duplicates[error.filepath .. line .. col] then
+				table.insert(quickfix, {
+					filename = error.filepath,
+					lnum = line,
+					col = col,
+					text = error.message[1],
+					type = "E",
+				})
+				duplicates[error.filepath .. line .. col] = true
+			end
+		end
+	end
+
+	vim.fn.setqflist(quickfix, "r")
+end
+
 function M.refresh_diagnostics(bufnr, testClass, report)
 	if not report.tests then
 		return
@@ -176,9 +201,15 @@ function M.refresh_diagnostics(bufnr, testClass, report)
 
 	local ns = vim.api.nvim_create_namespace("xcodebuild-diagnostics")
 	local diagnostics = {}
+	local duplicates = {}
 
 	for _, test in ipairs(report.tests[testClass] or {}) do
-		if not test.success and test.filepath and test.lineNumber then
+		if
+			not test.success
+			and test.filepath
+			and test.lineNumber
+			and not duplicates[test.filepath .. test.lineNumber]
+		then
 			table.insert(diagnostics, {
 				bufnr = bufnr,
 				lnum = test.lineNumber - 1,
@@ -188,6 +219,7 @@ function M.refresh_diagnostics(bufnr, testClass, report)
 				message = table.concat(test.message, "\n"),
 				user_data = {},
 			})
+			duplicates[test.filepath .. test.lineNumber] = true
 		end
 	end
 

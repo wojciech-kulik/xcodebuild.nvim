@@ -98,4 +98,50 @@ function M.get_testplans(projectCommand, scheme)
 	return result
 end
 
+function M.build_project(projectCommand, scheme, destination, callback)
+	local command = "xcodebuild "
+		.. projectCommand
+		.. " -scheme '"
+		.. scheme
+		.. "' -destination 'id="
+		.. destination
+		.. "'"
+
+	local isFirstChunk = true
+	local report = {}
+
+	vim.print("Building...")
+	vim.cmd("silent wa!")
+	vim.fn.jobstart(command, {
+		stdout_buffered = false,
+		stderr_buffered = false,
+		on_stdout = function(_, output)
+			if isFirstChunk then
+				parser.clear()
+			end
+			report = parser.parse_logs(output)
+			isFirstChunk = false
+
+			if report.buildErrors and report.buildErrors[1] then
+				vim.cmd("echo 'Building... [Errors: " .. #report.buildErrors .. "]'")
+			end
+		end,
+		on_stderr = function(_, output)
+			if isFirstChunk then
+				parser.clear()
+				isFirstChunk = false
+			end
+			report = parser.parse_logs(output)
+		end,
+		on_exit = function()
+			ui.show_logs(report)
+			if not report.buildErrors or not report.buildErrors[1] then
+				vim.print("BUILD SUCCEEDED")
+			end
+			ui.set_build_quickfix(report)
+			callback()
+		end,
+	})
+end
+
 return M

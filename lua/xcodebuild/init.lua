@@ -2,6 +2,7 @@ local ui = require("xcodebuild.ui")
 local parser = require("xcodebuild.parser")
 local util = require("xcodebuild.util")
 local config = require("xcodebuild.config")
+local xcode = require("xcodebuild.xcode")
 
 local M = {}
 local autogroup = vim.api.nvim_create_augroup("xcodebuild.nvim", { clear = true })
@@ -20,6 +21,14 @@ function M.setup()
 				end)
 			end)
 		end)
+	end, { nargs = 0 })
+
+	vim.api.nvim_create_user_command("Build", function()
+		config.load_settings()
+		local destination = config.settings().destination
+		local projectCommand = config.settings().projectCommand
+		local scheme = config.settings().scheme
+		xcode.build_project(projectCommand, scheme, destination, function() end)
 	end, { nargs = 0 })
 
 	vim.api.nvim_create_user_command("Test", function(opts)
