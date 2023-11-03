@@ -27,7 +27,7 @@ function M.print_tests_summary(report)
 		vim.print("Tests Failed [Executed: 0]")
 	else
 		vim.print(
-			report.failedTestsCount == 0 and "All Tests Succeeded [Executed: " .. report.testsCount .. "]"
+			report.failedTestsCount == 0 and "All Tests Passed [Executed: " .. report.testsCount .. "]"
 				or "Tests Failed [Executed: " .. report.testsCount .. ", Failed: " .. report.failedTestsCount .. "]"
 		)
 	end
@@ -71,6 +71,9 @@ function M.show_test_results(report, prettyOutput)
 			end
 		end
 		table.insert(failedTestsSummary, "")
+	else
+		table.insert(prettyOutput, "  ✔ All " .. report.testsCount .. " Tests Passed")
+		table.insert(prettyOutput, "")
 	end
 
 	local summary = util.merge_array(prettyOutput, failedTestsSummary)
@@ -119,6 +122,8 @@ function M.show_errors(prettyOutput, buildErrors)
 			table.insert(prettyOutput, (index == 1 and not error.filepath) and "  ✖ " .. message or "    " .. message)
 		end
 	end
+	table.insert(prettyOutput, "")
+	table.insert(prettyOutput, "  ✖ Build Failed")
 	table.insert(prettyOutput, "")
 
 	M.show_panel(prettyOutput)
