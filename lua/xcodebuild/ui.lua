@@ -82,11 +82,14 @@ function M.show_error_logs(prettyOutput, buildErrors)
 	table.insert(prettyOutput, "Errors:")
 	for _, error in ipairs(buildErrors) do
 		if error.filepath then
-			table.insert(prettyOutput, "✖ " .. error.filepath .. ":" .. error.lineNumber .. ":" .. error.columnNumber)
+			table.insert(
+				prettyOutput,
+				"  ✖ " .. error.filepath .. ":" .. error.lineNumber .. ":" .. error.columnNumber
+			)
 		end
 
 		for index, message in ipairs(error.message) do
-			table.insert(prettyOutput, (index == 1 and not error.filepath) and "✖ " .. message or message)
+			table.insert(prettyOutput, (index == 1 and not error.filepath) and "  ✖ " .. message or "    " .. message)
 		end
 	end
 	table.insert(prettyOutput, "")
