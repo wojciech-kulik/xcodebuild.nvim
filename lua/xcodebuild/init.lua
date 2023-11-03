@@ -151,7 +151,7 @@ function M.setup()
 		end,
 	})
 
-	vim.api.nvim_create_autocmd({ "BufReadPost" }, {
+	vim.api.nvim_create_autocmd({ "BufReadPost", "BufWritePost" }, {
 		group = autogroup,
 		pattern = "*Tests.swift",
 		callback = function(ev)

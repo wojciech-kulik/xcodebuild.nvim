@@ -207,7 +207,7 @@ function M.set_buf_marks(bufnr, testClass, tests)
 end
 
 function M.refresh_buf_diagnostics(report)
-	if not report.buildErrors or not report.buildErrors[1] then
+	if report.buildErrors and report.buildErrors[1] then
 		return
 	end
 
