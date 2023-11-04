@@ -129,7 +129,7 @@ function M.update_log_panel(show)
 	vim.api.nvim_buf_set_option(bufnr, "readonly", false)
 
 	if winnr then
-		vim.cmd("e!")
+		vim.cmd("silent e!")
 		local linesNumber = #vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
 		vim.api.nvim_win_set_cursor(winnr, { linesNumber, 0 })
 	end
