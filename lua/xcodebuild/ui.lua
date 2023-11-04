@@ -33,32 +33,33 @@ function M.print_tests_summary(report)
 	end
 end
 
-function M.show_logs(report, isTesting)
+function M.set_logs(report, isTesting, show)
 	appdata.write_original_logs(report.output)
 	local logs_filepath = appdata.get_original_logs_filepath()
 	local prettyOutput = util.shell("cat '" .. logs_filepath .. "' | xcbeautify --disable-colored-output")
 
 	add_summary_header(prettyOutput)
-	M.show_warnings(prettyOutput, report.warnings)
+	M.set_warnings(prettyOutput, report.warnings)
 
 	if report.buildErrors and report.buildErrors[1] then
-		M.show_errors(prettyOutput, report.buildErrors)
+		M.set_errors(prettyOutput, report.buildErrors)
 	elseif isTesting then
-		M.show_test_results(report, prettyOutput)
+		M.set_test_results(report, prettyOutput)
 	else
 		table.insert(prettyOutput, "  ✔ Build Succeeded")
 		table.insert(prettyOutput, "")
-		M.show_panel(prettyOutput)
 	end
+
+	vim.fn.writefile(prettyOutput, appdata.get_build_logs_filepath())
+
+	M.update_panel(show)
 end
 
-function M.show_test_results(report, prettyOutput)
+function M.set_test_results(report, prettyOutput)
 	M.print_tests_summary(report)
 
-	local failedTestsSummary = {}
-
 	if report.failedTestsCount > 0 then
-		table.insert(failedTestsSummary, "Failing Tests:")
+		table.insert(prettyOutput, "Failing Tests:")
 		for _, testsPerClass in pairs(report.tests) do
 			for _, test in ipairs(testsPerClass) do
 				if not test.success then
@@ -66,21 +67,18 @@ function M.show_test_results(report, prettyOutput)
 					if test.lineNumber then
 						message = message .. ":" .. test.lineNumber
 					end
-					table.insert(failedTestsSummary, message)
+					table.insert(prettyOutput, message)
 				end
 			end
 		end
-		table.insert(failedTestsSummary, "")
+		table.insert(prettyOutput, "")
 	else
-		table.insert(prettyOutput, "  ✔ All " .. report.testsCount .. " Tests Passed")
+		table.insert(prettyOutput, "  ✔ All " .. report.testCount .. " Tests Passed")
 		table.insert(prettyOutput, "")
 	end
-
-	local summary = util.merge_array(prettyOutput, failedTestsSummary)
-	M.show_panel(summary)
 end
 
-function M.show_warnings(prettyOutput, warnings)
+function M.set_warnings(prettyOutput, warnings)
 	if not warnings or not next(warnings) then
 		return
 	end
@@ -106,7 +104,7 @@ function M.show_warnings(prettyOutput, warnings)
 	table.insert(prettyOutput, "")
 end
 
-function M.show_errors(prettyOutput, buildErrors)
+function M.set_errors(prettyOutput, buildErrors)
 	vim.print("Build Failed [" .. #buildErrors .. " error(s)]")
 	table.insert(prettyOutput, "Errors:")
 
@@ -125,20 +123,22 @@ function M.show_errors(prettyOutput, buildErrors)
 	table.insert(prettyOutput, "")
 	table.insert(prettyOutput, "  ✖ Build Failed")
 	table.insert(prettyOutput, "")
-
-	M.show_panel(prettyOutput)
 end
 
-function M.show_panel(lines)
+function M.update_panel(show)
 	local testBufferName = appdata.get_build_logs_filename()
 	local testBuffer = util.get_buf_by_name(testBufferName)
 
-	if testBuffer and not next(vim.fn.win_findbuf(testBuffer)) then
-		vim.cmd("bo split | resize 20 | b " .. testBuffer)
-	elseif not testBuffer then
-		vim.cmd("new")
-		vim.api.nvim_win_set_height(0, 20)
-		vim.api.nvim_buf_set_name(0, appdata.get_build_logs_filepath())
+	if show then
+		if testBuffer and not next(vim.fn.win_findbuf(testBuffer)) then
+			vim.cmd("bo split | resize 20 | b " .. testBuffer)
+		elseif not testBuffer then
+			vim.cmd("bo split " .. appdata.get_build_logs_filepath() .. " | resize 20")
+		end
+	end
+
+	if not show and not testBuffer then
+		return
 	end
 
 	testBuffer = testBuffer or 0
@@ -147,10 +147,8 @@ function M.show_panel(lines)
 	vim.api.nvim_buf_set_option(testBuffer, "modifiable", true)
 	vim.api.nvim_buf_set_option(testBuffer, "readonly", false)
 
-	vim.api.nvim_buf_set_lines(testBuffer, 0, -1, false, lines)
-	vim.api.nvim_win_set_cursor(0, { #lines, 0 })
+	vim.cmd("e! | execute 'norm G'")
 
-	vim.cmd("silent update!")
 	vim.api.nvim_buf_set_option(testBuffer, "modifiable", false)
 	vim.api.nvim_buf_set_option(testBuffer, "readonly", true)
 end
@@ -159,7 +157,9 @@ function M.toggle_logs()
 	local testBufferName = appdata.get_build_logs_filename()
 	local testBuffer = util.get_buf_by_name(testBufferName, { returnNotLoaded = true })
 
-	if not testBuffer then
+	local logsFilepath = appdata.get_build_logs_filepath()
+	if not testBuffer and vim.fn.readfile(logsFilepath) then
+		vim.cmd("bo split " .. logsFilepath .. " | resize 20 ")
 		return
 	end
 
@@ -265,7 +265,7 @@ function M.open_test_file(tests)
 
 	for _, test in ipairs(tests[testClass] or {}) do
 		if test.name == testName and test.filepath then
-			vim.cmd("e " .. test.filepath .. " | " .. line)
+			vim.cmd("wincmd p | e " .. test.filepath .. " | " .. line)
 			return
 		end
 	end

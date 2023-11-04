@@ -55,7 +55,6 @@ end
 function M.find_all_swift_files()
 	local pwd = vim.api.nvim_exec2("pwd", { output = true })["output"]
 	local allFiles = vim.fn.system({ "find", pwd, "-iname", "*.swift" })
-	-- local allFiles = table.concat(vim.fn.readfile("/Users/wkulik/Desktop/tests/file_tree.txt"), "\n")
 
 	local map = {}
 
@@ -71,7 +70,6 @@ end
 
 function M.find_all_swift_files2()
 	local pwd = vim.api.nvim_exec2("pwd", { output = true })["output"]
-	-- local allFiles = table.concat(vim.fn.readfile("/Users/wkulik/Desktop/tests/file_tree.txt"), "\n")
 	local allFiles = vim.fn.system({ "find", pwd, "-iname", "*.swift" })
 
 	local map = {}

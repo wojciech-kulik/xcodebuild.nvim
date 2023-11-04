@@ -1,7 +1,4 @@
 local util = require("xcodebuild.util")
-local parser = require("xcodebuild.parser")
-local ui = require("xcodebuild.ui")
-local quickfix = require("xcodebuild.quickfix")
 
 local M = {}
 
@@ -99,49 +96,125 @@ function M.get_testplans(projectCommand, scheme)
 	return result
 end
 
-function M.build_project(projectCommand, scheme, destination, callback)
+function M.build_project(opts)
+	local command = "xcodebuild "
+		.. opts.projectCommand
+		.. " -scheme '"
+		.. opts.scheme
+		.. "' -destination 'id="
+		.. opts.destination
+		.. "'"
+
+	vim.fn.jobstart(command, {
+		stdout_buffered = false,
+		stderr_buffered = false,
+		on_stdout = opts.on_stdout,
+		on_stderr = opts.on_stderr,
+		on_exit = opts.on_exit,
+	})
+end
+
+function M.get_bundle_id(projectCommand, scheme, callback)
 	local command = "xcodebuild "
 		.. projectCommand
 		.. " -scheme '"
 		.. scheme
+		.. "' -showBuildSettings | grep PRODUCT_BUNDLE_IDENTIFIER | awk -F ' = ' '{print $2}'"
+
+	vim.fn.jobstart(command, {
+		stdout_buffered = true,
+		on_stdout = function(_, output)
+			callback(true, table.concat(output, ""))
+		end,
+	})
+end
+
+function M.get_app_settings(logs)
+	local targetName = nil
+	local buildDir = nil
+	local bundleId = nil
+
+	for _, line in ipairs(logs) do
+		if string.find(line, "TARGETNAME") then
+			targetName = string.match(line, "TARGETNAME\\=(.*)")
+		elseif string.find(line, "TARGET_BUILD_DIR") then
+			buildDir = string.match(line, "TARGET_BUILD_DIR\\=(.*)")
+		elseif string.find(line, "PRODUCT_BUNDLE_IDENTIFIER") then
+			bundleId = string.match(line, "PRODUCT_BUNDLE_IDENTIFIER\\=(.*)")
+		end
+
+		if targetName and buildDir and bundleId then
+			break
+		end
+	end
+
+	if not targetName or not buildDir or not bundleId then
+		error("Could not locate built app path")
+	end
+
+	targetName = string.gsub(targetName, "\\", "")
+	buildDir = string.gsub(buildDir, "\\", "")
+
+	local result = {
+		appPath = buildDir .. "/" .. targetName .. ".app",
+		targetName = targetName,
+		bundleId = bundleId,
+	}
+
+	return result
+end
+
+function M.install_app(destination, appPath, callback)
+	local command = "xcrun simctl install '" .. destination .. "' '" .. appPath .. "'"
+
+	vim.fn.jobstart(command, {
+		stdout_buffered = true,
+		on_stdout = callback,
+	})
+end
+
+function M.launch_app(destination, bundleId, callback)
+	local command = "xcrun simctl launch --terminate-running-process '" .. destination .. "' " .. bundleId
+	vim.fn.jobstart(command, {
+		stdout_buffered = true,
+		detach = true,
+		on_exit = callback,
+	})
+end
+
+function M.get_app_pid(target)
+	local pid = util.shell("ps aux | grep '" .. target .. ".app' | grep -v grep | awk '{ print$2 }'")
+	local pidString = pid and table.concat(pid, "") or nil
+
+	return tonumber(pidString)
+end
+
+function M.kill_app(target)
+	local pid = M.get_app_pid(target)
+
+	if pid then
+		util.shell("kill -9 " .. pid)
+	end
+end
+
+function M.run_tests(opts)
+	local command = "xcodebuild test -scheme '"
+		.. opts.scheme
 		.. "' -destination 'id="
-		.. destination
+		.. opts.destination
+		.. "' "
+		.. opts.projectCommand
+		.. " -testPlan '"
+		.. opts.testPlan
 		.. "'"
 
-	local isFirstChunk = true
-	local report = {}
-
-	vim.print("Building...")
 	vim.cmd("silent wa!")
 	vim.fn.jobstart(command, {
 		stdout_buffered = false,
 		stderr_buffered = false,
-		on_stdout = function(_, output)
-			if isFirstChunk then
-				parser.clear()
-			end
-			report = parser.parse_logs(output)
-			isFirstChunk = false
-
-			if report.buildErrors and report.buildErrors[1] then
-				vim.cmd("echo 'Building... [Errors: " .. #report.buildErrors .. "]'")
-			end
-		end,
-		on_stderr = function(_, output)
-			if isFirstChunk then
-				parser.clear()
-				isFirstChunk = false
-			end
-			report = parser.parse_logs(output)
-		end,
-		on_exit = function()
-			ui.show_logs(report, false)
-			if not report.buildErrors or not report.buildErrors[1] then
-				vim.print("BUILD SUCCEEDED")
-			end
-			quickfix.set(report)
-			callback(report)
-		end,
+		on_stdout = opts.on_stdout,
+		on_stderr = opts.on_stderr,
+		on_exit = opts.on_exit,
 	})
 end
 

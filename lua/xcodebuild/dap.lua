@@ -1,0 +1,38 @@
+local util = require("xcodebuild.util")
+local config = require("xcodebuild.config")
+local xcode = require("xcodebuild.xcode")
+
+local M = {}
+
+function M.wait_for_pid()
+	vim.cmd("silent wa!")
+	local co = coroutine
+	local target = config.settings().appTarget
+
+	if not target then
+		error("You must build the application first")
+	end
+
+	return co.create(function(dap_run_co)
+		local pid = nil
+
+		vim.print("Attaching debugger...")
+		for _ = 1, 10 do
+			util.shell("sleep 1")
+			pid = xcode.get_app_pid(target)
+
+			if tonumber(pid) then
+				break
+			end
+		end
+
+		if not tonumber(pid) then
+			vim.print("Launching the application timed out")
+			co.close(dap_run_co)
+		end
+
+		co.resume(dap_run_co, pid)
+	end)
+end
+
+return M
