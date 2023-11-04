@@ -4,7 +4,7 @@ local ui = require("xcodebuild.ui")
 local util = require("xcodebuild.util")
 local appdata = require("xcodebuild.appdata")
 
-local add_summary_header = function(output)
+local function add_summary_header(output)
 	table.insert(output, "-----------------------------")
 	table.insert(output, "-- xcodebuild.nvim summary --")
 	table.insert(output, "-----------------------------")

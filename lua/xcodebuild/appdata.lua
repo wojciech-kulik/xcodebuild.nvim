@@ -6,16 +6,16 @@ local appdir = vim.fn.getcwd() .. "/.nvim/xcodebuild"
 local original_logs_filename = "original_logs.log"
 local build_logs_filename = "xcodebuild.log"
 
-local write_to_app_dir = function(data, filename)
+local function write_to_app_dir(data, filename)
 	M.create_app_dir()
 	vim.fn.writefile(data, appdir .. "/" .. filename)
 end
 
-local read_from_app_dir = function(filename)
+local function read_from_app_dir(filename)
 	return vim.fn.readfile(appdir .. "/" .. filename)
 end
 
-local remove_from_app_dir = function(filename)
+local function remove_from_app_dir(filename)
 	util.shell("rm -f " .. appdir .. "/" .. filename)
 end
 

@@ -208,6 +208,12 @@ function M.run_tests(opts)
 		.. opts.testPlan
 		.. "'"
 
+	if opts.testsToRun then
+		for _, test in ipairs(opts.testsToRun) do
+			command = command .. " -only-testing " .. test
+		end
+	end
+
 	vim.cmd("silent wa!")
 	vim.fn.jobstart(command, {
 		stdout_buffered = false,
@@ -215,6 +221,48 @@ function M.run_tests(opts)
 		on_stdout = opts.on_stdout,
 		on_stderr = opts.on_stderr,
 		on_exit = opts.on_exit,
+	})
+end
+
+function M.list_tests(opts, callback)
+	local command = "xcodebuild test -scheme '"
+		.. opts.scheme
+		.. "' -destination 'id="
+		.. opts.destination
+		.. "' "
+		.. opts.projectCommand
+		.. " -testPlan '"
+		.. opts.testPlan
+		.. "' -enumerate-tests"
+		.. " -test-enumeration-style flat"
+
+	local tests = {}
+	local foundTests = false
+
+	vim.cmd("silent wa!")
+	vim.fn.jobstart(command, {
+		stdout_buffered = false,
+		on_stdout = function(_, output)
+			for _, line in ipairs(output) do
+				if foundTests then
+					local target, class, test = string.match(line, "%s*([^/]*)/([^/]*)/(test[^/]*)%s*")
+					if target and class and test then
+						table.insert(tests, {
+							target = target,
+							class = class,
+							name = test,
+							classId = target .. "/" .. class,
+							testId = target .. "/" .. class .. "/" .. test,
+						})
+					end
+				elseif string.find(line, "Plan " .. opts.testPlan) then
+					foundTests = true
+				end
+			end
+		end,
+		on_exit = function()
+			callback(tests)
+		end,
 	})
 end
 

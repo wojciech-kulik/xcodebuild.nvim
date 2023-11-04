@@ -131,7 +131,7 @@ function M.build_project(opts, callback)
 	})
 end
 
-function M.run_tests()
+function M.run_tests(testsToRun)
 	appdata.create_app_dir()
 	config.load_settings()
 
@@ -167,7 +167,111 @@ function M.run_tests()
 		projectCommand = config.settings().projectCommand,
 		scheme = config.settings().scheme,
 		testPlan = config.settings().testPlan,
+		testsToRun = testsToRun,
 	})
+end
+
+local function find_tests(opts)
+	local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+	local selectedClass = nil
+	local selectedTests = {}
+
+	for _, line in ipairs(lines) do
+		selectedClass = string.match(line, "class ([^:%s]+)%s*%:?")
+		if selectedClass then
+			break
+		end
+	end
+
+	if opts.selectedTests then
+		local vstart = vim.fn.getpos("'<")
+		local vend = vim.fn.getpos("'>")
+		local lineStart = vstart[2]
+		local lineEnd = vend[2]
+
+		for i = lineStart, lineEnd do
+			local test = string.match(lines[i], "func (test[^%s%(]+)")
+			if test then
+				table.insert(selectedTests, {
+					name = test,
+					class = selectedClass,
+				})
+			end
+		end
+	elseif opts.currentTest then
+		local winnr = vim.api.nvim_get_current_win()
+		local currentLine = vim.api.nvim_win_get_cursor(winnr)[1]
+
+		for i = currentLine, 1, -1 do
+			local test = string.match(lines[i], "func (test[^%s%(]+)")
+			if test then
+				table.insert(selectedTests, {
+					name = test,
+					class = selectedClass,
+				})
+				break
+			end
+		end
+	elseif opts.failingTests and testReport.failedTestsCount > 0 then
+		for _, testsPerClass in pairs(testReport.tests) do
+			for _, test in ipairs(testsPerClass) do
+				if not test.success then
+					table.insert(selectedTests, {
+						name = test.name,
+						class = test.class,
+					})
+				end
+			end
+		end
+	end
+
+	return selectedClass, selectedTests
+end
+
+function M.run_selected_tests(opts)
+	local selectedClass, selectedTests = find_tests(opts)
+
+	appdata.create_app_dir()
+	config.load_settings()
+	local testOpts = {
+		destination = config.settings().destination,
+		projectCommand = config.settings().projectCommand,
+		scheme = config.settings().scheme,
+		testPlan = config.settings().testPlan,
+	}
+
+	vim.print("Building...")
+	xcode.list_tests(testOpts, function(tests)
+		local testsToRun = {}
+
+		for _, test in ipairs(tests) do
+			if opts.currentClass and test.class == selectedClass then
+				table.insert(testsToRun, test.classId)
+				break
+			end
+
+			if not opts.currentClass then
+				local matchingTest = util.find(selectedTests, function(val)
+					return val.class == test.class and val.name == test.name
+				end)
+
+				if matchingTest then
+					table.insert(testsToRun, test.testId)
+					if #testsToRun == #selectedTests then
+						break
+					end
+				end
+			end
+		end
+
+		vim.print("Discovered tests: " .. vim.inspect(testsToRun))
+
+		if next(testsToRun) then
+			M.run_tests(testsToRun)
+		else
+			vim.print("Tests not found")
+		end
+	end)
 end
 
 function M.configure_project()

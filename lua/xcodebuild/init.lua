@@ -21,6 +21,30 @@ function M.setup()
 		coordinator.run_tests()
 	end, { nargs = 0 })
 
+	vim.api.nvim_create_user_command("TestClass", function()
+		coordinator.run_selected_tests({
+			currentClass = true,
+		})
+	end, { nargs = 0 })
+
+	vim.api.nvim_create_user_command("TestFunc", function()
+		coordinator.run_selected_tests({
+			currentTest = true,
+		})
+	end, { nargs = 0 })
+
+	vim.api.nvim_create_user_command("TestSelected", function()
+		coordinator.run_selected_tests({
+			selectedTests = true,
+		})
+	end, { nargs = 0 })
+
+	vim.api.nvim_create_user_command("TestFailing", function()
+		coordinator.run_selected_tests({
+			failingTests = true,
+		})
+	end, { nargs = 0 })
+
 	vim.api.nvim_set_keymap("n", "dx", "", {
 		callback = function()
 			logs.toggle_logs()

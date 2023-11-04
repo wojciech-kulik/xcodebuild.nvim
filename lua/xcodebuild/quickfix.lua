@@ -2,7 +2,7 @@ local util = require("xcodebuild.util")
 
 local M = {}
 
-local set_build_errors = function(list, errors)
+local function set_build_errors(list, errors)
 	local duplicates = {}
 
 	for _, error in ipairs(errors) do
@@ -24,7 +24,7 @@ local set_build_errors = function(list, errors)
 	end
 end
 
-local set_failing_tests = function(list, tests)
+local function set_failing_tests(list, tests)
 	for _, testsPerClass in pairs(tests) do
 		for _, test in ipairs(testsPerClass) do
 			if not test.success and test.filepath and test.lineNumber then
@@ -39,7 +39,7 @@ local set_failing_tests = function(list, tests)
 	end
 end
 
-local set_warnings = function(list, warnings)
+local function set_warnings(list, warnings)
 	for _, warning in ipairs(warnings) do
 		if warning.filepath and warning.lineNumber then
 			table.insert(list, {
@@ -53,7 +53,7 @@ local set_warnings = function(list, warnings)
 	end
 end
 
-local set_diagnostics_for_test_errors = function(list, diagnostics)
+local function set_diagnostics_for_test_errors(list, diagnostics)
 	local allSwiftFiles = util.find_all_swift_files2()
 	for _, diagnostic in ipairs(diagnostics) do
 		for _, filepath in ipairs(allSwiftFiles) do

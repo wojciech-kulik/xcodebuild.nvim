@@ -24,7 +24,7 @@ local buildErrors = {}
 local warnings = {}
 local diagnostics = {}
 
-local flush_test = function(message)
+local function flush_test(message)
 	if message then
 		table.insert(lineData.message, message)
 	end
@@ -36,7 +36,7 @@ local flush_test = function(message)
 	lineData = {}
 end
 
-local flush_error = function(line)
+local function flush_error(line)
 	if line then
 		table.insert(lineData.message, line)
 	end
@@ -46,7 +46,7 @@ local flush_error = function(line)
 	lineData = {}
 end
 
-local flush_warning = function(line)
+local function flush_warning(line)
 	if line then
 		table.insert(lineData.message, line)
 	end
@@ -56,7 +56,7 @@ local flush_warning = function(line)
 	lineData = {}
 end
 
-local flush_diagnostic = function(filepath, filename, lineNumber)
+local function flush_diagnostic(filepath, filename, lineNumber)
 	table.insert(diagnostics, {
 		filepath = filepath,
 		filename = filename,
@@ -65,7 +65,7 @@ local flush_diagnostic = function(filepath, filename, lineNumber)
 	})
 end
 
-local flush = function(line)
+local function flush(line)
 	if lineType == BUILD_ERROR then
 		flush_error(line)
 	elseif lineType == BUILD_WARNING then
@@ -75,11 +75,11 @@ local flush = function(line)
 	end
 end
 
-local sanitize = function(message)
+local function sanitize(message)
 	return string.match(message, "%-%[%w+%.%w+ %g+%] %: (.*)") or message
 end
 
-local find_test_line = function(filepath, testName)
+local function find_test_line(filepath, testName)
 	local success, lines = pcall(vim.fn.readfile, filepath)
 	if not success then
 		return nil
@@ -94,7 +94,7 @@ local find_test_line = function(filepath, testName)
 	return nil
 end
 
-local parse_build_error = function(line)
+local function parse_build_error(line)
 	if string.find(line, "[^%s]*%.swift%:%d+%:%d*%:? %w*%s*error%: .*") then
 		local filepath, lineNumber, colNumber, message =
 			string.match(line, "([^%s]*%.swift)%:(%d+)%:(%d*)%:? %w*%s*error%: (.*)")
@@ -122,7 +122,7 @@ local parse_build_error = function(line)
 	end
 end
 
-local parse_test_error = function(line)
+local function parse_test_error(line)
 	local filepath, lineNumber, message = string.match(line, "([^%s]*%.swift)%:(%d+)%:%d*%:? %w*%s*error%: (.*)")
 
 	if filepath and message then
@@ -143,7 +143,7 @@ local parse_test_error = function(line)
 	end
 end
 
-local parse_warning = function(line)
+local function parse_warning(line)
 	local filepath, lineNumber, columnNumber, message =
 		string.match(line, "([^%s]*%.swift)%:(%d+)%:(%d*)%:? %w*%s*warning%: (.*)")
 
@@ -157,7 +157,7 @@ local parse_warning = function(line)
 	end
 end
 
-local parse_test_finished = function(line)
+local function parse_test_finished(line)
 	if string.find(line, "^Test Case .*.%-") then
 		local testResult, time = string.match(line, "^Test Case .*.%-%[%w+%.%w+ %g+%]. (%w+)% %((.*)%)%.")
 		if lastTest then
@@ -198,7 +198,7 @@ local parse_test_finished = function(line)
 	end
 end
 
-local parse_test_started = function(line)
+local function parse_test_started(line)
 	local testClass, testName = string.match(line, "^Test Case .*.%-%[%w+%.(%w+) (%g+)%]")
 	if not allSwiftFiles[testClass] then
 		vim.print(testClass)
@@ -215,7 +215,7 @@ local parse_test_started = function(line)
 	}
 end
 
-local process_line = function(line)
+local function process_line(line)
 	table.insert(output, line)
 
 	-- POSSIBLE PATHS:

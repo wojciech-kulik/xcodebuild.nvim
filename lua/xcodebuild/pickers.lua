@@ -9,7 +9,7 @@ local util = require("xcodebuild.util")
 
 local M = {}
 
-local show_picker = function(title, items, callback)
+local function show_picker(title, items, callback)
 	pickers
 		.new(require("telescope.themes").get_dropdown({}), {
 			prompt_title = title,

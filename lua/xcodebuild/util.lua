@@ -134,4 +134,24 @@ function M.hasPrefix(text, prefix)
 	return string.sub(text, 1, #prefix) == prefix
 end
 
+function M.contains(tab, val)
+	for _, value in ipairs(tab) do
+		if value == val then
+			return true
+		end
+	end
+
+	return false
+end
+
+function M.find(tab, predicate)
+	for _, value in ipairs(tab) do
+		if predicate(value) then
+			return value
+		end
+	end
+
+	return nil
+end
+
 return M

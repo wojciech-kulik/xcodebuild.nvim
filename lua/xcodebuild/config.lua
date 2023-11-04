@@ -3,7 +3,7 @@ local util = require("xcodebuild.util")
 local M = {}
 local settings = {}
 
-local get_file_path = function()
+local function get_file_path()
 	local cwd = vim.fn.getcwd()
 	local dirpath = cwd .. "/.nvim/xcodebuild"
 	local filepath = dirpath .. "/settings.json"
