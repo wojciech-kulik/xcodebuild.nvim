@@ -1,6 +1,6 @@
-local ui = require("xcodebuild.ui")
 local coordinator = require("xcodebuild.coordinator")
 local autocmd = require("xcodebuild.autocmd")
+local logs = require("xcodebuild.logs")
 
 local M = {}
 
@@ -23,7 +23,7 @@ function M.setup()
 
 	vim.api.nvim_set_keymap("n", "dx", "", {
 		callback = function()
-			ui.toggle_logs()
+			logs.toggle_logs()
 		end,
 	})
 end

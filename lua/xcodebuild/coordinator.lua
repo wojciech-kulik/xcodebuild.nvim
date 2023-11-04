@@ -5,6 +5,8 @@ local appdata = require("xcodebuild.appdata")
 local quickfix = require("xcodebuild.quickfix")
 local config = require("xcodebuild.config")
 local xcode = require("xcodebuild.xcode")
+local logs = require("xcodebuild.logs")
+local diagnostics = require("xcodebuild.diagnostics")
 
 local M = {}
 local testReport = {}
@@ -15,14 +17,18 @@ end
 
 function M.setup_log_buffer(bufnr)
 	local win = vim.fn.win_findbuf(bufnr)[1]
+	vim.api.nvim_buf_set_option(bufnr, "modifiable", true)
+	vim.api.nvim_buf_set_option(bufnr, "readonly", false)
+
 	vim.api.nvim_win_set_option(win, "wrap", false)
 	vim.api.nvim_win_set_option(win, "spell", false)
 	vim.api.nvim_buf_set_option(bufnr, "filetype", "objc")
 	vim.api.nvim_buf_set_option(bufnr, "buflisted", false)
 	vim.api.nvim_buf_set_option(bufnr, "fileencoding", "utf-8")
+	vim.api.nvim_buf_set_option(bufnr, "modified", false)
+
 	vim.api.nvim_buf_set_option(bufnr, "readonly", true)
 	vim.api.nvim_buf_set_option(bufnr, "modifiable", false)
-	vim.api.nvim_buf_set_option(bufnr, "modified", false)
 
 	vim.api.nvim_buf_set_keymap(bufnr, "n", "q", "<cmd>close<cr>", {})
 	vim.api.nvim_buf_set_keymap(bufnr, "n", "o", "", {
@@ -43,8 +49,8 @@ end
 
 function M.refresh_buf_diagnostics(bufnr, file)
 	local testClass = util.get_filename(file)
-	ui.refresh_diagnostics(bufnr, testClass, testReport)
-	ui.set_buf_marks(bufnr, testClass, testReport.tests)
+	diagnostics.refresh_diagnostics(bufnr, testClass, testReport)
+	diagnostics.set_buf_marks(bufnr, testClass, testReport.tests)
 end
 
 function M.build_and_install_app(callback)
@@ -58,6 +64,12 @@ function M.build_and_install_app(callback)
 		local target = config.settings().appTarget
 		local settings = xcode.get_app_settings(report.output)
 
+		if report.buildErrors and report.buildErrors[1] then
+			vim.print("Build Failed")
+			logs.open_logs(true, true)
+			return
+		end
+
 		if target then
 			xcode.kill_app(target)
 		end
@@ -67,7 +79,9 @@ function M.build_and_install_app(callback)
 		config.settings().bundleId = settings.bundleId
 		config.save_settings()
 
+		vim.print("Installing...")
 		xcode.install_app(destination, settings.appPath, function()
+			vim.print("Launching...")
 			xcode.launch_app(destination, settings.bundleId, function()
 				callback()
 			end)
@@ -97,7 +111,7 @@ function M.build_project(opts, callback)
 	end
 
 	local on_exit = function()
-		ui.set_logs(testReport, false, open_logs_on_success)
+		logs.set_logs(testReport, false, open_logs_on_success)
 		if not testReport.buildErrors or not testReport.buildErrors[1] then
 			vim.print("Build Succeeded")
 		end
@@ -129,7 +143,7 @@ function M.run_tests()
 	local on_stdout = function(_, output)
 		testReport = parser.parse_logs(output)
 		ui.show_tests_progress(testReport, isFirstChunk)
-		ui.refresh_buf_diagnostics(testReport)
+		diagnostics.refresh_buf_diagnostics(testReport)
 		isFirstChunk = false
 	end
 
@@ -139,9 +153,9 @@ function M.run_tests()
 	end
 
 	local on_exit = function()
-		ui.set_logs(testReport, true, true)
+		logs.set_logs(testReport, true, true)
 		quickfix.set(testReport)
-		ui.refresh_buf_diagnostics(testReport)
+		diagnostics.refresh_buf_diagnostics(testReport)
 	end
 
 	xcode.run_tests({
