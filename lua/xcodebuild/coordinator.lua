@@ -74,7 +74,7 @@ function M.build_and_install_app(callback)
 		local settings = xcode.get_app_settings(report.output)
 
 		if report.buildErrors and report.buildErrors[1] then
-			vim.print("Build Failed")
+			vim.notify("Build Failed", vim.log.levels.ERROR)
 			logs.open_logs(true, true)
 			return
 		end
@@ -88,9 +88,9 @@ function M.build_and_install_app(callback)
 		config.settings().bundleId = settings.bundleId
 		config.save_settings()
 
-		vim.print("Installing...")
+		vim.notify("Installing...")
 		currentJobId = xcode.install_app(destination, settings.appPath, function()
-			vim.print("Launching...")
+			vim.notify("Launching...")
 			currentJobId = xcode.launch_app(destination, settings.bundleId, function()
 				callback()
 			end)
@@ -103,7 +103,7 @@ function M.build_project(opts, callback)
 	config.load_settings()
 
 	local open_logs_on_success = (opts or {}).open_logs_on_success
-	vim.print("Building...")
+	vim.notify("Building...")
 	vim.cmd("silent wa!")
 	parser.clear()
 
@@ -125,7 +125,7 @@ function M.build_project(opts, callback)
 		end
 		logs.set_logs(testReport, false, open_logs_on_success)
 		if not testReport.buildErrors or not testReport.buildErrors[1] then
-			vim.print("Build Succeeded")
+			vim.notify("Build Succeeded")
 		end
 		quickfix.set(testReport)
 		callback(testReport)
@@ -147,7 +147,7 @@ function M.run_tests(testsToRun)
 	appdata.create_app_dir()
 	config.load_settings()
 
-	vim.print("Starting Tests...")
+	vim.notify("Starting Tests...")
 	vim.cmd("silent wa!")
 	parser.clear()
 
@@ -255,7 +255,7 @@ function M.run_selected_tests(opts)
 		testPlan = config.settings().testPlan,
 	}
 
-	vim.print("Building...")
+	vim.notify("Building...")
 	currentJobId = xcode.list_tests(testOpts, function(tests)
 		local testsToRun = {}
 
@@ -284,7 +284,7 @@ function M.run_selected_tests(opts)
 		if next(testsToRun) then
 			M.run_tests(testsToRun)
 		else
-			vim.print("Tests not found")
+			vim.notify("Tests not found", vim.log.levels.ERROR)
 		end
 	end)
 end

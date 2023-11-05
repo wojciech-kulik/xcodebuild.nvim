@@ -84,7 +84,7 @@ function M.set_warnings(prettyOutput, warnings)
 end
 
 function M.set_errors(prettyOutput, buildErrors)
-	vim.print("Build Failed [" .. #buildErrors .. " error(s)]")
+	vim.notify("Build Failed [" .. #buildErrors .. " error(s)]", vim.log.levels.ERROR)
 	table.insert(prettyOutput, "Errors:")
 
 	for _, error in ipairs(buildErrors) do

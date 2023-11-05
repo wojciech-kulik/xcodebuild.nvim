@@ -200,9 +200,6 @@ end
 
 local function parse_test_started(line)
 	local testClass, testName = string.match(line, "^Test Case .*.%-%[%w+%.(%w+) (%g+)%]")
-	if not allSwiftFiles[testClass] then
-		vim.print(testClass)
-	end
 	local filepath = allSwiftFiles[testClass]
 	testsCount = testsCount + 1
 	lastTest = nil

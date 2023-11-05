@@ -5,7 +5,6 @@ local xcode = require("xcodebuild.xcode")
 local M = {}
 
 function M.wait_for_pid()
-	vim.cmd("silent wa!")
 	local co = coroutine
 	local target = config.settings().appTarget
 
@@ -16,7 +15,7 @@ function M.wait_for_pid()
 	return co.create(function(dap_run_co)
 		local pid = nil
 
-		vim.print("Attaching debugger...")
+		vim.notify("Attaching debugger...")
 		for _ = 1, 10 do
 			util.shell("sleep 1")
 			pid = xcode.get_app_pid(target)
@@ -27,7 +26,7 @@ function M.wait_for_pid()
 		end
 
 		if not tonumber(pid) then
-			vim.print("Launching the application timed out")
+			vim.notify("Launching the application timed out", vim.log.levels.ERROR)
 			co.close(dap_run_co)
 		end
 

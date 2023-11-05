@@ -3,7 +3,7 @@ local M = {}
 function M.show_tests_progress(report, firstChunk)
 	if not next(report.tests) then
 		if firstChunk then
-			vim.print("Building Project...")
+			vim.notify("Building Project...")
 		end
 	else
 		vim.cmd(
@@ -14,9 +14,9 @@ end
 
 function M.print_tests_summary(report)
 	if report.testsCount == 0 then
-		vim.print("Tests Failed [Executed: 0]")
+		vim.notify("Tests Failed [Executed: 0]")
 	else
-		vim.print(
+		vim.notify(
 			report.failedTestsCount == 0 and "All Tests Passed [Executed: " .. report.testsCount .. "]"
 				or "Tests Failed [Executed: " .. report.testsCount .. ", Failed: " .. report.failedTestsCount .. "]"
 		)
