@@ -105,7 +105,7 @@ function M.build_project(opts)
 		.. opts.destination
 		.. "'"
 
-	vim.fn.jobstart(command, {
+	return vim.fn.jobstart(command, {
 		stdout_buffered = false,
 		stderr_buffered = false,
 		on_stdout = opts.on_stdout,
@@ -121,7 +121,7 @@ function M.get_bundle_id(projectCommand, scheme, callback)
 		.. scheme
 		.. "' -showBuildSettings | grep PRODUCT_BUNDLE_IDENTIFIER | awk -F ' = ' '{print $2}'"
 
-	vim.fn.jobstart(command, {
+	return vim.fn.jobstart(command, {
 		stdout_buffered = true,
 		on_stdout = function(_, output)
 			callback(true, table.concat(output, ""))
@@ -167,7 +167,7 @@ end
 function M.install_app(destination, appPath, callback)
 	local command = "xcrun simctl install '" .. destination .. "' '" .. appPath .. "'"
 
-	vim.fn.jobstart(command, {
+	return vim.fn.jobstart(command, {
 		stdout_buffered = true,
 		on_stdout = callback,
 	})
@@ -175,7 +175,7 @@ end
 
 function M.launch_app(destination, bundleId, callback)
 	local command = "xcrun simctl launch --terminate-running-process '" .. destination .. "' " .. bundleId
-	vim.fn.jobstart(command, {
+	return vim.fn.jobstart(command, {
 		stdout_buffered = true,
 		detach = true,
 		on_exit = callback,
@@ -215,7 +215,7 @@ function M.run_tests(opts)
 	end
 
 	vim.cmd("silent wa!")
-	vim.fn.jobstart(command, {
+	return vim.fn.jobstart(command, {
 		stdout_buffered = false,
 		stderr_buffered = false,
 		on_stdout = opts.on_stdout,
@@ -240,7 +240,7 @@ function M.list_tests(opts, callback)
 	local foundTests = false
 
 	vim.cmd("silent wa!")
-	vim.fn.jobstart(command, {
+	return vim.fn.jobstart(command, {
 		stdout_buffered = false,
 		on_stdout = function(_, output)
 			for _, line in ipairs(output) do
@@ -260,7 +260,10 @@ function M.list_tests(opts, callback)
 				end
 			end
 		end,
-		on_exit = function()
+		on_exit = function(_, code, _)
+			if code == 143 then
+				return
+			end
 			callback(tests)
 		end,
 	})

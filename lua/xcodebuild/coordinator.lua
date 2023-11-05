@@ -10,6 +10,15 @@ local diagnostics = require("xcodebuild.diagnostics")
 
 local M = {}
 local testReport = {}
+local currentJobId = nil
+
+function M.cancel()
+	if currentJobId then
+		vim.fn.jobstop(currentJobId)
+		currentJobId = nil
+		vim.notify("Stopped")
+	end
+end
 
 function M.get_report()
 	return testReport
@@ -80,9 +89,9 @@ function M.build_and_install_app(callback)
 		config.save_settings()
 
 		vim.print("Installing...")
-		xcode.install_app(destination, settings.appPath, function()
+		currentJobId = xcode.install_app(destination, settings.appPath, function()
 			vim.print("Launching...")
-			xcode.launch_app(destination, settings.bundleId, function()
+			currentJobId = xcode.launch_app(destination, settings.bundleId, function()
 				callback()
 			end)
 		end)
@@ -110,7 +119,10 @@ function M.build_project(opts, callback)
 		testReport = parser.parse_logs(output)
 	end
 
-	local on_exit = function()
+	local on_exit = function(_, code, _)
+		if code == 143 then
+			return
+		end
 		logs.set_logs(testReport, false, open_logs_on_success)
 		if not testReport.buildErrors or not testReport.buildErrors[1] then
 			vim.print("Build Succeeded")
@@ -119,7 +131,7 @@ function M.build_project(opts, callback)
 		callback(testReport)
 	end
 
-	xcode.build_project({
+	currentJobId = xcode.build_project({
 		on_exit = on_exit,
 		on_stdout = on_stdout,
 		on_stderr = on_stderr,
@@ -152,13 +164,16 @@ function M.run_tests(testsToRun)
 		testReport = parser.parse_logs(output)
 	end
 
-	local on_exit = function()
+	local on_exit = function(_, code, _)
+		if code == 143 then
+			return
+		end
 		logs.set_logs(testReport, true, true)
 		quickfix.set(testReport)
 		diagnostics.refresh_buf_diagnostics(testReport)
 	end
 
-	xcode.run_tests({
+	currentJobId = xcode.run_tests({
 		on_exit = on_exit,
 		on_stdout = on_stdout,
 		on_stderr = on_stderr,
@@ -241,7 +256,7 @@ function M.run_selected_tests(opts)
 	}
 
 	vim.print("Building...")
-	xcode.list_tests(testOpts, function(tests)
+	currentJobId = xcode.list_tests(testOpts, function(tests)
 		local testsToRun = {}
 
 		for _, test in ipairs(tests) do

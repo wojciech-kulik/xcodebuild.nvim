@@ -45,6 +45,10 @@ function M.setup()
 		})
 	end, { nargs = 0 })
 
+	vim.api.nvim_create_user_command("XcodebuildCancel", function()
+		coordinator.cancel()
+	end, { nargs = 0 })
+
 	vim.api.nvim_set_keymap("n", "dx", "", {
 		callback = function()
 			logs.toggle_logs()
