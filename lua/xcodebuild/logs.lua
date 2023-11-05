@@ -14,22 +14,27 @@ end
 function M.set_logs(report, isTesting, show)
 	appdata.write_original_logs(report.output)
 	local logs_filepath = appdata.get_original_logs_filepath()
-	local prettyOutput = util.shell("cat '" .. logs_filepath .. "' | xcbeautify --disable-colored-output")
+	local command = "cat '" .. logs_filepath .. "' | xcbeautify --disable-colored-output"
 
-	add_summary_header(prettyOutput)
-	M.set_warnings(prettyOutput, report.warnings)
+	vim.fn.jobstart(command, {
+		stdout_buffered = true,
+		on_stdout = function(_, prettyOutput)
+			add_summary_header(prettyOutput)
+			M.set_warnings(prettyOutput, report.warnings)
 
-	if report.buildErrors and report.buildErrors[1] then
-		M.set_errors(prettyOutput, report.buildErrors)
-	elseif isTesting then
-		M.set_test_results(report, prettyOutput)
-	else
-		table.insert(prettyOutput, "  ✔ Build Succeeded")
-		table.insert(prettyOutput, "")
-	end
+			if report.buildErrors and report.buildErrors[1] then
+				M.set_errors(prettyOutput, report.buildErrors)
+			elseif isTesting then
+				M.set_test_results(report, prettyOutput)
+			else
+				table.insert(prettyOutput, "  ✔ Build Succeeded")
+				table.insert(prettyOutput, "")
+			end
 
-	vim.fn.writefile(prettyOutput, appdata.get_build_logs_filepath())
-	M.update_log_panel(show)
+			vim.fn.writefile(prettyOutput, appdata.get_build_logs_filepath())
+			M.update_log_panel(show)
+		end,
+	})
 end
 
 function M.set_test_results(report, prettyOutput)
