@@ -17,6 +17,7 @@ function M.setup()
 
 	-- Build & Test
 	vim.api.nvim_create_user_command("XcodebuildBuild", call(actions.build), { nargs = 0 })
+	vim.api.nvim_create_user_command("XcodebuildRun", call(actions.run), { nargs = 0 })
 	vim.api.nvim_create_user_command("XcodebuildCancel", call(actions.cancel), { nargs = 0 })
 	vim.api.nvim_create_user_command("XcodebuildTest", call(actions.run_tests), { nargs = 0 })
 	vim.api.nvim_create_user_command("XcodebuildTestClass", call(actions.run_class_tests), { nargs = 0 })

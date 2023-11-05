@@ -75,29 +75,33 @@ function M.build_and_run_app(callback)
 	M.build_project({
 		open_logs_on_success = false,
 	}, function(report)
-		local settings = config.settings()
-		local destination = settings.destination
-		local target = settings.appTarget
-
 		if report.buildErrors and report.buildErrors[1] then
 			vim.notify("Build Failed", vim.log.levels.ERROR)
 			logs.open_logs(true, true)
 			return
 		end
 
-		if target then
-			xcode.kill_app(target)
-		end
+		M.run_app(callback)
+	end)
+end
 
-		vim.notify("Installing application...")
-		currentJobId = xcode.install_app(destination, settings.appPath, function()
-			vim.notify("Launching application...")
-			currentJobId = xcode.launch_app(destination, settings.bundleId, function()
-				vim.notify("Application has been launched")
-				if callback then
-					callback()
-				end
-			end)
+function M.run_app(callback)
+	local settings = config.settings()
+	local destination = settings.destination
+	local target = settings.appTarget
+
+	if target then
+		xcode.kill_app(target)
+	end
+
+	vim.notify("Installing application...")
+	currentJobId = xcode.install_app(destination, settings.appPath, function()
+		vim.notify("Launching application...")
+		currentJobId = xcode.launch_app(destination, settings.bundleId, function()
+			vim.notify("Application has been launched")
+			if callback then
+				callback()
+			end
 		end)
 	end)
 end

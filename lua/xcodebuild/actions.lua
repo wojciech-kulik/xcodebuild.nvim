@@ -42,6 +42,10 @@ function M.build_and_run(callback)
 	coordinator.build_and_run_app(callback)
 end
 
+function M.run(callback)
+	coordinator.run_app(callback)
+end
+
 function M.run_tests()
 	coordinator.run_tests()
 end

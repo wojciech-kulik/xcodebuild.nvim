@@ -213,6 +213,7 @@ function M.show_all_actions()
 	local actionsNames = {
 		"Build Project",
 		"Build & Run Project",
+		"Run Without Building",
 		"Stop Running Action",
 
 		"Test Project",
@@ -234,6 +235,7 @@ function M.show_all_actions()
 	local actionsPointers = {
 		actions.build,
 		actions.build_and_run,
+		actions.run,
 		actions.cancel,
 
 		actions.run_tests,
@@ -253,7 +255,7 @@ function M.show_all_actions()
 		actions.close_logs,
 	}
 	M.show("Xcodebuild Actions", actionsNames, function(_, index)
-		if index > 8 then
+		if index > 9 then
 			actionsPointers[index]()
 		else
 			vim.defer_fn(actionsPointers[index], 100)

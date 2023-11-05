@@ -236,7 +236,13 @@ function M.install_app(destination, appPath, callback)
 
 	return vim.fn.jobstart(command, {
 		stdout_buffered = true,
-		on_stdout = callback,
+		on_exit = function(_, code, _)
+			if code ~= 0 then
+				vim.notify("Could not install app (code: " .. code .. ")", vim.log.levels.ERROR)
+			else
+				callback()
+			end
+		end,
 	})
 end
 
@@ -245,7 +251,13 @@ function M.launch_app(destination, bundleId, callback)
 	return vim.fn.jobstart(command, {
 		stdout_buffered = true,
 		detach = true,
-		on_exit = callback,
+		on_exit = function(_, code, _)
+			if code ~= 0 then
+				vim.notify("Could not launch app (code: " .. code .. ")", vim.log.levels.ERROR)
+			else
+				callback()
+			end
+		end,
 	})
 end
 
