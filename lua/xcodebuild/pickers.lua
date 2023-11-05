@@ -36,31 +36,6 @@ function M.show(title, items, callback)
 	show_picker(title, items, callback)
 end
 
-function M.select_device(callback)
-	local runtimes = xcode.get_runtimes()
-	local runtimesName = util.select(runtimes, function(table)
-		return table.name
-	end)
-
-	M.show("Select Platform", runtimesName, function(_, runtimeIndex)
-		local runtimeId = runtimes[runtimeIndex].id
-		local devices = xcode.get_devices(runtimeId)
-		local devicesName = util.select(devices, function(table)
-			return table.name
-		end)
-
-		M.show("Select Device", devicesName, function(_, deviceIndex)
-			local deviceId = devices[deviceIndex].id
-			config.settings().deviceId = deviceId
-			config.save_settings()
-
-			if callback then
-				callback()
-			end
-		end)
-	end)
-end
-
 function M.select_project(callback)
 	local files = util.shell(
 		"find '"
@@ -82,6 +57,11 @@ function M.select_project(callback)
 		return table.name
 	end)
 
+	if not next(filenames) then
+		vim.notify("Could not a detect project file")
+		return
+	end
+
 	M.show("Select Project/Workspace", filenames, function(_, index)
 		local projectFile = sanitizedFiles[index].filepath
 		local isWorkspace = util.hasSuffix(projectFile, "xcworkspace")
@@ -98,67 +78,74 @@ end
 
 function M.select_scheme(callback)
 	local projectCommand = config.settings().projectCommand
-	local schemes = xcode.get_schemes(projectCommand)
 
-	M.show("Select Scheme", schemes, function(value, _)
-		config.settings().scheme = value
-		config.save_settings()
+	return xcode.get_schemes(projectCommand, function(schemes)
+		M.show("Select Scheme", schemes, function(value, _)
+			config.settings().scheme = value
+			config.save_settings()
 
-		if callback then
-			callback()
-		end
+			if callback then
+				callback()
+			end
+		end)
 	end)
 end
 
 function M.select_testplan(callback)
 	local projectCommand = config.settings().projectCommand
 	local scheme = config.settings().scheme
-	local testPlans = xcode.get_testplans(projectCommand, scheme)
 
-	M.show("Select Test Plan", testPlans, function(value, _)
-		config.settings().testPlan = value
-		config.save_settings()
+	return xcode.get_testplans(projectCommand, scheme, function(testPlans)
+		M.show("Select Test Plan", testPlans, function(value, _)
+			config.settings().testPlan = value
+			config.save_settings()
 
-		if callback then
-			callback()
-		end
+			if callback then
+				callback()
+			end
+		end)
 	end)
 end
 
 function M.select_destination(callback)
 	local projectCommand = config.settings().projectCommand
 	local scheme = config.settings().scheme
-	local destinations = util.filter(xcode.get_destinations(projectCommand, scheme), function(table)
-		return table.id ~= nil and table.platform ~= "iOS" and (not table.name or not string.find(table.name, "^Any"))
-	end)
 
-	local destinationsName = util.select(destinations, function(table)
-		local name = table.name or ""
-		if table.platform and table.platform ~= "iOS Simulator" then
-			name = util.trim(name .. " " .. table.platform)
-		end
-		if table.platform == "macOS" and table.arch then
-			name = name .. " (" .. table.arch .. ")"
-		end
-		if table.os then
-			name = name .. " (" .. table.os .. ")"
-		end
-		if table.variant then
-			name = name .. " (" .. table.variant .. ")"
-		end
-		if table.error then
-			name = name .. " [error]"
-		end
-		return name
-	end)
+	return xcode.get_destinations(projectCommand, scheme, function(destinations)
+		local filtered = util.filter(destinations, function(table)
+			return table.id ~= nil
+				and table.platform ~= "iOS"
+				and (not table.name or not string.find(table.name, "^Any"))
+		end)
 
-	M.show("Select Destination", destinationsName, function(_, index)
-		config.settings().destination = destinations[index].id
-		config.save_settings()
+		local destinationsName = util.select(filtered, function(table)
+			local name = table.name or ""
+			if table.platform and table.platform ~= "iOS Simulator" then
+				name = util.trim(name .. " " .. table.platform)
+			end
+			if table.platform == "macOS" and table.arch then
+				name = name .. " (" .. table.arch .. ")"
+			end
+			if table.os then
+				name = name .. " (" .. table.os .. ")"
+			end
+			if table.variant then
+				name = name .. " (" .. table.variant .. ")"
+			end
+			if table.error then
+				name = name .. " [error]"
+			end
+			return name
+		end)
 
-		if callback then
-			callback()
-		end
+		M.show("Select Destination", destinationsName, function(_, index)
+			config.settings().destination = filtered[index].id
+			config.save_settings()
+
+			if callback then
+				callback()
+			end
+		end)
 	end)
 end
 

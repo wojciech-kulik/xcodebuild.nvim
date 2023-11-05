@@ -2,98 +2,128 @@ local util = require("xcodebuild.util")
 
 local M = {}
 
-function M.get_runtimes()
-	local result = {}
-	local content = util.shell("xcrun simctl list runtimes -j -e")
-	local json = vim.fn.json_decode(content)
+function M.get_runtimes(callback)
+	local command = "xcrun simctl list runtimes -j -e"
 
-	for _, runtime in ipairs(json.runtimes) do
-		if runtime.isAvailable then
-			local runtimeName = runtime.name .. " [" .. runtime.buildversion .. "]"
-			table.insert(result, { name = runtimeName, id = runtime.identifier })
-		end
-	end
+	return vim.fn.jobstart(command, {
+		stdout_buffered = true,
+		on_stdout = function(_, output)
+			local result = {}
+			local json = vim.fn.json_decode(output)
 
-	return result
+			for _, runtime in ipairs(json.runtimes) do
+				if runtime.isAvailable then
+					local runtimeName = runtime.name .. " [" .. runtime.buildversion .. "]"
+					table.insert(result, { name = runtimeName, id = runtime.identifier })
+				end
+			end
+
+			callback(result)
+		end,
+	})
 end
 
-function M.get_devices(runtimeId)
-	local result = {}
-	local content = util.shell("xcrun simctl list devices -j -e")
-	local json = vim.fn.json_decode(content)
+function M.get_devices(runtimeId, callback)
+	local command = "xcrun simctl list devices -j -e"
 
-	for _, device in ipairs(json.devices[runtimeId]) do
-		local deviceName = device.name .. " [" .. device.udid .. "]"
-		deviceName = deviceName .. (device.state == "Booted" and " (Booted)" or "")
-		table.insert(result, { name = deviceName, id = device.udid })
-	end
+	return vim.fn.jobstart(command, {
+		stdout_buffered = true,
+		on_stdout = function(_, output)
+			local result = {}
+			local json = vim.fn.json_decode(output)
 
-	return result
+			for _, device in ipairs(json.devices[runtimeId]) do
+				local deviceName = device.name .. " [" .. device.udid .. "]"
+				deviceName = deviceName .. (device.state == "Booted" and " (Booted)" or "")
+				table.insert(result, { name = deviceName, id = device.udid })
+			end
+
+			callback(result)
+		end,
+	})
 end
 
-function M.get_destinations(projectCommand, scheme)
-	local result = {}
-	local content = util.shell("xcodebuild -showdestinations " .. projectCommand .. " -scheme '" .. scheme .. "'")
+function M.get_destinations(projectCommand, scheme, callback)
+	local command = "xcodebuild -showdestinations " .. projectCommand .. " -scheme '" .. scheme .. "'"
 
-	local foundDestinations = false
-	for _, line in ipairs(content) do
-		if foundDestinations and util.trim(line) == "" then
-			break
-		elseif foundDestinations then
-			local trimmed = string.gsub(util.trim(line), ", ", "@")
-			local valuePattern = "%:%s*([^@}]-)%s*[@}]"
-			local destination = {
-				platform = string.match(trimmed, "platform" .. valuePattern),
-				variant = string.match(trimmed, "variant" .. valuePattern),
-				arch = string.match(trimmed, "arch" .. valuePattern),
-				id = string.match(trimmed, "id" .. valuePattern),
-				name = string.match(trimmed, "name" .. valuePattern),
-				os = string.match(trimmed, "OS" .. valuePattern),
-				error = string.match(trimmed, "error" .. valuePattern),
-			}
-			table.insert(result, destination)
-		elseif string.find(util.trim(line), "Available destinations") then
-			foundDestinations = true
-		end
-	end
+	return vim.fn.jobstart(command, {
+		stdout_buffered = true,
+		on_stdout = function(_, output)
+			local result = {}
+			local foundDestinations = false
 
-	return result
+			for _, line in ipairs(output) do
+				if foundDestinations and util.trim(line) == "" then
+					break
+				elseif foundDestinations then
+					local trimmed = string.gsub(util.trim(line), ", ", "@")
+					local valuePattern = "%:%s*([^@}]-)%s*[@}]"
+					local destination = {
+						platform = string.match(trimmed, "platform" .. valuePattern),
+						variant = string.match(trimmed, "variant" .. valuePattern),
+						arch = string.match(trimmed, "arch" .. valuePattern),
+						id = string.match(trimmed, "id" .. valuePattern),
+						name = string.match(trimmed, "name" .. valuePattern),
+						os = string.match(trimmed, "OS" .. valuePattern),
+						error = string.match(trimmed, "error" .. valuePattern),
+					}
+					table.insert(result, destination)
+				elseif string.find(util.trim(line), "Available destinations") then
+					foundDestinations = true
+				end
+			end
+
+			callback(result)
+		end,
+	})
 end
 
-function M.get_schemes(projectCommand)
-	local result = {}
-	local content = util.shell("xcodebuild " .. projectCommand .. " -list")
+function M.get_schemes(projectCommand, callback)
+	local command = "xcodebuild " .. projectCommand .. " -list"
 
-	local foundSchemes = false
-	for _, line in ipairs(content) do
-		if foundSchemes and util.trim(line) == "" then
-			break
-		elseif foundSchemes then
-			table.insert(result, util.trim(line))
-		elseif string.find(util.trim(line), "Schemes") then
-			foundSchemes = true
-		end
-	end
+	return vim.fn.jobstart(command, {
+		stdout_buffered = true,
+		on_stdout = function(_, output)
+			local result = {}
 
-	return result
+			local foundSchemes = false
+			for _, line in ipairs(output) do
+				if foundSchemes and util.trim(line) == "" then
+					break
+				elseif foundSchemes then
+					table.insert(result, util.trim(line))
+				elseif string.find(util.trim(line), "Schemes") then
+					foundSchemes = true
+				end
+			end
+
+			callback(result)
+		end,
+	})
 end
 
-function M.get_testplans(projectCommand, scheme)
-	local result = {}
-	local content = util.shell("xcodebuild test " .. projectCommand .. " -scheme '" .. scheme .. "' -showTestPlans")
+function M.get_testplans(projectCommand, scheme, callback)
+	local command = "xcodebuild test " .. projectCommand .. " -scheme '" .. scheme .. "' -showTestPlans"
 
-	local foundTestPlans = false
-	for _, line in ipairs(content) do
-		if foundTestPlans and util.trim(line) == "" then
-			break
-		elseif foundTestPlans then
-			table.insert(result, util.trim(line))
-		elseif string.find(util.trim(line), "Test plans") then
-			foundTestPlans = true
-		end
-	end
+	return vim.fn.jobstart(command, {
+		stdout_buffered = true,
+		on_stdout = function(_, output)
+			local result = {}
 
-	return result
+			local foundTestPlans = false
+			for _, line in ipairs(output) do
+				if foundTestPlans and util.trim(line) == "" then
+					break
+				elseif foundTestPlans then
+					table.insert(result, util.trim(line))
+				elseif string.find(util.trim(line), "Test plans") then
+					foundTestPlans = true
+				end
+			end
+
+			callback(result)
+		end,
+	})
 end
 
 function M.build_project(opts)
