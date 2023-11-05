@@ -11,7 +11,7 @@ local diagnostics = require("xcodebuild.diagnostics")
 local M = {}
 local testReport = {}
 local currentJobId = nil
-local cachedTests = {}
+local targetToFiles = {}
 
 local function update_settings(output)
 	local settings = xcode.get_app_settings(output)
@@ -75,8 +75,9 @@ function M.build_and_run_app(callback)
 	M.build_project({
 		open_logs_on_success = false,
 	}, function(report)
-		local destination = config.settings().destination
-		local target = config.settings().appTarget
+		local settings = config.settings()
+		local destination = settings.destination
+		local target = settings.appTarget
 
 		if report.buildErrors and report.buildErrors[1] then
 			vim.notify("Build Failed", vim.log.levels.ERROR)
@@ -103,6 +104,8 @@ end
 
 function M.build_project(opts, callback)
 	local open_logs_on_success = (opts or {}).open_logs_on_success
+	local build_for_testing = (opts or {}).build_for_testing
+
 	vim.notify("Building...")
 	vim.cmd("silent wa!")
 	parser.clear()
@@ -140,6 +143,7 @@ function M.build_project(opts, callback)
 		on_stdout = on_stdout,
 		on_stderr = on_stderr,
 
+		build_for_testing = build_for_testing,
 		destination = config.settings().destination,
 		projectCommand = config.settings().projectCommand,
 		scheme = config.settings().scheme,
@@ -169,7 +173,11 @@ function M.run_tests(testsToRun)
 		if code == 143 then
 			return
 		end
+
+		update_settings(testReport.output)
+		targetToFiles = xcode.get_targets_list(config.settings().appPath)
 		logs.set_logs(testReport, true, true)
+		quickfix.setTargets(targetToFiles)
 		quickfix.set(testReport)
 		diagnostics.refresh_buf_diagnostics(testReport)
 	end
@@ -235,6 +243,7 @@ local function find_tests(opts)
 					table.insert(selectedTests, {
 						name = test.name,
 						class = test.class,
+						filepath = test.filepath,
 					})
 				end
 			end
@@ -244,33 +253,42 @@ local function find_tests(opts)
 	return selectedClass, selectedTests
 end
 
+local function find_target_for_file(filepath)
+	for target, files in pairs(targetToFiles) do
+		if util.contains(files, filepath) then
+			return target
+		end
+	end
+end
+
 function M.run_selected_tests(opts)
 	local selectedClass, selectedTests = find_tests(opts)
-	local testOpts = {
-		destination = config.settings().destination,
-		projectCommand = config.settings().projectCommand,
-		scheme = config.settings().scheme,
-		testPlan = config.settings().testPlan,
-	}
 
-	local tests_callback = function(tests)
+	local start = function()
 		local testsToRun = {}
-		for _, test in ipairs(tests) do
-			if opts.currentClass and test.class == selectedClass then
-				table.insert(testsToRun, test.classId)
-				break
+		local testFilepath = vim.api.nvim_buf_get_name(0)
+		local target = find_target_for_file(testFilepath)
+
+		if not target then
+			vim.notify("Could not detect test target. Please run build again.")
+			return
+		end
+
+		if opts.currentClass and selectedClass then
+			table.insert(testsToRun, target .. "/" .. selectedClass)
+		end
+
+		if opts.currentTest or opts.selectedTests then
+			for _, test in ipairs(selectedTests) do
+				table.insert(testsToRun, target .. "/" .. test.class .. "/" .. test.name)
 			end
+		end
 
-			if not opts.currentClass then
-				local matchingTest = util.find(selectedTests, function(val)
-					return val.class == test.class and val.name == test.name
-				end)
-
-				if matchingTest then
-					table.insert(testsToRun, test.testId)
-					if #testsToRun == #selectedTests then
-						break
-					end
+		if opts.failingTests then
+			for _, test in ipairs(selectedTests) do
+				local testTarget = find_target_for_file(test.filepath)
+				if testTarget then
+					table.insert(testsToRun, testTarget .. "/" .. test.class .. "/" .. test.name)
 				end
 			end
 		end
@@ -284,17 +302,17 @@ function M.run_selected_tests(opts)
 		end
 	end
 
-	if cachedTests and cachedTests[testOpts.testPlan] and next(cachedTests[testOpts.testPlan]) then
-		tests_callback(cachedTests[testOpts.testPlan])
-	else
+	if not targetToFiles or not next(targetToFiles) then
 		vim.notify("Loading tests...")
-		currentJobId = xcode.list_tests(testOpts, function(tests)
-			if tests and next(tests) then
-				cachedTests[testOpts.testPlan] = tests
-			end
-
-			tests_callback(tests)
+		currentJobId = M.build_project({
+			build_for_testing = true,
+		}, function()
+			targetToFiles = xcode.get_targets_list(config.settings().appPath)
+			quickfix.setTargets(targetToFiles)
+			start()
 		end)
+	else
+		start()
 	end
 end
 
@@ -319,10 +337,6 @@ function M.configure_project()
 			end)
 		end)
 	end)
-end
-
-function M.clear_tests_cache()
-	cachedTests = {}
 end
 
 return M

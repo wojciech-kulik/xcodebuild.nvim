@@ -23,7 +23,6 @@ function M.setup()
 	vim.api.nvim_create_user_command("XcodebuildTestFunc", call(actions.run_func_test), { nargs = 0 })
 	vim.api.nvim_create_user_command("XcodebuildTestSelected", call(actions.run_selected_tests), { nargs = 0 })
 	vim.api.nvim_create_user_command("XcodebuildTestFailing", call(actions.run_failing_tests), { nargs = 0 })
-	vim.api.nvim_create_user_command("XcodebuildClearTestsCache", call(actions.clear_tests_cache), { nargs = 0 })
 
 	-- Pickers
 	vim.api.nvim_create_user_command("XcodebuildPicker", call(actions.show_picker), { nargs = 0 })

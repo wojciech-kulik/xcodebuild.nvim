@@ -49,7 +49,7 @@ function M.focus_buffer(bufNr)
 end
 
 function M.get_filename(filepath)
-	return string.match(filepath, ".*%/([^/]*)%.swift")
+	return string.match(filepath, ".*%/([^/]*)%..+$")
 end
 
 function M.find_all_swift_files()

@@ -2,6 +2,41 @@ local util = require("xcodebuild.util")
 
 local M = {}
 
+function M.get_targets_list(appPath)
+	if not appPath then
+		vim.print("Could not locate build dir. Please run Build.")
+		return {}
+	end
+
+	local searchPath = string.match(appPath, "(.*/Build)/Products")
+	if not searchPath then
+		vim.print("Could not locate build dir. Please run Build.")
+		return {}
+	end
+
+	searchPath = searchPath .. "/Intermediates.noindex"
+
+	local targetToFiles = {}
+	local fileListFiles = util.shell("find '" .. searchPath .. "' -type f -iname *.SwiftFileList")
+
+	for _, file in ipairs(fileListFiles) do
+		if file ~= "" then
+			local target = util.get_filename(file)
+			local success, content = pcall(vim.fn.readfile, file)
+
+			if success then
+				targetToFiles[target] = targetToFiles[target] or {}
+
+				for _, line in ipairs(content) do
+					table.insert(targetToFiles[target], line)
+				end
+			end
+		end
+	end
+
+	return targetToFiles
+end
+
 function M.get_runtimes(callback)
 	local command = "xcrun simctl list runtimes -j -e"
 
@@ -127,7 +162,9 @@ function M.get_testplans(projectCommand, scheme, callback)
 end
 
 function M.build_project(opts)
+	local action = opts.build_for_testing and "build-for-testing " or ""
 	local command = "xcodebuild "
+		.. action
 		.. opts.projectCommand
 		.. " -scheme '"
 		.. opts.scheme
