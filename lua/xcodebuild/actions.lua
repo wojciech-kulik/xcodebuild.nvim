@@ -70,6 +70,10 @@ function M.run_failing_tests()
 	})
 end
 
+function M.clear_tests_cache()
+	coordinator.clear_tests_cache()
+end
+
 function M.select_project(callback)
 	pickers.select_project(callback, { close_on_select = true })
 end

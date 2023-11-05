@@ -214,16 +214,20 @@ function M.show_all_actions()
 		"Build Project",
 		"Build & Run Project",
 		"Stop Running Action",
+
 		"Test Project",
 		"Test Class",
 		"Test Function",
 		"Test Selected Functions",
 		"Test Failed Tests",
+		"Clear Tests Cache (used for running selected tests)",
+
 		"Select Project File",
 		"Select Scheme",
 		"Select Device",
 		"Select Test Plan",
 		"Show Configuration Wizard",
+
 		"Toggle Logs",
 		"Show Logs",
 		"Close Logs",
@@ -238,6 +242,7 @@ function M.show_all_actions()
 		actions.run_func_test,
 		actions.run_selected_tests,
 		actions.run_failing_tests,
+		actions.clear_tests_cache,
 
 		actions.select_project,
 		actions.select_scheme,
@@ -250,7 +255,7 @@ function M.show_all_actions()
 		actions.close_logs,
 	}
 	M.show("Xcodebuild Actions", actionsNames, function(_, index)
-		if index > 8 then
+		if index > 9 then
 			actionsPointers[index]()
 		else
 			vim.defer_fn(actionsPointers[index], 100)

@@ -11,6 +11,7 @@ local diagnostics = require("xcodebuild.diagnostics")
 local M = {}
 local testReport = {}
 local currentJobId = nil
+local cachedTests = {}
 
 function M.cancel()
 	if currentJobId then
@@ -249,10 +250,8 @@ function M.run_selected_tests(opts)
 		testPlan = config.settings().testPlan,
 	}
 
-	vim.notify("Loading tests...")
-	currentJobId = xcode.list_tests(testOpts, function(tests)
+	local tests_callback = function(tests)
 		local testsToRun = {}
-
 		for _, test in ipairs(tests) do
 			if opts.currentClass and test.class == selectedClass then
 				table.insert(testsToRun, test.classId)
@@ -280,7 +279,20 @@ function M.run_selected_tests(opts)
 		else
 			vim.notify("Tests not found", vim.log.levels.ERROR)
 		end
-	end)
+	end
+
+	if cachedTests and cachedTests[testOpts.testPlan] and next(cachedTests[testOpts.testPlan]) then
+		tests_callback(cachedTests[testOpts.testPlan])
+	else
+		vim.notify("Loading tests...")
+		currentJobId = xcode.list_tests(testOpts, function(tests)
+			if tests and next(tests) then
+				cachedTests[testOpts.testPlan] = tests
+			end
+
+			tests_callback(tests)
+		end)
+	end
 end
 
 function M.configure_project()
@@ -304,6 +316,10 @@ function M.configure_project()
 			end)
 		end)
 	end)
+end
+
+function M.clear_tests_cache()
+	cachedTests = {}
 end
 
 return M
