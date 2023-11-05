@@ -118,7 +118,7 @@ function M.update_log_panel(show)
 		if winnr then
 			util.focus_buffer(bufnr)
 		elseif vim.fn.filereadable(logsFilepath) then
-			vim.cmd("bo split " .. logsFilepath .. " | resize 20")
+			vim.cmd("silent bo split " .. logsFilepath .. " | resize 20")
 			local numberOfLines = #vim.api.nvim_buf_get_lines(0, 0, -1, false)
 			vim.api.nvim_win_set_cursor(0, { numberOfLines, 0 })
 			bufnr = 0
