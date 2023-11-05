@@ -1,5 +1,5 @@
 local xcode = require("xcodebuild.xcode")
-local config = require("xcodebuild.config")
+local projectConfig = require("xcodebuild.project_config")
 local util = require("xcodebuild.util")
 
 local telescopePickers = require("telescope.pickers")
@@ -115,9 +115,9 @@ function M.select_project(callback, opts)
 		local projectFile = sanitizedFiles[index].filepath
 		local isWorkspace = util.hasSuffix(projectFile, "xcworkspace")
 
-		config.settings().projectFile = projectFile
-		config.settings().projectCommand = (isWorkspace and "-workspace '" or "-project '") .. projectFile .. "'"
-		config.save_settings()
+		projectConfig.settings().projectFile = projectFile
+		projectConfig.settings().projectCommand = (isWorkspace and "-workspace '" or "-project '") .. projectFile .. "'"
+		projectConfig.save_settings()
 
 		if callback then
 			callback(projectFile)
@@ -126,11 +126,11 @@ function M.select_project(callback, opts)
 end
 
 function M.select_scheme(callback, opts)
-	local projectCommand = config.settings().projectCommand
+	local projectCommand = projectConfig.settings().projectCommand
 	start_telescope_spinner()
 	M.show("Select Scheme", {}, function(value, _)
-		config.settings().scheme = value
-		config.save_settings()
+		projectConfig.settings().scheme = value
+		projectConfig.save_settings()
 
 		if callback then
 			callback()
@@ -141,13 +141,13 @@ function M.select_scheme(callback, opts)
 end
 
 function M.select_testplan(callback, opts)
-	local projectCommand = config.settings().projectCommand
-	local scheme = config.settings().scheme
+	local projectCommand = projectConfig.settings().projectCommand
+	local scheme = projectConfig.settings().scheme
 
 	start_telescope_spinner()
 	M.show("Select Test Plan", {}, function(value, _)
-		config.settings().testPlan = value
-		config.save_settings()
+		projectConfig.settings().testPlan = value
+		projectConfig.save_settings()
 
 		if callback then
 			callback(value)
@@ -158,8 +158,8 @@ function M.select_testplan(callback, opts)
 end
 
 function M.select_destination(callback, opts)
-	local projectCommand = config.settings().projectCommand
-	local scheme = config.settings().scheme
+	local projectCommand = projectConfig.settings().projectCommand
+	local scheme = projectConfig.settings().scheme
 	local results = {}
 
 	start_telescope_spinner()
@@ -168,8 +168,8 @@ function M.select_destination(callback, opts)
 			return
 		end
 
-		config.settings().destination = results[index].id
-		config.save_settings()
+		projectConfig.settings().destination = results[index].id
+		projectConfig.save_settings()
 
 		if callback then
 			callback(results[index])

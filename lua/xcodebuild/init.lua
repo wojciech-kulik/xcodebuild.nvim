@@ -1,7 +1,7 @@
 local autocmd = require("xcodebuild.autocmd")
 local logs = require("xcodebuild.logs")
 local actions = require("xcodebuild.actions")
-local config = require("xcodebuild.config")
+local projectConfig = require("xcodebuild.project_config")
 
 local M = {}
 
@@ -13,7 +13,7 @@ end
 
 function M.setup()
 	autocmd.setup()
-	config.load_settings()
+	projectConfig.load_settings()
 
 	-- Build & Test
 	vim.api.nvim_create_user_command("XcodebuildBuild", call(actions.build), { nargs = 0 })

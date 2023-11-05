@@ -3,7 +3,7 @@ local parser = require("xcodebuild.parser")
 local util = require("xcodebuild.util")
 local appdata = require("xcodebuild.appdata")
 local quickfix = require("xcodebuild.quickfix")
-local config = require("xcodebuild.config")
+local projectConfig = require("xcodebuild.project_config")
 local xcode = require("xcodebuild.xcode")
 local logs = require("xcodebuild.logs")
 local diagnostics = require("xcodebuild.diagnostics")
@@ -15,10 +15,10 @@ local targetToFiles = {}
 
 local function update_settings(output)
 	local settings = xcode.get_app_settings(output)
-	config.settings().appPath = settings.appPath
-	config.settings().appTarget = settings.targetName
-	config.settings().bundleId = settings.bundleId
-	config.save_settings()
+	projectConfig.settings().appPath = settings.appPath
+	projectConfig.settings().appTarget = settings.targetName
+	projectConfig.settings().bundleId = settings.bundleId
+	projectConfig.save_settings()
 end
 
 function M.cancel()
@@ -86,7 +86,7 @@ function M.build_and_run_app(callback)
 end
 
 function M.run_app(callback)
-	local settings = config.settings()
+	local settings = projectConfig.settings()
 	local destination = settings.destination
 	local target = settings.appTarget
 
@@ -107,7 +107,7 @@ function M.run_app(callback)
 end
 
 function M.uninstall_app(callback)
-	local settings = config.settings()
+	local settings = projectConfig.settings()
 
 	vim.notify("Uninstalling application...")
 	currentJobId = xcode.uninstall_app(settings.destination, settings.bundleId, function()
@@ -160,10 +160,10 @@ function M.build_project(opts, callback)
 		on_stderr = on_stderr,
 
 		build_for_testing = build_for_testing,
-		destination = config.settings().destination,
-		projectCommand = config.settings().projectCommand,
-		scheme = config.settings().scheme,
-		testPlan = config.settings().testPlan,
+		destination = projectConfig.settings().destination,
+		projectCommand = projectConfig.settings().projectCommand,
+		scheme = projectConfig.settings().scheme,
+		testPlan = projectConfig.settings().testPlan,
 	})
 end
 
@@ -191,7 +191,7 @@ function M.run_tests(testsToRun)
 		end
 
 		update_settings(testReport.output)
-		targetToFiles = xcode.get_targets_list(config.settings().appPath)
+		targetToFiles = xcode.get_targets_list(projectConfig.settings().appPath)
 		logs.set_logs(testReport, true, true)
 		quickfix.setTargets(targetToFiles)
 		quickfix.set(testReport)
@@ -203,10 +203,10 @@ function M.run_tests(testsToRun)
 		on_stdout = on_stdout,
 		on_stderr = on_stderr,
 
-		destination = config.settings().destination,
-		projectCommand = config.settings().projectCommand,
-		scheme = config.settings().scheme,
-		testPlan = config.settings().testPlan,
+		destination = projectConfig.settings().destination,
+		projectCommand = projectConfig.settings().projectCommand,
+		scheme = projectConfig.settings().scheme,
+		testPlan = projectConfig.settings().testPlan,
 		testsToRun = testsToRun,
 	})
 end
@@ -323,7 +323,7 @@ function M.run_selected_tests(opts)
 		currentJobId = M.build_project({
 			build_for_testing = true,
 		}, function()
-			targetToFiles = xcode.get_targets_list(config.settings().appPath)
+			targetToFiles = xcode.get_targets_list(projectConfig.settings().appPath)
 			quickfix.setTargets(targetToFiles)
 			start()
 		end)

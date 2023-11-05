@@ -1,12 +1,12 @@
 local util = require("xcodebuild.util")
-local config = require("xcodebuild.config")
+local projectConfig = require("xcodebuild.project_config")
 local xcode = require("xcodebuild.xcode")
 
 local M = {}
 
 function M.wait_for_pid()
 	local co = coroutine
-	local target = config.settings().appTarget
+	local target = projectConfig.settings().appTarget
 
 	if not target then
 		error("You must build the application first")
