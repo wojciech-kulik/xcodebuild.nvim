@@ -38,6 +38,9 @@ function M.setup()
 	vim.api.nvim_create_user_command("XcodebuildShowLogs", call(actions.show_logs), { nargs = 0 })
 	vim.api.nvim_create_user_command("XcodebuildCloseLogs", call(actions.close_logs), { nargs = 0 })
 
+	-- Other
+	vim.api.nvim_create_user_command("XcodebuildUninstall", call(actions.uninstall), { nargs = 0 })
+
 	-- Keymaps
 	vim.api.nvim_set_keymap("n", "dx", "", {
 		callback = function()

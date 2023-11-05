@@ -231,6 +231,8 @@ function M.show_all_actions()
 		"Toggle Logs",
 		"Show Logs",
 		"Close Logs",
+
+		"Uninstall Application",
 	}
 	local actionsPointers = {
 		actions.build,
@@ -253,6 +255,8 @@ function M.show_all_actions()
 		actions.toggle_logs,
 		actions.show_logs,
 		actions.close_logs,
+
+		actions.uninstall,
 	}
 	M.show("Xcodebuild Actions", actionsNames, function(_, index)
 		if index > 9 then

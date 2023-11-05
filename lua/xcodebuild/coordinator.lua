@@ -106,6 +106,18 @@ function M.run_app(callback)
 	end)
 end
 
+function M.uninstall_app(callback)
+	local settings = config.settings()
+
+	vim.notify("Uninstalling application...")
+	currentJobId = xcode.uninstall_app(settings.destination, settings.bundleId, function()
+		vim.notify("Application has been uninstalled")
+		if callback then
+			callback()
+		end
+	end)
+end
+
 function M.build_project(opts, callback)
 	local open_logs_on_success = (opts or {}).open_logs_on_success
 	local build_for_testing = (opts or {}).build_for_testing

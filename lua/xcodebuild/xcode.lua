@@ -261,6 +261,20 @@ function M.launch_app(destination, bundleId, callback)
 	})
 end
 
+function M.uninstall_app(destination, bundleId, callback)
+	local command = "xcrun simctl uninstall '" .. destination .. "' " .. bundleId
+	return vim.fn.jobstart(command, {
+		stdout_buffered = true,
+		on_exit = function(_, code, _)
+			if code ~= 0 then
+				vim.notify("Could not uninstall app (code: " .. code .. ")", vim.log.levels.ERROR)
+			else
+				callback()
+			end
+		end,
+	})
+end
+
 function M.get_app_pid(target)
 	local pid = util.shell("ps aux | grep '" .. target .. ".app' | grep -v grep | awk '{ print$2 }'")
 	local pidString = pid and table.concat(pid, "") or nil

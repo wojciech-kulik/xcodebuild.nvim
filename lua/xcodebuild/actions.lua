@@ -93,4 +93,8 @@ function M.select_device(callback)
 	pickers.select_destination(callback, { close_on_select = true })
 end
 
+function M.uninstall(callback)
+	coordinator.uninstall_app(callback)
+end
+
 return M
