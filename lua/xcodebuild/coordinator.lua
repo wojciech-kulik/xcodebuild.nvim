@@ -62,10 +62,7 @@ function M.refresh_buf_diagnostics(bufnr, file)
 	diagnostics.set_buf_marks(bufnr, testClass, testReport.tests)
 end
 
-function M.build_and_install_app(callback)
-	appdata.create_app_dir()
-	config.load_settings()
-
+function M.build_and_run_app(callback)
 	M.build_project({
 		open_logs_on_success = false,
 	}, function(report)
@@ -88,20 +85,20 @@ function M.build_and_install_app(callback)
 		config.settings().bundleId = settings.bundleId
 		config.save_settings()
 
-		vim.notify("Installing...")
+		vim.notify("Installing application...")
 		currentJobId = xcode.install_app(destination, settings.appPath, function()
-			vim.notify("Launching...")
+			vim.notify("Launching application...")
 			currentJobId = xcode.launch_app(destination, settings.bundleId, function()
-				callback()
+				vim.notify("Application has been launched")
+				if callback then
+					callback()
+				end
 			end)
 		end)
 	end)
 end
 
 function M.build_project(opts, callback)
-	appdata.create_app_dir()
-	config.load_settings()
-
 	local open_logs_on_success = (opts or {}).open_logs_on_success
 	vim.notify("Building...")
 	vim.cmd("silent wa!")
@@ -128,7 +125,10 @@ function M.build_project(opts, callback)
 			vim.notify("Build Succeeded")
 		end
 		quickfix.set(testReport)
-		callback(testReport)
+
+		if callback then
+			callback(testReport)
+		end
 	end
 
 	currentJobId = xcode.build_project({
@@ -144,9 +144,6 @@ function M.build_project(opts, callback)
 end
 
 function M.run_tests(testsToRun)
-	appdata.create_app_dir()
-	config.load_settings()
-
 	vim.notify("Starting Tests...")
 	vim.cmd("silent wa!")
 	parser.clear()
@@ -245,9 +242,6 @@ end
 
 function M.run_selected_tests(opts)
 	local selectedClass, selectedTests = find_tests(opts)
-
-	appdata.create_app_dir()
-	config.load_settings()
 	local testOpts = {
 		destination = config.settings().destination,
 		projectCommand = config.settings().projectCommand,
@@ -255,7 +249,7 @@ function M.run_selected_tests(opts)
 		testPlan = config.settings().testPlan,
 	}
 
-	vim.notify("Building...")
+	vim.notify("Loading tests...")
 	currentJobId = xcode.list_tests(testOpts, function(tests)
 		local testsToRun = {}
 
@@ -301,12 +295,12 @@ function M.configure_project()
 	pickers.select_project(function()
 		defer_print("Loading schemes...")
 		pickers.select_scheme(function()
-			defer_print("Loading test plans...")
-			pickers.select_testplan(function()
-				defer_print("Loading devices...")
-				pickers.select_destination(function()
+			defer_print("Loading devices...")
+			pickers.select_destination(function()
+				defer_print("Loading test plans...")
+				pickers.select_testplan(function()
 					defer_print("Xcodebuild configuration has been saved!")
-				end)
+				end, { close_on_select = true })
 			end)
 		end)
 	end)

@@ -52,7 +52,7 @@ function M.set_test_results(report, prettyOutput)
 		table.insert(prettyOutput, "  ✖ " .. report.failedTestsCount .. " Test(s) Failed")
 		table.insert(prettyOutput, "")
 	else
-		table.insert(prettyOutput, "  ✔ All " .. report.testsCount .. " Test(s) Passed")
+		table.insert(prettyOutput, "  ✔ All Tests Passed [Executed: " .. report.testsCount .. "]")
 		table.insert(prettyOutput, "")
 	end
 end

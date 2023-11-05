@@ -1,42 +1,91 @@
-local pickers = require("telescope.pickers")
-local finders = require("telescope.finders")
-local conf = require("telescope.config").values
-local actions = require("telescope.actions")
-local action_state = require("telescope.actions.state")
 local xcode = require("xcodebuild.xcode")
 local config = require("xcodebuild.config")
 local util = require("xcodebuild.util")
 
+local telescopePickers = require("telescope.pickers")
+local telescopeFinders = require("telescope.finders")
+local telescopeConfig = require("telescope.config").values
+local telescopeActions = require("telescope.actions")
+local telescopeState = require("telescope.actions.state")
+
 local M = {}
 
-local function show_picker(title, items, callback)
-	pickers
-		.new(require("telescope.themes").get_dropdown({}), {
-			prompt_title = title,
-			finder = finders.new_table({
-				results = items,
+local active_picker = nil
+local anim_timer = nil
+local current_frame = 1
+local spinner_anim_frames = {
+	"[      ]",
+	"[ .    ]",
+	"[ ..   ]",
+	"[ ...  ]",
+	"[  ... ]",
+	"[   .. ]",
+	"[    . ]",
+}
+
+local function update_telescope_spinner()
+	if active_picker then
+		current_frame = current_frame >= #spinner_anim_frames and 1 or current_frame + 1
+		active_picker:change_prompt_prefix(spinner_anim_frames[current_frame] .. " ", "TelescopePromptPrefix")
+		vim.cmd("echo '" .. spinner_anim_frames[current_frame] .. "'")
+	end
+end
+
+local function start_telescope_spinner()
+	if not anim_timer then
+		anim_timer = vim.fn.timer_start(80, update_telescope_spinner, { ["repeat"] = -1 })
+	end
+end
+
+local function stop_telescope_spinner()
+	if anim_timer then
+		vim.fn.timer_stop(anim_timer)
+		anim_timer = nil
+		vim.cmd("echo ''")
+	end
+end
+
+local function update_results(results)
+	stop_telescope_spinner()
+
+	if active_picker then
+		active_picker:refresh(
+			telescopeFinders.new_table({
+				results = results,
 			}),
-			sorter = conf.generic_sorter(),
-			attach_mappings = function(prompt_bufnr, _)
-				actions.select_default:replace(function()
-					actions.close(prompt_bufnr)
-
-					if callback then
-						local selection = action_state.get_selected_entry()
-						callback(selection[1], selection.index)
-					end
-				end)
-				return true
-			end,
-		})
-		:find()
+			{
+				new_prefix = telescopeConfig.prompt_prefix,
+			}
+		)
+	end
 end
 
-function M.show(title, items, callback)
-	show_picker(title, items, callback)
+function M.show(title, items, callback, opts)
+	active_picker = telescopePickers.new(require("telescope.themes").get_dropdown({}), {
+		prompt_title = title,
+		finder = telescopeFinders.new_table({
+			results = items,
+		}),
+		sorter = telescopeConfig.generic_sorter(),
+		attach_mappings = function(prompt_bufnr, _)
+			telescopeActions.select_default:replace(function()
+				if opts and opts.close_on_select then
+					telescopeActions.close(prompt_bufnr)
+				end
+
+				local selection = telescopeState.get_selected_entry()
+				if callback and selection then
+					callback(selection[1], selection.index)
+				end
+			end)
+			return true
+		end,
+	})
+
+	active_picker:find()
 end
 
-function M.select_project(callback)
+function M.select_project(callback, opts)
 	local files = util.shell(
 		"find '"
 			.. vim.fn.getcwd()
@@ -71,45 +120,61 @@ function M.select_project(callback)
 		config.save_settings()
 
 		if callback then
+			callback(projectFile)
+		end
+	end, opts)
+end
+
+function M.select_scheme(callback, opts)
+	local projectCommand = config.settings().projectCommand
+	start_telescope_spinner()
+	M.show("Select Scheme", {}, function(value, _)
+		config.settings().scheme = value
+		config.save_settings()
+
+		if callback then
 			callback()
 		end
-	end)
+	end, opts)
+
+	return xcode.get_schemes(projectCommand, update_results)
 end
 
-function M.select_scheme(callback)
-	local projectCommand = config.settings().projectCommand
-
-	return xcode.get_schemes(projectCommand, function(schemes)
-		M.show("Select Scheme", schemes, function(value, _)
-			config.settings().scheme = value
-			config.save_settings()
-
-			if callback then
-				callback()
-			end
-		end)
-	end)
-end
-
-function M.select_testplan(callback)
+function M.select_testplan(callback, opts)
 	local projectCommand = config.settings().projectCommand
 	local scheme = config.settings().scheme
 
-	return xcode.get_testplans(projectCommand, scheme, function(testPlans)
-		M.show("Select Test Plan", testPlans, function(value, _)
-			config.settings().testPlan = value
-			config.save_settings()
+	start_telescope_spinner()
+	M.show("Select Test Plan", {}, function(value, _)
+		config.settings().testPlan = value
+		config.save_settings()
 
-			if callback then
-				callback()
-			end
-		end)
-	end)
+		if callback then
+			callback(value)
+		end
+	end, opts)
+
+	return xcode.get_testplans(projectCommand, scheme, update_results)
 end
 
-function M.select_destination(callback)
+function M.select_destination(callback, opts)
 	local projectCommand = config.settings().projectCommand
 	local scheme = config.settings().scheme
+	local results = {}
+
+	start_telescope_spinner()
+	M.show("Select Device", {}, function(_, index)
+		if index <= 0 then
+			return
+		end
+
+		config.settings().destination = results[index].id
+		config.save_settings()
+
+		if callback then
+			callback(results[index])
+		end
+	end, opts)
 
 	return xcode.get_destinations(projectCommand, scheme, function(destinations)
 		local filtered = util.filter(destinations, function(table)
@@ -138,15 +203,59 @@ function M.select_destination(callback)
 			return name
 		end)
 
-		M.show("Select Destination", destinationsName, function(_, index)
-			config.settings().destination = filtered[index].id
-			config.save_settings()
-
-			if callback then
-				callback()
-			end
-		end)
+		results = filtered
+		update_results(destinationsName)
 	end)
+end
+
+function M.show_all_actions()
+	local actions = require("xcodebuild.actions")
+	local actionsNames = {
+		"Build Project",
+		"Build & Run Project",
+		"Stop Running Action",
+		"Test Project",
+		"Test Class",
+		"Test Function",
+		"Test Selected Functions",
+		"Test Failed Tests",
+		"Select Project File",
+		"Select Scheme",
+		"Select Device",
+		"Select Test Plan",
+		"Show Configuration Wizard",
+		"Toggle Logs",
+		"Show Logs",
+		"Close Logs",
+	}
+	local actionsPointers = {
+		actions.build,
+		actions.build_and_run,
+		actions.cancel,
+
+		actions.run_tests,
+		actions.run_class_tests,
+		actions.run_func_test,
+		actions.run_selected_tests,
+		actions.run_failing_tests,
+
+		actions.select_project,
+		actions.select_scheme,
+		actions.select_device,
+		actions.select_testplan,
+		actions.configure_project,
+
+		actions.toggle_logs,
+		actions.show_logs,
+		actions.close_logs,
+	}
+	M.show("Xcodebuild Actions", actionsNames, function(_, index)
+		if index > 8 then
+			actionsPointers[index]()
+		else
+			vim.defer_fn(actionsPointers[index], 100)
+		end
+	end, { close_on_select = true })
 end
 
 return M
