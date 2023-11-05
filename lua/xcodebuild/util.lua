@@ -53,8 +53,7 @@ function M.get_filename(filepath)
 end
 
 function M.find_all_swift_files()
-	local pwd = vim.api.nvim_exec2("pwd", { output = true })["output"]
-	local allFiles = vim.fn.system({ "find", pwd, "-iname", "*.swift" })
+	local allFiles = vim.fn.system({ "find", vim.fn.getcwd(), "-iname", "*.swift" })
 
 	local map = {}
 
@@ -63,19 +62,6 @@ function M.find_all_swift_files()
 		if filename then
 			map[filename] = filepath
 		end
-	end
-
-	return map
-end
-
-function M.find_all_swift_files2()
-	local pwd = vim.api.nvim_exec2("pwd", { output = true })["output"]
-	local allFiles = vim.fn.system({ "find", pwd, "-iname", "*.swift" })
-
-	local map = {}
-
-	for _, filepath in ipairs(vim.split(allFiles, "\n", { plain = true })) do
-		table.insert(map, filepath)
 	end
 
 	return map

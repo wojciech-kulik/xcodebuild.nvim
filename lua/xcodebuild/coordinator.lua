@@ -13,6 +13,14 @@ local testReport = {}
 local currentJobId = nil
 local cachedTests = {}
 
+local function update_settings(output)
+	local settings = xcode.get_app_settings(output)
+	config.settings().appPath = settings.appPath
+	config.settings().appTarget = settings.targetName
+	config.settings().bundleId = settings.bundleId
+	config.save_settings()
+end
+
 function M.cancel()
 	if currentJobId then
 		vim.fn.jobstop(currentJobId)
@@ -69,7 +77,6 @@ function M.build_and_run_app(callback)
 	}, function(report)
 		local destination = config.settings().destination
 		local target = config.settings().appTarget
-		local settings = xcode.get_app_settings(report.output)
 
 		if report.buildErrors and report.buildErrors[1] then
 			vim.notify("Build Failed", vim.log.levels.ERROR)
@@ -80,11 +87,6 @@ function M.build_and_run_app(callback)
 		if target then
 			xcode.kill_app(target)
 		end
-
-		config.settings().appPath = settings.appPath
-		config.settings().appTarget = settings.targetName
-		config.settings().bundleId = settings.bundleId
-		config.save_settings()
 
 		vim.notify("Installing application...")
 		currentJobId = xcode.install_app(destination, settings.appPath, function()
@@ -123,6 +125,7 @@ function M.build_project(opts, callback)
 		end
 		logs.set_logs(testReport, false, open_logs_on_success)
 		if not testReport.buildErrors or not testReport.buildErrors[1] then
+			update_settings(testReport.output)
 			vim.notify("Build Succeeded")
 		end
 		quickfix.set(testReport)

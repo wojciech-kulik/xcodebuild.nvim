@@ -177,10 +177,14 @@ local function parse_test_finished(line)
 		local testClass, testName, testResult, time =
 			string.match(line, "^Test case %'(%w+)%.(%g+)%(.*%' (%w+) .* %(([^%)]*)%)$")
 		if testClass and testName and testResult then
+			-- TODO: finding file path assuming that the test class name equals file name
+			-- and that this is unique might not be accurate.
+			-- Is there any way to obtain the file path to the test class based on information
+			-- provided in logs?
 			local filepath = allSwiftFiles[testClass]
 			lineData = {
 				filepath = filepath,
-				filename = filepath and util.get_filename(allSwiftFiles[testClass]) or nil,
+				filename = filepath and util.get_filename(filepath) or nil,
 				class = testClass,
 				name = testName,
 				lineNumber = filepath and find_test_line(filepath, testName) or nil,
@@ -199,6 +203,10 @@ local function parse_test_finished(line)
 end
 
 local function parse_test_started(line)
+	-- TODO: finding file path assuming that the test class name equals file name
+	-- and that this is unique might not be accurate.
+	-- Is there any way to obtain the file path to the test class based on information
+	-- provided in logs?
 	local testClass, testName = string.match(line, "^Test Case .*.%-%[%w+%.(%w+) (%g+)%]")
 	local filepath = allSwiftFiles[testClass]
 	testsCount = testsCount + 1
@@ -206,7 +214,7 @@ local function parse_test_started(line)
 	lineType = TEST_START
 	lineData = {
 		filepath = filepath,
-		filename = filepath and util.get_filename(allSwiftFiles[testClass]) or nil,
+		filename = filepath and util.get_filename(filepath) or nil,
 		class = testClass,
 		name = testName,
 	}

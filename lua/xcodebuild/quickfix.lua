@@ -54,11 +54,18 @@ local function set_warnings(list, warnings)
 end
 
 local function set_diagnostics_for_test_errors(list, diagnostics)
-	local allSwiftFiles = util.find_all_swift_files2()
+	local allSwiftFiles = util.find_all_swift_files()
+
 	for _, diagnostic in ipairs(diagnostics) do
-		for _, filepath in ipairs(allSwiftFiles) do
+		for _, filepath in pairs(allSwiftFiles) do
+			-- Errors are returned like "{target}/{filename}", for example: "MyProjectTests/Mocks.swift"
+			-- We are trying to find a real path based on that.
+			-- The code below assumes that the path should match "MyProject/.*/Mocks.swift"
+			-- In general, those errors occur only when the code is crashing during tests.
+			-- TODO: This code may not be accurate when the target is named differently than the folder. Also, the pattern could match some other place.
 			local filepathPattern = string.gsub(diagnostic.filepath, "/", "/.*/")
 			filepathPattern = string.gsub(filepathPattern, "Tests/", "/")
+
 			if string.find(filepath, filepathPattern) then
 				diagnostic.filepath = filepath
 				diagnostic.filename = util.get_filename(filepath)
