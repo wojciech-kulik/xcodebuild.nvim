@@ -23,6 +23,13 @@ local spinner_anim_frames = {
   "[    . ]",
 }
 
+local function stop_telescope_spinner()
+  if anim_timer then
+    vim.fn.timer_stop(anim_timer)
+    anim_timer = nil
+  end
+end
+
 local function update_telescope_spinner()
   if active_picker then
     current_frame = current_frame >= #spinner_anim_frames and 1 or current_frame + 1
@@ -30,21 +37,18 @@ local function update_telescope_spinner()
       spinner_anim_frames[current_frame] .. " ",
       "TelescopePromptPrefix"
     )
-    vim.cmd("echo '" .. spinner_anim_frames[current_frame] .. "'")
+
+    if not vim.api.nvim_win_is_valid(active_picker.results_win) then
+      stop_telescope_spinner()
+    end
+  else
+    stop_telescope_spinner()
   end
 end
 
 local function start_telescope_spinner()
   if not anim_timer then
     anim_timer = vim.fn.timer_start(80, update_telescope_spinner, { ["repeat"] = -1 })
-  end
-end
-
-local function stop_telescope_spinner()
-  if anim_timer then
-    vim.fn.timer_stop(anim_timer)
-    anim_timer = nil
-    vim.cmd("echo ''")
   end
 end
 
