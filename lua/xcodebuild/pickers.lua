@@ -259,12 +259,12 @@ function M.show_all_actions()
     "Select Build Configuration",
     "Select Device",
     "Select Test Plan",
-    "Show Configuration Wizard",
 
     "Toggle Logs",
     "Show Logs",
     "Close Logs",
 
+    "Show Configuration Wizard",
     "Uninstall Application",
   }
   local actionsPointers = {
@@ -284,12 +284,12 @@ function M.show_all_actions()
     actions.select_config,
     actions.select_device,
     actions.select_testplan,
-    actions.configure_project,
 
     actions.toggle_logs,
     actions.show_logs,
     actions.close_logs,
 
+    actions.configure_project,
     actions.uninstall,
   }
   M.show("Xcodebuild Actions", actionsNames, function(_, index)

@@ -140,7 +140,7 @@ end
 function M.uninstall_app(callback)
   local settings = projectConfig.settings()
   if settings.platform == "macOS" then
-    logs.notify("macOS app doesn't require uninstalling")
+    logs.notify("macOS app doesn't require uninstalling", vim.log.levels.ERROR)
     return
   end
 

@@ -8,7 +8,7 @@ A plugin that lets you move your iOS, iPadOS and macOS apps development to Neovi
 
 ## 🚧 Disclaimer
 
-This plugin is in early stage of development. It was tested on a limited number of projects and configurations. Therefore, it still could be buggy. If you find any issues don't hesitate to fix it and create a pull request or just report them.
+This plugin is in the early stage of development. It was tested on a limited number of projects and configurations. Therefore, it still could be buggy. If you find any issues don't hesitate to fix it and create a pull request or just report them.
 
 It is also my first Neovim plugin. Hopefully, a good one 😁.
 
@@ -20,7 +20,7 @@ Of course, you will still need Xcode for some project setup & management. Also, 
 
 - [x] Support for iOS, iPadOS, and macOS apps.
 - [x] Project-based configuration.
-- [x] Configuration wizard to setup: project file, scheme, test plan, and device.
+- [x] Configuration wizard to setup: project file, scheme, config, device, and test plan.
 - [x] Built based on core command line tools like `xcodebuild` and `xcrun simctl`. It doesn't require any external tools, only `xcbeautify` to format logs, but it could be changed in configuration.
 - [x] Build, run and test actions.
 - [x] App deployment to selected iOS simulator.
@@ -30,15 +30,15 @@ Of course, you will still need Xcode for some project setup & management. Also, 
 - [x] Showing test duration next to each test.
 - [x] Showing test errors in diagnostics and on the quickfix list.
 - [x] Showing build errors and warnings on the quickfix list.
-- [x] Advanced log parser to detect all errors, warnings, and failing tests to present them nicely formatted.
+- [x] Advanced log parser to detect all errors, warnings, and failing tests and to present them nicely formatted.
 - [x] Auto saving files before build or test actions.
-- [x] [nvim-dap](https://github.com/mfussenegger/nvim-dap) helper function to let you easily build, run, and attach the debugger.
+- [x] [nvim-dap](https://github.com/mfussenegger/nvim-dap) helper functions to let you easily build, run, and attach the debugger.
 - [x] [telescope.nvim](https://github.com/nvim-telescope/telescope.nvim) integration to show pickers with selectable project options.
 - [x] Picker with all available actions.
 
 ## 👷 Limitations
 
-The plugin assumes that test class name should match file name. If in logs `YourTraget.YourTestClass.testYourTest` appears, the plugin is trying to locate `YourTestClass.swift` file and show test results there (marks + diagnostics + quickfix).
+The plugin assumes that test class name should match file name. If `YourTraget.YourTestClass.testYourTest` appears in logs, the plugin will try locating `YourTestClass.swift` file and show test results there (marks + diagnostics + quickfix).
 
 If you have a different naming convention, or if you have multiple test classes named the same across the project, it may not work correctly.
 
@@ -86,7 +86,7 @@ Xcodebuild.nvim comes with the following defaults:
   logs = {
     auto_open_on_success_tests = true, -- open logs when tests succeeded
     auto_open_on_failed_tests = true, -- open logs when tests failed
-    auto_open_on_success_build = true, -- pen logs when build succeeded
+    auto_open_on_success_build = true, -- open logs when build succeeded
     auto_open_on_failed_build = true, -- open logs when build failed
     auto_focus = true, -- focus logs buffer when opened
     open_command = "silent bo split {path} | resize 20", -- command used to open logs panel. You must use {path} variable to load the log file
@@ -113,7 +113,7 @@ Xcodebuild.nvim comes with the following defaults:
     file_pattern = "*Tests.swift", -- test diagnostics will be loaded in files matching this pattern (if available)
   },
   quickfix = {
-    show_errors_on_quickfixlist = true, -- add errors to quickfix list
+    show_errors_on_quickfixlist = true, -- add build/test errors to quickfix list
     show_warnings_on_quickfixlist = true, -- add build warnings to quickfix list
   },
 }
@@ -131,9 +131,9 @@ To configure DAP for development:
 ```lua
 return {
   "mfussenegger/nvim-dap",
-    dependencies = {
-        "wojciech-kulik/xcodebuild.nvim"
-    },
+  dependencies = {
+    "wojciech-kulik/xcodebuild.nvim"
+  },
   config = function()
     local dap = require("dap")
 
@@ -142,7 +142,7 @@ return {
         name = "iOS App Debugger",
         type = "codelldb",
         request = "attach",
-                -- this will wait until the app is launched
+        -- this will wait until the app is launched
         pid = require("xcodebuild.dap").wait_for_pid,
         cwd = "${workspaceFolder}",
         stopOnEntry = false,
@@ -153,31 +153,31 @@ return {
       type = "server",
       port = "13000",
       executable = {
-                -- set path to the downloaded codelldb
+        -- set path to the downloaded codelldb
         command = "/path/to/codelldb/extension/adapter/codelldb",
         args = {
           "--port",
           "13000",
           "--liblldb",
-                    -- make sure that this path is correct on your side
+          -- make sure that this path is correct on your side
           "/Applications/Xcode.app/Contents/SharedFrameworks/LLDB.framework/Versions/A/LLDB",
         },
       },
     }
 
-        -- sample keymap to build & run the app
+    -- sample keymap to build & run the app
     vim.keymap.set("n", "<leader>R", function()
       require("xcodebuild.dap").build_and_run(function()
         dap.continue()
       end)
     end)
-    end,
+  end,
 }
 ```
 
 ## 🚀 Usage
 
-Make sure to open your project's root directory in Neovim and run `XcodebuildSetup` to configure the project. The plugin needs several information like project file, scheme, device, and test plan to be able to run commands.
+Make sure to open your project's root directory in Neovim and run `XcodebuildSetup` to configure the project. The plugin needs several information like project file, scheme, config, device, and test plan to be able to run commands.
 
 ### Commands
 
@@ -196,11 +196,11 @@ Xcodebuild.nvim comes with the following commands:
 | `XcodebuildTestFunc`       | Run test (where the cursor is)                           |
 | `XcodebuildTestSelected`   | Run selected tests (using visual mode)                   |
 | `XcodebuildTestFailing`    | Rerun previously failed tests                            |
-| `XcodebuildSelectProject`  | Show picker with project file selection                  |
-| `XcodebuildSelectScheme`   | Show picker with scheme selection                        |
-| `XcodebuildSelectConfig`   | Show picker with build configuration selection           |
-| `XcodebuildSelectDevice`   | Show picker with device selection                        |
-| `XcodebuildSelectTestPlan` | Show picker with test plan selection                     |
+| `XcodebuildSelectProject`  | Show project file picker                                 |
+| `XcodebuildSelectScheme`   | Show scheme picker                                       |
+| `XcodebuildSelectConfig`   | Show build configuration picker                          |
+| `XcodebuildSelectDevice`   | Show device picker                                       |
+| `XcodebuildSelectTestPlan` | Show test plan picker                                    |
 | `XcodebuildToggleLogs`     | Toggle logs panel                                        |
 | `XcodebuildOpenLogs`       | Open logs panel                                          |
 | `XcodebuildCloseLogs`      | Close logs panel                                         |
@@ -251,7 +251,8 @@ Sample `settings.json`:
 
 ## ⏳ Things To Do
 
-- [ ] Error handling - there is a lot of things that can go wrong with `xcodebuild` commands. Currently only errors from build and test actions are handled properly.
+- [ ] Add Neovim documentation
+- [ ] Error handling - there are a lot of things that can go wrong with `xcodebuild` commands. Currently, only errors from build and test actions are handled properly.
 - [ ] Show build progress based on the last build time.
 - [ ] List of tests to browse and run. Something like a tree with tests?
 - [ ] Presentation of currently selected device/config?

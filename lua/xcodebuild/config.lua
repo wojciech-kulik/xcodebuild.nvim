@@ -6,7 +6,7 @@ local defaults = {
   logs = {
     auto_open_on_success_tests = true, -- open logs when tests succeeded
     auto_open_on_failed_tests = true, -- open logs when tests failed
-    auto_open_on_success_build = true, -- pen logs when build succeeded
+    auto_open_on_success_build = true, -- open logs when build succeeded
     auto_open_on_failed_build = true, -- open logs when build failed
     auto_focus = true, -- focus logs buffer when opened
     open_command = "silent bo split {path} | resize 20", -- command used to open logs panel. You must use {path} variable to load the log file
@@ -33,7 +33,7 @@ local defaults = {
     file_pattern = "*Tests.swift", -- test diagnostics will be loaded in files matching this pattern (if available)
   },
   quickfix = {
-    show_errors_on_quickfixlist = true, -- add errors to quickfix list
+    show_errors_on_quickfixlist = true, -- add build/test errors to quickfix list
     show_warnings_on_quickfixlist = true, -- add build warnings to quickfix list
   },
 }
