@@ -117,6 +117,10 @@ function M.select_device(callback)
   end, { close_on_select = true })
 end
 
+function M.show_current_config()
+  coordinator.show_current_config()
+end
+
 function M.uninstall(callback)
   coordinator.uninstall_app(callback)
 end

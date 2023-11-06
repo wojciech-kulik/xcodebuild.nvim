@@ -264,6 +264,7 @@ function M.show_all_actions()
     "Show Logs",
     "Close Logs",
 
+    "Show Current Configuration",
     "Show Configuration Wizard",
     "Uninstall Application",
   }
@@ -289,6 +290,7 @@ function M.show_all_actions()
     actions.show_logs,
     actions.close_logs,
 
+    actions.show_current_config,
     actions.configure_project,
     actions.uninstall,
   }

@@ -13,6 +13,31 @@ local testReport = {}
 local currentJobId = nil
 local targetToFiles = {}
 
+function M.show_current_config()
+  local settings = projectConfig.settings()
+  vim.defer_fn(function()
+    logs.notify([[
+      Project Configuration
+
+      - platform: ]] .. settings.platform .. [[
+
+      - project: ]] .. settings.projectFile .. [[
+
+      - scheme: ]] .. settings.scheme .. [[
+
+      - config: ]] .. settings.config .. [[
+
+      - destination: ]] .. settings.destination .. [[
+
+      - testPlan: ]] .. (settings.testPlan or "") .. [[
+
+      - bundleId: ]] .. settings.bundleId .. [[
+
+      - appPath: ]] .. settings.appPath .. [[
+    ]])
+  end, 100)
+end
+
 function M.update_settings(callback)
   local settings = projectConfig.settings()
 
