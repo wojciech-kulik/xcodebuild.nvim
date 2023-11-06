@@ -13,7 +13,32 @@ local testReport = {}
 local currentJobId = nil
 local targetToFiles = {}
 
+local function validate_project()
+  if not require("xcodebuild.project_config").is_project_configured() then
+    logs.notify(
+      "The project is missing some details. Please run XcodebuildSetup first.",
+      vim.log.levels.ERROR
+    )
+    return false
+  end
+
+  return true
+end
+
+local function validate_testplan()
+  if not require("xcodebuild.project_config").settings().testPlan then
+    logs.notify("Test plan not found. Please run XcodebuilSelectTestPlan", vim.log.levels.ERROR)
+    return false
+  end
+
+  return true
+end
+
 function M.show_current_config()
+  if not validate_project() then
+    return
+  end
+
   local settings = projectConfig.settings()
   vim.defer_fn(function()
     logs.notify([[
@@ -34,6 +59,8 @@ function M.show_current_config()
       - bundleId: ]] .. settings.bundleId .. [[
 
       - appPath: ]] .. settings.appPath .. [[
+
+      - productName: ]] .. settings.productName .. [[
     ]])
   end, 100)
 end
@@ -48,7 +75,7 @@ function M.update_settings(callback)
     settings.config,
     function(buildSettings)
       projectConfig.settings().appPath = buildSettings.appPath
-      projectConfig.settings().appTarget = buildSettings.targetName
+      projectConfig.settings().productName = buildSettings.productName
       projectConfig.settings().bundleId = buildSettings.bundleId
       projectConfig.save_settings()
       if callback then
@@ -113,6 +140,10 @@ function M.refresh_buf_diagnostics(bufnr, file)
 end
 
 function M.build_and_run_app(callback)
+  if not validate_project() then
+    return
+  end
+
   M.build_project({
     open_logs_on_success = false,
   }, function(report)
@@ -127,6 +158,10 @@ function M.build_and_run_app(callback)
 end
 
 function M.run_app(callback)
+  if not validate_project() then
+    return
+  end
+
   local settings = projectConfig.settings()
 
   if settings.platform == "macOS" then
@@ -143,10 +178,10 @@ function M.run_app(callback)
     end
   else
     local destination = settings.destination
-    local target = settings.appTarget
+    local productName = settings.productName
 
-    if target then
-      xcode.kill_app(target)
+    if productName then
+      xcode.kill_app(productName)
     end
 
     logs.notify("Installing application...")
@@ -163,6 +198,10 @@ function M.run_app(callback)
 end
 
 function M.uninstall_app(callback)
+  if not validate_project() then
+    return
+  end
+
   local settings = projectConfig.settings()
   if settings.platform == "macOS" then
     logs.notify("macOS app doesn't require uninstalling", vim.log.levels.ERROR)
@@ -186,6 +225,10 @@ function M.auto_save()
 end
 
 function M.build_project(opts, callback)
+  if not validate_project() then
+    return
+  end
+
   local open_logs_on_success = (opts or {}).open_logs_on_success
   local build_for_testing = (opts or {}).build_for_testing
 
@@ -209,6 +252,8 @@ function M.build_project(opts, callback)
     if code == 143 then
       return
     end
+
+    vim.cmd("echo ''")
 
     local config = require("xcodebuild.config").options.logs
     local hasErrors = testReport.buildErrors and testReport.buildErrors[1]
@@ -241,6 +286,10 @@ function M.build_project(opts, callback)
 end
 
 function M.run_tests(testsToRun)
+  if not validate_project() or not validate_testplan() then
+    return
+  end
+
   logs.notify("Starting Tests...")
   M.auto_save()
   parser.clear()
@@ -356,6 +405,9 @@ local function find_target_for_file(filepath)
 end
 
 function M.run_selected_tests(opts)
+  if not validate_project() or not validate_testplan() then
+    return
+  end
   local selectedClass, selectedTests = find_tests(opts)
 
   local start = function()

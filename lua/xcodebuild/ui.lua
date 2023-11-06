@@ -1,7 +1,7 @@
 local M = {}
 
-local function notify(message)
-  require("xcodebuild.logs").notify(message)
+local function notify(message, severity)
+  require("xcodebuild.logs").notify(message, severity)
 end
 
 local function notify_progress(message)
@@ -14,19 +14,23 @@ function M.show_tests_progress(report, firstChunk)
       notify("Building Project...")
     end
   else
-    notify_progress("Running Tests [Executed: " .. report.testsCount .. ", Failed: " .. report.failedTestsCount .. "]")
+    notify_progress(
+      "Running Tests [Executed: " .. report.testsCount .. ", Failed: " .. report.failedTestsCount .. "]"
+    )
   end
 end
 
 function M.print_tests_summary(report)
   if report.testsCount == 0 then
-    notify("Tests Failed [Executed: 0]")
+    notify("Tests Failed [Executed: 0]", vim.log.levels.ERROR)
   else
     notify(
       report.failedTestsCount == 0 and "All Tests Passed [Executed: " .. report.testsCount .. "]"
-        or "Tests Failed [Executed: " .. report.testsCount .. ", Failed: " .. report.failedTestsCount .. "]"
+        or "Tests Failed [Executed: " .. report.testsCount .. ", Failed: " .. report.failedTestsCount .. "]",
+      report.failedTestsCount == 0 and vim.log.levels.INFO or vim.log.levels.ERROR
     )
   end
+  vim.cmd("echo ''")
 end
 
 function M.open_test_file(tests)

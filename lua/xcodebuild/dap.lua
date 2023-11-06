@@ -12,9 +12,9 @@ end
 
 function M.wait_for_pid()
   local co = coroutine
-  local target = projectConfig.settings().appTarget
+  local productName = projectConfig.settings().productName
 
-  if not target then
+  if not productName then
     error("You must build the application first")
   end
 
@@ -24,7 +24,7 @@ function M.wait_for_pid()
     logs.notify("Attaching debugger...")
     for _ = 1, 10 do
       util.shell("sleep 1")
-      pid = xcode.get_app_pid(target)
+      pid = xcode.get_app_pid(productName)
 
       if tonumber(pid) then
         break

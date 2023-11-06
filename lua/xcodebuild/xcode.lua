@@ -186,11 +186,7 @@ function M.get_project_information(projectCommand, callback)
 end
 
 function M.get_testplans(projectCommand, scheme, callback)
-  local command = "xcodebuild test "
-    .. projectCommand
-    .. " -scheme '"
-    .. scheme
-    .. "' -showTestPlans"
+  local command = "xcodebuild test " .. projectCommand .. " -scheme '" .. scheme .. "' -showTestPlans"
 
   return vim.fn.jobstart(command, {
     stdout_buffered = true,
@@ -251,34 +247,34 @@ function M.get_build_settings(platform, projectCommand, scheme, config, callback
     stdout_buffered = true,
     on_stdout = function(_, output)
       local foundBundleId = nil
-      local foundTargetName = nil
+      local foundProductName = nil
       local foundBuildDir = nil
 
       for _, line in ipairs(output) do
         local bundleId = string.match(line, "PRODUCT_BUNDLE_IDENTIFIER = (.*)%s*")
-        local targetName = string.match(line, "TARGETNAME = (.*)%s*")
+        local productName = string.match(line, "PRODUCT_NAME = (.*)%s*")
         local buildDir = string.match(line, "TARGET_BUILD_DIR = (.*)%s*")
         if bundleId then
           foundBundleId = bundleId
         end
-        if targetName then
-          foundTargetName = targetName
+        if productName then
+          foundProductName = productName
         end
         if buildDir then
           foundBuildDir = buildDir
         end
-        if foundBuildDir and foundTargetName and foundBundleId then
+        if foundBuildDir and foundProductName and foundBundleId then
           break
         end
       end
 
-      if not foundBundleId or not foundBuildDir or not foundTargetName then
+      if not foundBundleId or not foundBuildDir or not foundProductName then
         error("Could not get build settings")
       end
 
       local result = {
-        appPath = foundBuildDir .. "/" .. foundTargetName .. ".app",
-        targetName = foundTargetName,
+        appPath = foundBuildDir .. "/" .. foundProductName .. ".app",
+        productName = foundProductName,
         bundleId = foundBundleId,
       }
 
@@ -297,6 +293,9 @@ function M.install_app(destination, appPath, callback)
     on_exit = function(_, code, _)
       if code ~= 0 then
         logs.notify("Could not install app (code: " .. code .. ")", vim.log.levels.ERROR)
+        if code == 149 then
+          logs.notify("Make sure that the simulator is booted.", vim.log.levels.WARN)
+        end
       else
         callback()
       end
@@ -305,16 +304,16 @@ function M.install_app(destination, appPath, callback)
 end
 
 function M.launch_app(destination, bundleId, callback)
-  local command = "xcrun simctl launch --terminate-running-process '"
-    .. destination
-    .. "' "
-    .. bundleId
+  local command = "xcrun simctl launch --terminate-running-process '" .. destination .. "' " .. bundleId
   return vim.fn.jobstart(command, {
     stdout_buffered = true,
     detach = true,
     on_exit = function(_, code, _)
       if code ~= 0 then
         logs.notify("Could not launch app (code: " .. code .. ")", vim.log.levels.ERROR)
+        if code == 149 then
+          logs.notify("Make sure that the simulator is booted.", vim.log.levels.WARN)
+        end
       else
         callback()
       end

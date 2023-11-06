@@ -241,7 +241,7 @@ Sample `settings.json`:
   "bundleId": "com.company.bundle-id",
   "destination": "00006000-000C58DC1ED8801E",
   "projectFile": "/path/to/project/App.xcworkspace",
-  "appTarget": "App",
+  "productName": "App",
   "scheme": "App",
   "appPath": "/Users/YOU/Library/Developer/Xcode/DerivedData/App-abafsafasdfasdf/Build/Products/Debug/App.app"
 }

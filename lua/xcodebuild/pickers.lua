@@ -33,10 +33,7 @@ end
 local function update_telescope_spinner()
   if active_picker then
     current_frame = current_frame >= #spinner_anim_frames and 1 or current_frame + 1
-    active_picker:change_prompt_prefix(
-      spinner_anim_frames[current_frame] .. " ",
-      "TelescopePromptPrefix"
-    )
+    active_picker:change_prompt_prefix(spinner_anim_frames[current_frame] .. " ", "TelescopePromptPrefix")
 
     if not vim.api.nvim_win_is_valid(active_picker.results_win) then
       stop_telescope_spinner()
@@ -185,7 +182,20 @@ function M.select_testplan(callback, opts)
     end
   end, opts)
 
-  return xcode.get_testplans(projectCommand, scheme, update_results)
+  return xcode.get_testplans(projectCommand, scheme, function(testPlans)
+    if not testPlans or not next(testPlans) then
+      require("xcodebuild.logs").notify("Could not detect test plans", vim.log.levels.WARN)
+
+      if active_picker then
+        telescopeActions.close(active_picker.prompt_bufnr)
+      end
+      if callback then
+        callback()
+      end
+    else
+      update_results(testPlans)
+    end
+  end)
 end
 
 function M.select_destination(callback, opts)
@@ -294,8 +304,14 @@ function M.show_all_actions()
     actions.configure_project,
     actions.uninstall,
   }
+
+  if not projectConfig.is_project_configured() then
+    actionsNames = { "Show Configuration Wizard " }
+    actionsPointers = { actions.configure_project }
+  end
+
   M.show("Xcodebuild Actions", actionsNames, function(_, index)
-    if index > 9 then
+    if index > 9 or #actionsNames == 1 then
       actionsPointers[index]()
     else
       vim.defer_fn(actionsPointers[index], 100)

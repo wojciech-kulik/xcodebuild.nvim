@@ -31,4 +31,16 @@ function M.settings()
   return settings
 end
 
+function M.is_project_configured()
+  return settings.platform
+    and settings.projectFile
+    and settings.projectCommand
+    and settings.scheme
+    and settings.config
+    and settings.destination
+    and settings.bundleId
+    and settings.appPath
+    and settings.productName
+end
+
 return M
