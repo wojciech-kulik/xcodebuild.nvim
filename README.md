@@ -224,3 +224,34 @@ vim.keymap.set("n", "<leader>xq", "<cmd>Telescope quickfix<cr>", { desc = "Show 
 ### API
 
 If you want to use functions directly instead of user commands, then please see [xcodebuild.actions](./lua/xcodebuild/actions.lua) module.
+
+## 🧰 Troubleshooting
+
+Loading project configuration is a very complex task that relies on parsing multiple crazy outputs from `xcodebuild` commands. Those logs are a pure nightmare to parse. It may not always work. In case of any issues with that, you can try manually providing the configuration by adding `.nvim/xcodebuild/settings.json` file in your root directory.
+
+Sample `settings.json`:
+
+```json
+{
+  "platform": "iOS",
+  "testPlan": "UnitTests",
+  "config": "Debug",
+  "projectCommand": "-workspace '/path/to/project/App.xcworkspace'",
+  "bundleId": "com.company.bundle-id",
+  "destination": "00006000-000C58DC1ED8801E",
+  "projectFile": "/path/to/project/App.xcworkspace",
+  "appTarget": "App",
+  "scheme": "App",
+  "appPath": "/Users/YOU/Library/Developer/Xcode/DerivedData/App-abafsafasdfasdf/Build/Products/Debug/App.app"
+}
+```
+
+- `platform` - `macOS` or `iOS`
+- `destination` - simulator ID
+
+## ⏳ Things To Do
+
+- [ ] Error handling - there is a lot of things that can go wrong with `xcodebuild` commands. Currently only errors from build and test actions are handled properly.
+- [ ] Show build progress based on the last build time.
+- [ ] List of tests to browse and run. Something like a tree with tests?
+- [ ] Presentation of currently selected device/config?
