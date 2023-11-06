@@ -6,11 +6,11 @@ local M = {}
 
 local function defer_print(text)
 	vim.defer_fn(function()
-		vim.notify(text)
+		logs.notify(text)
 	end, 100)
 end
 
-function M.show_logs()
+function M.open_logs()
 	logs.open_logs(true, true)
 end
 

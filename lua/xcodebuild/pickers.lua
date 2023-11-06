@@ -106,11 +106,6 @@ function M.select_project(callback, opts)
 		return table.name
 	end)
 
-	if not next(filenames) then
-		vim.notify("Could not a detect project file")
-		return
-	end
-
 	M.show("Select Project/Workspace", filenames, function(_, index)
 		local projectFile = sanitizedFiles[index].filepath
 		local isWorkspace = util.hasSuffix(projectFile, "xcworkspace")
@@ -215,13 +210,13 @@ function M.show_all_actions()
 		"Build Project",
 		"Build & Run Project",
 		"Run Without Building",
-		"Stop Running Action",
+		"Cancel Running Action",
 
-		"Test Project",
-		"Test Class",
-		"Test Function",
-		"Test Selected Functions",
-		"Test Failed Tests",
+		"Run Test Plan (all tests)",
+		"Run This Test Class",
+		"Run This Test",
+		"Run Selected Tests",
+		"Run Failed Tests",
 
 		"Select Project File",
 		"Select Scheme",

@@ -1,8 +1,3 @@
-local autocmd = require("xcodebuild.autocmd")
-local logs = require("xcodebuild.logs")
-local actions = require("xcodebuild.actions")
-local projectConfig = require("xcodebuild.project_config")
-
 local M = {}
 
 local function call(action)
@@ -11,12 +6,19 @@ local function call(action)
 	end
 end
 
-function M.setup()
+function M.setup(options)
+	require("xcodebuild.config").setup(options)
+
+	local autocmd = require("xcodebuild.autocmd")
+	local actions = require("xcodebuild.actions")
+	local projectConfig = require("xcodebuild.project_config")
+
 	autocmd.setup()
 	projectConfig.load_settings()
 
 	-- Build & Test
 	vim.api.nvim_create_user_command("XcodebuildBuild", call(actions.build), { nargs = 0 })
+	vim.api.nvim_create_user_command("XcodebuildBuildRun", call(actions.build_and_run), { nargs = 0 })
 	vim.api.nvim_create_user_command("XcodebuildRun", call(actions.run), { nargs = 0 })
 	vim.api.nvim_create_user_command("XcodebuildCancel", call(actions.cancel), { nargs = 0 })
 	vim.api.nvim_create_user_command("XcodebuildTest", call(actions.run_tests), { nargs = 0 })
@@ -35,18 +37,11 @@ function M.setup()
 
 	-- Logs
 	vim.api.nvim_create_user_command("XcodebuildToggleLogs", call(actions.toggle_logs), { nargs = 0 })
-	vim.api.nvim_create_user_command("XcodebuildShowLogs", call(actions.show_logs), { nargs = 0 })
+	vim.api.nvim_create_user_command("XcodebuildOpenLogs", call(actions.open_logs), { nargs = 0 })
 	vim.api.nvim_create_user_command("XcodebuildCloseLogs", call(actions.close_logs), { nargs = 0 })
 
 	-- Other
 	vim.api.nvim_create_user_command("XcodebuildUninstall", call(actions.uninstall), { nargs = 0 })
-
-	-- Keymaps
-	vim.api.nvim_set_keymap("n", "dx", "", {
-		callback = function()
-			logs.toggle_logs()
-		end,
-	})
 end
 
 return M

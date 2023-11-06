@@ -1,9 +1,9 @@
-local M = {}
-
 local ui = require("xcodebuild.ui")
 local util = require("xcodebuild.util")
 local appdata = require("xcodebuild.appdata")
+local config = require("xcodebuild.config").options.logs
 
+local M = {}
 local function add_summary_header(output)
 	table.insert(output, "-----------------------------")
 	table.insert(output, "-- xcodebuild.nvim summary --")
@@ -11,30 +11,59 @@ local function add_summary_header(output)
 	table.insert(output, "")
 end
 
+local function split(filepath)
+	local command = string.gsub(config.open_command, "{path}", filepath)
+	vim.cmd(command)
+end
+
+function M.notify(message, severity)
+	config.notify(message, severity)
+end
+
+function M.notify_progress(message)
+	config.notify_progress(message)
+end
+
 function M.set_logs(report, isTesting, show)
 	appdata.write_original_logs(report.output)
-	local logs_filepath = appdata.get_original_logs_filepath()
-	local command = "cat '" .. logs_filepath .. "' | xcbeautify --disable-colored-output"
 
-	vim.fn.jobstart(command, {
-		stdout_buffered = true,
-		on_stdout = function(_, prettyOutput)
-			add_summary_header(prettyOutput)
+	local completion = function(prettyOutput)
+		add_summary_header(prettyOutput)
+		if config.show_warnings then
 			M.set_warnings(prettyOutput, report.warnings)
+		end
 
-			if report.buildErrors and report.buildErrors[1] then
-				M.set_errors(prettyOutput, report.buildErrors)
-			elseif isTesting then
-				M.set_test_results(report, prettyOutput)
-			else
-				table.insert(prettyOutput, "  ✔ Build Succeeded")
-				table.insert(prettyOutput, "")
-			end
+		local hasErrors = report.buildErrors and report.buildErrors[1]
 
-			vim.fn.writefile(prettyOutput, appdata.get_build_logs_filepath())
-			M.update_log_panel(show)
-		end,
-	})
+		if hasErrors then
+			M.set_errors(prettyOutput, report.buildErrors)
+		elseif isTesting then
+			M.set_test_results(report, prettyOutput)
+		else
+			table.insert(prettyOutput, "  ✔ Build Succeeded")
+			table.insert(prettyOutput, "")
+		end
+
+		vim.fn.writefile(prettyOutput, appdata.get_build_logs_filepath())
+
+		M.update_log_panel(show)
+	end
+
+	if config.only_summary then
+		completion({})
+	elseif config.logs_formatter then
+		local logs_filepath = appdata.get_original_logs_filepath()
+		local command = "cat '" .. logs_filepath .. "' | " .. config.logs_formatter
+
+		vim.fn.jobstart(command, {
+			stdout_buffered = true,
+			on_stdout = function(_, prettyOutput)
+				completion(prettyOutput)
+			end,
+		})
+	else
+		completion(report.output)
+	end
 end
 
 function M.set_test_results(report, prettyOutput)
@@ -89,7 +118,7 @@ function M.set_warnings(prettyOutput, warnings)
 end
 
 function M.set_errors(prettyOutput, buildErrors)
-	vim.notify("Build Failed [" .. #buildErrors .. " error(s)]", vim.log.levels.ERROR)
+	M.notify("Build Failed [" .. #buildErrors .. " error(s)]", vim.log.levels.ERROR)
 	table.insert(prettyOutput, "Errors:")
 
 	for _, error in ipairs(buildErrors) do
@@ -118,7 +147,7 @@ function M.update_log_panel(show)
 		if winnr then
 			util.focus_buffer(bufnr)
 		elseif vim.fn.filereadable(logsFilepath) then
-			vim.cmd("silent bo split " .. logsFilepath .. " | resize 20")
+			split(logsFilepath)
 			local numberOfLines = #vim.api.nvim_buf_get_lines(0, 0, -1, false)
 			vim.api.nvim_win_set_cursor(0, { numberOfLines, 0 })
 			bufnr = 0
@@ -141,6 +170,10 @@ function M.update_log_panel(show)
 
 	vim.api.nvim_buf_set_option(bufnr, "modifiable", false)
 	vim.api.nvim_buf_set_option(bufnr, "readonly", true)
+
+	if not config.auto_focus then
+		vim.cmd("wincmd p")
+	end
 end
 
 function M.open_logs(forceScroll, focus)
@@ -155,14 +188,15 @@ function M.open_logs(forceScroll, focus)
 		return
 	end
 
-	vim.cmd("bo split " .. logsFilepath .. " | resize 20")
-	if not focus then
-		vim.cmd("wincmd p")
-	end
+	split(logsFilepath)
 
 	if bufnr == -1 or forceScroll then -- new buffer should be scrolled
 		local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
 		vim.api.nvim_win_set_cursor(0, { #lines, 0 })
+	end
+
+	if not focus or not config.auto_focus_on_open then
+		vim.cmd("wincmd p")
 	end
 end
 

@@ -1,4 +1,5 @@
 local util = require("xcodebuild.util")
+local logs = require("xcodebuild.logs")
 
 local M = {}
 
@@ -196,13 +197,13 @@ function M.get_bundle_id(projectCommand, scheme, callback)
 	})
 end
 
-function M.get_app_settings(logs)
+function M.get_app_settings(logLines)
 	local targetName = nil
 	local buildDir = nil
 	local bundleId = nil
 
-	for i = #logs, 1, -1 do
-		local line = logs[i]
+	for i = #logLines, 1, -1 do
+		local line = logLines[i]
 		if string.find(line, "TARGETNAME") then
 			targetName = string.match(line, "TARGETNAME\\=(.*)")
 		elseif string.find(line, "TARGET_BUILD_DIR") then
@@ -239,7 +240,7 @@ function M.install_app(destination, appPath, callback)
 		stdout_buffered = true,
 		on_exit = function(_, code, _)
 			if code ~= 0 then
-				vim.notify("Could not install app (code: " .. code .. ")", vim.log.levels.ERROR)
+				logs.notify("Could not install app (code: " .. code .. ")", vim.log.levels.ERROR)
 			else
 				callback()
 			end
@@ -254,7 +255,7 @@ function M.launch_app(destination, bundleId, callback)
 		detach = true,
 		on_exit = function(_, code, _)
 			if code ~= 0 then
-				vim.notify("Could not launch app (code: " .. code .. ")", vim.log.levels.ERROR)
+				logs.notify("Could not launch app (code: " .. code .. ")", vim.log.levels.ERROR)
 			else
 				callback()
 			end
@@ -268,7 +269,7 @@ function M.uninstall_app(destination, bundleId, callback)
 		stdout_buffered = true,
 		on_exit = function(_, code, _)
 			if code ~= 0 then
-				vim.notify("Could not uninstall app (code: " .. code .. ")", vim.log.levels.ERROR)
+				logs.notify("Could not uninstall app (code: " .. code .. ")", vim.log.levels.ERROR)
 			else
 				callback()
 			end
@@ -308,7 +309,6 @@ function M.run_tests(opts)
 		end
 	end
 
-	vim.cmd("silent wa!")
 	return vim.fn.jobstart(command, {
 		stdout_buffered = false,
 		stderr_buffered = false,
@@ -333,7 +333,6 @@ function M.list_tests(opts, callback)
 	local tests = {}
 	local foundTests = false
 
-	vim.cmd("silent wa!")
 	return vim.fn.jobstart(command, {
 		stdout_buffered = false,
 		on_stdout = function(_, output)

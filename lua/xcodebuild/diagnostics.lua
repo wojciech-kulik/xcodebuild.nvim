@@ -1,9 +1,10 @@
 local M = {}
 
 local util = require("xcodebuild.util")
+local config = require("xcodebuild.config").options.marks
 
 function M.refresh_diagnostics(bufnr, testClass, report)
-	if not report.tests then
+	if not report.tests or not config.show_diagnostics then
 		return
 	end
 
@@ -41,8 +42,8 @@ function M.set_buf_marks(bufnr, testClass, tests)
 	end
 
 	local ns = vim.api.nvim_create_namespace("xcodebuild-marks")
-	local successSign = "✔"
-	local failureSign = "✖"
+	local successSign = config.success_sign
+	local failureSign = config.failure_sign
 	local bufLines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
 	local findTestLine = function(testName)
 		for lineNumber, line in ipairs(bufLines) do
@@ -58,14 +59,27 @@ function M.set_buf_marks(bufnr, testClass, tests)
 
 	for _, test in ipairs(tests[testClass] or {}) do
 		local lineNumber = findTestLine(test.name)
-		local mark = test.time and { "(" .. test.time .. ")", test.success and "DiagnosticWarn" or "DiagnosticError" }
-			or { "" }
 
-		if test.filepath and lineNumber then
+		local testDuration = nil
+		if config.show_test_duration then
+			testDuration = test.time
+					and {
+						"(" .. test.time .. ")",
+						test.success and config.success_test_duration_hl or config.failure_test_duration_hl,
+					}
+				or { "" }
+		end
+
+		local signText = nil
+		if config.show_signs then
+			signText = test.success and successSign or failureSign
+		end
+
+		if test.filepath and lineNumber and (config.show_test_duration or config.show_signs) then
 			vim.api.nvim_buf_set_extmark(bufnr, ns, lineNumber, 0, {
-				virt_text = { mark },
-				sign_text = test.success and successSign or failureSign,
-				sign_hl_group = test.success and "DiagnosticSignOk" or "DiagnosticSignError",
+				virt_text = { testDuration },
+				sign_text = signText,
+				sign_hl_group = test.success and config.success_sign_hl or config.failure_sign_hl,
 			})
 		end
 	end

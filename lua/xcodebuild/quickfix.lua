@@ -1,4 +1,5 @@
 local util = require("xcodebuild.util")
+local config = require("xcodebuild.config").options.quickfix
 
 local M = {}
 local targetToFiles = {}
@@ -81,10 +82,19 @@ end
 function M.set(report)
 	local quickfix = {}
 
-	set_build_errors(quickfix, report.buildErrors or {})
-	set_warnings(quickfix, report.warnings or {})
-	set_failing_tests(quickfix, report.tests or {})
-	set_diagnostics_for_test_errors(quickfix, report.diagnostics or {})
+	if not config.show_warnings_on_quickfixlist and not config.show_errors_on_quickfixlist then
+		return
+	end
+
+	if config.show_warnings_on_quickfixlist then
+		set_warnings(quickfix, report.warnings or {})
+	end
+
+	if config.show_errors_on_quickfixlist then
+		set_build_errors(quickfix, report.buildErrors or {})
+		set_failing_tests(quickfix, report.tests or {})
+		set_diagnostics_for_test_errors(quickfix, report.diagnostics or {})
+	end
 
 	vim.fn.setqflist(quickfix, "r")
 end

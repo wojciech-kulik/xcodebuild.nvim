@@ -25,7 +25,7 @@ function M.cancel()
 	if currentJobId then
 		vim.fn.jobstop(currentJobId)
 		currentJobId = nil
-		vim.notify("Stopped")
+		logs.notify("Stopped")
 	end
 end
 
@@ -76,7 +76,7 @@ function M.build_and_run_app(callback)
 		open_logs_on_success = false,
 	}, function(report)
 		if report.buildErrors and report.buildErrors[1] then
-			vim.notify("Build Failed", vim.log.levels.ERROR)
+			logs.notify("Build Failed", vim.log.levels.ERROR)
 			logs.open_logs(true, true)
 			return
 		end
@@ -89,14 +89,14 @@ function M.run_app(callback)
 	local settings = projectConfig.settings()
 
 	if settings.platform == "macOS" then
-		vim.notify("Launching application...")
+		logs.notify("Launching application...")
 		local app = string.match(settings.appPath, "/([^/]+)%.app$")
 		local path = settings.appPath .. "/Contents/MacOS/" .. app
 		vim.print(path)
 		currentJobId = vim.fn.jobstart(path, {
 			detach = true,
 		})
-		vim.notify("Application has been launched")
+		logs.notify("Application has been launched")
 		if callback then
 			callback()
 		end
@@ -108,11 +108,11 @@ function M.run_app(callback)
 			xcode.kill_app(target)
 		end
 
-		vim.notify("Installing application...")
+		logs.notify("Installing application...")
 		currentJobId = xcode.install_app(destination, settings.appPath, function()
-			vim.notify("Launching application...")
+			logs.notify("Launching application...")
 			currentJobId = xcode.launch_app(destination, settings.bundleId, function()
-				vim.notify("Application has been launched")
+				logs.notify("Application has been launched")
 				if callback then
 					callback()
 				end
@@ -124,32 +124,39 @@ end
 function M.uninstall_app(callback)
 	local settings = projectConfig.settings()
 	if settings.platform == "macOS" then
-		vim.notify("macOS app doesn't require uninstalling")
+		logs.notify("macOS app doesn't require uninstalling")
 		return
 	end
 
-	vim.notify("Uninstalling application...")
+	logs.notify("Uninstalling application...")
 	currentJobId = xcode.uninstall_app(settings.destination, settings.bundleId, function()
-		vim.notify("Application has been uninstalled")
+		logs.notify("Application has been uninstalled")
 		if callback then
 			callback()
 		end
 	end)
 end
 
+function M.auto_save()
+	local config = require("xcodebuild.config").options
+	if config.auto_save then
+		vim.cmd("silent wa!")
+	end
+end
+
 function M.build_project(opts, callback)
 	local open_logs_on_success = (opts or {}).open_logs_on_success
 	local build_for_testing = (opts or {}).build_for_testing
 
-	vim.notify("Building...")
-	vim.cmd("silent wa!")
+	logs.notify("Building...")
+	M.auto_save()
 	parser.clear()
 
 	local on_stdout = function(_, output)
 		testReport = parser.parse_logs(output)
 
 		if testReport.buildErrors and testReport.buildErrors[1] then
-			vim.cmd("echo 'Building... [Errors: " .. #testReport.buildErrors .. "]'")
+			logs.notify_progress("Building... [Errors: " .. #testReport.buildErrors .. "]")
 		end
 	end
 
@@ -161,10 +168,16 @@ function M.build_project(opts, callback)
 		if code == 143 then
 			return
 		end
-		logs.set_logs(testReport, false, open_logs_on_success)
-		if not testReport.buildErrors or not testReport.buildErrors[1] then
+
+		local config = require("xcodebuild.config").options.logs
+		local hasErrors = testReport.buildErrors and testReport.buildErrors[1]
+		local shouldShow = (hasErrors and config.auto_open_on_failed_build)
+			or (not hasErrors and config.auto_open_on_success_build)
+
+		logs.set_logs(testReport, false, shouldShow and open_logs_on_success)
+		if not hasErrors then
 			update_settings(testReport.output)
-			vim.notify("Build Succeeded")
+			logs.notify("Build Succeeded")
 		end
 		quickfix.set(testReport)
 
@@ -187,8 +200,8 @@ function M.build_project(opts, callback)
 end
 
 function M.run_tests(testsToRun)
-	vim.notify("Starting Tests...")
-	vim.cmd("silent wa!")
+	logs.notify("Starting Tests...")
+	M.auto_save()
 	parser.clear()
 
 	local isFirstChunk = true
@@ -209,9 +222,14 @@ function M.run_tests(testsToRun)
 			return
 		end
 
+		local config = require("xcodebuild.config").options.logs
+		local hasErrors = testReport.buildErrors and testReport.buildErrors[1]
+		local shouldShow = (hasErrors and config.auto_open_on_failed_tests)
+			or (not hasErrors and config.auto_open_on_success_tests)
+
 		update_settings(testReport.output)
 		targetToFiles = xcode.get_targets_list(projectConfig.settings().appPath)
-		logs.set_logs(testReport, true, true)
+		logs.set_logs(testReport, true, shouldShow)
 		quickfix.setTargets(targetToFiles)
 		quickfix.set(testReport)
 		diagnostics.refresh_buf_diagnostics(testReport)
@@ -305,7 +323,7 @@ function M.run_selected_tests(opts)
 		local target = find_target_for_file(testFilepath)
 
 		if not target then
-			vim.notify("Could not detect test target. Please run build again.")
+			logs.notify("Could not detect test target. Please run build again.")
 			return
 		end
 
@@ -333,12 +351,12 @@ function M.run_selected_tests(opts)
 		if next(testsToRun) then
 			M.run_tests(testsToRun)
 		else
-			vim.notify("Tests not found", vim.log.levels.ERROR)
+			logs.notify("Tests not found", vim.log.levels.ERROR)
 		end
 	end
 
 	if not targetToFiles or not next(targetToFiles) then
-		vim.notify("Loading tests...")
+		logs.notify("Loading tests...")
 		currentJobId = M.build_project({
 			build_for_testing = true,
 		}, function()
@@ -356,7 +374,7 @@ function M.configure_project()
 	local pickers = require("xcodebuild.pickers")
 	local defer_print = function(text)
 		vim.defer_fn(function()
-			vim.notify(text)
+			logs.notify(text)
 		end, 100)
 	end
 
