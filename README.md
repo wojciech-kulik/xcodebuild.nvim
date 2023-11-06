@@ -3,6 +3,7 @@
 A plugin that lets you move your iOS, iPadOS and macOS apps development to Neovim. It supports most of Xcode actions that are required to work with a project, like device selection, building, launching, and testing.
 
 ![Xcodebuild Debugging](./media/tests.png)
+
 ![Xcodebuild Testing](./media/debug.png)
 
 ## 🚧 Disclaimer
@@ -101,6 +102,7 @@ Xcodebuild.nvim comes with the following defaults:
     success_test_duration_hl = "DiagnosticWarn", -- test duration highlight when test passed
     failure_test_duration_hl = "DiagnosticError", -- test duration highlight when test failed
     show_diagnostics = true, -- add test failures to diagnostics
+    file_pattern = "*Tests.swift", -- test diagnostics will try to load for files matching this pattern
   },
   quickfix = {
     show_errors_on_quickfixlist = true, -- add errors to quickfix list

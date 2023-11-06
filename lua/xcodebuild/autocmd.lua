@@ -21,16 +21,16 @@ function M.setup()
       once = true,
       callback = function()
         coordinator.load_last_report()
+      end,
+    })
+  end
 
-        if config.marks.show_diagnostics or config.marks.show_signs then
-          vim.api.nvim_create_autocmd({ "BufReadPost", "BufWritePost" }, {
-            group = autogroup,
-            pattern = "*Tests.swift",
-            callback = function(ev)
-              coordinator.refresh_buf_diagnostics(ev.buf, ev.file)
-            end,
-          })
-        end
+  if config.marks.show_diagnostics or config.marks.show_signs then
+    vim.api.nvim_create_autocmd({ "BufReadPost", "BufWritePost" }, {
+      group = autogroup,
+      pattern = config.marks.file_pattern,
+      callback = function(ev)
+        coordinator.refresh_buf_diagnostics(ev.buf, ev.file)
       end,
     })
   end
