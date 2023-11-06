@@ -36,6 +36,14 @@ Of course, you will still need Xcode for some project setup & management. Also, 
 - [x] [telescope.nvim](https://github.com/nvim-telescope/telescope.nvim) integration to show pickers with selectable project options.
 - [x] Picker with all available actions.
 
+## 👷 Limitations
+
+The plugin assumes that test class name should match file name. If in logs `YourTraget.YourTestClass.testYourTest` appears, the plugin is trying to locate `YourTestClass.swift` file and show test results there (marks + diagnostics + quickfix).
+
+If you have a different naming convention, or if you have multiple test classes named the same across the project, it may not work correctly.
+
+I will try to address it as soon as possible, but for now there is this limitation.
+
 ## ⚡️ Requirements
 
 - [Neovim](https://neovim.io) (not sure which version, use the new one :D).
