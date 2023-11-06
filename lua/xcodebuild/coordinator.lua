@@ -58,10 +58,14 @@ end
 
 function M.load_last_report()
   local success, log = pcall(appdata.read_original_logs)
+
   if success then
     parser.clear()
     testReport = parser.parse_logs(log)
     quickfix.set(testReport)
+    vim.defer_fn(function()
+      diagnostics.refresh_buf_diagnostics(testReport)
+    end, 500)
   end
 end
 

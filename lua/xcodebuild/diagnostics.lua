@@ -85,7 +85,10 @@ function M.refresh_buf_diagnostics(report)
     return
   end
 
-  local buffers = util.get_bufs_by_name_matching(".*/.*[Tt]est[s]?%.swift$")
+  local filePattern = config.file_pattern
+  -- TODO: improve
+  local regexPattern = string.gsub(string.gsub(filePattern, "%.", "%%."), "%*", "%.%*")
+  local buffers = util.get_bufs_by_name_matching(regexPattern)
 
   for _, buffer in ipairs(buffers or {}) do
     local testClass = util.get_filename(buffer.file)

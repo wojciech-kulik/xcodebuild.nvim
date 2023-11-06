@@ -10,7 +10,7 @@ local defaults = {
     auto_open_on_failed_build = true, -- open logs when build failed
     auto_focus = true, -- focus logs buffer when opened
     open_command = "silent bo split {path} | resize 20", -- command used to open logs panel. You must use {path} variable to load the log file
-    logs_formatter = "xcbeautify --disable-colored-output", -- command used to format logs
+    logs_formatter = "xcbeautify --disable-colored-output", -- command used to format logs, you can use nil to skip formatting
     only_summary = false, -- if true logs won't be displayed, just xcodebuild.nvim summary
     show_warnings = true, -- show warnings in logs summary
     notify = function(message, severity) -- function to show notifications from this module (like "Build Failed")
@@ -30,7 +30,7 @@ local defaults = {
     success_test_duration_hl = "DiagnosticWarn", -- test duration highlight when test passed
     failure_test_duration_hl = "DiagnosticError", -- test duration highlight when test failed
     show_diagnostics = true, -- add test failures to diagnostics
-    file_pattern = "*Tests.swift", -- test diagnostics will try to load for files matching this pattern
+    file_pattern = "*Tests.swift", -- test diagnostics will be loaded in files matching this pattern (if available)
   },
   quickfix = {
     show_errors_on_quickfixlist = true, -- add errors to quickfix list
