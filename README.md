@@ -72,40 +72,40 @@ Xcodebuild.nvim comes with the following defaults:
 
 ```lua
 {
-	restore_on_start = true, -- logs, diagnostics, and marks will be loaded on VimEnter (may affect performance)
-	auto_save = true, -- save all buffers before running build or tests (command: silent wa!)
-	logs = {
-		auto_open_on_success_tests = true, -- open logs when tests succeeded
-		auto_open_on_failed_tests = true, -- open logs when tests failed
-		auto_open_on_success_build = true, -- pen logs when build succeeded
-		auto_open_on_failed_build = true, -- open logs when build failed
-		auto_focus = true, -- focus logs buffer when opened
-		open_command = "silent bo split {path} | resize 20", -- command used to open logs panel. You must use {path} variable to load the log file
-		logs_formatter = "xcbeautify --disable-colored-output", -- command used to format logs
-		only_summary = false, -- if true logs won't be displayed, just xcodebuild.nvim summary
-		show_warnings = true, -- show warnings in logs summary
-		notify = function(message, severity) -- function to show notifications from this module (like "Build Failed")
-			vim.notify(message, severity)
-		end,
-		notify_progress = function(message) -- function to show live progress (like during tests)
-			vim.cmd("echo '" .. message .. "'")
-		end,
-	},
-	marks = {
-		show_signs = true, -- show each test result on the side bar
-		success_sign = "✔", -- passed test icon
-		failure_sign = "✖", -- failed test icon
-		success_sign_hl = "DiagnosticSignOk", -- highlight for success_sign
-		failure_sign_hl = "DiagnosticSignError", -- highlight for failure_sign
-		show_test_duration = true, -- show each test duration next to its declaration
-		success_test_duration_hl = "DiagnosticWarn", -- test duration highlight when test passed
-		failure_test_duration_hl = "DiagnosticError", -- test duration highlight when test failed
-		show_diagnostics = true, -- add test failures to diagnostics
-	},
-	quickfix = {
-		show_errors_on_quickfixlist = true, -- add errors to quickfix list
-		show_warnings_on_quickfixlist = true, -- add build warnings to quickfix list
-	},
+  restore_on_start = true, -- logs, diagnostics, and marks will be loaded on VimEnter (may affect performance)
+  auto_save = true, -- save all buffers before running build or tests (command: silent wa!)
+  logs = {
+    auto_open_on_success_tests = true, -- open logs when tests succeeded
+    auto_open_on_failed_tests = true, -- open logs when tests failed
+    auto_open_on_success_build = true, -- pen logs when build succeeded
+    auto_open_on_failed_build = true, -- open logs when build failed
+    auto_focus = true, -- focus logs buffer when opened
+    open_command = "silent bo split {path} | resize 20", -- command used to open logs panel. You must use {path} variable to load the log file
+    logs_formatter = "xcbeautify --disable-colored-output", -- command used to format logs
+    only_summary = false, -- if true logs won't be displayed, just xcodebuild.nvim summary
+    show_warnings = true, -- show warnings in logs summary
+    notify = function(message, severity) -- function to show notifications from this module (like "Build Failed")
+      vim.notify(message, severity)
+    end,
+    notify_progress = function(message) -- function to show live progress (like during tests)
+      vim.cmd("echo '" .. message .. "'")
+    end,
+  },
+  marks = {
+    show_signs = true, -- show each test result on the side bar
+    success_sign = "✔", -- passed test icon
+    failure_sign = "✖", -- failed test icon
+    success_sign_hl = "DiagnosticSignOk", -- highlight for success_sign
+    failure_sign_hl = "DiagnosticSignError", -- highlight for failure_sign
+    show_test_duration = true, -- show each test duration next to its declaration
+    success_test_duration_hl = "DiagnosticWarn", -- test duration highlight when test passed
+    failure_test_duration_hl = "DiagnosticError", -- test duration highlight when test failed
+    show_diagnostics = true, -- add test failures to diagnostics
+  },
+  quickfix = {
+    show_errors_on_quickfixlist = true, -- add errors to quickfix list
+    show_warnings_on_quickfixlist = true, -- add build warnings to quickfix list
+  },
 }
 ```
 
@@ -120,47 +120,47 @@ To configure DAP for development:
 
 ```lua
 return {
-	"mfussenegger/nvim-dap",
+  "mfussenegger/nvim-dap",
     dependencies = {
         "wojciech-kulik/xcodebuild.nvim"
     },
-	config = function()
-		local dap = require("dap")
+  config = function()
+    local dap = require("dap")
 
-		dap.configurations.swift = {
-			{
-				name = "iOS App Debugger",
-				type = "codelldb",
-				request = "attach",
+    dap.configurations.swift = {
+      {
+        name = "iOS App Debugger",
+        type = "codelldb",
+        request = "attach",
                 -- this will wait until the app is launched
-				pid = require("xcodebuild.dap").wait_for_pid,
-				cwd = "${workspaceFolder}",
-				stopOnEntry = false,
-			},
-		}
+        pid = require("xcodebuild.dap").wait_for_pid,
+        cwd = "${workspaceFolder}",
+        stopOnEntry = false,
+      },
+    }
 
-		dap.adapters.codelldb = {
-			type = "server",
-			port = "13000",
-			executable = {
+    dap.adapters.codelldb = {
+      type = "server",
+      port = "13000",
+      executable = {
                 -- set path to the downloaded codelldb
-				command = "/path/to/codelldb/extension/adapter/codelldb",
-				args = {
-					"--port",
-					"13000",
-					"--liblldb",
+        command = "/path/to/codelldb/extension/adapter/codelldb",
+        args = {
+          "--port",
+          "13000",
+          "--liblldb",
                     -- make sure that this path is correct on your side
-					"/Applications/Xcode.app/Contents/SharedFrameworks/LLDB.framework/Versions/A/LLDB",
-				},
-			},
-		}
+          "/Applications/Xcode.app/Contents/SharedFrameworks/LLDB.framework/Versions/A/LLDB",
+        },
+      },
+    }
 
         -- sample keymap to build & run the app
-		vim.keymap.set("n", "<leader>R", function()
-			require("xcodebuild.dap").build_and_run(function()
-				dap.continue()
-			end)
-		end)
+    vim.keymap.set("n", "<leader>R", function()
+      require("xcodebuild.dap").build_and_run(function()
+        dap.continue()
+      end)
+    end)
     end,
 }
 ```

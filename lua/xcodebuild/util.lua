@@ -1,143 +1,141 @@
 local M = {}
 
 function M.get_buffers(opts)
-	local result = {}
-	local optsUnwrapped = opts or {}
+  local result = {}
+  local optsUnwrapped = opts or {}
 
-	for i, buf in ipairs(vim.api.nvim_list_bufs()) do
-		if
-			optsUnwrapped.returnNotLoaded == true and vim.api.nvim_buf_is_valid(buf) or vim.api.nvim_buf_is_loaded(buf)
-		then
-			result[i] = buf
-		end
-	end
+  for i, buf in ipairs(vim.api.nvim_list_bufs()) do
+    if optsUnwrapped.returnNotLoaded == true and vim.api.nvim_buf_is_valid(buf) or vim.api.nvim_buf_is_loaded(buf) then
+      result[i] = buf
+    end
+  end
 
-	return result
+  return result
 end
 
 function M.get_buf_by_name(name, opts)
-	local allBuffers = M.get_buffers(opts)
+  local allBuffers = M.get_buffers(opts)
 
-	for _, buf in pairs(allBuffers) do
-		if string.match(vim.api.nvim_buf_get_name(buf), ".*/(.*)") == name then
-			return buf
-		end
-	end
+  for _, buf in pairs(allBuffers) do
+    if string.match(vim.api.nvim_buf_get_name(buf), ".*/(.*)") == name then
+      return buf
+    end
+  end
 
-	return nil
+  return nil
 end
 
 function M.get_bufs_by_name_matching(pattern)
-	local allBuffers = M.get_buffers()
-	local result = {}
+  local allBuffers = M.get_buffers()
+  local result = {}
 
-	for _, buf in pairs(allBuffers) do
-		local bufName = vim.api.nvim_buf_get_name(buf)
-		if string.find(bufName, pattern) then
-			table.insert(result, { bufnr = buf, file = bufName })
-		end
-	end
+  for _, buf in pairs(allBuffers) do
+    local bufName = vim.api.nvim_buf_get_name(buf)
+    if string.find(bufName, pattern) then
+      table.insert(result, { bufnr = buf, file = bufName })
+    end
+  end
 
-	return result
+  return result
 end
 
 function M.focus_buffer(bufNr)
-	local _, window = next(vim.fn.win_findbuf(bufNr))
-	if window then
-		vim.api.nvim_set_current_win(window)
-	end
+  local _, window = next(vim.fn.win_findbuf(bufNr))
+  if window then
+    vim.api.nvim_set_current_win(window)
+  end
 end
 
 function M.get_filename(filepath)
-	return string.match(filepath, ".*%/([^/]*)%..+$")
+  return string.match(filepath, ".*%/([^/]*)%..+$")
 end
 
 function M.find_all_swift_files()
-	local allFiles = vim.fn.system({ "find", vim.fn.getcwd(), "-iname", "*.swift" })
+  local allFiles = vim.fn.system({ "find", vim.fn.getcwd(), "-iname", "*.swift" })
 
-	local map = {}
+  local map = {}
 
-	for _, filepath in ipairs(vim.split(allFiles, "\n", { plain = true })) do
-		local filename = M.get_filename(filepath)
-		if filename then
-			map[filename] = filepath
-		end
-	end
+  for _, filepath in ipairs(vim.split(allFiles, "\n", { plain = true })) do
+    local filename = M.get_filename(filepath)
+    if filename then
+      map[filename] = filepath
+    end
+  end
 
-	return map
+  return map
 end
 
 function M.shell(cmd)
-	local handle = io.popen(cmd)
+  local handle = io.popen(cmd)
 
-	if handle ~= nil then
-		local result = handle:read("*a")
-		handle:close()
-		return vim.split(result, "\n", { plain = true })
-	end
+  if handle ~= nil then
+    local result = handle:read("*a")
+    handle:close()
+    return vim.split(result, "\n", { plain = true })
+  end
 
-	return {}
+  return {}
 end
 
 function M.merge_array(lhs, rhs)
-	local result = lhs
-	for _, val in ipairs(rhs) do
-		table.insert(result, val)
-	end
+  local result = lhs
+  for _, val in ipairs(rhs) do
+    table.insert(result, val)
+  end
 
-	return result
+  return result
 end
 
 function M.trim(str)
-	return string.match(str, "^%s*(.-)%s*$")
+  return string.match(str, "^%s*(.-)%s*$")
 end
 
 function M.select(tab, selector)
-	local result = {}
-	for _, value in ipairs(tab) do
-		table.insert(result, selector(value))
-	end
+  local result = {}
+  for _, value in ipairs(tab) do
+    table.insert(result, selector(value))
+  end
 
-	return result
+  return result
 end
 
 function M.filter(tab, predicate)
-	local result = {}
-	for _, value in ipairs(tab) do
-		if predicate(value) then
-			table.insert(result, value)
-		end
-	end
+  local result = {}
+  for _, value in ipairs(tab) do
+    if predicate(value) then
+      table.insert(result, value)
+    end
+  end
 
-	return result
+  return result
 end
 
 function M.hasSuffix(text, suffix)
-	return string.sub(text, -#suffix) == suffix
+  return string.sub(text, -#suffix) == suffix
 end
 
 function M.hasPrefix(text, prefix)
-	return string.sub(text, 1, #prefix) == prefix
+  return string.sub(text, 1, #prefix) == prefix
 end
 
 function M.contains(tab, val)
-	for _, value in ipairs(tab) do
-		if value == val then
-			return true
-		end
-	end
+  for _, value in ipairs(tab) do
+    if value == val then
+      return true
+    end
+  end
 
-	return false
+  return false
 end
 
 function M.find(tab, predicate)
-	for _, value in ipairs(tab) do
-		if predicate(value) then
-			return value
-		end
-	end
+  for _, value in ipairs(tab) do
+    if predicate(value) then
+      return value
+    end
+  end
 
-	return nil
+  return nil
 end
 
 return M

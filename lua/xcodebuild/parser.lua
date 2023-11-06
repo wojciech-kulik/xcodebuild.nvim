@@ -25,264 +25,264 @@ local warnings = {}
 local diagnostics = {}
 
 local function flush_test(message)
-	if message then
-		table.insert(lineData.message, message)
-	end
+  if message then
+    table.insert(lineData.message, message)
+  end
 
-	tests[lineData.class] = tests[lineData.class] or {}
-	table.insert(tests[lineData.class], lineData)
-	lastTest = lineData
-	lineType = BEGIN
-	lineData = {}
+  tests[lineData.class] = tests[lineData.class] or {}
+  table.insert(tests[lineData.class], lineData)
+  lastTest = lineData
+  lineType = BEGIN
+  lineData = {}
 end
 
 local function flush_error(line)
-	if line then
-		table.insert(lineData.message, line)
-	end
+  if line then
+    table.insert(lineData.message, line)
+  end
 
-	table.insert(buildErrors, lineData)
-	lineType = BEGIN
-	lineData = {}
+  table.insert(buildErrors, lineData)
+  lineType = BEGIN
+  lineData = {}
 end
 
 local function flush_warning(line)
-	if line then
-		table.insert(lineData.message, line)
-	end
+  if line then
+    table.insert(lineData.message, line)
+  end
 
-	table.insert(warnings, lineData)
-	lineType = BEGIN
-	lineData = {}
+  table.insert(warnings, lineData)
+  lineType = BEGIN
+  lineData = {}
 end
 
 local function flush_diagnostic(filepath, filename, lineNumber)
-	table.insert(diagnostics, {
-		filepath = filepath,
-		filename = filename,
-		lineNumber = lineNumber,
-		message = lineData.message,
-	})
+  table.insert(diagnostics, {
+    filepath = filepath,
+    filename = filename,
+    lineNumber = lineNumber,
+    message = lineData.message,
+  })
 end
 
 local function flush(line)
-	if lineType == BUILD_ERROR then
-		flush_error(line)
-	elseif lineType == BUILD_WARNING then
-		flush_warning(line)
-	elseif lineType == TEST_ERROR then
-		flush_test(line)
-	end
+  if lineType == BUILD_ERROR then
+    flush_error(line)
+  elseif lineType == BUILD_WARNING then
+    flush_warning(line)
+  elseif lineType == TEST_ERROR then
+    flush_test(line)
+  end
 end
 
 local function sanitize(message)
-	return string.match(message, "%-%[%w+%.%w+ %g+%] %: (.*)") or message
+  return string.match(message, "%-%[%w+%.%w+ %g+%] %: (.*)") or message
 end
 
 local function find_test_line(filepath, testName)
-	local success, lines = pcall(vim.fn.readfile, filepath)
-	if not success then
-		return nil
-	end
+  local success, lines = pcall(vim.fn.readfile, filepath)
+  if not success then
+    return nil
+  end
 
-	for lineNumber, line in ipairs(lines) do
-		if string.find(line, "func " .. testName .. "%(") then
-			return lineNumber
-		end
-	end
+  for lineNumber, line in ipairs(lines) do
+    if string.find(line, "func " .. testName .. "%(") then
+      return lineNumber
+    end
+  end
 
-	return nil
+  return nil
 end
 
 local function parse_build_error(line)
-	if string.find(line, "[^%s]*%.swift%:%d+%:%d*%:? %w*%s*error%: .*") then
-		local filepath, lineNumber, colNumber, message =
-			string.match(line, "([^%s]*%.swift)%:(%d+)%:(%d*)%:? %w*%s*error%: (.*)")
-		if filepath and message then
-			lineType = BUILD_ERROR
-			lineData = {
-				filename = util.get_filename(filepath),
-				filepath = filepath,
-				lineNumber = tonumber(lineNumber),
-				columnNumber = tonumber(colNumber) or 0,
-				message = { message },
-			}
-		end
-	else
-		local source, message = string.match(line, "(.*)%: %w*%s*error%: (.*)")
-		message = message or string.match(line, "error%: (.*)")
+  if string.find(line, "[^%s]*%.swift%:%d+%:%d*%:? %w*%s*error%: .*") then
+    local filepath, lineNumber, colNumber, message =
+      string.match(line, "([^%s]*%.swift)%:(%d+)%:(%d*)%:? %w*%s*error%: (.*)")
+    if filepath and message then
+      lineType = BUILD_ERROR
+      lineData = {
+        filename = util.get_filename(filepath),
+        filepath = filepath,
+        lineNumber = tonumber(lineNumber),
+        columnNumber = tonumber(colNumber) or 0,
+        message = { message },
+      }
+    end
+  else
+    local source, message = string.match(line, "(.*)%: %w*%s*error%: (.*)")
+    message = message or string.match(line, "error%: (.*)")
 
-		if message then
-			lineType = BUILD_ERROR
-			lineData = {
-				source = source,
-				message = { message },
-			}
-		end
-	end
+    if message then
+      lineType = BUILD_ERROR
+      lineData = {
+        source = source,
+        message = { message },
+      }
+    end
+  end
 end
 
 local function parse_test_error(line)
-	local filepath, lineNumber, message = string.match(line, "([^%s]*%.swift)%:(%d+)%:%d*%:? %w*%s*error%: (.*)")
+  local filepath, lineNumber, message = string.match(line, "([^%s]*%.swift)%:(%d+)%:%d*%:? %w*%s*error%: (.*)")
 
-	if filepath and message then
-		failedTestsCount = failedTestsCount + 1
-		lineType = TEST_ERROR
-		lineData.message = { sanitize(message) }
-		lineData.testResult = "failed"
-		lineData.success = false
+  if filepath and message then
+    failedTestsCount = failedTestsCount + 1
+    lineType = TEST_ERROR
+    lineData.message = { sanitize(message) }
+    lineData.testResult = "failed"
+    lineData.success = false
 
-		-- If file from error doesn't match test file, let's set lineNumber to test declaration line
-		local filename = util.get_filename(filepath)
-		if filename ~= lineData.filename then
-			lineData.lineNumber = find_test_line(lineData.filepath, lineData.name)
-			flush_diagnostic(filepath, filename, tonumber(lineNumber))
-		else
-			lineData.lineNumber = tonumber(lineNumber)
-		end
-	end
+    -- If file from error doesn't match test file, let's set lineNumber to test declaration line
+    local filename = util.get_filename(filepath)
+    if filename ~= lineData.filename then
+      lineData.lineNumber = find_test_line(lineData.filepath, lineData.name)
+      flush_diagnostic(filepath, filename, tonumber(lineNumber))
+    else
+      lineData.lineNumber = tonumber(lineNumber)
+    end
+  end
 end
 
 local function parse_warning(line)
-	local filepath, lineNumber, columnNumber, message =
-		string.match(line, "([^%s]*%.swift)%:(%d+)%:(%d*)%:? %w*%s*warning%: (.*)")
+  local filepath, lineNumber, columnNumber, message =
+    string.match(line, "([^%s]*%.swift)%:(%d+)%:(%d*)%:? %w*%s*warning%: (.*)")
 
-	if filepath and message and util.hasPrefix(filepath, vim.fn.getcwd()) then
-		lineType = BUILD_WARNING
-		lineData.filepath = filepath
-		lineData.filename = util.get_filename(filepath)
-		lineData.message = { message }
-		lineData.lineNumber = tonumber(lineNumber) or 0
-		lineData.columnNumber = tonumber(columnNumber) or 0
-	end
+  if filepath and message and util.hasPrefix(filepath, vim.fn.getcwd()) then
+    lineType = BUILD_WARNING
+    lineData.filepath = filepath
+    lineData.filename = util.get_filename(filepath)
+    lineData.message = { message }
+    lineData.lineNumber = tonumber(lineNumber) or 0
+    lineData.columnNumber = tonumber(columnNumber) or 0
+  end
 end
 
 local function parse_test_finished(line)
-	if string.find(line, "^Test Case .*.%-") then
-		local testResult, time = string.match(line, "^Test Case .*.%-%[%w+%.%w+ %g+%]. (%w+)% %((.*)%)%.")
-		if lastTest then
-			lastTest.time = time
-			lastTest.testResult = testResult
-			lastTest.success = testResult == "passed"
-			lastTest = nil
-			lineData = {}
-			lineType = BEGIN
-		else
-			lineData.time = time
-			lineData.testResult = testResult
-			lineData.success = testResult == "passed"
-			flush_test()
-		end
-	else -- when running with autogenerated plan
-		local testClass, testName, testResult, time =
-			string.match(line, "^Test case %'(%w+)%.(%g+)%(.*%' (%w+) .* %(([^%)]*)%)$")
-		if testClass and testName and testResult then
-			-- TODO: finding file path assuming that the test class name equals file name
-			-- and that this is unique might not be accurate.
-			-- Is there any way to obtain the file path to the test class based on information
-			-- provided in logs?
-			local filepath = allSwiftFiles[testClass]
-			lineData = {
-				filepath = filepath,
-				filename = filepath and util.get_filename(filepath) or nil,
-				class = testClass,
-				name = testName,
-				lineNumber = filepath and find_test_line(filepath, testName) or nil,
-				testResult = testResult,
-				success = testResult == "passed",
-				time = time,
-			}
-			testsCount = testsCount + 1
-			if not lineData.success then
-				lineData.message = { "Failed" }
-				failedTestsCount = failedTestsCount + 1
-			end
-			flush_test()
-		end
-	end
+  if string.find(line, "^Test Case .*.%-") then
+    local testResult, time = string.match(line, "^Test Case .*.%-%[%w+%.%w+ %g+%]. (%w+)% %((.*)%)%.")
+    if lastTest then
+      lastTest.time = time
+      lastTest.testResult = testResult
+      lastTest.success = testResult == "passed"
+      lastTest = nil
+      lineData = {}
+      lineType = BEGIN
+    else
+      lineData.time = time
+      lineData.testResult = testResult
+      lineData.success = testResult == "passed"
+      flush_test()
+    end
+  else -- when running with autogenerated plan
+    local testClass, testName, testResult, time =
+      string.match(line, "^Test case %'(%w+)%.(%g+)%(.*%' (%w+) .* %(([^%)]*)%)$")
+    if testClass and testName and testResult then
+      -- TODO: finding file path assuming that the test class name equals file name
+      -- and that this is unique might not be accurate.
+      -- Is there any way to obtain the file path to the test class based on information
+      -- provided in logs?
+      local filepath = allSwiftFiles[testClass]
+      lineData = {
+        filepath = filepath,
+        filename = filepath and util.get_filename(filepath) or nil,
+        class = testClass,
+        name = testName,
+        lineNumber = filepath and find_test_line(filepath, testName) or nil,
+        testResult = testResult,
+        success = testResult == "passed",
+        time = time,
+      }
+      testsCount = testsCount + 1
+      if not lineData.success then
+        lineData.message = { "Failed" }
+        failedTestsCount = failedTestsCount + 1
+      end
+      flush_test()
+    end
+  end
 end
 
 local function parse_test_started(line)
-	-- TODO: finding file path assuming that the test class name equals file name
-	-- and that this is unique might not be accurate.
-	-- Is there any way to obtain the file path to the test class based on information
-	-- provided in logs?
-	local testClass, testName = string.match(line, "^Test Case .*.%-%[%w+%.(%w+) (%g+)%]")
-	local filepath = allSwiftFiles[testClass]
-	testsCount = testsCount + 1
-	lastTest = nil
-	lineType = TEST_START
-	lineData = {
-		filepath = filepath,
-		filename = filepath and util.get_filename(filepath) or nil,
-		class = testClass,
-		name = testName,
-	}
+  -- TODO: finding file path assuming that the test class name equals file name
+  -- and that this is unique might not be accurate.
+  -- Is there any way to obtain the file path to the test class based on information
+  -- provided in logs?
+  local testClass, testName = string.match(line, "^Test Case .*.%-%[%w+%.(%w+) (%g+)%]")
+  local filepath = allSwiftFiles[testClass]
+  testsCount = testsCount + 1
+  lastTest = nil
+  lineType = TEST_START
+  lineData = {
+    filepath = filepath,
+    filename = filepath and util.get_filename(filepath) or nil,
+    class = testClass,
+    name = testName,
+  }
 end
 
 local function process_line(line)
-	table.insert(output, line)
+  table.insert(output, line)
 
-	-- POSSIBLE PATHS:
-	-- BEGIN -> BUILD_ERROR -> BEGIN
-	-- BEGIN -> BUILD_WARNING -> BEGIN
-	-- BEGIN -> TEST_START -> passed -> BEGIN
-	-- BEGIN -> TEST_START -> TEST_ERROR -> (failed) -> BEGIN
+  -- POSSIBLE PATHS:
+  -- BEGIN -> BUILD_ERROR -> BEGIN
+  -- BEGIN -> BUILD_WARNING -> BEGIN
+  -- BEGIN -> TEST_START -> passed -> BEGIN
+  -- BEGIN -> TEST_START -> TEST_ERROR -> (failed) -> BEGIN
 
-	if string.find(line, "^Test Case.*started%.") then
-		parse_test_started(line)
-	elseif string.find(line, "^Test [Cc]ase.*passed") or string.find(line, "^Test [Cc]ase.*failed") then
-		parse_test_finished(line)
-	elseif string.find(line, "error%:") then
-		flush()
-		if lineType == TEST_START then
-			parse_test_error(line)
-		elseif testsCount == 0 and lineType == BEGIN then
-			parse_build_error(line)
-		end
-	elseif string.find(line, "warning%:") then
-		flush()
-		parse_warning(line)
-	elseif string.find(line, "%s*~*%^~*%s*") then
-		flush(line)
-	elseif string.find(line, "^%s*$") then
-		flush()
-	elseif string.find(line, "^Linting") or string.find(line, "^note%:") then
-		flush()
-	elseif lineType == TEST_ERROR or lineType == BUILD_ERROR or lineType == BUILD_WARNING then
-		table.insert(lineData.message, line)
-	end
+  if string.find(line, "^Test Case.*started%.") then
+    parse_test_started(line)
+  elseif string.find(line, "^Test [Cc]ase.*passed") or string.find(line, "^Test [Cc]ase.*failed") then
+    parse_test_finished(line)
+  elseif string.find(line, "error%:") then
+    flush()
+    if lineType == TEST_START then
+      parse_test_error(line)
+    elseif testsCount == 0 and lineType == BEGIN then
+      parse_build_error(line)
+    end
+  elseif string.find(line, "warning%:") then
+    flush()
+    parse_warning(line)
+  elseif string.find(line, "%s*~*%^~*%s*") then
+    flush(line)
+  elseif string.find(line, "^%s*$") then
+    flush()
+  elseif string.find(line, "^Linting") or string.find(line, "^note%:") then
+    flush()
+  elseif lineType == TEST_ERROR or lineType == BUILD_ERROR or lineType == BUILD_WARNING then
+    table.insert(lineData.message, line)
+  end
 end
 
 function M.clear()
-	lastTest = nil
-	lineData = {}
-	lineType = BEGIN
-	allSwiftFiles = util.find_all_swift_files()
+  lastTest = nil
+  lineData = {}
+  lineType = BEGIN
+  allSwiftFiles = util.find_all_swift_files()
 
-	tests = {}
-	testsCount = 0
-	failedTestsCount = 0
-	output = {}
-	buildErrors = {}
-	warnings = {}
-	diagnostics = {}
+  tests = {}
+  testsCount = 0
+  failedTestsCount = 0
+  output = {}
+  buildErrors = {}
+  warnings = {}
+  diagnostics = {}
 end
 
 function M.parse_logs(logLines)
-	for _, line in ipairs(logLines) do
-		process_line(line)
-	end
+  for _, line in ipairs(logLines) do
+    process_line(line)
+  end
 
-	return {
-		output = output,
-		tests = tests,
-		testsCount = testsCount,
-		failedTestsCount = failedTestsCount,
-		buildErrors = buildErrors,
-		warnings = warnings,
-		diagnostics = diagnostics,
-	}
+  return {
+    output = output,
+    tests = tests,
+    testsCount = testsCount,
+    failedTestsCount = failedTestsCount,
+    buildErrors = buildErrors,
+    warnings = warnings,
+    diagnostics = diagnostics,
+  }
 end
 
 return M
