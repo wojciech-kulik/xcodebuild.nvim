@@ -138,8 +138,59 @@ function M.get_schemes(projectCommand, callback)
   })
 end
 
+function M.get_project_information(projectCommand, callback)
+  if string.find(projectCommand, "-workspace") then
+    projectCommand = string.gsub(projectCommand, "-workspace", "-project")
+    projectCommand = string.gsub(projectCommand, "%.xcworkspace", ".xcodeproj")
+  end
+  local command = "xcodebuild " .. projectCommand .. " -list"
+
+  return vim.fn.jobstart(command, {
+    stdout_buffered = true,
+    on_stdout = function(_, output)
+      local schemes = {}
+      local configs = {}
+      local targets = {}
+      local SCHEME = "scheme"
+      local CONFIG = "config"
+      local TARGET = "target"
+
+      local mode = nil
+      for _, line in ipairs(output) do
+        if string.find(util.trim(line), "Schemes:") then
+          mode = SCHEME
+        elseif string.find(util.trim(line), "Build Configurations:") then
+          mode = CONFIG
+        elseif string.find(util.trim(line), "Targets:") then
+          mode = TARGET
+        elseif util.trim(line) ~= "" then
+          if mode == SCHEME then
+            table.insert(schemes, util.trim(line))
+          elseif mode == CONFIG then
+            table.insert(configs, util.trim(line))
+          elseif mode == TARGET then
+            table.insert(targets, util.trim(line))
+          end
+        else
+          mode = nil
+        end
+      end
+
+      callback({
+        configs = configs,
+        targets = targets,
+        schemes = schemes,
+      })
+    end,
+  })
+end
+
 function M.get_testplans(projectCommand, scheme, callback)
-  local command = "xcodebuild test " .. projectCommand .. " -scheme '" .. scheme .. "' -showTestPlans"
+  local command = "xcodebuild test "
+    .. projectCommand
+    .. " -scheme '"
+    .. scheme
+    .. "' -showTestPlans"
 
   return vim.fn.jobstart(command, {
     stdout_buffered = true,
@@ -172,6 +223,9 @@ function M.build_project(opts)
     .. "' -destination 'id="
     .. opts.destination
     .. "'"
+    .. " -configuration '"
+    .. opts.config
+    .. "'"
 
   return vim.fn.jobstart(command, {
     stdout_buffered = false,
@@ -182,55 +236,57 @@ function M.build_project(opts)
   })
 end
 
-function M.get_bundle_id(projectCommand, scheme, callback)
+function M.get_build_settings(platform, projectCommand, scheme, config, callback)
   local command = "xcodebuild "
     .. projectCommand
     .. " -scheme '"
     .. scheme
-    .. "' -showBuildSettings | grep PRODUCT_BUNDLE_IDENTIFIER | awk -F ' = ' '{print $2}'"
+    .. "' -configuration '"
+    .. config
+    .. "' -showBuildSettings"
+    .. " -sdk "
+    .. (platform == "macOS" and "macosx" or "iphonesimulator")
 
   return vim.fn.jobstart(command, {
     stdout_buffered = true,
     on_stdout = function(_, output)
-      callback(true, table.concat(output, ""))
+      local foundBundleId = nil
+      local foundTargetName = nil
+      local foundBuildDir = nil
+
+      for _, line in ipairs(output) do
+        local bundleId = string.match(line, "PRODUCT_BUNDLE_IDENTIFIER = (.*)%s*")
+        local targetName = string.match(line, "TARGETNAME = (.*)%s*")
+        local buildDir = string.match(line, "TARGET_BUILD_DIR = (.*)%s*")
+        if bundleId then
+          foundBundleId = bundleId
+        end
+        if targetName then
+          foundTargetName = targetName
+        end
+        if buildDir then
+          foundBuildDir = buildDir
+        end
+        if foundBuildDir and foundTargetName and foundBundleId then
+          break
+        end
+      end
+
+      if not foundBundleId or not foundBuildDir or not foundTargetName then
+        error("Could not get build settings")
+      end
+
+      local result = {
+        appPath = foundBuildDir .. "/" .. foundTargetName .. ".app",
+        targetName = foundTargetName,
+        bundleId = foundBundleId,
+      }
+
+      if callback then
+        callback(result)
+      end
     end,
   })
-end
-
-function M.get_app_settings(logLines)
-  local targetName = nil
-  local buildDir = nil
-  local bundleId = nil
-
-  for i = #logLines, 1, -1 do
-    local line = logLines[i]
-    if string.find(line, "TARGETNAME") then
-      targetName = string.match(line, "TARGETNAME\\=(.*)")
-    elseif string.find(line, "TARGET_BUILD_DIR") then
-      buildDir = string.match(line, "TARGET_BUILD_DIR\\=(.*)")
-    elseif string.find(line, "PRODUCT_BUNDLE_IDENTIFIER") then
-      bundleId = string.match(line, "PRODUCT_BUNDLE_IDENTIFIER\\=(.*)")
-    end
-
-    if targetName and buildDir and bundleId then
-      break
-    end
-  end
-
-  if not targetName or not buildDir or not bundleId then
-    error("Could not locate built app path")
-  end
-
-  targetName = string.gsub(targetName, "\\", "")
-  buildDir = string.gsub(buildDir, "\\", "")
-
-  local result = {
-    appPath = buildDir .. "/" .. targetName .. ".app",
-    targetName = targetName,
-    bundleId = bundleId,
-  }
-
-  return result
 end
 
 function M.install_app(destination, appPath, callback)
@@ -249,7 +305,10 @@ function M.install_app(destination, appPath, callback)
 end
 
 function M.launch_app(destination, bundleId, callback)
-  local command = "xcrun simctl launch --terminate-running-process '" .. destination .. "' " .. bundleId
+  local command = "xcrun simctl launch --terminate-running-process '"
+    .. destination
+    .. "' "
+    .. bundleId
   return vim.fn.jobstart(command, {
     stdout_buffered = true,
     detach = true,
@@ -301,6 +360,9 @@ function M.run_tests(opts)
     .. opts.projectCommand
     .. " -testPlan '"
     .. opts.testPlan
+    .. "'"
+    .. " -configuration '"
+    .. opts.config
     .. "'"
 
   if opts.testsToRun then

@@ -13,12 +13,24 @@ local testReport = {}
 local currentJobId = nil
 local targetToFiles = {}
 
-local function update_settings(output)
-  local settings = xcode.get_app_settings(output)
-  projectConfig.settings().appPath = settings.appPath
-  projectConfig.settings().appTarget = settings.targetName
-  projectConfig.settings().bundleId = settings.bundleId
-  projectConfig.save_settings()
+function M.update_settings(callback)
+  local settings = projectConfig.settings()
+
+  xcode.get_build_settings(
+    settings.platform,
+    settings.projectCommand,
+    settings.scheme,
+    settings.config,
+    function(buildSettings)
+      projectConfig.settings().appPath = buildSettings.appPath
+      projectConfig.settings().appTarget = buildSettings.targetName
+      projectConfig.settings().bundleId = buildSettings.bundleId
+      projectConfig.save_settings()
+      if callback then
+        callback()
+      end
+    end
+  )
 end
 
 function M.cancel()
@@ -180,7 +192,6 @@ function M.build_project(opts, callback)
 
     logs.set_logs(testReport, false, shouldShow and open_logs_on_success)
     if not hasErrors then
-      update_settings(testReport.output)
       logs.notify("Build Succeeded")
     end
     quickfix.set(testReport)
@@ -199,6 +210,7 @@ function M.build_project(opts, callback)
     destination = projectConfig.settings().destination,
     projectCommand = projectConfig.settings().projectCommand,
     scheme = projectConfig.settings().scheme,
+    config = projectConfig.settings().config,
     testPlan = projectConfig.settings().testPlan,
   })
 end
@@ -231,7 +243,6 @@ function M.run_tests(testsToRun)
     local shouldShow = (hasErrors and config.auto_open_on_failed_tests)
       or (not hasErrors and config.auto_open_on_success_tests)
 
-    update_settings(testReport.output)
     targetToFiles = xcode.get_targets_list(projectConfig.settings().appPath)
     logs.set_logs(testReport, true, shouldShow)
     quickfix.setTargets(targetToFiles)
@@ -247,6 +258,7 @@ function M.run_tests(testsToRun)
     destination = projectConfig.settings().destination,
     projectCommand = projectConfig.settings().projectCommand,
     scheme = projectConfig.settings().scheme,
+    config = projectConfig.settings().config,
     testPlan = projectConfig.settings().testPlan,
     testsToRun = testsToRun,
   })
@@ -350,8 +362,6 @@ function M.run_selected_tests(opts)
       end
     end
 
-    vim.print("Discovered tests: " .. vim.inspect(testsToRun))
-
     if next(testsToRun) then
       M.run_tests(testsToRun)
     else
@@ -383,14 +393,19 @@ function M.configure_project()
   end
 
   pickers.select_project(function()
-    defer_print("Loading schemes...")
-    pickers.select_scheme(function()
-      defer_print("Loading devices...")
-      pickers.select_destination(function()
-        defer_print("Loading test plans...")
-        pickers.select_testplan(function()
-          defer_print("Xcodebuild configuration has been saved!")
-        end, { close_on_select = true })
+    defer_print("Loading project information...")
+    pickers.select_config(function(projectInfo)
+      pickers.select_scheme(projectInfo.schemes, function()
+        defer_print("Loading devices...")
+        pickers.select_destination(function()
+          defer_print("Updating settings...")
+          M.update_settings(function()
+            defer_print("Loading test plans...")
+            pickers.select_testplan(function()
+              defer_print("Xcodebuild configuration has been saved!")
+            end, { close_on_select = true })
+          end)
+        end)
       end)
     end)
   end)

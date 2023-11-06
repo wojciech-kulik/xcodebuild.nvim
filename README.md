@@ -198,6 +198,7 @@ Xcodebuild.nvim comes with the following commands:
 | `XcodebuildTestFailing`    | Rerun previously failed tests                            |
 | `XcodebuildSelectProject`  | Show picker with project file selection                  |
 | `XcodebuildSelectScheme`   | Show picker with scheme selection                        |
+| `XcodebuildSelectConfig`   | Show picker with build configuration selection           |
 | `XcodebuildSelectDevice`   | Show picker with device selection                        |
 | `XcodebuildSelectTestPlan` | Show picker with test plan selection                     |
 | `XcodebuildToggleLogs`     | Toggle logs panel                                        |

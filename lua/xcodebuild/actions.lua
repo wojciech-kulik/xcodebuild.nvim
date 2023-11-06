@@ -10,6 +10,17 @@ local function defer_print(text)
   end, 100)
 end
 
+local function update_settings(callback)
+  defer_print("Updating settings...")
+  coordinator.update_settings(function()
+    logs.notify("Settings updated")
+
+    if callback then
+      callback()
+    end
+  end)
+end
+
 function M.open_logs()
   logs.open_logs(true, true)
 end
@@ -75,12 +86,23 @@ function M.run_failing_tests()
 end
 
 function M.select_project(callback)
-  pickers.select_project(callback, { close_on_select = true })
+  pickers.select_project(function()
+    update_settings(callback)
+  end, { close_on_select = true })
 end
 
 function M.select_scheme(callback)
   defer_print("Loading schemes...")
-  pickers.select_scheme(callback, { close_on_select = true })
+  pickers.select_scheme(nil, function()
+    update_settings(callback)
+  end, { close_on_select = true })
+end
+
+function M.select_config(callback)
+  defer_print("Loading schemes...")
+  pickers.select_config(function()
+    update_settings(callback)
+  end, { close_on_select = true })
 end
 
 function M.select_testplan(callback)
@@ -90,7 +112,9 @@ end
 
 function M.select_device(callback)
   defer_print("Loading devices...")
-  pickers.select_destination(callback, { close_on_select = true })
+  pickers.select_destination(function()
+    update_settings(callback)
+  end, { close_on_select = true })
 end
 
 function M.uninstall(callback)

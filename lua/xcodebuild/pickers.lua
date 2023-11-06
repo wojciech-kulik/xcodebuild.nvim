@@ -26,7 +26,10 @@ local spinner_anim_frames = {
 local function update_telescope_spinner()
   if active_picker then
     current_frame = current_frame >= #spinner_anim_frames and 1 or current_frame + 1
-    active_picker:change_prompt_prefix(spinner_anim_frames[current_frame] .. " ", "TelescopePromptPrefix")
+    active_picker:change_prompt_prefix(
+      spinner_anim_frames[current_frame] .. " ",
+      "TelescopePromptPrefix"
+    )
     vim.cmd("echo '" .. spinner_anim_frames[current_frame] .. "'")
   end
 end
@@ -111,7 +114,9 @@ function M.select_project(callback, opts)
     local isWorkspace = util.hasSuffix(projectFile, "xcworkspace")
 
     projectConfig.settings().projectFile = projectFile
-    projectConfig.settings().projectCommand = (isWorkspace and "-workspace '" or "-project '") .. projectFile .. "'"
+    projectConfig.settings().projectCommand = (isWorkspace and "-workspace '" or "-project '")
+      .. projectFile
+      .. "'"
     projectConfig.save_settings()
 
     if callback then
@@ -120,10 +125,12 @@ function M.select_project(callback, opts)
   end, opts)
 end
 
-function M.select_scheme(callback, opts)
-  local projectCommand = projectConfig.settings().projectCommand
-  start_telescope_spinner()
-  M.show("Select Scheme", {}, function(value, _)
+function M.select_scheme(schemes, callback, opts)
+  if not schemes or not next(schemes) then
+    start_telescope_spinner()
+  end
+
+  M.show("Select Scheme", schemes, function(value, _)
     projectConfig.settings().scheme = value
     projectConfig.save_settings()
 
@@ -132,7 +139,32 @@ function M.select_scheme(callback, opts)
     end
   end, opts)
 
-  return xcode.get_schemes(projectCommand, update_results)
+  if not schemes or not next(schemes) then
+    local projectCommand = projectConfig.settings().projectCommand
+    return xcode.get_project_information(projectCommand, function(info)
+      update_results(info.schemes)
+    end)
+  end
+end
+
+function M.select_config(callback, opts)
+  local projectCommand = projectConfig.settings().projectCommand
+  local projectInfo = nil
+
+  start_telescope_spinner()
+  M.show("Select Build Configuration", {}, function(value, _)
+    projectConfig.settings().config = value
+    projectConfig.save_settings()
+
+    if callback then
+      callback(projectInfo)
+    end
+  end, opts)
+
+  return xcode.get_project_information(projectCommand, function(info)
+    projectInfo = info
+    update_results(info.configs)
+  end)
 end
 
 function M.select_testplan(callback, opts)
@@ -174,7 +206,9 @@ function M.select_destination(callback, opts)
 
   return xcode.get_destinations(projectCommand, scheme, function(destinations)
     local filtered = util.filter(destinations, function(table)
-      return table.id ~= nil and table.platform ~= "iOS" and (not table.name or not string.find(table.name, "^Any"))
+      return table.id ~= nil
+        and table.platform ~= "iOS"
+        and (not table.name or not string.find(table.name, "^Any"))
     end)
 
     local destinationsName = util.select(filtered, function(table)
@@ -218,6 +252,7 @@ function M.show_all_actions()
 
     "Select Project File",
     "Select Scheme",
+    "Select Build Configuration",
     "Select Device",
     "Select Test Plan",
     "Show Configuration Wizard",
@@ -242,6 +277,7 @@ function M.show_all_actions()
 
     actions.select_project,
     actions.select_scheme,
+    actions.select_config,
     actions.select_device,
     actions.select_testplan,
     actions.configure_project,
