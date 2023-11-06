@@ -87,27 +87,46 @@ end
 
 function M.run_app(callback)
 	local settings = projectConfig.settings()
-	local destination = settings.destination
-	local target = settings.appTarget
 
-	if target then
-		xcode.kill_app(target)
-	end
-
-	vim.notify("Installing application...")
-	currentJobId = xcode.install_app(destination, settings.appPath, function()
+	if settings.platform == "macOS" then
 		vim.notify("Launching application...")
-		currentJobId = xcode.launch_app(destination, settings.bundleId, function()
-			vim.notify("Application has been launched")
-			if callback then
-				callback()
-			end
+		local app = string.match(settings.appPath, "/([^/]+)%.app$")
+		local path = settings.appPath .. "/Contents/MacOS/" .. app
+		vim.print(path)
+		currentJobId = vim.fn.jobstart(path, {
+			detach = true,
+		})
+		vim.notify("Application has been launched")
+		if callback then
+			callback()
+		end
+	else
+		local destination = settings.destination
+		local target = settings.appTarget
+
+		if target then
+			xcode.kill_app(target)
+		end
+
+		vim.notify("Installing application...")
+		currentJobId = xcode.install_app(destination, settings.appPath, function()
+			vim.notify("Launching application...")
+			currentJobId = xcode.launch_app(destination, settings.bundleId, function()
+				vim.notify("Application has been launched")
+				if callback then
+					callback()
+				end
+			end)
 		end)
-	end)
+	end
 end
 
 function M.uninstall_app(callback)
 	local settings = projectConfig.settings()
+	if settings.platform == "macOS" then
+		vim.notify("macOS app doesn't require uninstalling")
+		return
+	end
 
 	vim.notify("Uninstalling application...")
 	currentJobId = xcode.uninstall_app(settings.destination, settings.bundleId, function()

@@ -169,6 +169,7 @@ function M.select_destination(callback, opts)
 		end
 
 		projectConfig.settings().destination = results[index].id
+		projectConfig.settings().platform = results[index].platform
 		projectConfig.save_settings()
 
 		if callback then

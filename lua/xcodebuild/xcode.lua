@@ -201,7 +201,8 @@ function M.get_app_settings(logs)
 	local buildDir = nil
 	local bundleId = nil
 
-	for _, line in ipairs(logs) do
+	for i = #logs, 1, -1 do
+		local line = logs[i]
 		if string.find(line, "TARGETNAME") then
 			targetName = string.match(line, "TARGETNAME\\=(.*)")
 		elseif string.find(line, "TARGET_BUILD_DIR") then
