@@ -10,13 +10,13 @@ A plugin that lets you move your iOS, iPadOS and macOS apps development to Neovi
 
 ## 🚧 Disclaimer
 
-This plugin is in the early stage of development. It was tested on a limited number of projects and configurations. Therefore, it still could be buggy. If you find any issues don't hesitate to fix it and create a pull request or just report them.
-
-It is also my first Neovim plugin. Hopefully, a good one 😁.
+This plugin is in the early stage of development. It was tested on a limited number of projects and configurations. Therefore, it still could be buggy. If you find any issue don't hesitate to fix it and create a pull request or just report it.
 
 I've been looking for a solution to move my development to any other IDE than Xcode for a long time. It seems that this plugin + [nvim-dap](https://github.com/mfussenegger/nvim-dap) + [nvim-dap-ui](https://github.com/rcarriga/nvim-dap-ui) + [nvim-lspconfig](https://github.com/neovim/nvim-lspconfig) + [xcode-build-server](https://github.com/SolaWing/xcode-build-server), all together, provide everything that is needed to move to Neovim with iOS, iPadOS, and macOS apps development.
 
 Of course, you will still need Xcode for some project setup & management. Also, you may need to migrate to [tuist](https://github.com/tuist/tuist) or [xcodegen](https://github.com/yonaskolb/XcodeGen) to be able to add new files easily.
+
+It is also my first Neovim plugin. Hopefully, a good one 😁.
 
 ## ✨ Features
 
@@ -32,6 +32,7 @@ Of course, you will still need Xcode for some project setup & management. Also, 
 - [x] Showing test duration next to each test.
 - [x] Showing test errors in diagnostics and on the quickfix list.
 - [x] Showing build errors and warnings on the quickfix list.
+- [x] Showing build progress bar based on the previous build time.
 - [x] Advanced log parser to detect all errors, warnings, and failing tests and to present them nicely formatted.
 - [x] Auto saving files before build or test actions.
 - [x] [nvim-dap](https://github.com/mfussenegger/nvim-dap) helper functions to let you easily build, run, and attach the debugger.
@@ -42,7 +43,7 @@ Of course, you will still need Xcode for some project setup & management. Also, 
 
 The plugin assumes that test class name should match file name. If `YourTraget.YourTestClass.testYourTest` appears in logs, the plugin will try locating `YourTestClass.swift` file and show test results there (marks + diagnostics + quickfix).
 
-If you have a different naming convention, or if you have multiple test classes named the same across the project, it may not work correctly.
+If you have a different naming convention, or if you have multiple test files named the same across the project, it may not work correctly.
 
 I will try to address it as soon as possible, but for now there is this limitation.
 
@@ -85,6 +86,7 @@ Xcodebuild.nvim comes with the following defaults:
 {
   restore_on_start = true, -- logs, diagnostics, and marks will be loaded on VimEnter (may affect performance)
   auto_save = true, -- save all buffers before running build or tests (command: silent wa!)
+  show_build_progress_bar = true, -- shows [ ...    ] progress bar during build, based on the last duration
   logs = {
     auto_open_on_success_tests = true, -- open logs when tests succeeded
     auto_open_on_failed_tests = true, -- open logs when tests failed
@@ -261,7 +263,7 @@ Sample `settings.json`:
 ## ⏳ Things To Do
 
 - [ ] Add Neovim documentation
-- [ ] Error handling - there are a lot of things that can go wrong with `xcodebuild` commands. Probably the plugin should check some common issues and present user friendly errors.
-- [ ] Show build progress based on the last build time.
+- [ ] Error handling - there are a lot of things that can go wrong with `xcodebuild` commands. Probably this plugin should check some common issues and present user friendly errors.
 - [ ] List tests to browse and run. Something like a tree with tests?
 - [ ] Resolve issues with finding the corresponding test file.
+- [ ] Add clean build action. While testing this command was failing for some reasons, that's why for now it's postponed.

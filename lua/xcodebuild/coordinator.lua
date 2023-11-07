@@ -231,16 +231,15 @@ function M.build_project(opts, callback)
 
   local openLogsOnSuccess = (opts or {}).openLogsOnSuccess
   local buildForTesting = (opts or {}).buildForTesting
-  logs.notify("Building...")
+  local lastBuildTime = projectConfig.settings().lastBuildTime
+  local progressTimer = not buildForTesting and ui.start_action_timer("Building", lastBuildTime) or nil
+  local startTime = os.time()
+
   M.auto_save()
   parser.clear()
 
   local on_stdout = function(_, output)
     testReport = parser.parse_logs(output)
-
-    if testReport.buildErrors and testReport.buildErrors[1] then
-      logs.notify_progress("Building... [Errors: " .. #testReport.buildErrors .. "]")
-    end
   end
 
   local on_stderr = function(_, output)
@@ -248,6 +247,10 @@ function M.build_project(opts, callback)
   end
 
   local on_exit = function(_, code, _)
+    if progressTimer then
+      vim.fn.timer_stop(progressTimer)
+    end
+
     if code == 143 then
       return
     end
@@ -261,7 +264,10 @@ function M.build_project(opts, callback)
 
     logs.set_logs(testReport, false, shouldShow and openLogsOnSuccess)
     if not hasErrors then
-      logs.notify("Build Succeeded")
+      local duration = os.difftime(os.time(), startTime)
+      projectConfig.settings().lastBuildTime = duration
+      projectConfig.save_settings()
+      logs.notify(string.format("Build Succeeded [%d seconds]", duration))
     end
     quickfix.set(testReport)
 
@@ -445,6 +451,7 @@ function M.run_selected_tests(opts)
     end
   end
 
+  -- TODO: clear cache when a new swift test file is added
   if not targetToFiles or not next(targetToFiles) then
     logs.notify("Loading tests...")
     currentJobId = M.build_project({

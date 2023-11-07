@@ -3,6 +3,7 @@ local M = {}
 local defaults = {
   restore_on_start = true, -- logs, diagnostics, and marks will be loaded on VimEnter (may affect performance)
   auto_save = true, -- save all buffers before running build or tests (command: silent wa!)
+  show_build_progress_bar = true, -- shows [ ...    ] progress bar during build, based on the last duration
   logs = {
     auto_open_on_success_tests = true, -- open logs when tests succeeded
     auto_open_on_failed_tests = true, -- open logs when tests failed

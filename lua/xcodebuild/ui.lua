@@ -1,5 +1,29 @@
 local M = {}
 
+local currentFrame = 0
+local progressFrames = {
+  "..........",
+  " .........",
+  "  ........",
+  "   .......",
+  "    ......",
+  "     .....",
+  "      ....",
+  "       ...",
+  "        ..",
+  "         .",
+  "          ",
+  ".         ",
+  "..        ",
+  "...       ",
+  "....      ",
+  ".....     ",
+  "......    ",
+  ".......   ",
+  "........  ",
+  "......... ",
+}
+
 local function notify(message, severity)
   require("xcodebuild.logs").notify(message, severity)
 end
@@ -47,6 +71,34 @@ function M.open_test_file(tests)
       return
     end
   end
+end
+
+function M.start_action_timer(actionTitle, expectedDuration)
+  local logs = require("xcodebuild.logs")
+  local startTime = os.time()
+  local shouldShowProgressBar = require("xcodebuild.config").options.show_build_progress_bar
+
+  local timer = vim.fn.timer_start(80, function()
+    local duration = os.difftime(os.time(), startTime)
+
+    if expectedDuration and shouldShowProgressBar then
+      local progress
+      local numberOfDots = math.floor(duration / expectedDuration * 10.0)
+
+      if numberOfDots <= 10 then
+        progress = string.rep(".", numberOfDots) .. string.rep(" ", 10 - numberOfDots)
+      else
+        progress = progressFrames[currentFrame % 20 + 1]
+        currentFrame = currentFrame + 1
+      end
+
+      logs.notify_progress(string.format("[ %s ] %s (%d seconds)", progress, actionTitle, duration))
+    else
+      logs.notify_progress(string.format("%s [%d seconds]", actionTitle, duration))
+    end
+  end, { ["repeat"] = -1 })
+
+  return timer
 end
 
 return M
