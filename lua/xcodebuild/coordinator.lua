@@ -169,7 +169,6 @@ function M.run_app(callback)
     logs.notify("Launching application...")
     local app = string.match(settings.appPath, "/([^/]+)%.app$")
     local path = settings.appPath .. "/Contents/MacOS/" .. app
-    vim.print(path)
     currentJobId = vim.fn.jobstart(path, {
       detach = true,
     })
