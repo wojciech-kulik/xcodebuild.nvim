@@ -1,6 +1,8 @@
+![](https://img.shields.io/badge/Release-0.9.0--beta-blue)
+
 # 🛠️ xcodebuild.nvim
 
-A plugin that lets you move your iOS, iPadOS and macOS apps development to Neovim. It supports most of Xcode actions that are required to work with a project, like device selection, building, launching, and testing.
+A plugin that lets you move your iOS, iPadOS and macOS apps development to Neovim. It supports most of Xcode actions that are required to work with a project, including device selection, building, launching, and testing.
 
 ![Xcodebuild Debugging](./media/tests.png)
 
@@ -122,7 +124,7 @@ Xcodebuild.nvim comes with the following defaults:
 
 ### DAP Integration
 
-[nvim-dap](https://github.com/mfussenegger/nvim-dap) plugin let's you debug applications like in any other IDE. On top of that [nvim-dap-ui](https://github.com/rcarriga/nvim-dap-ui) extension will present for you all panels with stack, breakpoints, variables, logs, etc.
+[nvim-dap](https://github.com/mfussenegger/nvim-dap) plugin lets you debug applications like in any other IDE. On top of that [nvim-dap-ui](https://github.com/rcarriga/nvim-dap-ui) extension will present for you all panels with stack, breakpoints, variables, logs, etc.
 
 To configure DAP for development:
 
@@ -205,7 +207,7 @@ Xcodebuild.nvim comes with the following commands:
 | `XcodebuildToggleLogs`     | Toggle logs panel                                        |
 | `XcodebuildOpenLogs`       | Open logs panel                                          |
 | `XcodebuildCloseLogs`      | Close logs panel                                         |
-| `XcodebuildShowConfig`     | Prints current project configuration                     |
+| `XcodebuildShowConfig`     | Print current project configuration                      |
 | `XcodebuildUninstall`      | Uninstall mobile app                                     |
 
 Sample key bindings:
@@ -262,3 +264,4 @@ Sample `settings.json`:
 - [ ] Error handling - there are a lot of things that can go wrong with `xcodebuild` commands. Probably the plugin should check some common issues and present user friendly errors.
 - [ ] Show build progress based on the last build time.
 - [ ] List tests to browse and run. Something like a tree with tests?
+- [ ] Resolve issues with finding the corresponding test file.
