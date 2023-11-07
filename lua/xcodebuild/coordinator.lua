@@ -468,6 +468,7 @@ end
 
 function M.configure_project()
   appdata.create_app_dir()
+
   local pickers = require("xcodebuild.pickers")
   local defer_print = function(text)
     vim.defer_fn(function()

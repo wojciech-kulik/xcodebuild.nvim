@@ -4,16 +4,16 @@ local logs = require("xcodebuild.logs")
 
 local M = {}
 
-local function defer_print(text)
+local function defer_notify(text)
   vim.defer_fn(function()
     logs.notify(text)
   end, 100)
 end
 
 local function update_settings(callback)
-  defer_print("Updating settings...")
+  defer_notify("Updating project settings...")
   coordinator.update_settings(function()
-    logs.notify("Settings updated")
+    logs.notify("Project settings updated")
 
     if callback then
       callback()
@@ -92,26 +92,26 @@ function M.select_project(callback)
 end
 
 function M.select_scheme(callback)
-  defer_print("Loading schemes...")
+  defer_notify("Loading schemes...")
   pickers.select_scheme(nil, function()
     update_settings(callback)
   end, { close_on_select = true })
 end
 
 function M.select_config(callback)
-  defer_print("Loading schemes...")
+  defer_notify("Loading schemes...")
   pickers.select_config(function()
     update_settings(callback)
   end, { close_on_select = true })
 end
 
 function M.select_testplan(callback)
-  defer_print("Loading test plans...")
+  defer_notify("Loading test plans...")
   pickers.select_testplan(callback, { close_on_select = true })
 end
 
 function M.select_device(callback)
-  defer_print("Loading devices...")
+  defer_notify("Loading devices...")
   pickers.select_destination(function()
     update_settings(callback)
   end, { close_on_select = true })

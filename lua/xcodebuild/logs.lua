@@ -44,7 +44,7 @@ function M.set_logs(report, isTesting, show)
       table.insert(prettyOutput, "")
     end
 
-    vim.fn.writefile(prettyOutput, appdata.get_build_logs_filepath())
+    appdata.write_build_logs(prettyOutput)
 
     M.update_log_panel(show)
   end
@@ -52,7 +52,7 @@ function M.set_logs(report, isTesting, show)
   if config.only_summary then
     completion({})
   elseif config.logs_formatter then
-    local logs_filepath = appdata.get_original_logs_filepath()
+    local logs_filepath = appdata.original_logs_filepath
     local command = "cat '" .. logs_filepath .. "' | " .. config.logs_formatter
 
     vim.fn.jobstart(command, {
@@ -142,8 +142,8 @@ function M.set_errors(prettyOutput, buildErrors)
 end
 
 function M.update_log_panel(show)
-  local logsFilepath = appdata.get_build_logs_filepath()
-  local bufnr = util.get_buf_by_name(appdata.get_build_logs_filename(), { returnNotLoaded = true }) or -1
+  local logsFilepath = appdata.build_logs_filepath
+  local bufnr = util.get_buf_by_name(appdata.build_logs_filename, { returnNotLoaded = true }) or -1
   local winnr = vim.fn.win_findbuf(bufnr)[1]
 
   if show then
@@ -180,8 +180,8 @@ function M.update_log_panel(show)
 end
 
 function M.open_logs(forceScroll, focus)
-  local logsFilepath = appdata.get_build_logs_filepath()
-  local bufnr = util.get_buf_by_name(appdata.get_build_logs_filename(), { returnNotLoaded = true }) or -1
+  local logsFilepath = appdata.build_logs_filepath
+  local bufnr = util.get_buf_by_name(appdata.build_logs_filename, { returnNotLoaded = true }) or -1
   local winnr = vim.fn.win_findbuf(bufnr)[1]
 
   if winnr then
@@ -204,7 +204,7 @@ function M.open_logs(forceScroll, focus)
 end
 
 function M.close_logs()
-  local bufnr = util.get_buf_by_name(appdata.get_build_logs_filename(), { returnNotLoaded = true }) or -1
+  local bufnr = util.get_buf_by_name(appdata.build_logs_filename, { returnNotLoaded = true }) or -1
   local winnr = vim.fn.win_findbuf(bufnr)[1]
 
   if winnr then
@@ -213,7 +213,7 @@ function M.close_logs()
 end
 
 function M.toggle_logs()
-  local bufnr = util.get_buf_by_name(appdata.get_build_logs_filename(), { returnNotLoaded = true }) or -1
+  local bufnr = util.get_buf_by_name(appdata.build_logs_filename, { returnNotLoaded = true }) or -1
   local winnr = vim.fn.win_findbuf(bufnr)[1]
 
   if winnr then

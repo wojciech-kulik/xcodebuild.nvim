@@ -8,7 +8,7 @@ local autogroup = vim.api.nvim_create_augroup("xcodebuild.nvim", { clear = true 
 function M.setup()
   vim.api.nvim_create_autocmd({ "BufReadPost", "BufWritePost" }, {
     group = autogroup,
-    pattern = "*" .. appdata.get_build_logs_filename(),
+    pattern = "*" .. appdata.build_logs_filename,
     callback = function(ev)
       coordinator.setup_log_buffer(ev.buf)
     end,
