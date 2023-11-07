@@ -259,7 +259,6 @@ Sample `settings.json`:
 ## ⏳ Things To Do
 
 - [ ] Add Neovim documentation
-- [ ] Error handling - there are a lot of things that can go wrong with `xcodebuild` commands. Currently, only errors from build and test actions are handled properly.
+- [ ] Error handling - there are a lot of things that can go wrong with `xcodebuild` commands. Probably the plugin should check some common issues and present user friendly errors.
 - [ ] Show build progress based on the last build time.
-- [ ] List of tests to browse and run. Something like a tree with tests?
-- [ ] Presentation of currently selected device/config?
+- [ ] List tests to browse and run. Something like a tree with tests?
