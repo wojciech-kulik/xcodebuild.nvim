@@ -38,7 +38,7 @@ function M.show_picker()
 end
 
 function M.build(callback)
-  coordinator.build_project({ open_logs_on_success = true }, callback)
+  coordinator.build_project({ openLogsOnSuccess = true }, callback)
 end
 
 function M.cancel()

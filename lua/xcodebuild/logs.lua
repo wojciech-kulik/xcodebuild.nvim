@@ -174,7 +174,7 @@ function M.update_log_panel(show)
   vim.api.nvim_buf_set_option(bufnr, "modifiable", false)
   vim.api.nvim_buf_set_option(bufnr, "readonly", true)
 
-  if not config.auto_focus then
+  if show and not config.auto_focus then
     vim.cmd("wincmd p")
   end
 end

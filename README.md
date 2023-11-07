@@ -89,6 +89,7 @@ Xcodebuild.nvim comes with the following defaults:
     auto_open_on_success_build = true, -- open logs when build succeeded
     auto_open_on_failed_build = true, -- open logs when build failed
     auto_focus = true, -- focus logs buffer when opened
+    filetype = "objc", -- file type set for buffer with logs
     open_command = "silent bo split {path} | resize 20", -- command used to open logs panel. You must use {path} variable to load the log file
     logs_formatter = "xcbeautify --disable-colored-output", -- command used to format logs, you can use nil to skip formatting
     only_summary = false, -- if true logs won't be displayed, just xcodebuild.nvim summary

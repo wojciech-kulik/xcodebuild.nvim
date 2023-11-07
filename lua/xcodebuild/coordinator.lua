@@ -98,13 +98,14 @@ function M.get_report()
 end
 
 function M.setup_log_buffer(bufnr)
+  local config = require("xcodebuild.config").options.logs
   local win = vim.fn.win_findbuf(bufnr)[1]
   vim.api.nvim_buf_set_option(bufnr, "modifiable", true)
   vim.api.nvim_buf_set_option(bufnr, "readonly", false)
 
   vim.api.nvim_win_set_option(win, "wrap", false)
   vim.api.nvim_win_set_option(win, "spell", false)
-  vim.api.nvim_buf_set_option(bufnr, "filetype", "objc")
+  vim.api.nvim_buf_set_option(bufnr, "filetype", config.filetype)
   vim.api.nvim_buf_set_option(bufnr, "buflisted", false)
   vim.api.nvim_buf_set_option(bufnr, "fileencoding", "utf-8")
   vim.api.nvim_buf_set_option(bufnr, "modified", false)
@@ -145,7 +146,7 @@ function M.build_and_run_app(callback)
   end
 
   M.build_project({
-    open_logs_on_success = false,
+    openLogsOnSuccess = false,
   }, function(report)
     if report.buildErrors and report.buildErrors[1] then
       logs.notify("Build Failed", vim.log.levels.ERROR)
@@ -229,9 +230,8 @@ function M.build_project(opts, callback)
     return
   end
 
-  local open_logs_on_success = (opts or {}).open_logs_on_success
-  local build_for_testing = (opts or {}).build_for_testing
-
+  local openLogsOnSuccess = (opts or {}).openLogsOnSuccess
+  local buildForTesting = (opts or {}).buildForTesting
   logs.notify("Building...")
   M.auto_save()
   parser.clear()
@@ -258,9 +258,9 @@ function M.build_project(opts, callback)
     local config = require("xcodebuild.config").options.logs
     local hasErrors = testReport.buildErrors and testReport.buildErrors[1]
     local shouldShow = (hasErrors and config.auto_open_on_failed_build)
-      or (not hasErrors and config.auto_open_on_success_build)
+      or (not hasErrors and config.auto_open_on_success_build and not buildForTesting)
 
-    logs.set_logs(testReport, false, shouldShow and open_logs_on_success)
+    logs.set_logs(testReport, false, shouldShow and openLogsOnSuccess)
     if not hasErrors then
       logs.notify("Build Succeeded")
     end
@@ -276,7 +276,7 @@ function M.build_project(opts, callback)
     on_stdout = on_stdout,
     on_stderr = on_stderr,
 
-    build_for_testing = build_for_testing,
+    buildForTesting = buildForTesting,
     destination = projectConfig.settings().destination,
     projectCommand = projectConfig.settings().projectCommand,
     scheme = projectConfig.settings().scheme,
@@ -314,8 +314,8 @@ function M.run_tests(testsToRun)
 
     local config = require("xcodebuild.config").options.logs
     local hasErrors = testReport.buildErrors and testReport.buildErrors[1]
-    local shouldShow = (hasErrors and config.auto_open_on_failed_tests)
-      or (not hasErrors and config.auto_open_on_success_tests)
+    local shouldShow = ((hasErrors or testReport.failedTestsCount > 0) and config.auto_open_on_failed_tests)
+      or (testReport.failedTestsCount == 0 and config.auto_open_on_success_tests)
 
     targetToFiles = xcode.get_targets_list(projectConfig.settings().appPath)
     logs.set_logs(testReport, true, shouldShow)
@@ -449,7 +449,7 @@ function M.run_selected_tests(opts)
   if not targetToFiles or not next(targetToFiles) then
     logs.notify("Loading tests...")
     currentJobId = M.build_project({
-      build_for_testing = true,
+      buildForTesting = true,
     }, function()
       targetToFiles = xcode.get_targets_list(projectConfig.settings().appPath)
       quickfix.setTargets(targetToFiles)

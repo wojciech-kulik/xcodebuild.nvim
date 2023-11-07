@@ -210,7 +210,7 @@ function M.get_testplans(projectCommand, scheme, callback)
 end
 
 function M.build_project(opts)
-  local action = opts.build_for_testing and "build-for-testing " or ""
+  local action = opts.buildForTesting and "build-for-testing " or ""
   local command = "xcodebuild "
     .. action
     .. opts.projectCommand
