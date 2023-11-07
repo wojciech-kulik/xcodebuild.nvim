@@ -223,6 +223,11 @@ vim.keymap.set("n", "<leader>xp", "<cmd>XcodebuildSelectTestPlan<cr>", { desc = 
 vim.keymap.set("n", "<leader>xq", "<cmd>Telescope quickfix<cr>", { desc = "Show QuickFix List" })
 ```
 
+### Logs Panel Key Bindings
+
+- Press `o` on a failed test (in summary section) to jump to failing place.
+- Press `q` to close the panel.
+
 ### API
 
 If you want to use functions directly instead of user commands, then please see [xcodebuild.actions](./lua/xcodebuild/actions.lua) module.
