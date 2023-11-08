@@ -26,7 +26,7 @@ local function validate_project()
 end
 
 local function validate_testplan()
-  if not require("xcodebuild.project_config").settings().testPlan then
+  if not require("xcodebuild.project_config").settings.testPlan then
     logs.notify("Test plan not found. Please run XcodebuilSelectTestPlan", vim.log.levels.ERROR)
     return false
   end
@@ -39,7 +39,7 @@ function M.show_current_config()
     return
   end
 
-  local settings = projectConfig.settings()
+  local settings = projectConfig.settings
   vim.defer_fn(function()
     logs.notify([[
       Project Configuration
@@ -66,7 +66,7 @@ function M.show_current_config()
 end
 
 function M.update_settings(callback)
-  local settings = projectConfig.settings()
+  local settings = projectConfig.settings
 
   xcode.get_build_settings(
     settings.platform,
@@ -74,9 +74,9 @@ function M.update_settings(callback)
     settings.scheme,
     settings.config,
     function(buildSettings)
-      projectConfig.settings().appPath = buildSettings.appPath
-      projectConfig.settings().productName = buildSettings.productName
-      projectConfig.settings().bundleId = buildSettings.bundleId
+      projectConfig.settings.appPath = buildSettings.appPath
+      projectConfig.settings.productName = buildSettings.productName
+      projectConfig.settings.bundleId = buildSettings.bundleId
       projectConfig.save_settings()
       if callback then
         callback()
@@ -163,7 +163,7 @@ function M.run_app(callback)
     return
   end
 
-  local settings = projectConfig.settings()
+  local settings = projectConfig.settings
 
   if settings.platform == "macOS" then
     logs.notify("Launching application...")
@@ -202,7 +202,7 @@ function M.uninstall_app(callback)
     return
   end
 
-  local settings = projectConfig.settings()
+  local settings = projectConfig.settings
   if settings.platform == "macOS" then
     logs.notify("macOS app doesn't require uninstalling", vim.log.levels.ERROR)
     return
@@ -231,7 +231,7 @@ function M.build_project(opts, callback)
 
   local openLogsOnSuccess = (opts or {}).openLogsOnSuccess
   local buildForTesting = (opts or {}).buildForTesting
-  local lastBuildTime = projectConfig.settings().lastBuildTime
+  local lastBuildTime = projectConfig.settings.lastBuildTime
   local progressTimer = not buildForTesting and ui.start_action_timer("Building", lastBuildTime) or nil
   local startTime = os.time()
 
@@ -265,7 +265,7 @@ function M.build_project(opts, callback)
     logs.set_logs(testReport, false, shouldShow and openLogsOnSuccess)
     if not hasErrors then
       local duration = os.difftime(os.time(), startTime)
-      projectConfig.settings().lastBuildTime = duration
+      projectConfig.settings.lastBuildTime = duration
       projectConfig.save_settings()
       logs.notify(string.format("Build Succeeded [%d seconds]", duration))
     end
@@ -282,11 +282,11 @@ function M.build_project(opts, callback)
     on_stderr = on_stderr,
 
     buildForTesting = buildForTesting,
-    destination = projectConfig.settings().destination,
-    projectCommand = projectConfig.settings().projectCommand,
-    scheme = projectConfig.settings().scheme,
-    config = projectConfig.settings().config,
-    testPlan = projectConfig.settings().testPlan,
+    destination = projectConfig.settings.destination,
+    projectCommand = projectConfig.settings.projectCommand,
+    scheme = projectConfig.settings.scheme,
+    config = projectConfig.settings.config,
+    testPlan = projectConfig.settings.testPlan,
   })
 end
 
@@ -322,7 +322,7 @@ function M.run_tests(testsToRun)
     local shouldShow = ((hasErrors or testReport.failedTestsCount > 0) and config.auto_open_on_failed_tests)
       or (testReport.failedTestsCount == 0 and config.auto_open_on_success_tests)
 
-    targetToFiles = xcode.get_targets_list(projectConfig.settings().appPath)
+    targetToFiles = xcode.get_targets_list(projectConfig.settings.appPath)
     logs.set_logs(testReport, true, shouldShow)
     quickfix.setTargets(targetToFiles)
     quickfix.set(testReport)
@@ -334,11 +334,11 @@ function M.run_tests(testsToRun)
     on_stdout = on_stdout,
     on_stderr = on_stderr,
 
-    destination = projectConfig.settings().destination,
-    projectCommand = projectConfig.settings().projectCommand,
-    scheme = projectConfig.settings().scheme,
-    config = projectConfig.settings().config,
-    testPlan = projectConfig.settings().testPlan,
+    destination = projectConfig.settings.destination,
+    projectCommand = projectConfig.settings.projectCommand,
+    scheme = projectConfig.settings.scheme,
+    config = projectConfig.settings.config,
+    testPlan = projectConfig.settings.testPlan,
     testsToRun = testsToRun,
   })
 end
@@ -457,7 +457,7 @@ function M.run_selected_tests(opts)
     currentJobId = M.build_project({
       buildForTesting = true,
     }, function()
-      targetToFiles = xcode.get_targets_list(projectConfig.settings().appPath)
+      targetToFiles = xcode.get_targets_list(projectConfig.settings.appPath)
       quickfix.setTargets(targetToFiles)
       start()
     end)

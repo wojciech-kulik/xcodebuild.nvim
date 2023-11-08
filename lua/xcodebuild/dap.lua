@@ -10,9 +10,13 @@ function M.build_and_run(callback)
   coordinator.build_and_run_app(callback)
 end
 
+function M.run_app(callback)
+  coordinator.run_app(callback)
+end
+
 function M.wait_for_pid()
   local co = coroutine
-  local productName = projectConfig.settings().productName
+  local productName = projectConfig.settings.productName
 
   if not productName then
     error("You must build the application first")

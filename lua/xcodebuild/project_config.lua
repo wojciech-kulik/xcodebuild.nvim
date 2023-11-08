@@ -1,37 +1,26 @@
-local util = require("xcodebuild.util")
+local M = {
+  settings = {},
+}
 
-local M = {}
-local settings = {}
-
-local function get_file_path()
-  local cwd = vim.fn.getcwd()
-  local dirpath = cwd .. "/.nvim/xcodebuild"
-  local filepath = dirpath .. "/settings.json"
-  util.shell("mkdir -p '" .. dirpath .. "'")
-
-  return filepath
+local function get_filepath()
+  return vim.fn.getcwd() .. "/.nvim/xcodebuild/settings.json"
 end
 
 function M.load_settings()
-  local filepath = get_file_path()
-  local success, content = pcall(vim.fn.readfile, filepath)
+  local success, content = pcall(vim.fn.readfile, get_filepath())
 
   if success then
-    settings = vim.fn.json_decode(content)
+    M.settings = vim.fn.json_decode(content)
   end
 end
 
 function M.save_settings()
-  local filepath = get_file_path()
-  local json = vim.split(vim.fn.json_encode(settings), "\n", { plain = true })
-  vim.fn.writefile(json, filepath)
-end
-
-function M.settings()
-  return settings
+  local json = vim.split(vim.fn.json_encode(M.settings), "\n", { plain = true })
+  vim.fn.writefile(json, get_filepath())
 end
 
 function M.is_project_configured()
+  local settings = M.settings
   return settings.platform
     and settings.projectFile
     and settings.projectCommand
