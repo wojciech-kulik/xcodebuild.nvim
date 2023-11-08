@@ -70,11 +70,12 @@ function M.show(title, items, callback, opts)
     sorter = telescopeConfig.generic_sorter(),
     attach_mappings = function(prompt_bufnr, _)
       telescopeActions.select_default:replace(function()
-        if opts and opts.close_on_select then
+        local selection = telescopeState.get_selected_entry()
+
+        if opts and opts.close_on_select and selection then
           telescopeActions.close(prompt_bufnr)
         end
 
-        local selection = telescopeState.get_selected_entry()
         if callback and selection then
           callback(selection[1], selection.index)
         end
@@ -261,7 +262,7 @@ function M.show_all_actions()
     "Select Test Plan",
 
     "Toggle Logs",
-    "Show Logs",
+    "Open Logs",
     "Close Logs",
 
     "Show Current Configuration",
@@ -287,7 +288,7 @@ function M.show_all_actions()
     actions.select_testplan,
 
     actions.toggle_logs,
-    actions.show_logs,
+    actions.open_logs,
     actions.close_logs,
 
     actions.show_current_config,

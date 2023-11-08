@@ -38,47 +38,6 @@ function M.get_targets_list(appPath)
   return targetToFiles
 end
 
-function M.get_runtimes(callback)
-  local command = "xcrun simctl list runtimes -j -e"
-
-  return vim.fn.jobstart(command, {
-    stdout_buffered = true,
-    on_stdout = function(_, output)
-      local result = {}
-      local json = vim.fn.json_decode(output)
-
-      for _, runtime in ipairs(json.runtimes) do
-        if runtime.isAvailable then
-          local runtimeName = runtime.name .. " [" .. runtime.buildversion .. "]"
-          table.insert(result, { name = runtimeName, id = runtime.identifier })
-        end
-      end
-
-      callback(result)
-    end,
-  })
-end
-
-function M.get_devices(runtimeId, callback)
-  local command = "xcrun simctl list devices -j -e"
-
-  return vim.fn.jobstart(command, {
-    stdout_buffered = true,
-    on_stdout = function(_, output)
-      local result = {}
-      local json = vim.fn.json_decode(output)
-
-      for _, device in ipairs(json.devices[runtimeId]) do
-        local deviceName = device.name .. " [" .. device.udid .. "]"
-        deviceName = deviceName .. (device.state == "Booted" and " (Booted)" or "")
-        table.insert(result, { name = deviceName, id = device.udid })
-      end
-
-      callback(result)
-    end,
-  })
-end
-
 function M.get_destinations(projectCommand, scheme, callback)
   local command = "xcodebuild -showdestinations " .. projectCommand .. " -scheme '" .. scheme .. "'"
 
