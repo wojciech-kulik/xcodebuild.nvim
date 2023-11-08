@@ -28,6 +28,8 @@ local progressFrames = {
   "......... ",
 }
 
+math.randomseed(tonumber(tostring(os.time()):reverse():sub(1, 9)))
+
 function M.start_action_timer(actionTitle, expectedDuration)
   local startTime = os.time()
   local shouldShowProgressBar = require("xcodebuild.config").options.show_build_progress_bar
@@ -56,27 +58,37 @@ function M.start_action_timer(actionTitle, expectedDuration)
 end
 
 function M.send_build_started(buildForTesting)
-  local projectConfig = require("xcodebuild.project_config")
-  local lastBuildTime = projectConfig.settings.lastBuildTime
-
-  buildState.timer = not buildForTesting and M.start_action_timer("Building", lastBuildTime)
-  buildState.startTime = os.time()
-  buildState.buildForTesting = buildForTesting
-end
-
-function M.send_build_finished(report)
   if buildState.timer then
     vim.fn.timer_stop(buildState.timer)
   end
 
-  M.send_progress("")
-
   local projectConfig = require("xcodebuild.project_config")
+  local lastBuildTime = projectConfig.settings.lastBuildTime
 
-  if util.is_empty(report.buildErrors) then
+  buildState.id = math.random(10000000)
+  buildState.timer = not buildForTesting and M.start_action_timer("Building", lastBuildTime)
+  buildState.startTime = os.time()
+  buildState.buildForTesting = buildForTesting
+
+  return buildState.id
+end
+
+function M.send_build_finished(report, id, isCancelled)
+  if id ~= buildState.id then
+    return
+  end
+
+  if buildState.timer then
+    vim.fn.timer_stop(buildState.timer)
+  end
+
+  if isCancelled then
+    M.send_warning("Build cancelled")
+  elseif util.is_empty(report.buildErrors) then
     local duration = os.difftime(os.time(), buildState.startTime)
 
     if not buildState.buildForTesting then
+      local projectConfig = require("xcodebuild.project_config")
       projectConfig.settings.lastBuildTime = duration
       projectConfig.save_settings()
     end
@@ -103,8 +115,10 @@ function M.show_tests_progress(report)
   end
 end
 
-function M.send_tests_finished(report)
-  if report.testsCount == 0 then
+function M.send_tests_finished(report, isCancelled)
+  if isCancelled then
+    M.send_warning("Tests cancelled")
+  elseif report.testsCount == 0 then
     M.send_error("Error: No Test Executed")
   else
     M.send(

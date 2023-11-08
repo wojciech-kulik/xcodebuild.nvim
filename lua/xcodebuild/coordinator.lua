@@ -168,7 +168,7 @@ function M.build_project(buildForTesting, callback)
     return
   end
 
-  notifications.send_build_started()
+  local buildId = notifications.send_build_started()
   M.auto_save()
   parser.clear()
 
@@ -178,13 +178,13 @@ function M.build_project(buildForTesting, callback)
 
   local on_exit = function(_, code, _)
     if code == CANCELLED_CODE then
-      notifications.send_build_finished(M.report)
+      notifications.send_build_finished(M.report, buildId, true)
       return
     end
 
     logs.set_logs(M.report, false)
     quickfix.set(M.report)
-    notifications.send_build_finished(M.report)
+    notifications.send_build_finished(M.report, buildId, false)
 
     if callback then
       callback(M.report)
@@ -222,6 +222,7 @@ function M.run_tests(testsToRun)
 
   local on_exit = function(_, code, _)
     if code == CANCELLED_CODE then
+      notifications.send_tests_finished(M.report, true)
       return
     end
 
@@ -230,7 +231,7 @@ function M.run_tests(testsToRun)
     quickfix.set_targets_filemap(M.targetsFilesMap)
     quickfix.set(M.report)
     diagnostics.refresh_all_test_buffers(M.report)
-    notifications.send_tests_finished(M.report)
+    notifications.send_tests_finished(M.report, false)
   end
 
   M.currentJobId = xcode.run_tests({
