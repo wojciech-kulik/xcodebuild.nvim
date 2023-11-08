@@ -1,19 +1,20 @@
+local notifications = require("xcodebuild.notifications")
 local coordinator = require("xcodebuild.coordinator")
 local pickers = require("xcodebuild.pickers")
 local logs = require("xcodebuild.logs")
 
 local M = {}
 
-local function defer_notify(text)
+local function defer_send(text)
   vim.defer_fn(function()
-    logs.notify(text)
+    notifications.send(text)
   end, 100)
 end
 
 local function update_settings(callback)
-  defer_notify("Updating project settings...")
+  defer_send("Updating project settings...")
   coordinator.update_settings(function()
-    logs.notify("Project settings updated")
+    notifications.send("Project settings updated")
 
     if callback then
       callback()
@@ -92,26 +93,26 @@ function M.select_project(callback)
 end
 
 function M.select_scheme(callback)
-  defer_notify("Loading schemes...")
+  defer_send("Loading schemes...")
   pickers.select_scheme(nil, function()
     update_settings(callback)
   end, { close_on_select = true })
 end
 
 function M.select_config(callback)
-  defer_notify("Loading schemes...")
+  defer_send("Loading schemes...")
   pickers.select_config(function()
     update_settings(callback)
   end, { close_on_select = true })
 end
 
 function M.select_testplan(callback)
-  defer_notify("Loading test plans...")
+  defer_send("Loading test plans...")
   pickers.select_testplan(callback, { close_on_select = true })
 end
 
 function M.select_device(callback)
-  defer_notify("Loading devices...")
+  defer_send("Loading devices...")
   pickers.select_destination(function()
     update_settings(callback)
   end, { close_on_select = true })

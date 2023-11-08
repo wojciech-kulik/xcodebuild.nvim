@@ -1,6 +1,7 @@
 local xcode = require("xcodebuild.xcode")
 local projectConfig = require("xcodebuild.project_config")
 local util = require("xcodebuild.util")
+local notifications = require("xcodebuild.notifications")
 
 local telescopePickers = require("telescope.pickers")
 local telescopeFinders = require("telescope.finders")
@@ -184,7 +185,7 @@ function M.select_testplan(callback, opts)
 
   return xcode.get_testplans(projectCommand, scheme, function(testPlans)
     if not testPlans or not next(testPlans) then
-      require("xcodebuild.logs").notify("Could not detect test plans", vim.log.levels.WARN)
+      notifications.send_warning("Could not detect test plans")
 
       if active_picker then
         telescopeActions.close(active_picker.prompt_bufnr)

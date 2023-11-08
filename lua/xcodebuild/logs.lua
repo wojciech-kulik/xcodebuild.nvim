@@ -1,4 +1,3 @@
-local ui = require("xcodebuild.ui")
 local util = require("xcodebuild.util")
 local appdata = require("xcodebuild.appdata")
 local config = require("xcodebuild.config").options.logs
@@ -74,8 +73,6 @@ local function refresh_logs_content()
 end
 
 local function insert_test_results(report, prettyOutput)
-  ui.print_tests_summary(report)
-
   if report.failedTestsCount > 0 then
     table.insert(prettyOutput, "Failing Tests:")
     for _, testsPerClass in pairs(report.tests) do
@@ -160,14 +157,6 @@ local function should_show_panel(report)
   return configValue
 end
 
-function M.notify(message, severity)
-  config.notify(message, severity)
-end
-
-function M.notify_progress(message)
-  config.notify_progress(message)
-end
-
 function M.set_logs(report, isTesting)
   appdata.write_original_logs(report.output)
 
@@ -235,6 +224,22 @@ function M.toggle_logs()
     M.close_logs()
   else
     M.open_logs(false)
+  end
+end
+
+function M.open_test_file(tests)
+  if not tests then
+    return
+  end
+
+  local currentLine = vim.api.nvim_get_current_line()
+  local testClass, testName, line = string.match(currentLine, "(%w*)%.(.*)%:(%d+)")
+
+  for _, test in ipairs(tests[testClass] or {}) do
+    if test.name == testName and test.filepath then
+      vim.cmd("wincmd p | e " .. test.filepath .. " | " .. line)
+      return
+    end
   end
 end
 

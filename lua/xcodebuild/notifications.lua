@@ -1,3 +1,5 @@
+local config = require("xcodebuild.config").options.logs
+
 local M = {}
 
 local currentFrame = 0
@@ -24,21 +26,11 @@ local progressFrames = {
   "......... ",
 }
 
-local function notify(message, severity)
-  require("xcodebuild.logs").notify(message, severity)
-end
-
-local function notify_progress(message)
-  require("xcodebuild.logs").notify_progress(message)
-end
-
-function M.show_tests_progress(report, firstChunk)
+function M.show_tests_progress(report)
   if not next(report.tests) then
-    if firstChunk then
-      notify("Building Project...")
-    end
+    M.send_progress("Building Project...")
   else
-    notify_progress(
+    M.send_progress(
       "Running Tests [Executed: " .. report.testsCount .. ", Failed: " .. report.failedTestsCount .. "]"
     )
   end
@@ -46,35 +38,17 @@ end
 
 function M.print_tests_summary(report)
   if report.testsCount == 0 then
-    notify("Tests Failed [Executed: 0]", vim.log.levels.ERROR)
+    M.send_error("Error: No Test Executed")
   else
-    notify(
+    M.send(
       report.failedTestsCount == 0 and "All Tests Passed [Executed: " .. report.testsCount .. "]"
         or "Tests Failed [Executed: " .. report.testsCount .. ", Failed: " .. report.failedTestsCount .. "]",
       report.failedTestsCount == 0 and vim.log.levels.INFO or vim.log.levels.ERROR
     )
   end
-  vim.cmd("echo ''")
-end
-
-function M.open_test_file(tests)
-  if not tests then
-    return
-  end
-
-  local currentLine = vim.api.nvim_get_current_line()
-  local testClass, testName, line = string.match(currentLine, "(%w*)%.(.*)%:(%d+)")
-
-  for _, test in ipairs(tests[testClass] or {}) do
-    if test.name == testName and test.filepath then
-      vim.cmd("wincmd p | e " .. test.filepath .. " | " .. line)
-      return
-    end
-  end
 end
 
 function M.start_action_timer(actionTitle, expectedDuration)
-  local logs = require("xcodebuild.logs")
   local startTime = os.time()
   local shouldShowProgressBar = require("xcodebuild.config").options.show_build_progress_bar
 
@@ -92,13 +66,29 @@ function M.start_action_timer(actionTitle, expectedDuration)
         currentFrame = currentFrame + 1
       end
 
-      logs.notify_progress(string.format("[ %s ] %s (%d seconds)", progress, actionTitle, duration))
+      M.send_progress(string.format("[ %s ] %s (%d seconds)", progress, actionTitle, duration))
     else
-      logs.notify_progress(string.format("%s [%d seconds]", actionTitle, duration))
+      M.send_progress(string.format("%s [%d seconds]", actionTitle, duration))
     end
   end, { ["repeat"] = -1 })
 
   return timer
+end
+
+function M.send(message, severity)
+  config.notify(message, severity)
+end
+
+function M.send_error(message)
+  config.notify(message, vim.log.levels.ERROR)
+end
+
+function M.send_warning(message)
+  config.notify(message, vim.log.levels.WARN)
+end
+
+function M.send_progress(message)
+  config.notify_progress(message)
 end
 
 return M

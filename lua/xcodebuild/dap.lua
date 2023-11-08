@@ -1,4 +1,4 @@
-local logs = require("xcodebuild.logs")
+local notifications = require("xcodebuild.notifications")
 local util = require("xcodebuild.util")
 local projectConfig = require("xcodebuild.project_config")
 local xcode = require("xcodebuild.xcode")
@@ -25,7 +25,7 @@ function M.wait_for_pid()
   return co.create(function(dap_run_co)
     local pid = nil
 
-    logs.notify("Attaching debugger...")
+    notifications.send("Attaching debugger...")
     for _ = 1, 10 do
       util.shell("sleep 1")
       pid = xcode.get_app_pid(productName)
@@ -36,7 +36,7 @@ function M.wait_for_pid()
     end
 
     if not tonumber(pid) then
-      logs.notify("Launching the application timed out", vim.log.levels.ERROR)
+      notifications.send_error("Launching the application timed out")
       co.close(dap_run_co)
     end
 

@@ -1,5 +1,5 @@
 local util = require("xcodebuild.util")
-local logs = require("xcodebuild.logs")
+local notifications = require("xcodebuild.notifications")
 
 local M = {}
 
@@ -292,9 +292,9 @@ function M.install_app(destination, appPath, callback)
     stdout_buffered = true,
     on_exit = function(_, code, _)
       if code ~= 0 then
-        logs.notify("Could not install app (code: " .. code .. ")", vim.log.levels.ERROR)
+        notifications.send_error("Could not install app (code: " .. code .. ")")
         if code == 149 then
-          logs.notify("Make sure that the simulator is booted.", vim.log.levels.WARN)
+          notifications.send_warning("Make sure that the simulator is booted.")
         end
       else
         callback()
@@ -310,9 +310,9 @@ function M.launch_app(destination, bundleId, callback)
     detach = true,
     on_exit = function(_, code, _)
       if code ~= 0 then
-        logs.notify("Could not launch app (code: " .. code .. ")", vim.log.levels.ERROR)
+        notifications.send_error("Could not launch app (code: " .. code .. ")")
         if code == 149 then
-          logs.notify("Make sure that the simulator is booted.", vim.log.levels.WARN)
+          notifications.send_warning("Make sure that the simulator is booted.")
         end
       else
         callback()
@@ -327,7 +327,7 @@ function M.uninstall_app(destination, bundleId, callback)
     stdout_buffered = true,
     on_exit = function(_, code, _)
       if code ~= 0 then
-        logs.notify("Could not uninstall app (code: " .. code .. ")", vim.log.levels.ERROR)
+        notifications.send_error("Could not uninstall app (code: " .. code .. ")")
       else
         callback()
       end
