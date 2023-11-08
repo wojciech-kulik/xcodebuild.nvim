@@ -1,7 +1,7 @@
-local M = {}
-
 local util = require("xcodebuild.util")
 local config = require("xcodebuild.config").options.marks
+
+local M = {}
 
 function M.refresh_diagnostics(bufnr, testClass, report)
   if not report.tests or not config.show_diagnostics then
@@ -13,7 +13,12 @@ function M.refresh_diagnostics(bufnr, testClass, report)
   local duplicates = {}
 
   for _, test in ipairs(report.tests[testClass] or {}) do
-    if not test.success and test.filepath and test.lineNumber and not duplicates[test.filepath .. test.lineNumber] then
+    if
+      not test.success
+      and test.filepath
+      and test.lineNumber
+      and not duplicates[test.filepath .. test.lineNumber]
+    then
       table.insert(diagnostics, {
         bufnr = bufnr,
         lnum = test.lineNumber - 1,
@@ -32,13 +37,11 @@ function M.refresh_diagnostics(bufnr, testClass, report)
 end
 
 function M.set_buf_marks(bufnr, testClass, tests)
-  if not tests then
+  if not tests or not (config.show_test_duration or config.show_signs) then
     return
   end
 
   local ns = vim.api.nvim_create_namespace("xcodebuild-marks")
-  local successSign = config.success_sign
-  local failureSign = config.failure_sign
   local bufLines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
   local findTestLine = function(testName)
     for lineNumber, line in ipairs(bufLines) do
@@ -54,43 +57,46 @@ function M.set_buf_marks(bufnr, testClass, tests)
 
   for _, test in ipairs(tests[testClass] or {}) do
     local lineNumber = findTestLine(test.name)
-
     local testDuration = nil
-    if config.show_test_duration then
-      testDuration = test.time
-          and {
-            "(" .. test.time .. ")",
-            test.success and config.success_test_duration_hl or config.failure_test_duration_hl,
-          }
-        or { "" }
-    end
-
     local signText = nil
-    if config.show_signs then
-      signText = test.success and successSign or failureSign
+    local signHighlight = nil
+
+    if config.show_test_duration then
+      if test.time then
+        local text = "(" .. test.time .. ")"
+        local highlight = test.success and config.success_test_duration_hl or config.failure_test_duration_hl
+        testDuration = { text, highlight }
+      else
+        testDuration = { "" }
+      end
     end
 
-    if test.filepath and lineNumber and (config.show_test_duration or config.show_signs) then
+    if config.show_signs then
+      signText = test.success and config.success_sign or config.failure_sign
+      signHighlight = test.success and config.success_sign_hl or config.failure_sign_hl
+    end
+
+    if test.filepath and lineNumber then
       vim.api.nvim_buf_set_extmark(bufnr, ns, lineNumber, 0, {
         virt_text = { testDuration },
         sign_text = signText,
-        sign_hl_group = test.success and config.success_sign_hl or config.failure_sign_hl,
+        sign_hl_group = signHighlight,
       })
     end
   end
 end
 
-function M.refresh_buf_diagnostics(report)
-  if report.buildErrors and report.buildErrors[1] then
+function M.refresh_test_buffers(report)
+  if util.is_not_empty(report.buildErrors) then
     return
   end
 
+  -- TODO: improve gsub - the conversion from wildcard to regex might not be reliable
   local filePattern = config.file_pattern
-  -- TODO: improve
   local regexPattern = string.gsub(string.gsub(filePattern, "%.", "%%."), "%*", "%.%*")
-  local buffers = util.get_bufs_by_name_matching(regexPattern)
+  local testBuffers = util.get_bufs_by_matching_name(regexPattern)
 
-  for _, buffer in ipairs(buffers or {}) do
+  for _, buffer in ipairs(testBuffers or {}) do
     local testClass = util.get_filename(buffer.file)
     M.refresh_diagnostics(buffer.bufnr, testClass, report)
     M.set_buf_marks(buffer.bufnr, testClass, report.tests)

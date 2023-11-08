@@ -1,5 +1,6 @@
 local M = {}
 
+-- luacheck: no max line length
 local defaults = {
   restore_on_start = true, -- logs, diagnostics, and marks will be loaded on VimEnter (may affect performance)
   auto_save = true, -- save all buffers before running build or tests (command: silent wa!)

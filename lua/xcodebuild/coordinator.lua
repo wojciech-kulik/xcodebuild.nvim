@@ -129,7 +129,7 @@ function M.load_last_report()
     testReport = parser.parse_logs(log)
     quickfix.set(testReport)
     vim.defer_fn(function()
-      diagnostics.refresh_buf_diagnostics(testReport)
+      diagnostics.refresh_test_buffers(testReport)
     end, 500)
   end
 end
@@ -303,7 +303,7 @@ function M.run_tests(testsToRun)
   local on_stdout = function(_, output)
     testReport = parser.parse_logs(output)
     ui.show_tests_progress(testReport, isFirstChunk)
-    diagnostics.refresh_buf_diagnostics(testReport)
+    diagnostics.refresh_test_buffers(testReport)
     isFirstChunk = false
   end
 
@@ -326,7 +326,7 @@ function M.run_tests(testsToRun)
     logs.set_logs(testReport, true, shouldShow)
     quickfix.setTargets(targetToFiles)
     quickfix.set(testReport)
-    diagnostics.refresh_buf_diagnostics(testReport)
+    diagnostics.refresh_test_buffers(testReport)
   end
 
   currentJobId = xcode.run_tests({

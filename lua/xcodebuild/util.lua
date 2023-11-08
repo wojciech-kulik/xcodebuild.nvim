@@ -1,11 +1,22 @@
 local M = {}
 
+function M.is_empty(tab)
+  return next(tab or {}) == nil
+end
+
+function M.is_not_empty(tab)
+  return not M.is_empty(tab)
+end
+
 function M.get_buffers(opts)
   local result = {}
   local optsUnwrapped = opts or {}
 
   for i, buf in ipairs(vim.api.nvim_list_bufs()) do
-    if optsUnwrapped.returnNotLoaded == true and vim.api.nvim_buf_is_valid(buf) or vim.api.nvim_buf_is_loaded(buf) then
+    if
+      optsUnwrapped.returnNotLoaded == true and vim.api.nvim_buf_is_valid(buf)
+      or vim.api.nvim_buf_is_loaded(buf)
+    then
       result[i] = buf
     end
   end
@@ -25,7 +36,7 @@ function M.get_buf_by_name(name, opts)
   return nil
 end
 
-function M.get_bufs_by_name_matching(pattern)
+function M.get_bufs_by_matching_name(pattern)
   local allBuffers = M.get_buffers()
   local result = {}
 
