@@ -4,13 +4,15 @@ function M.setup()
   local appdata = require("xcodebuild.appdata")
   local coordinator = require("xcodebuild.coordinator")
   local config = require("xcodebuild.config").options
+  local diagnostics = require("xcodebuild.diagnostics")
+  local logs = require("xcodebuild.logs")
   local autogroup = vim.api.nvim_create_augroup("xcodebuild.nvim", { clear = true })
 
   vim.api.nvim_create_autocmd({ "BufReadPost" }, {
     group = autogroup,
     pattern = "*" .. appdata.build_logs_filename,
     callback = function(ev)
-      coordinator.setup_log_buffer(ev.buf)
+      logs.setup_buffer(ev.buf, coordinator.get_report())
     end,
   })
 
@@ -28,7 +30,7 @@ function M.setup()
       group = autogroup,
       pattern = config.marks.file_pattern,
       callback = function(ev)
-        coordinator.refresh_buf_diagnostics(ev.buf, ev.file)
+        diagnostics.refresh_test_buffer(ev.buf, ev.file, coordinator.get_report())
       end,
     })
   end

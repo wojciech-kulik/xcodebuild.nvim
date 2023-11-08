@@ -157,6 +157,22 @@ local function should_show_panel(report)
   return configValue
 end
 
+local function open_test_file(tests)
+  if not tests then
+    return
+  end
+
+  local currentLine = vim.api.nvim_get_current_line()
+  local testClass, testName, line = string.match(currentLine, "(%w*)%.(.*)%:(%d+)")
+
+  for _, test in ipairs(tests[testClass] or {}) do
+    if test.name == testName and test.filepath then
+      vim.cmd("wincmd p | e " .. test.filepath .. " | " .. line)
+      return
+    end
+  end
+end
+
 function M.set_logs(report, isTesting)
   appdata.write_original_logs(report.output)
 
@@ -227,20 +243,31 @@ function M.toggle_logs()
   end
 end
 
-function M.open_test_file(tests)
-  if not tests then
-    return
+function M.setup_buffer(bufnr, report)
+  local win = vim.fn.win_findbuf(bufnr)
+
+  if win and win[1] then
+    vim.api.nvim_win_set_option(win[1], "wrap", false)
+    vim.api.nvim_win_set_option(win[1], "spell", false)
   end
 
-  local currentLine = vim.api.nvim_get_current_line()
-  local testClass, testName, line = string.match(currentLine, "(%w*)%.(.*)%:(%d+)")
+  vim.api.nvim_buf_set_option(bufnr, "modifiable", true)
+  vim.api.nvim_buf_set_option(bufnr, "readonly", false)
 
-  for _, test in ipairs(tests[testClass] or {}) do
-    if test.name == testName and test.filepath then
-      vim.cmd("wincmd p | e " .. test.filepath .. " | " .. line)
-      return
-    end
-  end
+  vim.api.nvim_buf_set_option(bufnr, "filetype", config.filetype)
+  vim.api.nvim_buf_set_option(bufnr, "buflisted", false)
+  vim.api.nvim_buf_set_option(bufnr, "fileencoding", "utf-8")
+  vim.api.nvim_buf_set_option(bufnr, "modified", false)
+
+  vim.api.nvim_buf_set_option(bufnr, "readonly", true)
+  vim.api.nvim_buf_set_option(bufnr, "modifiable", false)
+
+  vim.api.nvim_buf_set_keymap(bufnr, "n", "q", "<cmd>close<cr>", {})
+  vim.api.nvim_buf_set_keymap(bufnr, "n", "o", "", {
+    callback = function()
+      open_test_file(report.tests)
+    end,
+  })
 end
 
 return M

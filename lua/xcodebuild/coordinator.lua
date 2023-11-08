@@ -94,30 +94,6 @@ function M.get_report()
   return testReport
 end
 
-function M.setup_log_buffer(bufnr)
-  local config = require("xcodebuild.config").options.logs
-  local win = vim.fn.win_findbuf(bufnr)[1]
-  vim.api.nvim_buf_set_option(bufnr, "modifiable", true)
-  vim.api.nvim_buf_set_option(bufnr, "readonly", false)
-
-  vim.api.nvim_win_set_option(win, "wrap", false)
-  vim.api.nvim_win_set_option(win, "spell", false)
-  vim.api.nvim_buf_set_option(bufnr, "filetype", config.filetype)
-  vim.api.nvim_buf_set_option(bufnr, "buflisted", false)
-  vim.api.nvim_buf_set_option(bufnr, "fileencoding", "utf-8")
-  vim.api.nvim_buf_set_option(bufnr, "modified", false)
-
-  vim.api.nvim_buf_set_option(bufnr, "readonly", true)
-  vim.api.nvim_buf_set_option(bufnr, "modifiable", false)
-
-  vim.api.nvim_buf_set_keymap(bufnr, "n", "q", "<cmd>close<cr>", {})
-  vim.api.nvim_buf_set_keymap(bufnr, "n", "o", "", {
-    callback = function()
-      logs.open_test_file(testReport.tests)
-    end,
-  })
-end
-
 function M.load_last_report()
   local success, log = pcall(appdata.read_original_logs)
 
@@ -126,15 +102,9 @@ function M.load_last_report()
     testReport = parser.parse_logs(log)
     quickfix.set(testReport)
     vim.defer_fn(function()
-      diagnostics.refresh_test_buffers(testReport)
+      diagnostics.refresh_all_test_buffers(testReport)
     end, 500)
   end
-end
-
-function M.refresh_buf_diagnostics(bufnr, file)
-  local testClass = util.get_filename(file)
-  diagnostics.refresh_diagnostics(bufnr, testClass, testReport)
-  diagnostics.set_buf_marks(bufnr, testClass, testReport.tests)
 end
 
 function M.build_and_run_app(callback)
@@ -292,7 +262,7 @@ function M.run_tests(testsToRun)
   local on_stdout = function(_, output)
     testReport = parser.parse_logs(output)
     notifications.show_tests_progress(testReport)
-    diagnostics.refresh_test_buffers(testReport)
+    diagnostics.refresh_all_test_buffers(testReport)
   end
 
   local on_stderr = function(_, output)
@@ -309,7 +279,7 @@ function M.run_tests(testsToRun)
     notifications.print_tests_summary(testReport)
     quickfix.set_targets_filemap(targetToFiles)
     quickfix.set(testReport)
-    diagnostics.refresh_test_buffers(testReport)
+    diagnostics.refresh_all_test_buffers(testReport)
   end
 
   currentJobId = xcode.run_tests({

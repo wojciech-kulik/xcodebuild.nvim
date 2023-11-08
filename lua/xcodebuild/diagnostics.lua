@@ -3,7 +3,7 @@ local config = require("xcodebuild.config").options.marks
 
 local M = {}
 
-function M.refresh_diagnostics(bufnr, testClass, report)
+local function refresh_buf_diagnostics(bufnr, testClass, report)
   if not report.tests or not config.show_diagnostics then
     return
   end
@@ -36,7 +36,7 @@ function M.refresh_diagnostics(bufnr, testClass, report)
   vim.diagnostic.set(ns, bufnr, diagnostics, {})
 end
 
-function M.set_buf_marks(bufnr, testClass, tests)
+local function refresh_buf_marks(bufnr, testClass, tests)
   if not tests or not (config.show_test_duration or config.show_signs) then
     return
   end
@@ -86,7 +86,13 @@ function M.set_buf_marks(bufnr, testClass, tests)
   end
 end
 
-function M.refresh_test_buffers(report)
+function M.refresh_test_buffer(bufnr, file, report)
+  local testClass = util.get_filename(file)
+  refresh_buf_diagnostics(bufnr, testClass, report)
+  refresh_buf_marks(bufnr, testClass, report.tests)
+end
+
+function M.refresh_all_test_buffers(report)
   if util.is_not_empty(report.buildErrors) then
     return
   end
@@ -98,8 +104,8 @@ function M.refresh_test_buffers(report)
 
   for _, buffer in ipairs(testBuffers or {}) do
     local testClass = util.get_filename(buffer.file)
-    M.refresh_diagnostics(buffer.bufnr, testClass, report)
-    M.set_buf_marks(buffer.bufnr, testClass, report.tests)
+    refresh_buf_diagnostics(buffer.bufnr, testClass, report)
+    refresh_buf_marks(buffer.bufnr, testClass, report.tests)
   end
 end
 

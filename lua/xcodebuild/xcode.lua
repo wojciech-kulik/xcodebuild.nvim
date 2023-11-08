@@ -5,13 +5,13 @@ local M = {}
 
 function M.get_targets_list(appPath)
   if not appPath then
-    vim.print("Could not locate build dir. Please run Build.")
+    notifications.send_error("Could not locate build dir. Please run Build.")
     return {}
   end
 
   local searchPath = string.match(appPath, "(.*/Build)/Products")
   if not searchPath then
-    vim.print("Could not locate build dir. Please run Build.")
+    notifications.send_error("Could not locate build dir. Please run Build.")
     return {}
   end
 
