@@ -2,7 +2,7 @@ local util = require("xcodebuild.util")
 local config = require("xcodebuild.config").options.quickfix
 
 local M = {
-  targetToFilesMap = {},
+  targetsFilesMap = {},
 }
 
 local function insert_build_errors(list, errors)
@@ -60,8 +60,8 @@ local function insert_diagnostics_for_test_errors(list, diagnostics)
   for _, diagnostic in ipairs(diagnostics) do
     local target, filename = string.match(diagnostic.filepath, "(.-)/(.+)")
 
-    if M.targetToFilesMap and M.targetToFilesMap[target] then
-      for _, filepath in ipairs(M.targetToFilesMap[target]) do
+    if M.targetsFilesMap and M.targetsFilesMap[target] then
+      for _, filepath in ipairs(M.targetsFilesMap[target]) do
         if util.has_suffix(filepath, filename) then
           table.insert(list, {
             filename = filepath,
@@ -77,7 +77,7 @@ local function insert_diagnostics_for_test_errors(list, diagnostics)
 end
 
 function M.set_targets_filemap(targets)
-  M.targetToFilesMap = targets
+  M.targetsFilesMap = targets
 end
 
 function M.set(report)

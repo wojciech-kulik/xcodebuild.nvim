@@ -3,7 +3,7 @@ local notifications = require("xcodebuild.notifications")
 
 local M = {}
 
-function M.get_targets_list(appPath)
+function M.get_targets_filemap(appPath)
   if not appPath then
     notifications.send_error("Could not locate build dir. Please run Build.")
     return {}
@@ -17,7 +17,7 @@ function M.get_targets_list(appPath)
 
   searchPath = searchPath .. "/Intermediates.noindex"
 
-  local targetToFiles = {}
+  local targetsFilesMap = {}
   local fileListFiles = util.shell("find '" .. searchPath .. "' -type f -iname *.SwiftFileList")
 
   for _, file in ipairs(fileListFiles) do
@@ -26,16 +26,16 @@ function M.get_targets_list(appPath)
       local success, content = pcall(vim.fn.readfile, file)
 
       if success then
-        targetToFiles[target] = targetToFiles[target] or {}
+        targetsFilesMap[target] = targetsFilesMap[target] or {}
 
         for _, line in ipairs(content) do
-          table.insert(targetToFiles[target], line)
+          table.insert(targetsFilesMap[target], line)
         end
       end
     end
   end
 
-  return targetToFiles
+  return targetsFilesMap
 end
 
 function M.get_destinations(projectCommand, scheme, callback)

@@ -7,14 +7,17 @@ local projectConfig = require("xcodebuild.project_config")
 local xcode = require("xcodebuild.xcode")
 local logs = require("xcodebuild.logs")
 local diagnostics = require("xcodebuild.diagnostics")
+local config = require("xcodebuild.config").options
 
-local M = {}
-local testReport = {}
-local currentJobId = nil
-local targetToFiles = {}
+local M = {
+  report = {},
+  currentJobId = nil,
+  targetsFilesMap = {},
+}
+local CANCELLED_CODE = 143
 
 local function validate_project()
-  if not require("xcodebuild.project_config").is_project_configured() then
+  if not projectConfig.is_project_configured() then
     notifications.send_error("The project is missing some details. Please run XcodebuildSetup first.")
     return false
   end
@@ -23,12 +26,18 @@ local function validate_project()
 end
 
 local function validate_testplan()
-  if not require("xcodebuild.project_config").settings.testPlan then
-    notifications.send_error("Test plan not found. Please run XcodebuilSelectTestPlan")
+  if not projectConfig.settings.testPlan then
+    notifications.send_error("Test plan not found. Please run XcodebuildSelectTestPlan")
     return false
   end
 
   return true
+end
+
+function M.auto_save()
+  if config.auto_save then
+    vim.cmd("silent wa!")
+  end
 end
 
 function M.show_current_config()
@@ -36,29 +45,8 @@ function M.show_current_config()
     return
   end
 
-  local settings = projectConfig.settings
   vim.defer_fn(function()
-    notifications.send([[
-      Project Configuration
-
-      - platform: ]] .. settings.platform .. [[
-
-      - project: ]] .. settings.projectFile .. [[
-
-      - scheme: ]] .. settings.scheme .. [[
-
-      - config: ]] .. settings.config .. [[
-
-      - destination: ]] .. settings.destination .. [[
-
-      - testPlan: ]] .. (settings.testPlan or "") .. [[
-
-      - bundleId: ]] .. settings.bundleId .. [[
-
-      - appPath: ]] .. settings.appPath .. [[
-
-      - productName: ]] .. settings.productName .. [[
-    ]])
+    notifications.send_project_settings(projectConfig.settings)
   end, 100)
 end
 
@@ -83,14 +71,10 @@ function M.update_settings(callback)
 end
 
 function M.cancel()
-  if currentJobId then
-    vim.fn.jobstop(currentJobId)
-    currentJobId = nil
+  if M.currentJobId then
+    vim.fn.jobstop(M.currentJobId)
+    M.currentJobId = nil
   end
-end
-
-function M.get_report()
-  return testReport
 end
 
 function M.load_last_report()
@@ -98,10 +82,10 @@ function M.load_last_report()
 
   if success then
     parser.clear()
-    testReport = parser.parse_logs(log)
-    quickfix.set(testReport)
+    M.report = parser.parse_logs(log)
+    quickfix.set(M.report)
     vim.defer_fn(function()
-      diagnostics.refresh_all_test_buffers(testReport)
+      diagnostics.refresh_all_test_buffers(M.report)
     end, 500)
   end
 end
@@ -112,7 +96,7 @@ function M.build_and_run_app(callback)
   end
 
   M.build_project(false, function(report)
-    if report.buildErrors and report.buildErrors[1] then
+    if util.is_not_empty(report.buildErrors) then
       notifications.send_error("Build Failed")
       logs.open_logs(true)
       return
@@ -131,28 +115,25 @@ function M.run_app(callback)
 
   if settings.platform == "macOS" then
     notifications.send("Launching application...")
-    local app = string.match(settings.appPath, "/([^/]+)%.app$")
-    local path = settings.appPath .. "/Contents/MacOS/" .. app
-    currentJobId = vim.fn.jobstart(path, {
-      detach = true,
-    })
+    local path = settings.appPath .. "/Contents/MacOS/" .. settings.productName
+
+    M.currentJobId = vim.fn.jobstart(path, { detach = true })
     notifications.send("Application has been launched")
+
     if callback then
       callback()
     end
   else
-    local destination = settings.destination
-    local productName = settings.productName
-
-    if productName then
-      xcode.kill_app(productName)
+    if settings.productName then
+      xcode.kill_app(settings.productName)
     end
 
     notifications.send("Installing application...")
-    currentJobId = xcode.install_app(destination, settings.appPath, function()
+    M.currentJobId = xcode.install_app(settings.destination, settings.appPath, function()
       notifications.send("Launching application...")
-      currentJobId = xcode.launch_app(destination, settings.bundleId, function()
+      M.currentJobId = xcode.launch_app(settings.destination, settings.bundleId, function()
         notifications.send("Application has been launched")
+
         if callback then
           callback()
         end
@@ -168,24 +149,18 @@ function M.uninstall_app(callback)
 
   local settings = projectConfig.settings
   if settings.platform == "macOS" then
-    notifications.send_error("macOS app doesn't require uninstalling")
+    notifications.send_error("macOS apps cannot be uninstalled")
     return
   end
 
   notifications.send("Uninstalling application...")
-  currentJobId = xcode.uninstall_app(settings.destination, settings.bundleId, function()
+  M.currentJobId = xcode.uninstall_app(settings.destination, settings.bundleId, function()
     notifications.send("Application has been uninstalled")
+
     if callback then
       callback()
     end
   end)
-end
-
-function M.auto_save()
-  local config = require("xcodebuild.config").options
-  if config.auto_save then
-    vim.cmd("silent wa!")
-  end
 end
 
 function M.build_project(buildForTesting, callback)
@@ -193,52 +168,33 @@ function M.build_project(buildForTesting, callback)
     return
   end
 
-  local lastBuildTime = projectConfig.settings.lastBuildTime
-  local progressTimer = not buildForTesting and notifications.start_action_timer("Building", lastBuildTime)
-  local startTime = os.time()
-
+  notifications.send_build_started()
   M.auto_save()
   parser.clear()
 
   local on_stdout = function(_, output)
-    testReport = parser.parse_logs(output)
-  end
-
-  local on_stderr = function(_, output)
-    testReport = parser.parse_logs(output)
+    M.report = parser.parse_logs(output)
   end
 
   local on_exit = function(_, code, _)
-    if progressTimer then
-      vim.fn.timer_stop(progressTimer)
-    end
-
-    if code == 143 then
+    if code == CANCELLED_CODE then
+      notifications.send_build_finished(M.report)
       return
     end
 
-    vim.cmd("echo ''")
-    logs.set_logs(testReport, false)
-    quickfix.set(testReport)
-
-    if util.is_empty(testReport.buildErrors) then
-      local duration = os.difftime(os.time(), startTime)
-      projectConfig.settings.lastBuildTime = duration
-      projectConfig.save_settings()
-      notifications.send(string.format("Build Succeeded [%d seconds]", duration))
-    else
-      notifications.send_error("Build Failed [" .. #testReport.buildErrors .. " error(s)]")
-    end
+    logs.set_logs(M.report, false)
+    quickfix.set(M.report)
+    notifications.send_build_finished(M.report)
 
     if callback then
-      callback(testReport)
+      callback(M.report)
     end
   end
 
-  currentJobId = xcode.build_project({
+  M.currentJobId = xcode.build_project({
     on_exit = on_exit,
     on_stdout = on_stdout,
-    on_stderr = on_stderr,
+    on_stderr = on_stdout,
 
     buildForTesting = buildForTesting,
     destination = projectConfig.settings.destination,
@@ -254,37 +210,33 @@ function M.run_tests(testsToRun)
     return
   end
 
-  notifications.send("Starting Tests...")
+  notifications.send_tests_started()
   M.auto_save()
   parser.clear()
 
   local on_stdout = function(_, output)
-    testReport = parser.parse_logs(output)
-    notifications.show_tests_progress(testReport)
-    diagnostics.refresh_all_test_buffers(testReport)
-  end
-
-  local on_stderr = function(_, output)
-    testReport = parser.parse_logs(output)
+    M.report = parser.parse_logs(output)
+    notifications.show_tests_progress(M.report)
+    diagnostics.refresh_all_test_buffers(M.report)
   end
 
   local on_exit = function(_, code, _)
-    if code == 143 then
+    if code == CANCELLED_CODE then
       return
     end
 
-    targetToFiles = xcode.get_targets_list(projectConfig.settings.appPath)
-    logs.set_logs(testReport, true)
-    notifications.print_tests_summary(testReport)
-    quickfix.set_targets_filemap(targetToFiles)
-    quickfix.set(testReport)
-    diagnostics.refresh_all_test_buffers(testReport)
+    M.targetsFilesMap = xcode.get_targets_filemap(projectConfig.settings.appPath)
+    logs.set_logs(M.report, true)
+    quickfix.set_targets_filemap(M.targetsFilesMap)
+    quickfix.set(M.report)
+    diagnostics.refresh_all_test_buffers(M.report)
+    notifications.send_tests_finished(M.report)
   end
 
-  currentJobId = xcode.run_tests({
+  M.currentJobId = xcode.run_tests({
     on_exit = on_exit,
     on_stdout = on_stdout,
-    on_stderr = on_stderr,
+    on_stderr = on_stdout,
 
     destination = projectConfig.settings.destination,
     projectCommand = projectConfig.settings.projectCommand,
@@ -336,8 +288,8 @@ local function find_tests(opts)
         break
       end
     end
-  elseif opts.failingTests and testReport.failedTestsCount > 0 then
-    for _, testsPerClass in pairs(testReport.tests) do
+  elseif opts.failingTests and M.report.failedTestsCount > 0 then
+    for _, testsPerClass in pairs(M.report.tests) do
       for _, test in ipairs(testsPerClass) do
         if not test.success then
           table.insert(selectedTests, {
@@ -354,7 +306,7 @@ local function find_tests(opts)
 end
 
 local function find_target_for_file(filepath)
-  for target, files in pairs(targetToFiles) do
+  for target, files in pairs(M.targetsFilesMap) do
     if util.contains(files, filepath) then
       return target
     end
@@ -373,7 +325,7 @@ function M.run_selected_tests(opts)
     local target = find_target_for_file(testFilepath)
 
     if not target then
-      notifications.send("Could not detect test target. Please run build again.")
+      notifications.send_error("Could not detect test target. Please run build again.")
       return
     end
 
@@ -399,16 +351,16 @@ function M.run_selected_tests(opts)
     if next(testsToRun) then
       M.run_tests(testsToRun)
     else
-      notifications.send_error("Tests not found")
+      notifications.send_error("Tests not found.")
     end
   end
 
   -- TODO: clear cache when a new swift test file is added
-  if not targetToFiles or not next(targetToFiles) then
+  if util.is_empty(M.targetsFilesMap) then
     notifications.send("Loading tests...")
-    currentJobId = M.build_project(true, function()
-      targetToFiles = xcode.get_targets_list(projectConfig.settings.appPath)
-      quickfix.set_targets_filemap(targetToFiles)
+    M.currentJobId = M.build_project(true, function()
+      M.targetsFilesMap = xcode.get_targets_filemap(projectConfig.settings.appPath)
+      quickfix.set_targets_filemap(M.targetsFilesMap)
       start()
     end)
   else

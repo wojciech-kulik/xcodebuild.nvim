@@ -23,9 +23,9 @@ local runTestCase = function(caseId)
   mockSwiftFiles()
   parser.clear()
 
-  local testReport = parser.parse_logs(log)
-  testReport.output = {}
-  local result = vim.split(vim.inspect(testReport), "\n", { plain = true })
+  local report = parser.parse_logs(log)
+  report.output = {}
+  local result = vim.split(vim.inspect(report), "\n", { plain = true })
 
   if recordSnapshots or not exists then
     vim.fn.writefile(result, expectedResultPath)

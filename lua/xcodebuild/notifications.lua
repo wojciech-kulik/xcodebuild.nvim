@@ -1,7 +1,9 @@
 local config = require("xcodebuild.config").options.logs
+local util = require("xcodebuild.util")
 
 local M = {}
 
+local buildState = {}
 local currentFrame = 0
 local progressFrames = {
   "..........",
@@ -25,28 +27,6 @@ local progressFrames = {
   "........  ",
   "......... ",
 }
-
-function M.show_tests_progress(report)
-  if not next(report.tests) then
-    M.send_progress("Building Project...")
-  else
-    M.send_progress(
-      "Running Tests [Executed: " .. report.testsCount .. ", Failed: " .. report.failedTestsCount .. "]"
-    )
-  end
-end
-
-function M.print_tests_summary(report)
-  if report.testsCount == 0 then
-    M.send_error("Error: No Test Executed")
-  else
-    M.send(
-      report.failedTestsCount == 0 and "All Tests Passed [Executed: " .. report.testsCount .. "]"
-        or "Tests Failed [Executed: " .. report.testsCount .. ", Failed: " .. report.failedTestsCount .. "]",
-      report.failedTestsCount == 0 and vim.log.levels.INFO or vim.log.levels.ERROR
-    )
-  end
-end
 
 function M.start_action_timer(actionTitle, expectedDuration)
   local startTime = os.time()
@@ -73,6 +53,90 @@ function M.start_action_timer(actionTitle, expectedDuration)
   end, { ["repeat"] = -1 })
 
   return timer
+end
+
+function M.send_build_started(buildForTesting)
+  local projectConfig = require("xcodebuild.project_config")
+  local lastBuildTime = projectConfig.settings.lastBuildTime
+
+  buildState.timer = not buildForTesting and M.start_action_timer("Building", lastBuildTime)
+  buildState.startTime = os.time()
+  buildState.buildForTesting = buildForTesting
+end
+
+function M.send_build_finished(report)
+  if buildState.timer then
+    vim.fn.timer_stop(buildState.timer)
+  end
+
+  M.send_progress("")
+
+  local projectConfig = require("xcodebuild.project_config")
+
+  if util.is_empty(report.buildErrors) then
+    local duration = os.difftime(os.time(), buildState.startTime)
+
+    if not buildState.buildForTesting then
+      projectConfig.settings.lastBuildTime = duration
+      projectConfig.save_settings()
+    end
+
+    M.send(string.format("Build Succeeded [%d seconds]", duration))
+  else
+    M.send_error("Build Failed [" .. #report.buildErrors .. " error(s)]")
+  end
+
+  buildState = {}
+end
+
+function M.send_tests_started()
+  M.send("Starting Tests...")
+end
+
+function M.show_tests_progress(report)
+  if not next(report.tests) then
+    M.send_progress("Building Project...")
+  else
+    M.send_progress(
+      "Running Tests [Executed: " .. report.testsCount .. ", Failed: " .. report.failedTestsCount .. "]"
+    )
+  end
+end
+
+function M.send_tests_finished(report)
+  if report.testsCount == 0 then
+    M.send_error("Error: No Test Executed")
+  else
+    M.send(
+      report.failedTestsCount == 0 and "All Tests Passed [Executed: " .. report.testsCount .. "]"
+        or "Tests Failed [Executed: " .. report.testsCount .. ", Failed: " .. report.failedTestsCount .. "]",
+      report.failedTestsCount == 0 and vim.log.levels.INFO or vim.log.levels.ERROR
+    )
+  end
+end
+
+function M.send_project_settings(settings)
+  M.send([[
+      Project Configuration
+
+      - platform: ]] .. settings.platform .. [[
+
+      - project: ]] .. settings.projectFile .. [[
+
+      - scheme: ]] .. settings.scheme .. [[
+
+      - config: ]] .. settings.config .. [[
+
+      - destination: ]] .. settings.destination .. [[
+
+      - testPlan: ]] .. (settings.testPlan or "") .. [[
+
+      - bundleId: ]] .. settings.bundleId .. [[
+
+      - appPath: ]] .. settings.appPath .. [[
+
+      - productName: ]] .. settings.productName .. [[
+    ]])
 end
 
 function M.send(message, severity)

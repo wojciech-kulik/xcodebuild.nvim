@@ -12,7 +12,7 @@ function M.setup()
     group = autogroup,
     pattern = "*" .. appdata.build_logs_filename,
     callback = function(ev)
-      logs.setup_buffer(ev.buf, coordinator.get_report())
+      logs.setup_buffer(ev.buf, coordinator.report)
     end,
   })
 
@@ -30,7 +30,7 @@ function M.setup()
       group = autogroup,
       pattern = config.marks.file_pattern,
       callback = function(ev)
-        diagnostics.refresh_test_buffer(ev.buf, ev.file, coordinator.get_report())
+        diagnostics.refresh_test_buffer(ev.buf, ev.file, coordinator.report)
       end,
     })
   end
