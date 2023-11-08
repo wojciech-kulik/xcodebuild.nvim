@@ -11,10 +11,10 @@ local telescopeState = require("telescope.actions.state")
 
 local M = {}
 
-local active_picker = nil
-local anim_timer = nil
-local current_frame = 1
-local spinner_anim_frames = {
+local activePicker = nil
+local progressTimer = nil
+local currentProgressFrame = 1
+local progressFrames = {
   "[      ]",
   "[ .    ]",
   "[ ..   ]",
@@ -25,36 +25,32 @@ local spinner_anim_frames = {
 }
 
 local function stop_telescope_spinner()
-  if anim_timer then
-    vim.fn.timer_stop(anim_timer)
-    anim_timer = nil
+  if progressTimer then
+    vim.fn.timer_stop(progressTimer)
+    progressTimer = nil
   end
 end
 
 local function update_telescope_spinner()
-  if active_picker then
-    current_frame = current_frame >= #spinner_anim_frames and 1 or current_frame + 1
-    active_picker:change_prompt_prefix(spinner_anim_frames[current_frame] .. " ", "TelescopePromptPrefix")
-
-    if not vim.api.nvim_win_is_valid(active_picker.results_win) then
-      stop_telescope_spinner()
-    end
+  if activePicker and vim.api.nvim_win_is_valid(activePicker.results_win) then
+    currentProgressFrame = currentProgressFrame >= #progressFrames and 1 or currentProgressFrame + 1
+    activePicker:change_prompt_prefix(progressFrames[currentProgressFrame] .. " ", "TelescopePromptPrefix")
   else
     stop_telescope_spinner()
   end
 end
 
 local function start_telescope_spinner()
-  if not anim_timer then
-    anim_timer = vim.fn.timer_start(80, update_telescope_spinner, { ["repeat"] = -1 })
+  if not progressTimer then
+    progressTimer = vim.fn.timer_start(80, update_telescope_spinner, { ["repeat"] = -1 })
   end
 end
 
 local function update_results(results)
   stop_telescope_spinner()
 
-  if active_picker then
-    active_picker:refresh(
+  if activePicker then
+    activePicker:refresh(
       telescopeFinders.new_table({
         results = results,
       }),
@@ -66,7 +62,7 @@ local function update_results(results)
 end
 
 function M.show(title, items, callback, opts)
-  active_picker = telescopePickers.new(require("telescope.themes").get_dropdown({}), {
+  activePicker = telescopePickers.new(require("telescope.themes").get_dropdown({}), {
     prompt_title = title,
     finder = telescopeFinders.new_table({
       results = items,
@@ -87,32 +83,28 @@ function M.show(title, items, callback, opts)
     end,
   })
 
-  active_picker:find()
+  activePicker:find()
 end
 
 function M.select_project(callback, opts)
+  local sanitizedFiles = {}
+  local filenames = {}
   local files = util.shell(
     "find '"
       .. vim.fn.getcwd()
-      .. "' \\( -iname '*.xcodeproj' -o -iname '*.xcworkspace' \\) -not -path '*/.*' -not -path '*xcodeproj/project.xcworkspace'"
+      .. "' \\( -iname '*.xcodeproj' -o -iname '*.xcworkspace' \\)"
+      .. " -not -path '*/.*' -not -path '*xcodeproj/project.xcworkspace'"
   )
-  local sanitizedFiles = {}
 
   for _, file in ipairs(files) do
     if util.trim(file) ~= "" then
-      table.insert(sanitizedFiles, {
-        filepath = file,
-        name = string.match(file, ".*%/([^/]*)$"),
-      })
+      table.insert(sanitizedFiles, file)
+      table.insert(filenames, string.match(file, ".*%/([^/]*)$"))
     end
   end
 
-  local filenames = util.select(sanitizedFiles, function(table)
-    return table.name
-  end)
-
   M.show("Select Project/Workspace", filenames, function(_, index)
-    local projectFile = sanitizedFiles[index].filepath
+    local projectFile = sanitizedFiles[index]
     local isWorkspace = util.has_suffix(projectFile, "xcworkspace")
 
     projectConfig.settings.projectFile = projectFile
@@ -128,7 +120,7 @@ function M.select_project(callback, opts)
 end
 
 function M.select_scheme(schemes, callback, opts)
-  if not schemes or not next(schemes) then
+  if util.is_empty(schemes) then
     start_telescope_spinner()
   end
 
@@ -137,11 +129,11 @@ function M.select_scheme(schemes, callback, opts)
     projectConfig.save_settings()
 
     if callback then
-      callback()
+      callback(value)
     end
   end, opts)
 
-  if not schemes or not next(schemes) then
+  if util.is_empty(schemes) then
     local projectCommand = projectConfig.settings.projectCommand
     return xcode.get_project_information(projectCommand, function(info)
       update_results(info.schemes)
@@ -184,12 +176,13 @@ function M.select_testplan(callback, opts)
   end, opts)
 
   return xcode.get_testplans(projectCommand, scheme, function(testPlans)
-    if not testPlans or not next(testPlans) then
+    if util.is_empty(testPlans) then
       notifications.send_warning("Could not detect test plans")
 
-      if active_picker then
-        telescopeActions.close(active_picker.prompt_bufnr)
+      if activePicker then
+        telescopeActions.close(activePicker.prompt_bufnr)
       end
+
       if callback then
         callback()
       end
@@ -206,10 +199,6 @@ function M.select_destination(callback, opts)
 
   start_telescope_spinner()
   M.show("Select Device", {}, function(_, index)
-    if index <= 0 then
-      return
-    end
-
     projectConfig.settings.destination = results[index].id
     projectConfig.settings.platform = results[index].platform
     projectConfig.save_settings()
@@ -226,7 +215,7 @@ function M.select_destination(callback, opts)
         and (not table.name or not string.find(table.name, "^Any"))
     end)
 
-    local destinationsName = util.select(filtered, function(table)
+    local destinationNames = util.select(filtered, function(table)
       local name = table.name or ""
       if table.platform and table.platform ~= "iOS Simulator" then
         name = util.trim(name .. " " .. table.platform)
@@ -247,7 +236,7 @@ function M.select_destination(callback, opts)
     end)
 
     results = filtered
-    update_results(destinationsName)
+    update_results(destinationNames)
   end)
 end
 

@@ -39,54 +39,65 @@ function M.show_picker()
 end
 
 function M.build(callback)
+  coordinator.cancel()
   coordinator.build_project(false, callback)
 end
 
 function M.cancel()
   coordinator.cancel()
+  notifications.send("Stopped")
 end
 
 function M.configure_project()
+  coordinator.cancel()
   coordinator.configure_project()
 end
 
 function M.build_and_run(callback)
+  coordinator.cancel()
   coordinator.build_and_run_app(callback)
 end
 
 function M.run(callback)
+  coordinator.cancel()
   coordinator.run_app(callback)
 end
 
 function M.run_tests()
+  coordinator.cancel()
   coordinator.run_tests()
 end
 
 function M.run_class_tests()
+  coordinator.cancel()
   coordinator.run_selected_tests({
     currentClass = true,
   })
 end
 
 function M.run_func_test()
+  coordinator.cancel()
   coordinator.run_selected_tests({
     currentTest = true,
   })
 end
 
 function M.run_selected_tests()
+  coordinator.cancel()
   coordinator.run_selected_tests({
     selectedTests = true,
   })
 end
 
 function M.run_failing_tests()
+  coordinator.cancel()
   coordinator.run_selected_tests({
     failingTests = true,
   })
 end
 
 function M.select_project(callback)
+  coordinator.cancel()
   pickers.select_project(function()
     update_settings(callback)
   end, { close_on_select = true })
@@ -94,6 +105,7 @@ end
 
 function M.select_scheme(callback)
   defer_send("Loading schemes...")
+  coordinator.cancel()
   pickers.select_scheme(nil, function()
     update_settings(callback)
   end, { close_on_select = true })
@@ -101,6 +113,7 @@ end
 
 function M.select_config(callback)
   defer_send("Loading schemes...")
+  coordinator.cancel()
   pickers.select_config(function()
     update_settings(callback)
   end, { close_on_select = true })
@@ -108,11 +121,13 @@ end
 
 function M.select_testplan(callback)
   defer_send("Loading test plans...")
+  coordinator.cancel()
   pickers.select_testplan(callback, { close_on_select = true })
 end
 
 function M.select_device(callback)
   defer_send("Loading devices...")
+  coordinator.cancel()
   pickers.select_destination(function()
     update_settings(callback)
   end, { close_on_select = true })
@@ -123,6 +138,7 @@ function M.show_current_config()
 end
 
 function M.uninstall(callback)
+  coordinator.cancel()
   coordinator.uninstall_app(callback)
 end
 

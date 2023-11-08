@@ -86,7 +86,6 @@ function M.cancel()
   if currentJobId then
     vim.fn.jobstop(currentJobId)
     currentJobId = nil
-    notifications.send("Stopped")
   end
 end
 
