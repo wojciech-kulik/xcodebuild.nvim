@@ -22,7 +22,7 @@ local function update_settings(callback)
 end
 
 function M.open_logs()
-  logs.open_logs(true, true)
+  logs.open_logs(false)
 end
 
 function M.close_logs()
@@ -38,7 +38,7 @@ function M.show_picker()
 end
 
 function M.build(callback)
-  coordinator.build_project({ openLogsOnSuccess = true }, callback)
+  coordinator.build_project(false, callback)
 end
 
 function M.cancel()

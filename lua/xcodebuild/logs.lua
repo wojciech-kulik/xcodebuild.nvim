@@ -5,7 +5,7 @@ local config = require("xcodebuild.config").options.logs
 
 local M = {}
 
-local function add_summary_header(output)
+local function insert_summary_header(output)
   table.insert(output, "-----------------------------")
   table.insert(output, "-- xcodebuild.nvim summary --")
   table.insert(output, "-----------------------------")
@@ -17,41 +17,22 @@ local function split(filepath)
   vim.cmd(command)
 end
 
-function M.notify(message, severity)
-  config.notify(message, severity)
-end
+local function get_buf_and_win_of_logs()
+  local bufnr = util.get_buf_by_name(appdata.build_logs_filename, { returnNotLoaded = true })
 
-function M.notify_progress(message)
-  config.notify_progress(message)
-end
-
-function M.set_logs(report, isTesting, show)
-  appdata.write_original_logs(report.output)
-
-  local completion = function(prettyOutput)
-    add_summary_header(prettyOutput)
-    if config.show_warnings then
-      M.set_warnings(prettyOutput, report.warnings)
+  if bufnr then
+    local winnr = vim.fn.win_findbuf(bufnr)
+    if winnr then
+      return bufnr, winnr[1]
     end
-
-    local hasErrors = report.buildErrors and report.buildErrors[1]
-
-    if hasErrors then
-      M.set_errors(prettyOutput, report.buildErrors)
-    elseif isTesting then
-      M.set_test_results(report, prettyOutput)
-    else
-      table.insert(prettyOutput, "  ✔ Build Succeeded")
-      table.insert(prettyOutput, "")
-    end
-
-    appdata.write_build_logs(prettyOutput)
-
-    M.update_log_panel(show)
   end
 
+  return bufnr, nil
+end
+
+local function format_logs(lines, callback)
   if config.only_summary then
-    completion({})
+    callback({})
   elseif config.logs_formatter then
     local logs_filepath = appdata.original_logs_filepath
     local command = "cat '" .. logs_filepath .. "' | " .. config.logs_formatter
@@ -59,15 +40,40 @@ function M.set_logs(report, isTesting, show)
     vim.fn.jobstart(command, {
       stdout_buffered = true,
       on_stdout = function(_, prettyOutput)
-        completion(prettyOutput)
+        callback(prettyOutput)
       end,
     })
   else
-    completion(report.output)
+    callback(lines)
   end
 end
 
-function M.set_test_results(report, prettyOutput)
+local function refresh_logs_content()
+  local bufnr, winnr = get_buf_and_win_of_logs()
+  if not bufnr then
+    return
+  end
+
+  vim.api.nvim_buf_set_option(bufnr, "modifiable", true)
+  vim.api.nvim_buf_set_option(bufnr, "readonly", false)
+
+  if winnr then
+    util.focus_buffer(bufnr)
+    vim.cmd("silent e!")
+
+    local linesNumber = #vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
+    vim.api.nvim_win_set_cursor(winnr, { linesNumber, 0 })
+
+    if not config.auto_focus then
+      vim.cmd("wincmd p")
+    end
+  end
+
+  vim.api.nvim_buf_set_option(bufnr, "modifiable", false)
+  vim.api.nvim_buf_set_option(bufnr, "readonly", true)
+end
+
+local function insert_test_results(report, prettyOutput)
   ui.print_tests_summary(report)
 
   if report.failedTestsCount > 0 then
@@ -92,8 +98,8 @@ function M.set_test_results(report, prettyOutput)
   end
 end
 
-function M.set_warnings(prettyOutput, warnings)
-  if not warnings or not next(warnings) then
+local function insert_warnings(prettyOutput, warnings)
+  if util.is_empty(warnings) then
     return
   end
 
@@ -118,8 +124,11 @@ function M.set_warnings(prettyOutput, warnings)
   table.insert(prettyOutput, "")
 end
 
-function M.set_errors(prettyOutput, buildErrors)
-  M.notify("Build Failed [" .. #buildErrors .. " error(s)]", vim.log.levels.ERROR)
+local function insert_errors(prettyOutput, buildErrors)
+  if util.is_empty(buildErrors) then
+    return
+  end
+
   table.insert(prettyOutput, "Errors:")
 
   for _, error in ipairs(buildErrors) do
@@ -142,51 +151,58 @@ function M.set_errors(prettyOutput, buildErrors)
   table.insert(prettyOutput, "")
 end
 
-function M.update_log_panel(show)
-  local logsFilepath = appdata.build_logs_filepath
-  local bufnr = util.get_buf_by_name(appdata.build_logs_filename, { returnNotLoaded = true }) or -1
-  local winnr = vim.fn.win_findbuf(bufnr)[1]
+local function should_show_panel(report)
+  local hasErrors = util.is_not_empty(report.buildErrors) or report.failedTestsCount > 0
+  local configValue = util.is_not_empty(report.tests)
+      and (hasErrors and config.auto_open_on_failed_tests or config.auto_open_on_success_tests)
+    or (hasErrors and config.auto_open_on_failed_build or config.auto_open_on_success_build)
 
-  if show then
-    if winnr then
-      util.focus_buffer(bufnr)
-    elseif vim.fn.filereadable(logsFilepath) then
-      split(logsFilepath)
-      local numberOfLines = #vim.api.nvim_buf_get_lines(0, 0, -1, false)
-      vim.api.nvim_win_set_cursor(0, { numberOfLines, 0 })
-      bufnr = 0
-      winnr = 0
-    end
-  end
-
-  if bufnr == -1 then
-    return
-  end
-
-  vim.api.nvim_buf_set_option(bufnr, "modifiable", true)
-  vim.api.nvim_buf_set_option(bufnr, "readonly", false)
-
-  if winnr then
-    vim.cmd("silent e!")
-    local linesNumber = #vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
-    vim.api.nvim_win_set_cursor(winnr, { linesNumber, 0 })
-  end
-
-  vim.api.nvim_buf_set_option(bufnr, "modifiable", false)
-  vim.api.nvim_buf_set_option(bufnr, "readonly", true)
-
-  if show and not config.auto_focus then
-    vim.cmd("wincmd p")
-  end
+  return configValue
 end
 
-function M.open_logs(forceScroll, focus)
-  local logsFilepath = appdata.build_logs_filepath
-  local bufnr = util.get_buf_by_name(appdata.build_logs_filename, { returnNotLoaded = true }) or -1
-  local winnr = vim.fn.win_findbuf(bufnr)[1]
+function M.notify(message, severity)
+  config.notify(message, severity)
+end
 
+function M.notify_progress(message)
+  config.notify_progress(message)
+end
+
+function M.set_logs(report, isTesting)
+  appdata.write_original_logs(report.output)
+
+  format_logs(report.output, function(prettyOutput)
+    insert_summary_header(prettyOutput)
+
+    if config.show_warnings then
+      insert_warnings(prettyOutput, report.warnings)
+    end
+
+    if util.is_not_empty(report.buildErrors) then
+      insert_errors(prettyOutput, report.buildErrors)
+    elseif isTesting then
+      insert_test_results(report, prettyOutput)
+    else
+      table.insert(prettyOutput, "  ✔ Build Succeeded")
+      table.insert(prettyOutput, "")
+    end
+
+    appdata.write_build_logs(prettyOutput)
+
+    if should_show_panel(report) then
+      M.open_logs(true)
+    end
+    refresh_logs_content()
+  end)
+end
+
+function M.open_logs(scrollToBottom)
+  local logsFilepath = appdata.build_logs_filepath
+  local bufnr, winnr = get_buf_and_win_of_logs()
+
+  -- window is visible
   if winnr then
-    if focus then
+    if config.auto_focus then
       util.focus_buffer(bufnr)
     end
     return
@@ -194,19 +210,18 @@ function M.open_logs(forceScroll, focus)
 
   split(logsFilepath)
 
-  if bufnr == -1 or forceScroll then -- new buffer should be scrolled
+  if scrollToBottom then -- new buffer should be scrolled
     local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
     vim.api.nvim_win_set_cursor(0, { #lines, 0 })
   end
 
-  if not focus or not config.auto_focus_on_open then
+  if not config.auto_focus then
     vim.cmd("wincmd p")
   end
 end
 
 function M.close_logs()
-  local bufnr = util.get_buf_by_name(appdata.build_logs_filename, { returnNotLoaded = true }) or -1
-  local winnr = vim.fn.win_findbuf(bufnr)[1]
+  local _, winnr = get_buf_and_win_of_logs()
 
   if winnr then
     vim.api.nvim_win_close(winnr, true)
@@ -214,13 +229,12 @@ function M.close_logs()
 end
 
 function M.toggle_logs()
-  local bufnr = util.get_buf_by_name(appdata.build_logs_filename, { returnNotLoaded = true }) or -1
-  local winnr = vim.fn.win_findbuf(bufnr)[1]
+  local _, winnr = get_buf_and_win_of_logs()
 
   if winnr then
     M.close_logs()
   else
-    M.open_logs(false, true)
+    M.open_logs(false)
   end
 end
 

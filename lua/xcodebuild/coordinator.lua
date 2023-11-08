@@ -145,12 +145,10 @@ function M.build_and_run_app(callback)
     return
   end
 
-  M.build_project({
-    openLogsOnSuccess = false,
-  }, function(report)
+  M.build_project(false, function(report)
     if report.buildErrors and report.buildErrors[1] then
       logs.notify("Build Failed", vim.log.levels.ERROR)
-      logs.open_logs(true, true)
+      logs.open_logs(true)
       return
     end
 
@@ -224,13 +222,11 @@ function M.auto_save()
   end
 end
 
-function M.build_project(opts, callback)
+function M.build_project(buildForTesting, callback)
   if not validate_project() then
     return
   end
 
-  local openLogsOnSuccess = (opts or {}).openLogsOnSuccess
-  local buildForTesting = (opts or {}).buildForTesting
   local lastBuildTime = projectConfig.settings.lastBuildTime
   local progressTimer = not buildForTesting and ui.start_action_timer("Building", lastBuildTime) or nil
   local startTime = os.time()
@@ -256,20 +252,17 @@ function M.build_project(opts, callback)
     end
 
     vim.cmd("echo ''")
+    logs.set_logs(testReport, false)
+    quickfix.set(testReport)
 
-    local config = require("xcodebuild.config").options.logs
-    local hasErrors = testReport.buildErrors and testReport.buildErrors[1]
-    local shouldShow = (hasErrors and config.auto_open_on_failed_build)
-      or (not hasErrors and config.auto_open_on_success_build and not buildForTesting)
-
-    logs.set_logs(testReport, false, shouldShow and openLogsOnSuccess)
-    if not hasErrors then
+    if util.is_empty(testReport.buildErrors) then
       local duration = os.difftime(os.time(), startTime)
       projectConfig.settings.lastBuildTime = duration
       projectConfig.save_settings()
       logs.notify(string.format("Build Succeeded [%d seconds]", duration))
+    else
+      logs.notify("Build Failed [" .. #testReport.buildErrors .. " error(s)]", vim.log.levels.ERROR)
     end
-    quickfix.set(testReport)
 
     if callback then
       callback(testReport)
@@ -317,13 +310,8 @@ function M.run_tests(testsToRun)
       return
     end
 
-    local config = require("xcodebuild.config").options.logs
-    local hasErrors = testReport.buildErrors and testReport.buildErrors[1]
-    local shouldShow = ((hasErrors or testReport.failedTestsCount > 0) and config.auto_open_on_failed_tests)
-      or (testReport.failedTestsCount == 0 and config.auto_open_on_success_tests)
-
     targetToFiles = xcode.get_targets_list(projectConfig.settings.appPath)
-    logs.set_logs(testReport, true, shouldShow)
+    logs.set_logs(testReport, true)
     quickfix.set_targets_filemap(targetToFiles)
     quickfix.set(testReport)
     diagnostics.refresh_test_buffers(testReport)
@@ -454,9 +442,7 @@ function M.run_selected_tests(opts)
   -- TODO: clear cache when a new swift test file is added
   if not targetToFiles or not next(targetToFiles) then
     logs.notify("Loading tests...")
-    currentJobId = M.build_project({
-      buildForTesting = true,
-    }, function()
+    currentJobId = M.build_project(true, function()
       targetToFiles = xcode.get_targets_list(projectConfig.settings.appPath)
       quickfix.set_targets_filemap(targetToFiles)
       start()
