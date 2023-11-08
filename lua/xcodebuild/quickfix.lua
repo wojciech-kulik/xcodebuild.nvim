@@ -1,10 +1,11 @@
 local util = require("xcodebuild.util")
 local config = require("xcodebuild.config").options.quickfix
 
-local M = {}
-local targetToFiles = {}
+local M = {
+  targetToFilesMap = {},
+}
 
-local function set_build_errors(list, errors)
+local function insert_build_errors(list, errors)
   local duplicates = {}
 
   for _, error in ipairs(errors) do
@@ -26,7 +27,7 @@ local function set_build_errors(list, errors)
   end
 end
 
-local function set_failing_tests(list, tests)
+local function insert_failing_tests(list, tests)
   for _, testsPerClass in pairs(tests) do
     for _, test in ipairs(testsPerClass) do
       if not test.success and test.filepath and test.lineNumber then
@@ -41,7 +42,7 @@ local function set_failing_tests(list, tests)
   end
 end
 
-local function set_warnings(list, warnings)
+local function insert_warnings(list, warnings)
   for _, warning in ipairs(warnings) do
     if warning.filepath and warning.lineNumber then
       table.insert(list, {
@@ -55,13 +56,13 @@ local function set_warnings(list, warnings)
   end
 end
 
-local function set_diagnostics_for_test_errors(list, diagnostics)
+local function insert_diagnostics_for_test_errors(list, diagnostics)
   for _, diagnostic in ipairs(diagnostics) do
     local target, filename = string.match(diagnostic.filepath, "(.-)/(.+)")
 
-    if targetToFiles and targetToFiles[target] then
-      for _, filepath in ipairs(targetToFiles[target]) do
-        if util.hasSuffix(filepath, filename) then
+    if M.targetToFilesMap and M.targetToFilesMap[target] then
+      for _, filepath in ipairs(M.targetToFilesMap[target]) do
+        if util.has_suffix(filepath, filename) then
           table.insert(list, {
             filename = filepath,
             lnum = diagnostic.lineNumber,
@@ -75,25 +76,25 @@ local function set_diagnostics_for_test_errors(list, diagnostics)
   end
 end
 
-function M.setTargets(targets)
-  targetToFiles = targets
+function M.set_targets_filemap(targets)
+  M.targetToFilesMap = targets
 end
 
 function M.set(report)
-  local quickfix = {}
-
   if not config.show_warnings_on_quickfixlist and not config.show_errors_on_quickfixlist then
     return
   end
 
+  local quickfix = {}
+
   if config.show_warnings_on_quickfixlist then
-    set_warnings(quickfix, report.warnings or {})
+    insert_warnings(quickfix, report.warnings or {})
   end
 
   if config.show_errors_on_quickfixlist then
-    set_build_errors(quickfix, report.buildErrors or {})
-    set_failing_tests(quickfix, report.tests or {})
-    set_diagnostics_for_test_errors(quickfix, report.diagnostics or {})
+    insert_build_errors(quickfix, report.buildErrors or {})
+    insert_failing_tests(quickfix, report.tests or {})
+    insert_diagnostics_for_test_errors(quickfix, report.diagnostics or {})
   end
 
   vim.fn.setqflist(quickfix, "r")

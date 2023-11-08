@@ -4,8 +4,10 @@ local cwd = vim.fn.getcwd()
 local recordSnapshots = false
 
 local mockSwiftFiles = function()
-  local filetree = table.concat(vim.fn.readfile(cwd .. "/lua/xcodebuild/tests/test_data/file_tree.txt"), "\n")
-  vim.fn.system = function()
+  local filetree = vim.fn.readfile(cwd .. "/lua/xcodebuild/tests/test_data/file_tree.txt")
+
+  ---@diagnostic disable-next-line: duplicate-set-field
+  require("xcodebuild.util").shell = function()
     return filetree
   end
 

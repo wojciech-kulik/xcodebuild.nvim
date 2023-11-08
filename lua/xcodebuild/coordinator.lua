@@ -324,7 +324,7 @@ function M.run_tests(testsToRun)
 
     targetToFiles = xcode.get_targets_list(projectConfig.settings.appPath)
     logs.set_logs(testReport, true, shouldShow)
-    quickfix.setTargets(targetToFiles)
+    quickfix.set_targets_filemap(targetToFiles)
     quickfix.set(testReport)
     diagnostics.refresh_test_buffers(testReport)
   end
@@ -458,7 +458,7 @@ function M.run_selected_tests(opts)
       buildForTesting = true,
     }, function()
       targetToFiles = xcode.get_targets_list(projectConfig.settings.appPath)
-      quickfix.setTargets(targetToFiles)
+      quickfix.set_targets_filemap(targetToFiles)
       start()
     end)
   else

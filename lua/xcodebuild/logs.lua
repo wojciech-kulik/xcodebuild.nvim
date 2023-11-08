@@ -4,6 +4,7 @@ local appdata = require("xcodebuild.appdata")
 local config = require("xcodebuild.config").options.logs
 
 local M = {}
+
 local function add_summary_header(output)
   table.insert(output, "-----------------------------")
   table.insert(output, "-- xcodebuild.nvim summary --")

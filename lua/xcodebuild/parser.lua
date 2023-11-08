@@ -123,7 +123,8 @@ local function parse_build_error(line)
 end
 
 local function parse_test_error(line)
-  local filepath, lineNumber, message = string.match(line, "([^%s]*%.swift)%:(%d+)%:%d*%:? %w*%s*error%: (.*)")
+  local filepath, lineNumber, message =
+    string.match(line, "([^%s]*%.swift)%:(%d+)%:%d*%:? %w*%s*error%: (.*)")
 
   if filepath and message then
     failedTestsCount = failedTestsCount + 1
@@ -147,7 +148,7 @@ local function parse_warning(line)
   local filepath, lineNumber, columnNumber, message =
     string.match(line, "([^%s]*%.swift)%:(%d+)%:(%d*)%:? %w*%s*warning%: (.*)")
 
-  if filepath and message and util.hasPrefix(filepath, vim.fn.getcwd()) then
+  if filepath and message and util.has_prefix(filepath, vim.fn.getcwd()) then
     lineType = BUILD_WARNING
     lineData.filepath = filepath
     lineData.filename = util.get_filename(filepath)

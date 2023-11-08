@@ -112,7 +112,7 @@ function M.select_project(callback, opts)
 
   M.show("Select Project/Workspace", filenames, function(_, index)
     local projectFile = sanitizedFiles[index].filepath
-    local isWorkspace = util.hasSuffix(projectFile, "xcworkspace")
+    local isWorkspace = util.has_suffix(projectFile, "xcworkspace")
 
     projectConfig.settings.projectFile = projectFile
     projectConfig.settings.projectCommand = (isWorkspace and "-workspace '" or "-project '")

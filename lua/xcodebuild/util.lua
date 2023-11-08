@@ -10,11 +10,10 @@ end
 
 function M.get_buffers(opts)
   local result = {}
-  local optsUnwrapped = opts or {}
 
   for i, buf in ipairs(vim.api.nvim_list_bufs()) do
     if
-      optsUnwrapped.returnNotLoaded == true and vim.api.nvim_buf_is_valid(buf)
+      (opts or {}).returnNotLoaded == true and vim.api.nvim_buf_is_valid(buf)
       or vim.api.nvim_buf_is_loaded(buf)
     then
       result[i] = buf
@@ -28,7 +27,7 @@ function M.get_buf_by_name(name, opts)
   local allBuffers = M.get_buffers(opts)
 
   for _, buf in pairs(allBuffers) do
-    if string.match(vim.api.nvim_buf_get_name(buf), ".*/(.*)") == name then
+    if string.match(vim.api.nvim_buf_get_name(buf), ".*/([^/]*)$") == name then
       return buf
     end
   end
@@ -62,11 +61,10 @@ function M.get_filename(filepath)
 end
 
 function M.find_all_swift_files()
-  local allFiles = vim.fn.system({ "find", vim.fn.getcwd(), "-iname", "*.swift" })
-
+  local allFiles = M.shell("find '" .. vim.fn.getcwd() .. "' -type f -iname '*.swift' -not -path '*/.*'")
   local map = {}
 
-  for _, filepath in ipairs(vim.split(allFiles, "\n", { plain = true })) do
+  for _, filepath in ipairs(allFiles) do
     local filename = M.get_filename(filepath)
     if filename then
       map[filename] = filepath
@@ -121,11 +119,11 @@ function M.filter(tab, predicate)
   return result
 end
 
-function M.hasSuffix(text, suffix)
+function M.has_suffix(text, suffix)
   return string.sub(text, -#suffix) == suffix
 end
 
-function M.hasPrefix(text, prefix)
+function M.has_prefix(text, prefix)
   return string.sub(text, 1, #prefix) == prefix
 end
 
