@@ -11,6 +11,7 @@ local telescopeState = require("telescope.actions.state")
 
 local M = {}
 
+local currentJobId = nil
 local activePicker = nil
 local progressTimer = nil
 local currentProgressFrame = 1
@@ -47,6 +48,10 @@ local function start_telescope_spinner()
 end
 
 local function update_results(results)
+  if currentJobId == nil then
+    return
+  end
+
   stop_telescope_spinner()
 
   if activePicker then
@@ -62,6 +67,11 @@ local function update_results(results)
 end
 
 function M.show(title, items, callback, opts)
+  if currentJobId then
+    vim.fn.jobstop(currentJobId)
+    currentJobId = nil
+  end
+
   activePicker = telescopePickers.new(require("telescope.themes").get_dropdown({}), {
     prompt_title = title,
     finder = telescopeFinders.new_table({
@@ -136,9 +146,11 @@ function M.select_scheme(schemes, callback, opts)
 
   if util.is_empty(schemes) then
     local projectCommand = projectConfig.settings.projectCommand
-    return xcode.get_project_information(projectCommand, function(info)
+    currentJobId = xcode.get_project_information(projectCommand, function(info)
       update_results(info.schemes)
     end)
+
+    return currentJobId
   end
 end
 
@@ -156,10 +168,12 @@ function M.select_config(callback, opts)
     end
   end, opts)
 
-  return xcode.get_project_information(projectCommand, function(info)
+  currentJobId = xcode.get_project_information(projectCommand, function(info)
     projectInfo = info
     update_results(info.configs)
   end)
+
+  return currentJobId
 end
 
 function M.select_testplan(callback, opts)
@@ -176,11 +190,13 @@ function M.select_testplan(callback, opts)
     end
   end, opts)
 
-  return xcode.get_testplans(projectCommand, scheme, function(testPlans)
-    if util.is_empty(testPlans) then
-      notifications.send_warning("Could not detect test plans")
+  currentJobId = xcode.get_testplans(projectCommand, scheme, function(testPlans)
+    if currentJobId and util.is_empty(testPlans) then
+      vim.defer_fn(function()
+        notifications.send_warning("Could not detect test plans")
+      end, 100)
 
-      if activePicker then
+      if activePicker and util.is_not_empty(vim.fn.win_findbuf(activePicker.prompt_bufnr)) then
         telescopeActions.close(activePicker.prompt_bufnr)
       end
 
@@ -191,6 +207,8 @@ function M.select_testplan(callback, opts)
       update_results(testPlans)
     end
   end)
+
+  return currentJobId
 end
 
 function M.select_destination(callback, opts)
@@ -209,7 +227,7 @@ function M.select_destination(callback, opts)
     end
   end, opts)
 
-  return xcode.get_destinations(projectCommand, scheme, function(destinations)
+  currentJobId = xcode.get_destinations(projectCommand, scheme, function(destinations)
     local filtered = util.filter(destinations, function(table)
       return table.id ~= nil
         and table.platform ~= "iOS"
@@ -239,6 +257,8 @@ function M.select_destination(callback, opts)
     results = filtered
     update_results(destinationNames)
   end)
+
+  return currentJobId
 end
 
 function M.show_all_actions()
