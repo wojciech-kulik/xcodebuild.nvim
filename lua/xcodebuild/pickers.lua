@@ -287,6 +287,7 @@ function M.show_all_actions()
 
     "Show Current Configuration",
     "Show Configuration Wizard",
+    "Boot Selected Simulator",
     "Uninstall Application",
   }
   local actionsPointers = {
@@ -313,6 +314,7 @@ function M.show_all_actions()
 
     actions.show_current_config,
     actions.configure_project,
+    actions.boot_simulator,
     actions.uninstall,
   }
 

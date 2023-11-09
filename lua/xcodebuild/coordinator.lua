@@ -142,6 +142,26 @@ function M.run_app(callback)
   end
 end
 
+function M.boot_simulator(callback)
+  if not validate_project() then
+    return
+  end
+
+  if projectConfig.settings.platform == "macOS" then
+    notifications.send_error("Your selected device is macOS.")
+    return
+  end
+
+  notifications.send("Booting simulator...")
+  xcode.boot_simulator(projectConfig.settings.destination, function()
+    notifications.send("Simulator booted")
+
+    if callback then
+      callback()
+    end
+  end)
+end
+
 function M.uninstall_app(callback)
   if not validate_project() then
     return

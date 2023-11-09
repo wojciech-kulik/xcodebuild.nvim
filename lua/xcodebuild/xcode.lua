@@ -288,6 +288,21 @@ function M.launch_app(destination, bundleId, callback)
   })
 end
 
+function M.boot_simulator(destination, callback)
+  local command = "xcrun simctl boot '" .. destination .. "' "
+
+  return vim.fn.jobstart(command, {
+    stdout_buffered = true,
+    on_exit = function(_, code, _)
+      if code ~= 0 then
+        notifications.send_error("Could not boot simulator (code: " .. code .. ")")
+      else
+        callback()
+      end
+    end,
+  })
+end
+
 function M.uninstall_app(destination, bundleId, callback)
   local command = "xcrun simctl uninstall '" .. destination .. "' " .. bundleId
 

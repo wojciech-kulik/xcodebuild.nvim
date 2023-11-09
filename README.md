@@ -210,6 +210,7 @@ Xcodebuild.nvim comes with the following commands:
 | `XcodebuildOpenLogs`       | Open logs panel                                          |
 | `XcodebuildCloseLogs`      | Close logs panel                                         |
 | `XcodebuildShowConfig`     | Print current project configuration                      |
+| `XcodebuildBootSimulator`  | Boot selected simulator                                  |
 | `XcodebuildUninstall`      | Uninstall mobile app                                     |
 
 Sample key bindings:

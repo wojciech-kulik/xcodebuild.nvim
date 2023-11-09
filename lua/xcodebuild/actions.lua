@@ -142,4 +142,8 @@ function M.uninstall(callback)
   coordinator.uninstall_app(callback)
 end
 
+function M.boot_simulator(callback)
+  coordinator.boot_simulator(callback)
+end
+
 return M
