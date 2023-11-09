@@ -168,7 +168,7 @@ function M.build_project(buildForTesting, callback)
     return
   end
 
-  local buildId = notifications.send_build_started()
+  local buildId = notifications.send_build_started(buildForTesting)
   M.auto_save()
   parser.clear()
 
@@ -318,6 +318,7 @@ function M.run_selected_tests(opts)
   if not validate_project() or not validate_testplan() then
     return
   end
+
   local selectedClass, selectedTests = find_tests(opts)
 
   local start = function()
@@ -352,7 +353,7 @@ function M.run_selected_tests(opts)
     if next(testsToRun) then
       M.run_tests(testsToRun)
     else
-      notifications.send_error("Tests not found.")
+      notifications.send_error("Tests not found")
     end
   end
 

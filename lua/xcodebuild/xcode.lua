@@ -46,24 +46,26 @@ function M.get_destinations(projectCommand, scheme, callback)
     on_stdout = function(_, output)
       local result = {}
       local foundDestinations = false
+      local valuePattern = "%:%s*([^@}]-)%s*[@}]"
 
       for _, line in ipairs(output) do
-        if foundDestinations and util.trim(line) == "" then
+        local trimmedLine = util.trim(line)
+
+        if foundDestinations and trimmedLine == "" then
           break
         elseif foundDestinations then
-          local trimmed = string.gsub(util.trim(line), ", ", "@")
-          local valuePattern = "%:%s*([^@}]-)%s*[@}]"
+          local sanitizedLine = string.gsub(trimmedLine, ", ", "@")
           local destination = {
-            platform = string.match(trimmed, "platform" .. valuePattern),
-            variant = string.match(trimmed, "variant" .. valuePattern),
-            arch = string.match(trimmed, "arch" .. valuePattern),
-            id = string.match(trimmed, "id" .. valuePattern),
-            name = string.match(trimmed, "name" .. valuePattern),
-            os = string.match(trimmed, "OS" .. valuePattern),
-            error = string.match(trimmed, "error" .. valuePattern),
+            platform = string.match(sanitizedLine, "platform" .. valuePattern),
+            variant = string.match(sanitizedLine, "variant" .. valuePattern),
+            arch = string.match(sanitizedLine, "arch" .. valuePattern),
+            id = string.match(sanitizedLine, "id" .. valuePattern),
+            name = string.match(sanitizedLine, "name" .. valuePattern),
+            os = string.match(sanitizedLine, "OS" .. valuePattern),
+            error = string.match(sanitizedLine, "error" .. valuePattern),
           }
           table.insert(result, destination)
-        elseif string.find(util.trim(line), "Available destinations") then
+        elseif string.find(trimmedLine, "Available destinations") then
           foundDestinations = true
         end
       end
@@ -80,14 +82,16 @@ function M.get_schemes(projectCommand, callback)
     stdout_buffered = true,
     on_stdout = function(_, output)
       local result = {}
-
       local foundSchemes = false
+
       for _, line in ipairs(output) do
-        if foundSchemes and util.trim(line) == "" then
+        local trimmedLine = util.trim(line)
+
+        if foundSchemes and trimmedLine == "" then
           break
         elseif foundSchemes then
-          table.insert(result, util.trim(line))
-        elseif string.find(util.trim(line), "Schemes") then
+          table.insert(result, trimmedLine)
+        elseif string.find(trimmedLine, "Schemes") then
           foundSchemes = true
         end
       end
@@ -98,10 +102,12 @@ function M.get_schemes(projectCommand, callback)
 end
 
 function M.get_project_information(projectCommand, callback)
+  -- for this command we need xcodeproj, not xcworkspace
   if string.find(projectCommand, "-workspace") then
     projectCommand = string.gsub(projectCommand, "-workspace", "-project")
     projectCommand = string.gsub(projectCommand, "%.xcworkspace", ".xcodeproj")
   end
+
   local command = "xcodebuild " .. projectCommand .. " -list"
 
   return vim.fn.jobstart(command, {
@@ -116,19 +122,21 @@ function M.get_project_information(projectCommand, callback)
 
       local mode = nil
       for _, line in ipairs(output) do
-        if string.find(util.trim(line), "Schemes:") then
+        local trimmedLine = util.trim(line)
+
+        if string.find(trimmedLine, "Schemes:") then
           mode = SCHEME
-        elseif string.find(util.trim(line), "Build Configurations:") then
+        elseif string.find(trimmedLine, "Build Configurations:") then
           mode = CONFIG
-        elseif string.find(util.trim(line), "Targets:") then
+        elseif string.find(trimmedLine, "Targets:") then
           mode = TARGET
-        elseif util.trim(line) ~= "" then
+        elseif trimmedLine ~= "" then
           if mode == SCHEME then
-            table.insert(schemes, util.trim(line))
+            table.insert(schemes, trimmedLine)
           elseif mode == CONFIG then
-            table.insert(configs, util.trim(line))
+            table.insert(configs, trimmedLine)
           elseif mode == TARGET then
-            table.insert(targets, util.trim(line))
+            table.insert(targets, trimmedLine)
           end
         else
           mode = nil
@@ -151,14 +159,16 @@ function M.get_testplans(projectCommand, scheme, callback)
     stdout_buffered = true,
     on_stdout = function(_, output)
       local result = {}
-
       local foundTestPlans = false
+
       for _, line in ipairs(output) do
-        if foundTestPlans and util.trim(line) == "" then
+        local trimmedLine = util.trim(line)
+
+        if foundTestPlans and trimmedLine == "" then
           break
         elseif foundTestPlans then
-          table.insert(result, util.trim(line))
-        elseif string.find(util.trim(line), "Test plans") then
+          table.insert(result, trimmedLine)
+        elseif string.find(trimmedLine, "Test plans") then
           foundTestPlans = true
         end
       end
@@ -169,7 +179,7 @@ function M.get_testplans(projectCommand, scheme, callback)
 end
 
 function M.build_project(opts)
-  local action = opts.buildForTesting and "build-for-testing " or ""
+  local action = opts.buildForTesting and "build-for-testing " or "build "
   local command = "xcodebuild "
     .. action
     .. opts.projectCommand
@@ -202,39 +212,36 @@ function M.get_build_settings(platform, projectCommand, scheme, config, callback
     .. " -sdk "
     .. (platform == "macOS" and "macosx" or "iphonesimulator")
 
+  local find_setting = function(source, key)
+    return string.match(source, "%s+" .. key .. " = (.*)%s*")
+  end
+
   return vim.fn.jobstart(command, {
     stdout_buffered = true,
     on_stdout = function(_, output)
-      local foundBundleId = nil
-      local foundProductName = nil
-      local foundBuildDir = nil
+      local bundleId = nil
+      local productName = nil
+      local buildDir = nil
 
       for _, line in ipairs(output) do
-        local bundleId = string.match(line, "PRODUCT_BUNDLE_IDENTIFIER = (.*)%s*")
-        local productName = string.match(line, "PRODUCT_NAME = (.*)%s*")
-        local buildDir = string.match(line, "TARGET_BUILD_DIR = (.*)%s*")
-        if bundleId then
-          foundBundleId = bundleId
-        end
-        if productName then
-          foundProductName = productName
-        end
-        if buildDir then
-          foundBuildDir = buildDir
-        end
-        if foundBuildDir and foundProductName and foundBundleId then
+        bundleId = bundleId or find_setting(line, "PRODUCT_BUNDLE_IDENTIFIER")
+        productName = productName or find_setting(line, "PRODUCT_NAME")
+        buildDir = buildDir or find_setting(line, "TARGET_BUILD_DIR")
+
+        if bundleId and productName and buildDir then
           break
         end
       end
 
-      if not foundBundleId or not foundBuildDir or not foundProductName then
-        error("Could not get build settings")
+      if not bundleId or not productName or not buildDir then
+        notifications.send_error("Could not get build settings")
+        return
       end
 
       local result = {
-        appPath = foundBuildDir .. "/" .. foundProductName .. ".app",
-        productName = foundProductName,
-        bundleId = foundBundleId,
+        appPath = buildDir .. "/" .. productName .. ".app",
+        productName = productName,
+        bundleId = bundleId,
       }
 
       if callback then
@@ -253,7 +260,7 @@ function M.install_app(destination, appPath, callback)
       if code ~= 0 then
         notifications.send_error("Could not install app (code: " .. code .. ")")
         if code == 149 then
-          notifications.send_warning("Make sure that the simulator is booted.")
+          notifications.send_warning("Make sure that the simulator is booted")
         end
       else
         callback()
@@ -264,6 +271,7 @@ end
 
 function M.launch_app(destination, bundleId, callback)
   local command = "xcrun simctl launch --terminate-running-process '" .. destination .. "' " .. bundleId
+
   return vim.fn.jobstart(command, {
     stdout_buffered = true,
     detach = true,
@@ -271,7 +279,7 @@ function M.launch_app(destination, bundleId, callback)
       if code ~= 0 then
         notifications.send_error("Could not launch app (code: " .. code .. ")")
         if code == 149 then
-          notifications.send_warning("Make sure that the simulator is booted.")
+          notifications.send_warning("Make sure that the simulator is booted")
         end
       else
         callback()
@@ -282,6 +290,7 @@ end
 
 function M.uninstall_app(destination, bundleId, callback)
   local command = "xcrun simctl uninstall '" .. destination .. "' " .. bundleId
+
   return vim.fn.jobstart(command, {
     stdout_buffered = true,
     on_exit = function(_, code, _)
@@ -294,15 +303,14 @@ function M.uninstall_app(destination, bundleId, callback)
   })
 end
 
-function M.get_app_pid(target)
-  local pid = util.shell("ps aux | grep '" .. target .. ".app' | grep -v grep | awk '{ print$2 }'")
-  local pidString = pid and table.concat(pid, "") or nil
+function M.get_app_pid(productName)
+  local pid = util.shell("ps aux | grep '" .. productName .. ".app' | grep -v grep | awk '{ print$2 }'")
 
-  return tonumber(pidString)
+  return tonumber(pid and pid[1] or nil)
 end
 
-function M.kill_app(target)
-  local pid = M.get_app_pid(target)
+function M.kill_app(productName)
+  local pid = M.get_app_pid(productName)
 
   if pid then
     util.shell("kill -9 " .. pid)
@@ -330,55 +338,11 @@ function M.run_tests(opts)
   end
 
   return vim.fn.jobstart(command, {
-    stdout_buffered = false,
-    stderr_buffered = false,
+    stdout_buffered = true,
+    stderr_buffered = true,
     on_stdout = opts.on_stdout,
     on_stderr = opts.on_stderr,
     on_exit = opts.on_exit,
-  })
-end
-
-function M.list_tests(opts, callback)
-  local command = "xcodebuild test -scheme '"
-    .. opts.scheme
-    .. "' -destination 'id="
-    .. opts.destination
-    .. "' "
-    .. opts.projectCommand
-    .. " -testPlan '"
-    .. opts.testPlan
-    .. "' -enumerate-tests"
-    .. " -test-enumeration-style flat"
-
-  local tests = {}
-  local foundTests = false
-
-  return vim.fn.jobstart(command, {
-    stdout_buffered = false,
-    on_stdout = function(_, output)
-      for _, line in ipairs(output) do
-        if foundTests then
-          local target, class, test = string.match(line, "%s*([^/]*)/([^/]*)/(test[^/]*)%s*")
-          if target and class and test then
-            table.insert(tests, {
-              target = target,
-              class = class,
-              name = test,
-              classId = target .. "/" .. class,
-              testId = target .. "/" .. class .. "/" .. test,
-            })
-          end
-        elseif string.find(line, "Plan " .. opts.testPlan) then
-          foundTests = true
-        end
-      end
-    end,
-    on_exit = function(_, code, _)
-      if code == 143 then
-        return
-      end
-      callback(tests)
-    end,
   })
 end
 
