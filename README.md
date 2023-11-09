@@ -264,7 +264,6 @@ Sample `settings.json`:
 ## ⏳ Things To Do
 
 - [ ] Add Neovim documentation
-- [ ] Error handling - there are a lot of things that can go wrong with `xcodebuild` commands. Probably this plugin should check some common issues and present user friendly errors.
 - [ ] List tests to browse and run. Something like a tree with tests?
 - [ ] Resolve issues with finding the corresponding test file.
 - [ ] Add clean build action. While testing this command was failing for some reasons, that's why for now it's postponed.
