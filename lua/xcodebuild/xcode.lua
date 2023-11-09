@@ -353,8 +353,8 @@ function M.run_tests(opts)
   end
 
   return vim.fn.jobstart(command, {
-    stdout_buffered = true,
-    stderr_buffered = true,
+    stdout_buffered = false,
+    stderr_buffered = false,
     on_stdout = opts.on_stdout,
     on_stderr = opts.on_stderr,
     on_exit = opts.on_exit,
