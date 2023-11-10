@@ -269,8 +269,12 @@ function M.install_app(destination, appPath, callback)
   })
 end
 
-function M.launch_app(destination, bundleId, callback)
+function M.launch_app(destination, bundleId, waitForDebugger, callback)
   local command = "xcrun simctl launch --terminate-running-process '" .. destination .. "' " .. bundleId
+
+  if waitForDebugger then
+    command = command .. " --wait-for-debugger"
+  end
 
   return vim.fn.jobstart(command, {
     stdout_buffered = true,

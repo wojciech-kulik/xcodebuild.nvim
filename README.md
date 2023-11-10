@@ -141,16 +141,19 @@ return {
   },
   config = function()
     local dap = require("dap")
+    local xcodebuild = require("xcodebuild.dap")
 
     dap.configurations.swift = {
       {
         name = "iOS App Debugger",
         type = "codelldb",
         request = "attach",
-        -- this will wait until the app is launched
-        pid = require("xcodebuild.dap").wait_for_pid,
+        program = xcodebuild.get_program_path,
+        -- alternatively, you can wait for the process manually
+        -- pid = xcodebuild.wait_for_pid,
         cwd = "${workspaceFolder}",
         stopOnEntry = false,
+        waitFor = true,
       },
     }
 
@@ -159,6 +162,7 @@ return {
       port = "13000",
       executable = {
         -- set path to the downloaded codelldb
+        -- sample path: "/Users/YOU/Downloads/codelldb-aarch64-darwin/extension/adapter/codelldb"
         command = "/path/to/codelldb/extension/adapter/codelldb",
         args = {
           "--port",
@@ -171,11 +175,8 @@ return {
     }
 
     -- sample keymap to build & run the app
-    vim.keymap.set("n", "<leader>R", function()
-      require("xcodebuild.dap").build_and_run(function()
-        dap.continue()
-      end)
-    end)
+    vim.keymap.set("n", "<leader>dd", xcodebuild.build_and_debug, { desc = "Build & Debug" })
+	vim.keymap.set("n", "<leader>dr", xcodebuild.debug_without_build, { desc = "Debug Without Building" })
   end,
 }
 ```

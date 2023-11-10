@@ -6,12 +6,54 @@ local coordinator = require("xcodebuild.coordinator")
 
 local M = {}
 
-function M.build_and_run(callback)
-  coordinator.build_and_run_app(callback)
+function M.build_and_debug(callback)
+  local loadedDap, dap = pcall(require, "dap")
+  if not loadedDap then
+    error("Could not load dap plugin")
+    return
+  end
+
+  xcode.kill_app(projectConfig.settings.productName)
+  dap.continue()
+
+  coordinator.build_project(false, function(report)
+    local success = util.is_empty(report.buildErrors)
+
+    if success then
+      coordinator.run_app(false, callback)
+    else
+      dap.terminate()
+
+      local loadedDapui, dapui = pcall(require, "dapui")
+      if loadedDapui then
+        dapui.close()
+      end
+    end
+  end)
 end
 
-function M.run_app(callback)
-  coordinator.run_app(callback)
+function M.debug_without_build(callback)
+  local loadedDap, dap = pcall(require, "dap")
+  if not loadedDap then
+    error("Could not load dap plugin")
+    return
+  end
+
+  xcode.kill_app(projectConfig.settings.productName)
+  dap.continue()
+  coordinator.run_app(false, callback)
+end
+
+function M.build_and_run(callback)
+  M.build_and_debug(callback)
+end
+
+function M.get_program_path()
+  if projectConfig.settings.platform == "macOS" then
+    return projectConfig.settings.appPath .. "/Contents/MacOS/" .. projectConfig.settings.productName
+  else
+    return projectConfig.settings.appPath
+  end
 end
 
 function M.wait_for_pid()

@@ -90,7 +90,7 @@ function M.load_last_report()
   end
 end
 
-function M.build_and_run_app(callback)
+function M.build_and_run_app(waitForDebugger, callback)
   if not validate_project() then
     return
   end
@@ -102,11 +102,11 @@ function M.build_and_run_app(callback)
       return
     end
 
-    M.run_app(callback)
+    M.run_app(waitForDebugger, callback)
   end)
 end
 
-function M.run_app(callback)
+function M.run_app(waitForDebugger, callback)
   if not validate_project() then
     return
   end
@@ -131,7 +131,7 @@ function M.run_app(callback)
     notifications.send("Installing application...")
     M.currentJobId = xcode.install_app(settings.destination, settings.appPath, function()
       notifications.send("Launching application...")
-      M.currentJobId = xcode.launch_app(settings.destination, settings.bundleId, function()
+      M.currentJobId = xcode.launch_app(settings.destination, settings.bundleId, waitForDebugger, function()
         notifications.send("Application has been launched")
 
         if callback then

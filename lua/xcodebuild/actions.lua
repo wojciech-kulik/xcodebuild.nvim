@@ -55,12 +55,12 @@ end
 
 function M.build_and_run(callback)
   coordinator.cancel()
-  coordinator.build_and_run_app(callback)
+  coordinator.build_and_run_app(false, callback)
 end
 
 function M.run(callback)
   coordinator.cancel()
-  coordinator.run_app(callback)
+  coordinator.run_app(false, callback)
 end
 
 function M.run_tests()
