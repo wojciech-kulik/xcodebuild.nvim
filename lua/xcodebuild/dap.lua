@@ -44,8 +44,12 @@ function M.debug_without_build(callback)
   coordinator.run_app(false, callback)
 end
 
-function M.build_and_run(callback)
-  M.build_and_debug(callback)
+function M.build_and_run()
+  vim.notify(
+    "xcodebuild.dap.build_and_run is deprecated."
+      .. " Please use xcodebuild.dap.build_and_debug. Read `dap` section in README.md for more details.",
+    vim.log.levels.WARN
+  )
 end
 
 function M.get_program_path()
