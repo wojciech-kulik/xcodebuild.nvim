@@ -111,6 +111,10 @@ function M.run_app(waitForDebugger, callback)
     return
   end
 
+  if config.logs.auto_close_on_app_launch then
+    logs.close_logs()
+  end
+
   local settings = projectConfig.settings
 
   if settings.platform == "macOS" then
