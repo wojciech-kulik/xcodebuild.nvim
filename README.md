@@ -174,9 +174,9 @@ return {
       },
     }
 
-    -- sample keymap to build & run the app
+    -- sample keymaps to debug application
     vim.keymap.set("n", "<leader>dd", xcodebuild.build_and_debug, { desc = "Build & Debug" })
-	vim.keymap.set("n", "<leader>dr", xcodebuild.debug_without_build, { desc = "Debug Without Building" })
+    vim.keymap.set("n", "<leader>dr", xcodebuild.debug_without_build, { desc = "Debug Without Building" })
   end,
 }
 ```
