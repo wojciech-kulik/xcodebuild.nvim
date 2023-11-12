@@ -125,6 +125,12 @@ Xcodebuild.nvim comes with the following defaults:
 }
 ```
 
+### Setup Your Neovim For iOS Development
+
+I wrote an article that sums up all steps to set up your Neovim from scratch to develop iOS and macOS apps: 
+
+[The Complete Guide To iOS & macOS Development In Neovim](https://wojciechkulik.pl/ios/the-complete-guide-to-ios-macos-development-in-neovim)
+
 ### DAP Integration
 
 [nvim-dap](https://github.com/mfussenegger/nvim-dap) plugin lets you debug applications like in any other IDE. On top of that [nvim-dap-ui](https://github.com/rcarriga/nvim-dap-ui) extension will present for you all panels with stack, breakpoints, variables, logs, etc.
