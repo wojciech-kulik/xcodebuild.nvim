@@ -49,23 +49,21 @@ end
 
 local function refresh_logs_content()
   local bufnr, winnr = get_buf_and_win_of_logs()
-  if not bufnr then
+  if not bufnr or not winnr then
     return
   end
 
   vim.api.nvim_buf_set_option(bufnr, "modifiable", true)
   vim.api.nvim_buf_set_option(bufnr, "readonly", false)
 
-  if winnr then
-    util.focus_buffer(bufnr)
-    vim.cmd("silent e!")
+  util.focus_buffer(bufnr)
+  vim.cmd("silent e!")
 
-    local linesNumber = #vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
-    vim.api.nvim_win_set_cursor(winnr, { linesNumber, 0 })
+  local linesNumber = #vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
+  vim.api.nvim_win_set_cursor(winnr, { linesNumber, 0 })
 
-    if not config.auto_focus then
-      vim.cmd("wincmd p")
-    end
+  if not config.auto_focus then
+    vim.cmd("wincmd p")
   end
 
   vim.api.nvim_buf_set_option(bufnr, "modifiable", false)
@@ -157,6 +155,13 @@ local function should_show_panel(report)
   return configValue
 end
 
+local function should_close_panel(report)
+  local isTesting = util.is_not_empty(report.tests)
+  local hasErrors = util.is_not_empty(report.buildErrors)
+
+  return not isTesting and not hasErrors and config.auto_close_on_success_build
+end
+
 local function open_test_file(tests)
   if not tests then
     return
@@ -173,7 +178,7 @@ local function open_test_file(tests)
   end
 end
 
-function M.set_logs(report, isTesting)
+function M.set_logs(report, isTesting, callback)
   appdata.write_original_logs(report.output)
 
   format_logs(report.output, function(prettyOutput)
@@ -196,8 +201,15 @@ function M.set_logs(report, isTesting)
 
     if should_show_panel(report) then
       M.open_logs(true)
+    elseif should_close_panel(report) then
+      M.close_logs()
     end
+
     refresh_logs_content()
+
+    if callback then
+      callback()
+    end
   end)
 end
 

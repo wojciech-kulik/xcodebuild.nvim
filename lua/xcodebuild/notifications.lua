@@ -57,6 +57,13 @@ function M.start_action_timer(actionTitle, expectedDuration)
   return timer
 end
 
+function M.stop_build_timer()
+  if buildState.timer then
+    vim.fn.timer_stop(buildState.timer)
+    buildState.timer = nil
+  end
+end
+
 function M.send_build_started(buildForTesting)
   if buildState.timer then
     vim.fn.timer_stop(buildState.timer)

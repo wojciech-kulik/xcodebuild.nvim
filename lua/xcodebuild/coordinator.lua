@@ -206,9 +206,13 @@ function M.build_project(buildForTesting, callback)
       return
     end
 
-    logs.set_logs(M.report, false)
     quickfix.set(M.report)
-    notifications.send_build_finished(M.report, buildId, false)
+
+    notifications.stop_build_timer()
+    notifications.send_progress("Processing logs...")
+    logs.set_logs(M.report, false, function()
+      notifications.send_build_finished(M.report, buildId, false)
+    end)
 
     if callback then
       callback(M.report)
@@ -251,11 +255,14 @@ function M.run_tests(testsToRun)
     end
 
     M.targetsFilesMap = xcode.get_targets_filemap(projectConfig.settings.appPath)
-    logs.set_logs(M.report, true)
     quickfix.set_targets_filemap(M.targetsFilesMap)
     quickfix.set(M.report)
     diagnostics.refresh_all_test_buffers(M.report)
-    notifications.send_tests_finished(M.report, false)
+
+    notifications.send_progress("Processing logs...")
+    logs.set_logs(M.report, true, function()
+      notifications.send_tests_finished(M.report, false)
+    end)
   end
 
   M.currentJobId = xcode.run_tests({

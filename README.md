@@ -93,6 +93,7 @@ Xcodebuild.nvim comes with the following defaults:
     auto_open_on_success_build = true, -- open logs when build succeeded
     auto_open_on_failed_build = true, -- open logs when build failed
     auto_close_on_app_launch = false, -- close logs when app is launched
+    auto_close_on_success_build = false, -- close logs when build succeeded (only if auto_open_on_success_build=false)
     auto_focus = true, -- focus logs buffer when opened
     filetype = "objc", -- file type set for buffer with logs
     open_command = "silent bo split {path} | resize 20", -- command used to open logs panel. You must use {path} variable to load the log file
@@ -127,7 +128,7 @@ Xcodebuild.nvim comes with the following defaults:
 
 ### Setup Your Neovim For iOS Development
 
-I wrote an article that sums up all steps to set up your Neovim from scratch to develop iOS and macOS apps: 
+I wrote an article that sums up all steps to set up your Neovim from scratch to develop iOS and macOS apps:
 
 [The Complete Guide To iOS & macOS Development In Neovim](https://wojciechkulik.pl/ios/the-complete-guide-to-ios-macos-development-in-neovim)
 
