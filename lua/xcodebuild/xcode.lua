@@ -179,6 +179,7 @@ function M.get_testplans(projectCommand, scheme, callback)
 end
 
 function M.build_project(opts)
+  -- stylua: ignore
   local action = opts.buildForTesting and "build-for-testing " or "build "
   local command = "xcodebuild "
     .. action
@@ -191,6 +192,7 @@ function M.build_project(opts)
     .. " -configuration '"
     .. opts.config
     .. "'"
+    .. (string.len(opts.extraBuildArgs) > 0 and " " .. opts.extraBuildArgs or "")
 
   return vim.fn.jobstart(command, {
     stdout_buffered = false,
@@ -337,6 +339,7 @@ function M.kill_app(productName)
 end
 
 function M.run_tests(opts)
+  -- stylua: ignore
   local command = "xcodebuild test -scheme '"
     .. opts.scheme
     .. "' -destination 'id="
@@ -349,6 +352,7 @@ function M.run_tests(opts)
     .. " -configuration '"
     .. opts.config
     .. "'"
+    .. (string.len(opts.extraTestArgs) > 0 and " " .. opts.extraTestArgs or "")
 
   if opts.testsToRun then
     for _, test in ipairs(opts.testsToRun) do

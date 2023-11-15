@@ -230,6 +230,7 @@ function M.build_project(buildForTesting, callback)
     scheme = projectConfig.settings.scheme,
     config = projectConfig.settings.config,
     testPlan = projectConfig.settings.testPlan,
+    extraBuildArgs = config.commands.extra_build_args,
   })
 end
 
@@ -276,6 +277,7 @@ function M.run_tests(testsToRun)
     config = projectConfig.settings.config,
     testPlan = projectConfig.settings.testPlan,
     testsToRun = testsToRun,
+    extraTestArgs = config.commands.extra_test_args,
   })
 end
 

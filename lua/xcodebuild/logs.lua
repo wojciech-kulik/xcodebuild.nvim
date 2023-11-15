@@ -32,7 +32,7 @@ end
 local function format_logs(lines, callback)
   if config.only_summary then
     callback({})
-  elseif config.logs_formatter then
+  elseif config.logs_formatter and string.len(config.logs_formatter) > 0 then
     local logs_filepath = appdata.original_logs_filepath
     local command = "cat '" .. logs_filepath .. "' | " .. config.logs_formatter
 
