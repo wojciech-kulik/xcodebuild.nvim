@@ -59,6 +59,7 @@ end
 
 function M.stop_build_timer()
   if buildState.timer then
+    buildState.buildDuration = os.difftime(os.time(), buildState.startTime)
     vim.fn.timer_stop(buildState.timer)
     buildState.timer = nil
   end
@@ -92,7 +93,7 @@ function M.send_build_finished(report, id, isCancelled)
   if isCancelled then
     M.send_warning("Build cancelled")
   elseif util.is_empty(report.buildErrors) then
-    local duration = os.difftime(os.time(), buildState.startTime)
+    local duration = buildState.buildDuration
 
     if not buildState.buildForTesting then
       local projectConfig = require("xcodebuild.project_config")
