@@ -145,6 +145,8 @@ function M.send_project_settings(settings)
 
       - project: ]] .. settings.projectFile .. [[
 
+      - xcodeproj: ]] .. (settings.xcodeproj or "-") .. [[
+
       - scheme: ]] .. settings.scheme .. [[
 
       - config: ]] .. settings.config .. [[

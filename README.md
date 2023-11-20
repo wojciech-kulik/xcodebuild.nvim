@@ -275,10 +275,11 @@ Sample `settings.json`:
   "platform": "iOS",
   "testPlan": "UnitTests",
   "config": "Debug",
+  "xcodeproj": "/path/to/project/App.xcodeproj",
+  "projectFile": "/path/to/project/App.xcworkspace",
   "projectCommand": "-workspace '/path/to/project/App.xcworkspace'",
   "bundleId": "com.company.bundle-id",
   "destination": "00006000-000C58DC1ED8801E",
-  "projectFile": "/path/to/project/App.xcworkspace",
   "productName": "App",
   "scheme": "App",
   "appPath": "/Users/YOU/Library/Developer/Xcode/DerivedData/App-abafsafasdfasdf/Build/Products/Debug/App.app"
@@ -287,6 +288,7 @@ Sample `settings.json`:
 
 - `platform` - `macOS` or `iOS`
 - `destination` - simulator ID
+- `projectFile` / `projectCommand` - can be `xcodeproj` or `xcworkspace`, the main project file that you use
 
 ## ⏳ Things To Do
 

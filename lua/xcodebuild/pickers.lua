@@ -98,6 +98,53 @@ function M.show(title, items, callback, opts)
   activePicker:find()
 end
 
+function M.select_xcodeproj_if_needed(callback, opts)
+  if projectConfig.settings.xcodeproj then
+    if callback then
+      callback(projectConfig.settings.xcodeproj)
+    end
+    return
+  end
+
+  local projectFile = projectConfig.settings.projectFile
+  local xcodeproj = string.gsub(projectFile, ".xcworkspace", ".xcodeproj")
+
+  if util.file_exists(xcodeproj) then
+    projectConfig.settings.xcodeproj = xcodeproj
+    projectConfig.save_settings()
+
+    if callback then
+      callback(xcodeproj)
+    end
+  else
+    M.select_xcodeproj(callback, opts)
+  end
+end
+
+function M.select_xcodeproj(callback, opts)
+  local sanitizedFiles = {}
+  local filenames = {}
+  local files = util.shell("find '" .. vim.fn.getcwd() .. "' -iname '*.xcodeproj'" .. " -not -path '*/.*'")
+
+  for _, file in ipairs(files) do
+    if util.trim(file) ~= "" then
+      table.insert(sanitizedFiles, file)
+      table.insert(filenames, string.match(file, ".*%/([^/]*)$"))
+    end
+  end
+
+  M.show("Select Project", filenames, function(_, index)
+    local selectedFile = sanitizedFiles[index]
+
+    projectConfig.settings.xcodeproj = selectedFile
+    projectConfig.save_settings()
+
+    if callback then
+      callback(selectedFile)
+    end
+  end, opts)
+end
+
 function M.select_project(callback, opts)
   local sanitizedFiles = {}
   local filenames = {}
@@ -115,14 +162,16 @@ function M.select_project(callback, opts)
     end
   end
 
-  M.show("Select Project/Workspace", filenames, function(_, index)
+  M.show("Select Main Xcworkspace or Xcodeproj", filenames, function(_, index)
     local projectFile = sanitizedFiles[index]
     local isWorkspace = util.has_suffix(projectFile, "xcworkspace")
 
+    projectConfig.settings.xcodeproj = not isWorkspace and projectFile
     projectConfig.settings.projectFile = projectFile
     projectConfig.settings.projectCommand = (isWorkspace and "-workspace '" or "-project '")
       .. projectFile
       .. "'"
+
     projectConfig.save_settings()
 
     if callback then
@@ -146,8 +195,8 @@ function M.select_scheme(schemes, callback, opts)
   end, opts)
 
   if util.is_empty(schemes) then
-    local projectCommand = projectConfig.settings.projectCommand
-    currentJobId = xcode.get_project_information(projectCommand, function(info)
+    local xcodeproj = projectConfig.settings.xcodeproj
+    currentJobId = xcode.get_project_information(xcodeproj, function(info)
       update_results(info.schemes)
     end)
 
@@ -156,7 +205,7 @@ function M.select_scheme(schemes, callback, opts)
 end
 
 function M.select_config(callback, opts)
-  local projectCommand = projectConfig.settings.projectCommand
+  local xcodeproj = projectConfig.settings.xcodeproj
   local projectInfo = nil
 
   start_telescope_spinner()
@@ -169,7 +218,7 @@ function M.select_config(callback, opts)
     end
   end, opts)
 
-  currentJobId = xcode.get_project_information(projectCommand, function(info)
+  currentJobId = xcode.get_project_information(xcodeproj, function(info)
     projectInfo = info
     update_results(info.configs)
   end)
