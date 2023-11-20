@@ -8,6 +8,7 @@ local xcode = require("xcodebuild.xcode")
 local logs = require("xcodebuild.logs")
 local diagnostics = require("xcodebuild.diagnostics")
 local config = require("xcodebuild.config").options
+local snapshots = require("xcodebuild.snapshots")
 
 local M = {
   report = {},
@@ -194,6 +195,7 @@ function M.build_project(buildForTesting, callback)
 
   local buildId = notifications.send_build_started(buildForTesting)
   M.auto_save()
+  snapshots.delete_snapshots()
   parser.clear()
 
   local on_stdout = function(_, output)
@@ -241,6 +243,7 @@ function M.run_tests(testsToRun)
 
   notifications.send_tests_started()
   M.auto_save()
+  snapshots.delete_snapshots()
   parser.clear()
 
   local on_stdout = function(_, output)
@@ -262,7 +265,14 @@ function M.run_tests(testsToRun)
 
     notifications.send_progress("Processing logs...")
     logs.set_logs(M.report, true, function()
-      notifications.send_tests_finished(M.report, false)
+      if M.report.failedTestsCount > 0 and config.prepare_snapshot_test_previews then
+        notifications.send_progress("Processing snapshots...")
+        snapshots.save_failing_snapshots(function()
+          notifications.send_tests_finished(M.report, false)
+        end)
+      else
+        notifications.send_tests_finished(M.report, false)
+      end
     end)
   end
 
@@ -401,6 +411,15 @@ function M.run_selected_tests(opts)
   else
     start()
   end
+end
+
+function M.show_failing_snapshot_tests()
+  if not validate_project() then
+    return
+  end
+
+  local pickers = require("xcodebuild.pickers")
+  pickers.select_failing_snapshot_test()
 end
 
 function M.configure_project()

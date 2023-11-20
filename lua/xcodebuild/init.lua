@@ -28,6 +28,11 @@ function M.setup(options)
   vim.api.nvim_create_user_command("XcodebuildTestFunc", call(actions.run_func_test), { nargs = 0 })
   vim.api.nvim_create_user_command("XcodebuildTestSelected", call(actions.run_selected_tests), { nargs = 0 })
   vim.api.nvim_create_user_command("XcodebuildTestFailing", call(actions.run_failing_tests), { nargs = 0 })
+  vim.api.nvim_create_user_command(
+    "XcodebuildFailingSnapshots",
+    call(actions.show_failing_snapshot_tests),
+    { nargs = 0 }
+  )
 
   -- Pickers
   vim.api.nvim_create_user_command("XcodebuildSetup", call(actions.configure_project), { nargs = 0 })

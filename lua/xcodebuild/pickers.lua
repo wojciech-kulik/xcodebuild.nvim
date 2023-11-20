@@ -2,6 +2,7 @@ local xcode = require("xcodebuild.xcode")
 local projectConfig = require("xcodebuild.project_config")
 local util = require("xcodebuild.util")
 local notifications = require("xcodebuild.notifications")
+local snapshots = require("xcodebuild.snapshots")
 
 local telescopePickers = require("telescope.pickers")
 local telescopeFinders = require("telescope.finders")
@@ -261,6 +262,22 @@ function M.select_destination(callback, opts)
   return currentJobId
 end
 
+function M.select_failing_snapshot_test()
+  local snapshots = require("xcodebuild.snapshots")
+  local failingSnapshots = snapshots.get_failing_snapshots()
+  local filenames = util.select(failingSnapshots, function(item)
+    return util.get_filename(item)
+  end)
+
+  require("xcodebuild.pickers").show("Failing Snapshot Tests", filenames, function(_, index)
+    local selectedFile = failingSnapshots[index]
+    vim.fn.jobstart("qlmanage -p '" .. selectedFile .. "'", {
+      detach = true,
+      on_exit = function() end,
+    })
+  end)
+end
+
 function M.show_all_actions()
   local actions = require("xcodebuild.actions")
   local actionsNames = {
@@ -321,6 +338,13 @@ function M.show_all_actions()
   if not projectConfig.is_project_configured() then
     actionsNames = { "Show Configuration Wizard " }
     actionsPointers = { actions.configure_project }
+  end
+
+  if require("xcodebuild.config").options.prepare_snapshot_test_previews then
+    if #snapshots.get_failing_snapshots() > 0 then
+      table.insert(actionsNames, 10, "Preview Failing Snapshot Tests")
+      table.insert(actionsPointers, 10, actions.show_failing_snapshot_tests)
+    end
   end
 
   M.show("Xcodebuild Actions", actionsNames, function(_, index)

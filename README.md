@@ -33,6 +33,7 @@ It is also my first Neovim plugin. Hopefully, a good one 😁.
 - [x] Showing test errors in diagnostics and on the quickfix list.
 - [x] Showing build errors and warnings on the quickfix list.
 - [x] Showing build progress bar based on the previous build time.
+- [x] Showing preview of failed snapshot tests (if you use [swift-snapshot-testing](https://github.com/pointfreeco/swift-snapshot-testing))
 - [x] Advanced log parser to detect all errors, warnings, and failing tests and to present them nicely formatted.
 - [x] Auto saving files before build or test actions.
 - [x] [nvim-dap](https://github.com/mfussenegger/nvim-dap) helper functions to let you easily build, run, and attach the debugger.
@@ -87,6 +88,7 @@ Xcodebuild.nvim comes with the following defaults:
   restore_on_start = true, -- logs, diagnostics, and marks will be loaded on VimEnter (may affect performance)
   auto_save = true, -- save all buffers before running build or tests (command: silent wa!)
   show_build_progress_bar = true, -- shows [ ...    ] progress bar during build, based on the last duration
+  prepare_snapshot_test_previews = true, -- prepares a list with failing snapshot tests
   commands = {
     extra_build_args = "-parallelizeTargets", -- extra arguments for `xcodebuild build`
     extra_test_args = "-parallelizeTargets", -- extra arguments for `xcodebuild test`
@@ -203,30 +205,31 @@ Make sure to open your project's root directory in Neovim and run `XcodebuildSet
 
 Xcodebuild.nvim comes with the following commands:
 
-| Command                    | Description                                              |
-| -------------------------- | -------------------------------------------------------- |
-| `XcodebuildSetup`          | Run configuration wizard to select project configuration |
-| `XcodebuildPicker`         | Show picker with all available actions                   |
-| `XcodebuildBuild`          | Build project                                            |
-| `XcodebuildBuildRun`       | Build & run app                                          |
-| `XcodebuildRun`            | Run app without building                                 |
-| `XcodebuildCancel`         | Cancel currently running action                          |
-| `XcodebuildTest`           | Run tests (whole test plan)                              |
-| `XcodebuildTestClass`      | Run test class (where the cursor is)                     |
-| `XcodebuildTestFunc`       | Run test (where the cursor is)                           |
-| `XcodebuildTestSelected`   | Run selected tests (using visual mode)                   |
-| `XcodebuildTestFailing`    | Rerun previously failed tests                            |
-| `XcodebuildSelectProject`  | Show project file picker                                 |
-| `XcodebuildSelectScheme`   | Show scheme picker                                       |
-| `XcodebuildSelectConfig`   | Show build configuration picker                          |
-| `XcodebuildSelectDevice`   | Show device picker                                       |
-| `XcodebuildSelectTestPlan` | Show test plan picker                                    |
-| `XcodebuildToggleLogs`     | Toggle logs panel                                        |
-| `XcodebuildOpenLogs`       | Open logs panel                                          |
-| `XcodebuildCloseLogs`      | Close logs panel                                         |
-| `XcodebuildShowConfig`     | Print current project configuration                      |
-| `XcodebuildBootSimulator`  | Boot selected simulator                                  |
-| `XcodebuildUninstall`      | Uninstall mobile app                                     |
+| Command                      | Description                                              |
+| ---------------------------- | -------------------------------------------------------- |
+| `XcodebuildSetup`            | Run configuration wizard to select project configuration |
+| `XcodebuildPicker`           | Show picker with all available actions                   |
+| `XcodebuildBuild`            | Build project                                            |
+| `XcodebuildBuildRun`         | Build & run app                                          |
+| `XcodebuildRun`              | Run app without building                                 |
+| `XcodebuildCancel`           | Cancel currently running action                          |
+| `XcodebuildTest`             | Run tests (whole test plan)                              |
+| `XcodebuildTestClass`        | Run test class (where the cursor is)                     |
+| `XcodebuildTestFunc`         | Run test (where the cursor is)                           |
+| `XcodebuildTestSelected`     | Run selected tests (using visual mode)                   |
+| `XcodebuildTestFailing`      | Rerun previously failed tests                            |
+| `XcodebuildFailingSnapshots` | Shows a picker with failing snapshot tests               |
+| `XcodebuildSelectProject`    | Show project file picker                                 |
+| `XcodebuildSelectScheme`     | Show scheme picker                                       |
+| `XcodebuildSelectConfig`     | Show build configuration picker                          |
+| `XcodebuildSelectDevice`     | Show device picker                                       |
+| `XcodebuildSelectTestPlan`   | Show test plan picker                                    |
+| `XcodebuildToggleLogs`       | Toggle logs panel                                        |
+| `XcodebuildOpenLogs`         | Open logs panel                                          |
+| `XcodebuildCloseLogs`        | Close logs panel                                         |
+| `XcodebuildShowConfig`       | Print current project configuration                      |
+| `XcodebuildBootSimulator`    | Boot selected simulator                                  |
+| `XcodebuildUninstall`        | Uninstall mobile app                                     |
 
 Sample key bindings:
 
@@ -241,12 +244,19 @@ vim.keymap.set("n", "<leader>X", "<cmd>XcodebuildPicker<cr>", { desc = "Show All
 vim.keymap.set("n", "<leader>xd", "<cmd>XcodebuildSelectDevice<cr>", { desc = "Select Device" })
 vim.keymap.set("n", "<leader>xp", "<cmd>XcodebuildSelectTestPlan<cr>", { desc = "Select Test Plan" })
 vim.keymap.set("n", "<leader>xq", "<cmd>Telescope quickfix<cr>", { desc = "Show QuickFix List" })
+vim.keymap.set("n", "<leader>xs", "<cmd>XcodebuildFailingSnapshots<cr>", { desc = "Show Failing Snapshots" })
 ```
 
 ### Logs Panel Key Bindings
 
 - Press `o` on a failed test (in summary section) to jump to failing place.
 - Press `q` to close the panel.
+
+### Snapshot Tests Preview
+
+This plugin also offers a nice list with failing snapshot tests. For each tests the plugin generates a preview image combining reference image, failure image, and difference image into one. It works with [swift-snapshot-testing](https://github.com/pointfreeco/swift-snapshot-testing) library.
+
+![Xcodebuild Snapshots](./media/snapshots.png)
 
 ### API
 

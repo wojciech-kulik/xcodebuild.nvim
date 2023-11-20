@@ -5,6 +5,7 @@ local defaults = {
   restore_on_start = true, -- logs, diagnostics, and marks will be loaded on VimEnter (may affect performance)
   auto_save = true, -- save all buffers before running build or tests (command: silent wa!)
   show_build_progress_bar = true, -- shows [ ...    ] progress bar during build, based on the last duration
+  prepare_snapshot_test_previews = true, -- prepares a list with failing snapshot tests
   commands = {
     extra_build_args = "-parallelizeTargets", -- extra arguments for `xcodebuild build`
     extra_test_args = "-parallelizeTargets", -- extra arguments for `xcodebuild test`

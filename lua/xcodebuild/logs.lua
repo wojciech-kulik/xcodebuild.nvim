@@ -85,7 +85,7 @@ local function insert_test_results(report, prettyOutput)
       end
     end
     table.insert(prettyOutput, "")
-    table.insert(prettyOutput, "  ✖ " .. report.failedTestsCount .. " Test(s) Failed")
+    table.insert(prettyOutput, "  " .. report.failedTestsCount .. " Test(s) Failed")
     table.insert(prettyOutput, "")
   else
     table.insert(prettyOutput, "  ✔ All Tests Passed [Executed: " .. report.testsCount .. "]")
@@ -142,7 +142,7 @@ local function insert_errors(prettyOutput, buildErrors)
     end
   end
   table.insert(prettyOutput, "")
-  table.insert(prettyOutput, "  ✖ Build Failed")
+  table.insert(prettyOutput, "  Build Failed")
   table.insert(prettyOutput, "")
 end
 

@@ -146,4 +146,8 @@ function M.boot_simulator(callback)
   coordinator.boot_simulator(callback)
 end
 
+function M.show_failing_snapshot_tests()
+  coordinator.show_failing_snapshot_tests()
+end
+
 return M
