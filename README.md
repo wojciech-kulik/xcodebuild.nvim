@@ -254,7 +254,9 @@ vim.keymap.set("n", "<leader>xs", "<cmd>XcodebuildFailingSnapshots<cr>", { desc 
 
 ### Snapshot Tests Preview
 
-This plugin also offers a nice list with failing snapshot tests. For each tests the plugin generates a preview image combining reference image, failure image, and difference image into one. It works with [swift-snapshot-testing](https://github.com/pointfreeco/swift-snapshot-testing) library.
+This plugin offers a nice list of failing snapshot tests. For each test it generates a preview image combining reference, failure, and difference images into one. It works with [swift-snapshot-testing](https://github.com/pointfreeco/swift-snapshot-testing) library.
+
+Run `:XcodebuildFailingSnapshots` to see the list.
 
 ![Xcodebuild Snapshots](./media/snapshots.png)
 
