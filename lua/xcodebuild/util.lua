@@ -23,6 +23,17 @@ function M.get_buffers(opts)
   return result
 end
 
+function M.file_exists(name)
+  local f = io.open(name, "r")
+
+  if f ~= nil then
+    io.close(f)
+    return true
+  end
+
+  return false
+end
+
 function M.get_buf_by_name(name, opts)
   local allBuffers = M.get_buffers(opts)
 

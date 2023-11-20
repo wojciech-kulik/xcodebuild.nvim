@@ -101,14 +101,8 @@ function M.get_schemes(projectCommand, callback)
   })
 end
 
-function M.get_project_information(projectCommand, callback)
-  -- for this command we need xcodeproj, not xcworkspace
-  if string.find(projectCommand, "-workspace") then
-    projectCommand = string.gsub(projectCommand, "-workspace", "-project")
-    projectCommand = string.gsub(projectCommand, "%.xcworkspace", ".xcodeproj")
-  end
-
-  local command = "xcodebuild " .. projectCommand .. " -list"
+function M.get_project_information(xcodeproj, callback)
+  local command = "xcodebuild -project '" .. xcodeproj .. "' -list"
 
   return vim.fn.jobstart(command, {
     stdout_buffered = true,

@@ -99,23 +99,31 @@ end
 function M.select_project(callback)
   coordinator.cancel()
   pickers.select_project(function()
-    update_settings(callback)
+    pickers.select_xcodeproj_if_needed(function()
+      update_settings(callback)
+    end, { close_on_select = true })
   end, { close_on_select = true })
 end
 
 function M.select_scheme(callback)
   defer_send("Loading schemes...")
   coordinator.cancel()
-  pickers.select_scheme(nil, function()
-    update_settings(callback)
+
+  pickers.select_xcodeproj_if_needed(function()
+    pickers.select_scheme(nil, function()
+      update_settings(callback)
+    end, { close_on_select = true })
   end, { close_on_select = true })
 end
 
 function M.select_config(callback)
   defer_send("Loading schemes...")
   coordinator.cancel()
-  pickers.select_config(function()
-    update_settings(callback)
+
+  pickers.select_xcodeproj_if_needed(function()
+    pickers.select_config(function()
+      update_settings(callback)
+    end, { close_on_select = true })
   end, { close_on_select = true })
 end
 
