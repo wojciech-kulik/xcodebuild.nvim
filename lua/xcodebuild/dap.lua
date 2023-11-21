@@ -44,14 +44,6 @@ function M.debug_without_build(callback)
   coordinator.run_app(false, callback)
 end
 
-function M.build_and_run()
-  vim.notify(
-    "xcodebuild.dap.build_and_run is deprecated."
-      .. " Please use xcodebuild.dap.build_and_debug. Read `dap` section in README.md for more details.",
-    vim.log.levels.WARN
-  )
-end
-
 function M.get_program_path()
   if projectConfig.settings.platform == "macOS" then
     return projectConfig.settings.appPath .. "/Contents/MacOS/" .. projectConfig.settings.productName
