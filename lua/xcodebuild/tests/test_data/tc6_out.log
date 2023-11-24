@@ -119,5 +119,6 @@
   output = {},
   tests = {},
   testsCount = 0,
-  warnings = {}
+  warnings = {},
+  xcresultFilepath = "/Users/john/Library/Developer/Xcode/DerivedData/CalendarAppDemo-gpxsuartkqsliqafuudvbkhotrhj/Logs/Test/Test-CalendarAppDemo-2023.10.31_18-26-38-+0100.xcresult"
 }

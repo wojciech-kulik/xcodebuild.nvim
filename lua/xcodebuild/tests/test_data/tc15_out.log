@@ -3114,5 +3114,6 @@
       filepath = "/Users/john/repositories/calendar-app-ios/DemoApp/CalendarEventDemo/Modules/Main/MainViewModel.swift",
       lineNumber = 58,
       message = { "string interpolation produces a debug description for an optional value; did you mean to make this explicit?", '        print("aa \\(b)")', "                    ^" }
-    } }
+    } },
+  xcresultFilepath = "/Users/john/Library/Developer/Xcode/DerivedData/CalendarEventDemo-gpxsuartkqsliqafuudvbkhotrhj/Logs/Test/Test-CalendarEventDemo-2023.11.03_21-55-24-+0100.xcresult"
 }

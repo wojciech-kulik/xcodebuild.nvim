@@ -3110,5 +3110,6 @@
       } }
   },
   testsCount = 377,
-  warnings = {}
+  warnings = {},
+  xcresultFilepath = "/Users/john/Library/Developer/Xcode/DerivedData/CalendarAppDemo-gpxsuartkqsliqafuudvbkhotrhj/Logs/Test/Test-CalendarAppDemo-2023.10.31_18-54-39-+0100.xcresult"
 }

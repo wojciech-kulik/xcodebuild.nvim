@@ -7,6 +7,14 @@ M.original_logs_filename = "original_logs.log"
 M.original_logs_filepath = M.appdir .. "/" .. M.original_logs_filename
 M.build_logs_filename = "xcodebuild.log"
 M.build_logs_filepath = M.appdir .. "/" .. M.build_logs_filename
+M.snapshots_dir = M.appdir .. "/failing-snapshots"
+
+GETSNAPSHOTS_TOOL = "getsnapshots"
+
+function M.tool_path(name)
+  local pathComponents = vim.split(debug.getinfo(1).source:sub(2), "/", { plain = true })
+  return table.concat(pathComponents, "/", 1, #pathComponents - 3) .. "/tools/" .. name
+end
 
 function M.create_app_dir()
   util.shell("mkdir -p .nvim/xcodebuild")

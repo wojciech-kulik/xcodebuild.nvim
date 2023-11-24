@@ -267,7 +267,7 @@ function M.run_tests(testsToRun)
     logs.set_logs(M.report, true, function()
       if M.report.failedTestsCount > 0 and config.prepare_snapshot_test_previews then
         notifications.send_progress("Processing snapshots...")
-        snapshots.save_failing_snapshots(function()
+        snapshots.save_failing_snapshots(M.report.xcresultFilepath, function()
           notifications.send_tests_finished(M.report, false)
         end)
       else

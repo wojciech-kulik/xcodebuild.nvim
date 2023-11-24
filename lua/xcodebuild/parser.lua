@@ -23,6 +23,7 @@ local output = {}
 local buildErrors = {}
 local warnings = {}
 local diagnostics = {}
+local xcresultFilepath = nil
 
 local function flush_test(message)
   if message then
@@ -250,6 +251,8 @@ local function process_line(line)
     flush()
   elseif string.find(line, "^Linting") or string.find(line, "^note%:") then
     flush()
+  elseif string.find(line, "%.xcresult$") then
+    xcresultFilepath = string.match(line, "%s*(.*[^%.%/]+%.xcresult)")
   elseif lineType == TEST_ERROR or lineType == BUILD_ERROR or lineType == BUILD_WARNING then
     table.insert(lineData.message, line)
   end
@@ -268,6 +271,7 @@ function M.clear()
   buildErrors = {}
   warnings = {}
   diagnostics = {}
+  xcresultFilepath = nil
 end
 
 function M.parse_logs(logLines)
@@ -283,6 +287,7 @@ function M.parse_logs(logLines)
     buildErrors = buildErrors,
     warnings = warnings,
     diagnostics = diagnostics,
+    xcresultFilepath = xcresultFilepath,
   }
 end
 

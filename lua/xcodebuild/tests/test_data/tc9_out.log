@@ -8,5 +8,6 @@
   output = {},
   tests = {},
   testsCount = 0,
-  warnings = {}
+  warnings = {},
+  xcresultFilepath = "2023-10-31 18:28:04.386 xcodebuild[76912:12819493] Writing error result bundle to /var/folders/c3/fn8391xj715ccg2w6bcv8s8w0000gn/T/ResultBundle_2023-31-10_18-28-0004.xcresult"
 }

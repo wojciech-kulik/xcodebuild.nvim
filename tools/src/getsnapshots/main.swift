@@ -36,35 +36,6 @@ func shell(_ command: String) -> String {
     return output
 }
 
-let summary = Summary(
-    resultPaths: [xcresultPath],
-    renderingMode: .inline,
-    downsizeImagesEnabled: false,
-    downsizeScaleFactor: 1.0
-)
-let failedTests = summary.getFailingSnapshotTests()
-
-var allTasks: [Task<(), Never>] = []
-
-for test in failedTests {
-    let sanitizedName = test.id
-        .replacingOccurrences(of: "(", with: "")
-        .replacingOccurrences(of: ")", with: "")
-        .replacingOccurrences(of: "/", with: "_")
-    allTasks.append(Task {
-        mergeImages(
-            image1: test.referenceImage,
-            image2: test.failureImage,
-            image3: test.diffImage,
-            outputPath: "\(outputDir)/\(sanitizedName).png"
-        )
-    })
-}
-
-for task in allTasks {
-    _ = await task.result
-}
-
 func mergeImages(image1: Data?, image2: Data?, image3: Data?, outputPath: String) {
     guard let image1, let image2, let image3 else { return }
 
@@ -147,4 +118,35 @@ extension NSImage {
             print("\(self) Error Function '\(#function)' Line: \(#line) \(error.localizedDescription)")
         }
     }
+}
+
+// MARK: - Execution
+
+let summary = Summary(
+    resultPaths: [xcresultPath],
+    renderingMode: .inline,
+    downsizeImagesEnabled: false,
+    downsizeScaleFactor: 1.0
+)
+let failingSnapshotTests = summary.getFailingSnapshotTests()
+
+var allTasks: [Task<(), Never>] = []
+
+for test in failingSnapshotTests {
+    let sanitizedName = test.id
+        .replacingOccurrences(of: "(", with: "")
+        .replacingOccurrences(of: ")", with: "")
+        .replacingOccurrences(of: "/", with: "_")
+    allTasks.append(Task {
+        mergeImages(
+            image1: test.referenceImage,
+            image2: test.failureImage,
+            image3: test.diffImage,
+            outputPath: "\(outputDir)/\(sanitizedName).png"
+        )
+    })
+}
+
+for task in allTasks {
+    _ = await task.result
 }

@@ -8,7 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		1608BFE82B0AD25900645759 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1608BFE72B0AD25900645759 /* main.swift */; };
-		1608BFF02B0AD29E00645759 /* xchtmlreportcore in Frameworks */ = {isa = PBXBuildFile; productRef = 1608BFEF2B0AD29E00645759 /* xchtmlreportcore */; };
+		16C2D9662B0ED6A600FABB86 /* xchtmlreportcore in Frameworks */ = {isa = PBXBuildFile; productRef = 16C2D9652B0ED6A600FABB86 /* xchtmlreportcore */; };
+		16C2D9692B0ED71A00FABB86 /* xchtmlreportcore in Frameworks */ = {isa = PBXBuildFile; productRef = 16C2D9682B0ED71A00FABB86 /* xchtmlreportcore */; };
+		16C2D96C2B0ED7AA00FABB86 /* xchtmlreportcore in Frameworks */ = {isa = PBXBuildFile; productRef = 16C2D96B2B0ED7AA00FABB86 /* xchtmlreportcore */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -33,7 +35,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1608BFF02B0AD29E00645759 /* xchtmlreportcore in Frameworks */,
+				16C2D9662B0ED6A600FABB86 /* xchtmlreportcore in Frameworks */,
+				16C2D96C2B0ED7AA00FABB86 /* xchtmlreportcore in Frameworks */,
+				16C2D9692B0ED71A00FABB86 /* xchtmlreportcore in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -81,7 +85,9 @@
 			);
 			name = getsnapshots;
 			packageProductDependencies = (
-				1608BFEF2B0AD29E00645759 /* xchtmlreportcore */,
+				16C2D9652B0ED6A600FABB86 /* xchtmlreportcore */,
+				16C2D9682B0ED71A00FABB86 /* xchtmlreportcore */,
+				16C2D96B2B0ED7AA00FABB86 /* xchtmlreportcore */,
 			);
 			productName = getsnapshots;
 			productReference = 1608BFE42B0AD25900645759 /* getsnapshots */;
@@ -112,7 +118,7 @@
 			);
 			mainGroup = 1608BFDB2B0AD25900645759;
 			packageReferences = (
-				1608BFEE2B0AD29E00645759 /* XCRemoteSwiftPackageReference "XCTestHTMLReport" */,
+				16C2D96A2B0ED7AA00FABB86 /* XCRemoteSwiftPackageReference "XCTestHTMLReport" */,
 			);
 			productRefGroup = 1608BFE52B0AD25900645759 /* Products */;
 			projectDirPath = "";
@@ -301,7 +307,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		1608BFEE2B0AD29E00645759 /* XCRemoteSwiftPackageReference "XCTestHTMLReport" */ = {
+		16C2D96A2B0ED7AA00FABB86 /* XCRemoteSwiftPackageReference "XCTestHTMLReport" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/wojciech-kulik/XCTestHTMLReport";
 			requirement = {
@@ -312,9 +318,17 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		1608BFEF2B0AD29E00645759 /* xchtmlreportcore */ = {
+		16C2D9652B0ED6A600FABB86 /* xchtmlreportcore */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 1608BFEE2B0AD29E00645759 /* XCRemoteSwiftPackageReference "XCTestHTMLReport" */;
+			productName = xchtmlreportcore;
+		};
+		16C2D9682B0ED71A00FABB86 /* xchtmlreportcore */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = xchtmlreportcore;
+		};
+		16C2D96B2B0ED7AA00FABB86 /* xchtmlreportcore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 16C2D96A2B0ED7AA00FABB86 /* XCRemoteSwiftPackageReference "XCTestHTMLReport" */;
 			productName = xchtmlreportcore;
 		};
 /* End XCSwiftPackageProductDependency section */
