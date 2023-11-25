@@ -302,6 +302,14 @@ function M.boot_simulator(destination, callback)
       if code ~= 0 then
         notifications.send_error("Could not boot simulator (code: " .. code .. ")")
       else
+        local output = util.shell("xcode-select -p")
+        if util.is_not_empty(output) then
+          vim.fn.jobstart(output[1] .. "/Applications/Simulator.app/Contents/MacOS/Simulator", {
+            detach = true,
+            on_exit = function() end,
+          })
+        end
+
         callback()
       end
     end,
