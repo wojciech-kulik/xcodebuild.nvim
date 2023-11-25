@@ -270,6 +270,8 @@ function M.select_destination(callback, opts)
   M.show("Select Device", {}, function(_, index)
     projectConfig.settings.destination = results[index].id
     projectConfig.settings.platform = results[index].platform
+    projectConfig.settings.deviceName = results[index].name
+    projectConfig.settings.os = results[index].os
     projectConfig.save_settings()
 
     if callback then
@@ -312,7 +314,6 @@ function M.select_destination(callback, opts)
 end
 
 function M.select_failing_snapshot_test()
-  local snapshots = require("xcodebuild.snapshots")
   local failingSnapshots = snapshots.get_failing_snapshots()
   local filenames = util.select(failingSnapshots, function(item)
     return util.get_filename(item)
@@ -392,7 +393,7 @@ function M.show_all_actions()
   end
 
   if require("xcodebuild.config").options.prepare_snapshot_test_previews then
-    if #snapshots.get_failing_snapshots() > 0 then
+    if util.is_not_empty(snapshots.get_failing_snapshots()) then
       table.insert(actionsNames, 11, "Preview Failing Snapshot Tests")
       table.insert(actionsPointers, 11, actions.show_failing_snapshot_tests)
     end

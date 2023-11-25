@@ -150,6 +150,10 @@ function M.send_project_settings(settings)
 
       - config: ]] .. settings.config .. [[
 
+      - device: ]] .. (settings.deviceName or settings.platform or "-") .. [[
+
+      - osVersion: ]] .. (settings.os or "-") .. [[
+
       - destination: ]] .. settings.destination .. [[
 
       - testPlan: ]] .. (settings.testPlan or "") .. [[
