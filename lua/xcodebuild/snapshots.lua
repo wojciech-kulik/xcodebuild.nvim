@@ -35,7 +35,7 @@ end
 
 function M.get_failing_snapshots()
   return util.filter(
-    util.shell("find '" .. appdata.snapshots_dir .. "' -type f -iname '*.png'"),
+    util.shell("find '" .. appdata.snapshots_dir .. "' -type f -iname '*.png' 2>/dev/null"),
     function(item)
       return item ~= ""
     end
