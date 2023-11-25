@@ -35,6 +35,7 @@ It is also my first Neovim plugin. Hopefully, a good one 😁.
 - [x] Advanced log parser to detect all errors, warnings, and failing tests and to present them nicely formatted.
 - [x] Auto saving files before build or test actions.
 - [x] [nvim-dap](https://github.com/mfussenegger/nvim-dap) helper functions to let you easily build, run, and attach the debugger.
+- [x] [lualine.nvim](https://github.com/nvim-lualine/lualine.nvim) integration to show current device and settings.
 - [x] [telescope.nvim](https://github.com/nvim-telescope/telescope.nvim) integration to show pickers with selectable project options.
 - [x] Picker with all available actions.
 
