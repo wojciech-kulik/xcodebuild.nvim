@@ -247,6 +247,7 @@ Xcodebuild.nvim comes with the following commands:
 | `XcodebuildToggleLogs`       | Toggle logs panel                                        |
 | `XcodebuildOpenLogs`         | Open logs panel                                          |
 | `XcodebuildCloseLogs`        | Close logs panel                                         |
+| `XcodebuildCleanDerivedData` | Deletes project's DerivedData                            |
 | `XcodebuildShowConfig`       | Print current project configuration                      |
 | `XcodebuildBootSimulator`    | Boot selected simulator                                  |
 | `XcodebuildUninstall`        | Uninstall mobile app                                     |

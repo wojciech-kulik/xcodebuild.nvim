@@ -369,6 +369,7 @@ function M.show_all_actions()
     "Open Logs",
     "Close Logs",
 
+    "Clean DerivedData",
     "Show Current Configuration",
     "Show Configuration Wizard",
     "Boot Selected Simulator",
@@ -397,6 +398,7 @@ function M.show_all_actions()
     actions.open_logs,
     actions.close_logs,
 
+    actions.clean_derived_data,
     actions.show_current_config,
     actions.configure_project,
     actions.boot_simulator,

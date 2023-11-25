@@ -420,6 +420,31 @@ function M.show_failing_snapshot_tests()
   pickers.select_failing_snapshot_test()
 end
 
+function M.clean_derived_data()
+  local appPath = projectConfig.settings.appPath
+  if not appPath then
+    notifications.send_error("Could not detect DerivedData. Please build project.")
+    return
+  end
+
+  local derivedDataPath = string.match(appPath, "(.+/DerivedData/[^/]+)/.+")
+  if not derivedDataPath then
+    notifications.send_error("Could not detect DerivedData. Please build project.")
+    return
+  end
+
+  local dir = string.match(derivedDataPath, "/([^/]+)$")
+
+  vim.defer_fn(function()
+    vim.ui.input({ prompt = "Delete " .. dir .. "? [y/n]" }, function(input)
+      if input == "y" then
+        util.shell("rm -rf '" .. derivedDataPath .. "' 2>/dev/null")
+        notifications.send("Deleted: " .. derivedDataPath)
+      end
+    end)
+  end, 200)
+end
+
 function M.configure_project()
   appdata.create_app_dir()
 

@@ -150,6 +150,10 @@ function M.show_current_config()
   coordinator.show_current_config()
 end
 
+function M.clean_derived_data()
+  coordinator.clean_derived_data()
+end
+
 function M.uninstall(callback)
   coordinator.cancel()
   coordinator.uninstall_app(callback)
