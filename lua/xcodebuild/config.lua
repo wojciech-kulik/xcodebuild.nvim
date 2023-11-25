@@ -13,6 +13,7 @@ local defaults = {
     lsp_timeout = 200, -- LSP timeout in milliseconds,
   },
   commands = {
+    cache_devices = true, -- cache recently loaded devices. Restart Neovim to clean cache.
     extra_build_args = "-parallelizeTargets", -- extra arguments for `xcodebuild build`
     extra_test_args = "-parallelizeTargets", -- extra arguments for `xcodebuild test`
   },

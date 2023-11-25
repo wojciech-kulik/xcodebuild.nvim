@@ -12,6 +12,8 @@ local telescopeState = require("telescope.actions.state")
 
 local M = {}
 
+local cachedDestinations = {}
+local cachedDeviceNames = {}
 local currentJobId = nil
 local activePicker = nil
 local progressTimer = nil
@@ -264,10 +266,15 @@ end
 function M.select_destination(callback, opts)
   local projectCommand = projectConfig.settings.projectCommand
   local scheme = projectConfig.settings.scheme
-  local results = {}
+  local results = cachedDestinations or {}
+  local useCache = require("xcodebuild.config").options.commands.cache_devices
+  local hasCachedDevices = useCache and util.is_not_empty(results) and util.is_not_empty(cachedDeviceNames)
 
-  start_telescope_spinner()
-  M.show("Select Device", {}, function(_, index)
+  if not hasCachedDevices then
+    start_telescope_spinner()
+  end
+
+  M.show("Select Device", cachedDeviceNames or {}, function(_, index)
     projectConfig.settings.destination = results[index].id
     projectConfig.settings.platform = results[index].platform
     projectConfig.settings.deviceName = results[index].name
@@ -278,6 +285,10 @@ function M.select_destination(callback, opts)
       callback(results[index])
     end
   end, opts)
+
+  if hasCachedDevices then
+    return nil
+  end
 
   currentJobId = xcode.get_destinations(projectCommand, scheme, function(destinations)
     local filtered = util.filter(destinations, function(table)
@@ -305,6 +316,11 @@ function M.select_destination(callback, opts)
       end
       return name
     end)
+
+    if useCache then
+      cachedDeviceNames = destinationNames
+      cachedDestinations = filtered
+    end
 
     results = filtered
     update_results(destinationNames)
