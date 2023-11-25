@@ -79,13 +79,12 @@ function M.cancel()
 end
 
 function M.load_last_report()
-  local success, log = pcall(appdata.read_original_logs)
+  parser.clear()
+  M.report = appdata.read_report() or {}
 
-  if success then
-    parser.clear()
-
+  if util.is_not_empty(M.report) then
     vim.defer_fn(function()
-      M.report = parser.parse_logs(log)
+      testSearch.load_targets_map()
       quickfix.set(M.report)
       diagnostics.refresh_all_test_buffers(M.report)
     end, vim.startswith(config.test_search.file_matching, "lsp") and 1000 or 500)
@@ -211,6 +210,10 @@ function M.build_project(opts, callback)
       return
     end
 
+    if config.restore_on_start then
+      appdata.write_report(M.report)
+    end
+
     quickfix.set(M.report)
 
     notifications.stop_build_timer()
@@ -260,6 +263,10 @@ function M.run_tests(testsToRun)
     if code == CANCELLED_CODE then
       notifications.send_tests_finished(M.report, true)
       return
+    end
+
+    if config.restore_on_start then
+      appdata.write_report(M.report)
     end
 
     testSearch.load_targets_map()

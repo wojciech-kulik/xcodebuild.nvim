@@ -7,6 +7,8 @@ M.original_logs_filename = "original_logs.log"
 M.original_logs_filepath = M.appdir .. "/" .. M.original_logs_filename
 M.build_logs_filename = "xcodebuild.log"
 M.build_logs_filepath = M.appdir .. "/" .. M.build_logs_filename
+M.report_filename = "report.json"
+M.report_filepath = M.appdir .. "/" .. M.report_filename
 M.snapshots_dir = M.appdir .. "/failing-snapshots"
 
 GETSNAPSHOTS_TOOL = "getsnapshots"
@@ -22,6 +24,21 @@ end
 
 function M.read_original_logs()
   return vim.fn.readfile(M.original_logs_filepath)
+end
+
+function M.read_report()
+  local success, json = pcall(vim.fn.readfile, M.report_filepath)
+  return success and vim.fn.json_decode(json)
+end
+
+function M.write_report(report)
+  local copy = report.output
+  report.output = nil
+
+  local json = vim.split(vim.fn.json_encode(report), "\n", { plain = true })
+  vim.fn.writefile(json, M.report_filepath)
+
+  report.output = copy
 end
 
 function M.write_original_logs(data)
