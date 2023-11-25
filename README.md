@@ -83,6 +83,11 @@ Xcodebuild.nvim comes with the following defaults:
   auto_save = true, -- save all buffers before running build or tests (command: silent wa!)
   show_build_progress_bar = true, -- shows [ ...    ] progress bar during build, based on the last duration
   prepare_snapshot_test_previews = true, -- prepares a list with failing snapshot tests
+  test_search = {
+    file_matching = "filename_lsp", -- one of: filename, lsp, lsp_filename, filename_lsp. Check out README for details.
+    target_matching = true, -- checks if the test file target matches the one from logs try disabling in case of not showing test results
+    lsp_client = "sourcekit", -- name of your LSP for Swift files
+  },
   commands = {
     extra_build_args = "-parallelizeTargets", -- extra arguments for `xcodebuild build`
     extra_test_args = "-parallelizeTargets", -- extra arguments for `xcodebuild test`

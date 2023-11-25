@@ -1,6 +1,7 @@
 local M = {}
 
 local util = require("xcodebuild.util")
+local testSearch = require("xcodebuild.test_search")
 
 -- state machine
 local BEGIN = "BEGIN"
@@ -10,8 +11,6 @@ local BUILD_ERROR = "BUILD_ERROR"
 local BUILD_WARNING = "BUILD_WARNING"
 
 -- temp fields
-local allSwiftFiles = {}
-local missingSymbols = {}
 local lineType = BEGIN
 local lineData = {}
 local lastTest = nil
@@ -25,23 +24,6 @@ local buildErrors = {}
 local warnings = {}
 local diagnostics = {}
 local xcresultFilepath = nil
-
-local function find_file_for_class(className)
-  -- TODO: this code assumes that test classes are uniquely named across the whole project.
-  -- Is there any better way to find a corresponding file path?
-
-  if not allSwiftFiles[className] then
-    local lspFilepath = not missingSymbols[className] and util.lsp_filepath_for_class_name(className)
-
-    if lspFilepath then
-      allSwiftFiles[className] = lspFilepath
-    else
-      missingSymbols[className] = true
-    end
-  end
-
-  return allSwiftFiles[className]
-end
 
 local function flush_test(message)
   if message then
@@ -197,7 +179,7 @@ local function parse_test_finished(line)
     local testClass, testName, testResult, time =
       string.match(line, "^Test case %'(%w+)%.(%g+)%(.*%' (%w+) .* %(([^%)]*)%)$")
     if testClass and testName and testResult then
-      local filepath = find_file_for_class(testClass)
+      local filepath = testSearch.find_filepath("", testClass)
 
       lineData = {
         filepath = filepath,
@@ -220,8 +202,8 @@ local function parse_test_finished(line)
 end
 
 local function parse_test_started(line)
-  local testClass, testName = string.match(line, "^Test Case .*.%-%[%w+%.(%w+) (%g+)%]")
-  local filepath = find_file_for_class(testClass)
+  local target, testClass, testName = string.match(line, "^Test Case .*.%-%[(%w+)%.(%w+) (%g+)%]")
+  local filepath = testSearch.find_filepath(target, testClass)
 
   testsCount = testsCount + 1
   lastTest = nil
@@ -274,8 +256,6 @@ function M.clear()
   lastTest = nil
   lineData = {}
   lineType = BEGIN
-  allSwiftFiles = util.find_all_swift_files()
-  missingSymbols = {}
 
   tests = {}
   testsCount = 0
@@ -285,6 +265,8 @@ function M.clear()
   warnings = {}
   diagnostics = {}
   xcresultFilepath = nil
+
+  testSearch.clear()
 end
 
 function M.parse_logs(logLines)

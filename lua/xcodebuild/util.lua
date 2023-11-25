@@ -78,7 +78,8 @@ function M.find_all_swift_files()
   for _, filepath in ipairs(allFiles) do
     local filename = M.get_filename(filepath)
     if filename then
-      map[filename] = filepath
+      map[filename] = map[filename] or {}
+      table.insert(map[filename], filepath)
     end
   end
 
@@ -152,40 +153,6 @@ function M.find(tab, predicate)
   for _, value in ipairs(tab) do
     if predicate(value) then
       return value
-    end
-  end
-
-  return nil
-end
-
-function M.lsp_filepath_for_class_name(className)
-  local lspResult, finished
-  local bufnr = 0
-
-  if vim.bo.filetype ~= "swift" then
-    local sourcekitClients = vim.lsp.get_active_clients({ name = "sourcekit" })
-    local sourcekitId = sourcekitClients[1] and sourcekitClients[1].id
-    if sourcekitId then
-      bufnr = vim.lsp.get_buffers_by_client_id(sourcekitId)[1] or 0
-    end
-  end
-
-  vim.lsp.buf_request_all(bufnr, "workspace/symbol", { query = className }, function(result)
-    finished = true
-    lspResult = result
-  end)
-
-  local counter = 0
-  while not finished and counter < 10 do
-    vim.wait(10)
-    counter = counter + 1
-  end
-
-  if lspResult and lspResult[1] and lspResult[1].result then
-    for _, result in ipairs(lspResult[1].result) do
-      if result.kind == 5 and result.name == className then
-        return (result.location.uri:gsub("file://", ""))
-      end
     end
   end
 

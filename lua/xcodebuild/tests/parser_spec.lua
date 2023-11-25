@@ -31,6 +31,12 @@ local mockLSP = function()
   filetreeMap["ShortcutRecorderCrashTests"] = "/Users/john/repo/something/ShortcutRecorder.swift"
   filetreeMap["ViewModelTests"] = "/Users/john/repo/something/Tests/ViewModel.swift"
 
+  vim.lsp.get_active_clients = function(_)
+    return { { id = 1 } }
+  end
+  vim.lsp.get_buffers_by_client_id = function(_)
+    return { 0 }
+  end
   vim.lsp.buf_request_all = function(_, _, params, callback)
     if not filetreeMap[params.query] then
       callback(nil)
@@ -54,6 +60,8 @@ local mockLSP = function()
 end
 
 local runTestCase = function(caseId)
+  require("xcodebuild.config").options.test_search.target_matching = false
+
   local expectedResultPath = cwd .. "/lua/xcodebuild/tests/test_data/tc" .. caseId .. "_out.log"
   local exists, expectedResult = pcall(vim.fn.readfile, expectedResultPath)
   local log = vim.fn.readfile(cwd .. "/lua/xcodebuild/tests/test_data/tc" .. caseId .. ".log")

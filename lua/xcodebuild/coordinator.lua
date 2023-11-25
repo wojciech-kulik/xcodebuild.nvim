@@ -35,6 +35,11 @@ local function validate_testplan()
   return true
 end
 
+local function load_targets_map()
+  M.targetsFilesMap = xcode.get_targets_filemap(projectConfig.settings.appPath)
+  quickfix.set_targets_filemap(M.targetsFilesMap)
+end
+
 function M.auto_save()
   if config.auto_save then
     vim.cmd("silent wa!")
@@ -83,11 +88,13 @@ function M.load_last_report()
 
   if success then
     parser.clear()
+
     vim.defer_fn(function()
+      load_targets_map()
       M.report = parser.parse_logs(log)
       quickfix.set(M.report)
       diagnostics.refresh_all_test_buffers(M.report)
-    end, 500)
+    end, vim.startswith(config.test_search.file_matching, "lsp") and 1000 or 500)
   end
 end
 
@@ -258,8 +265,7 @@ function M.run_tests(testsToRun)
       return
     end
 
-    M.targetsFilesMap = xcode.get_targets_filemap(projectConfig.settings.appPath)
-    quickfix.set_targets_filemap(M.targetsFilesMap)
+    load_targets_map()
     quickfix.set(M.report)
     diagnostics.refresh_all_test_buffers(M.report)
 
@@ -349,7 +355,11 @@ local function find_tests(opts)
   return selectedClass, selectedTests
 end
 
-local function find_target_for_file(filepath)
+function M.find_target_for_file(filepath)
+  if util.is_empty(M.targetsFilesMap) then
+    return nil
+  end
+
   for target, files in pairs(M.targetsFilesMap) do
     if util.contains(files, filepath) then
       return target
@@ -367,7 +377,7 @@ function M.run_selected_tests(opts)
   local start = function()
     local testsToRun = {}
     local testFilepath = vim.api.nvim_buf_get_name(0)
-    local target = find_target_for_file(testFilepath)
+    local target = M.find_target_for_file(testFilepath)
 
     if not target then
       notifications.send_error("Could not detect test target. Please run build again.")
@@ -386,7 +396,7 @@ function M.run_selected_tests(opts)
 
     if opts.failingTests then
       for _, test in ipairs(selectedTests) do
-        local testTarget = find_target_for_file(test.filepath)
+        local testTarget = M.find_target_for_file(test.filepath)
         if testTarget then
           table.insert(testsToRun, testTarget .. "/" .. test.class .. "/" .. test.name)
         end
@@ -404,8 +414,7 @@ function M.run_selected_tests(opts)
   if util.is_empty(M.targetsFilesMap) then
     notifications.send("Loading tests...")
     M.currentJobId = M.build_project(true, function()
-      M.targetsFilesMap = xcode.get_targets_filemap(projectConfig.settings.appPath)
-      quickfix.set_targets_filemap(M.targetsFilesMap)
+      load_targets_map()
       start()
     end)
   else
