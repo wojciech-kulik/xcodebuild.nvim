@@ -3,6 +3,25 @@ local config = require("xcodebuild.config").options.marks
 
 local M = {}
 
+local function find_test_class(bufnr, file, report)
+  -- Check if test class matching filename exists
+  local testClass = util.get_filename(file)
+  if testClass and (not report.tests or report.tests[testClass]) then
+    return testClass
+  end
+
+  -- if not try to find it in source code
+  local lines = vim.api.nvim_buf_get_lines(bufnr, 1, -1, false)
+  for _, line in ipairs(lines) do
+    local class = string.match(line, "class ([^:%s]+)%s*%:?")
+    if class then
+      return class
+    end
+  end
+
+  return nil
+end
+
 local function refresh_buf_diagnostics(bufnr, testClass, report)
   if not report.tests or not config.show_diagnostics then
     return
@@ -87,7 +106,7 @@ local function refresh_buf_marks(bufnr, testClass, tests)
 end
 
 function M.refresh_test_buffer(bufnr, file, report)
-  local testClass = util.get_filename(file)
+  local testClass = find_test_class(bufnr, file, report)
   refresh_buf_diagnostics(bufnr, testClass, report)
   refresh_buf_marks(bufnr, testClass, report.tests)
 end
@@ -103,7 +122,7 @@ function M.refresh_all_test_buffers(report)
   local testBuffers = util.get_bufs_by_matching_name(regexPattern)
 
   for _, buffer in ipairs(testBuffers or {}) do
-    local testClass = util.get_filename(buffer.file)
+    local testClass = find_test_class(buffer.bufnr, buffer.file, report)
     refresh_buf_diagnostics(buffer.bufnr, testClass, report)
     refresh_buf_marks(buffer.bufnr, testClass, report.tests)
   end

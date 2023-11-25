@@ -6,12 +6,16 @@
   tests = {
     ShortcutRecorderCrashTests = { {
         class = "ShortcutRecorderCrashTests",
+        filename = "ShortcutRecorder",
+        filepath = "/Users/john/repo/something/ShortcutRecorder.swift",
         name = "testExample",
         success = true,
         testResult = "passed",
         time = "0.001 seconds"
       }, {
         class = "ShortcutRecorderCrashTests",
+        filename = "ShortcutRecorder",
+        filepath = "/Users/john/repo/something/ShortcutRecorder.swift",
         name = "testPerformanceExample",
         success = true,
         testResult = "passed",

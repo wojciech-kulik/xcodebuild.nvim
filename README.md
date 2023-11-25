@@ -1,7 +1,5 @@
 # 🛠️ xcodebuild.nvim
 
-![](https://img.shields.io/badge/Release-0.9.2--beta-blue)
-
 A plugin that lets you move your iOS, iPadOS and macOS apps development to Neovim. It supports most of Xcode actions that are required to work with a project, including device selection, building, launching, and testing.
 
 ![Xcodebuild Debugging](./media/tests.png)
@@ -42,11 +40,7 @@ It is also my first Neovim plugin. Hopefully, a good one 😁.
 
 ## 👷 Limitations
 
-The plugin assumes that test class name should match file name. If `YourTraget.YourTestClass.testYourTest` appears in logs, the plugin will try locating `YourTestClass.swift` file and show test results there (marks + diagnostics + quickfix).
-
-If you have a different naming convention, or if you have multiple test files named the same across the project, it may not work correctly.
-
-I will try to address it as soon as possible, but for now there is this limitation.
+- [ ] If you have multiple test classes named the same across the project, test results could be presented in the wrong file. So far, I couldn't find any reliable way to find the corresponding file path based on the class name and target name. The plugin first tries to find any swift file matching test class name - that's the fastest way. If there is no match, it tries to use LSP to locate that class.
 
 ## ⚡️ Requirements
 
@@ -294,5 +288,4 @@ Sample `settings.json`:
 
 - [ ] Add Neovim documentation
 - [ ] List tests to browse and run. Something like a tree with tests?
-- [ ] Resolve issues with finding the corresponding test file.
 - [ ] Add clean build action. While testing this command was failing for some reasons, that's why for now it's postponed.

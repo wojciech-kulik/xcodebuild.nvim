@@ -11,6 +11,7 @@ local BUILD_WARNING = "BUILD_WARNING"
 
 -- temp fields
 local allSwiftFiles = {}
+local missingSymbols = {}
 local lineType = BEGIN
 local lineData = {}
 local lastTest = nil
@@ -24,6 +25,23 @@ local buildErrors = {}
 local warnings = {}
 local diagnostics = {}
 local xcresultFilepath = nil
+
+local function find_file_for_class(className)
+  -- TODO: this code assumes that test classes are uniquely named across the whole project.
+  -- Is there any better way to find a corresponding file path?
+
+  if not allSwiftFiles[className] then
+    local lspFilepath = not missingSymbols[className] and util.lsp_filepath_for_class_name(className)
+
+    if lspFilepath then
+      allSwiftFiles[className] = lspFilepath
+    else
+      missingSymbols[className] = true
+    end
+  end
+
+  return allSwiftFiles[className]
+end
 
 local function flush_test(message)
   if message then
@@ -179,11 +197,8 @@ local function parse_test_finished(line)
     local testClass, testName, testResult, time =
       string.match(line, "^Test case %'(%w+)%.(%g+)%(.*%' (%w+) .* %(([^%)]*)%)$")
     if testClass and testName and testResult then
-      -- TODO: finding file path assuming that the test class name equals file name
-      -- and that this is unique might not be accurate.
-      -- Is there any way to obtain the file path to the test class based on information
-      -- provided in logs?
-      local filepath = allSwiftFiles[testClass]
+      local filepath = find_file_for_class(testClass)
+
       lineData = {
         filepath = filepath,
         filename = filepath and util.get_filename(filepath) or nil,
@@ -205,12 +220,9 @@ local function parse_test_finished(line)
 end
 
 local function parse_test_started(line)
-  -- TODO: finding file path assuming that the test class name equals file name
-  -- and that this is unique might not be accurate.
-  -- Is there any way to obtain the file path to the test class based on information
-  -- provided in logs?
   local testClass, testName = string.match(line, "^Test Case .*.%-%[%w+%.(%w+) (%g+)%]")
-  local filepath = allSwiftFiles[testClass]
+  local filepath = find_file_for_class(testClass)
+
   testsCount = testsCount + 1
   lastTest = nil
   lineType = TEST_START
@@ -263,6 +275,7 @@ function M.clear()
   lineData = {}
   lineType = BEGIN
   allSwiftFiles = util.find_all_swift_files()
+  missingSymbols = {}
 
   tests = {}
   testsCount = 0

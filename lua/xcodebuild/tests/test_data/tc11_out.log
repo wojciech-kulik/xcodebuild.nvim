@@ -6,6 +6,8 @@
   tests = {
     ShortcutRecorderCrashTests = { {
         class = "ShortcutRecorderCrashTests",
+        filename = "ShortcutRecorder",
+        filepath = "/Users/john/repo/something/ShortcutRecorder.swift",
         message = { "Failed" },
         name = "testCrash",
         success = false,
@@ -13,6 +15,8 @@
         time = "0.000 seconds"
       }, {
         class = "ShortcutRecorderCrashTests",
+        filename = "ShortcutRecorder",
+        filepath = "/Users/john/repo/something/ShortcutRecorder.swift",
         message = { "Failed" },
         name = "testExample",
         success = false,
@@ -20,6 +24,8 @@
         time = "0.109 seconds"
       }, {
         class = "ShortcutRecorderCrashTests",
+        filename = "ShortcutRecorder",
+        filepath = "/Users/john/repo/something/ShortcutRecorder.swift",
         message = { "Failed" },
         name = "testFail",
         success = false,
@@ -27,6 +33,8 @@
         time = "0.001 seconds"
       }, {
         class = "ShortcutRecorderCrashTests",
+        filename = "ShortcutRecorder",
+        filepath = "/Users/john/repo/something/ShortcutRecorder.swift",
         name = "testOK",
         success = true,
         testResult = "passed",
@@ -34,6 +42,8 @@
       } },
     ViewModelTests = { {
         class = "ViewModelTests",
+        filename = "ViewModel",
+        filepath = "/Users/john/repo/something/Tests/ViewModel.swift",
         message = { "Failed" },
         name = "testSomething_ShouldCrash",
         success = false,
@@ -41,6 +51,8 @@
         time = "0.000 seconds"
       }, {
         class = "ViewModelTests",
+        filename = "ViewModel",
+        filepath = "/Users/john/repo/something/Tests/ViewModel.swift",
         message = { "Failed" },
         name = "testSomething_ShouldFail",
         success = false,
@@ -48,12 +60,16 @@
         time = "0.105 seconds"
       }, {
         class = "ViewModelTests",
+        filename = "ViewModel",
+        filepath = "/Users/john/repo/something/Tests/ViewModel.swift",
         name = "testSomething_ShouldPass",
         success = true,
         testResult = "passed",
         time = "0.000 seconds"
       }, {
         class = "ViewModelTests",
+        filename = "ViewModel",
+        filepath = "/Users/john/repo/something/Tests/ViewModel.swift",
         message = { "Failed" },
         name = "testSomething_ShouldReturnFail",
         success = false,

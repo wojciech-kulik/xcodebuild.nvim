@@ -83,9 +83,9 @@ function M.load_last_report()
 
   if success then
     parser.clear()
-    M.report = parser.parse_logs(log)
-    quickfix.set(M.report)
     vim.defer_fn(function()
+      M.report = parser.parse_logs(log)
+      quickfix.set(M.report)
       diagnostics.refresh_all_test_buffers(M.report)
     end, 500)
   end

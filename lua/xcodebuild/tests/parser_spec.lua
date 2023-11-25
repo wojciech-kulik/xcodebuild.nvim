@@ -1,5 +1,6 @@
 local assert = require("luassert")
 local parser = require("xcodebuild.parser")
+local util = require("xcodebuild.util")
 local cwd = vim.fn.getcwd()
 local recordSnapshots = false
 
@@ -16,11 +17,48 @@ local mockSwiftFiles = function()
   end
 end
 
+local mockLSP = function()
+  local filetree = vim.fn.readfile(cwd .. "/lua/xcodebuild/tests/test_data/file_tree.txt")
+
+  local filetreeMap = {}
+  for _, file in ipairs(filetree) do
+    local className = util.get_filename(file)
+    if className ~= nil then
+      filetreeMap[className] = file
+    end
+  end
+
+  filetreeMap["ShortcutRecorderCrashTests"] = "/Users/john/repo/something/ShortcutRecorder.swift"
+  filetreeMap["ViewModelTests"] = "/Users/john/repo/something/Tests/ViewModel.swift"
+
+  vim.lsp.buf_request_all = function(_, _, params, callback)
+    if not filetreeMap[params.query] then
+      callback(nil)
+      return
+    end
+
+    callback({
+      {
+        result = {
+          {
+            name = params.query,
+            kind = 5,
+            location = {
+              uri = filetreeMap[params.query],
+            },
+          },
+        },
+      },
+    })
+  end
+end
+
 local runTestCase = function(caseId)
   local expectedResultPath = cwd .. "/lua/xcodebuild/tests/test_data/tc" .. caseId .. "_out.log"
   local exists, expectedResult = pcall(vim.fn.readfile, expectedResultPath)
   local log = vim.fn.readfile(cwd .. "/lua/xcodebuild/tests/test_data/tc" .. caseId .. ".log")
   mockSwiftFiles()
+  mockLSP()
   parser.clear()
 
   local report = parser.parse_logs(log)
