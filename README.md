@@ -35,7 +35,7 @@ It is also my first Neovim plugin. Hopefully, a good one 😁.
 - [x] Advanced log parser to detect all errors, warnings, and failing tests and to present them nicely formatted.
 - [x] Auto saving files before build or test actions.
 - [x] [nvim-dap](https://github.com/mfussenegger/nvim-dap) helper functions to let you easily build, run, and attach the debugger.
-- [x] [lualine.nvim](https://github.com/nvim-lualine/lualine.nvim) integration to show current device and settings.
+- [x] [lualine.nvim](https://github.com/nvim-lualine/lualine.nvim) integration to show current device and project settings.
 - [x] [telescope.nvim](https://github.com/nvim-telescope/telescope.nvim) integration to show pickers with selectable project options.
 - [x] Picker with all available actions.
 
@@ -134,7 +134,7 @@ Xcodebuild.nvim comes with the following defaults:
 
 `xcodebuild` logs provide the following information about the test: target, test class, and test name. The plugin needs to find the file location based on that, which is not a trivial task.
 
-In order to support multiple cases, the plugin allows you to choose the search mode. It offers four modes to find a test class (set `test_search.file_matching`):
+In order to support multiple cases, the plugin allows you to choose the search mode. It offers four modes to find a test class. You can change it by setting `test_search.file_matching`.
 
 - `filename` - it assumes that the test class name matches the file name. It finds matching files and then based on the build output, it checks whether the file belongs to the desired target.
 - `lsp` - it uses LSP to find the class symbol. Each match is checked if it belongs to the desired target.
@@ -143,9 +143,9 @@ In order to support multiple cases, the plugin allows you to choose the search m
 
 `filename_lsp` is the recommended mode, because `filename` search is faster than `lsp`, but you also have `lsp` fallback if there is no match from `filename`.
 
-If you notice that your test results don't appear or appear in incorrect files, try playing with these modes.
+👉 If you notice that your test results don't appear or appear in incorrect files, try playing with these modes.
 
-If your test results don't appear, you can also try disabling `test_search.target_matching`. This way the plugin will always use the first match without checking its target. Target-file list comes from the build output and in some cases you may need to disable it.
+👉 If your test results don't appear, you can also try disabling `test_search.target_matching`. This way the plugin will always use the first match without checking its target. Target-file list comes from the build output and in some cases you may need to disable it.
 
 ### Setup Your Neovim For iOS Development
 
@@ -339,8 +339,3 @@ Sample `settings.json`:
 - `platform` - `macOS` or `iOS`
 - `destination` - simulator ID
 - `projectFile` / `projectCommand` - can be `xcodeproj` or `xcworkspace`, the main project file that you use
-
-## ⏳ Things To Do
-
-- [ ] Add Neovim documentation
-- [ ] List tests to browse and run. Something like a tree with tests?
