@@ -34,6 +34,10 @@ function M.file_exists(name)
   return false
 end
 
+function M.dir_exists(path)
+  return vim.fn.isdirectory(path) ~= 0
+end
+
 function M.get_buf_by_name(name, opts)
   local allBuffers = M.get_buffers(opts)
 

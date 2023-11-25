@@ -10,6 +10,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppNetworking/Tests/Modules/CalendarNetworkProviderTests.swift",
         name = "testRequest_ShouldNotInvalidateSessionAndThrowError_WhenRetriedRequestReturns500Error",
         success = true,
+        target = "CalendarAppNetworkingTests",
         testResult = "passed",
         time = "0.020 seconds"
       }, {
@@ -18,6 +19,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppNetworking/Tests/Modules/CalendarNetworkProviderTests.swift",
         name = "testRequest_ShouldThrowBlockError_WhenRequestReturnsMetadataWithBlockedUntilField",
         success = true,
+        target = "CalendarAppNetworkingTests",
         testResult = "passed",
         time = "0.005 seconds"
       }, {
@@ -26,6 +28,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppNetworking/Tests/Modules/CalendarNetworkProviderTests.swift",
         name = "testRequest_ShouldInvalidateSessionAndThrowError_WhenRetriedRequestReturns401Error",
         success = true,
+        target = "CalendarAppNetworkingTests",
         testResult = "passed",
         time = "0.001 seconds"
       }, {
@@ -34,6 +37,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppNetworking/Tests/Modules/CalendarNetworkProviderTests.swift",
         name = "testRequest_ShouldRefreshInfoTwice_WhenInfoTaskIsExpired",
         success = true,
+        target = "CalendarAppNetworkingTests",
         testResult = "passed",
         time = "0.005 seconds"
       }, {
@@ -42,6 +46,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppNetworking/Tests/Modules/CalendarNetworkProviderTests.swift",
         name = "testRequest_ShouldRefreshInfoOnce_WhenTwoRequestsReturn401ErrorAtTheSameTime",
         success = true,
+        target = "CalendarAppNetworkingTests",
         testResult = "passed",
         time = "0.012 seconds"
       }, {
@@ -50,6 +55,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppNetworking/Tests/Modules/CalendarNetworkProviderTests.swift",
         name = "testRequest_ShouldRefreshInfoAndRetryRequest_WhenRequestReturns401Error",
         success = true,
+        target = "CalendarAppNetworkingTests",
         testResult = "passed",
         time = "0.001 seconds"
       }, {
@@ -58,6 +64,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppNetworking/Tests/Modules/CalendarNetworkProviderTests.swift",
         name = "testRequest_ShouldInvalidateSessionAndThrowError_WhenRefreshInfoIsMissing",
         success = true,
+        target = "CalendarAppNetworkingTests",
         testResult = "passed",
         time = "0.001 seconds"
       }, {
@@ -66,6 +73,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppNetworking/Tests/Modules/CalendarNetworkProviderTests.swift",
         name = "testRequest_ShouldInvalidateSessionAndThrowError_WhenBothRequestAndInfoRefreshFail",
         success = true,
+        target = "CalendarAppNetworkingTests",
         testResult = "passed",
         time = "0.001 seconds"
       } },
@@ -75,6 +83,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppDesignSystem/Tests/CodeFieldTests/CodeFieldTests.swift",
         name = "testView_ShouldRenderCorrectly_onCurrentStateAndEventValue",
         success = true,
+        target = "CalendarAppDesignSystemTests",
         testResult = "passed",
         time = "0.228 seconds"
       } },
@@ -84,6 +93,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppOnboarding/Tests/Modules/ConfirmFullName/ConfirmFullNameViewModelTests.swift",
         name = "testOnCloseTap_ShouldPresentAlert",
         success = true,
+        target = "CalendarAppOnboardingTests",
         testResult = "passed",
         time = "0.006 seconds"
       }, {
@@ -92,6 +102,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppOnboarding/Tests/Modules/ConfirmFullName/ConfirmFullNameViewModelTests.swift",
         name = "testOnLoadAsync_ShouldSetError_WhenDataFetchFailed",
         success = true,
+        target = "CalendarAppOnboardingTests",
         testResult = "passed",
         time = "0.001 seconds"
       }, {
@@ -100,6 +111,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppOnboarding/Tests/Modules/ConfirmFullName/ConfirmFullNameViewModelTests.swift",
         name = "testOnLoadAsync_ShouldSetCorrectValue_WhenDataIsFetched",
         success = true,
+        target = "CalendarAppOnboardingTests",
         testResult = "passed",
         time = "0.001 seconds"
       } },
@@ -109,6 +121,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppOnboarding/Tests/Modules/ConfirmFullName/ConfirmFullNameViewTests.swift",
         name = "testView_ShouldRenderCorrectly",
         success = true,
+        target = "CalendarAppOnboardingTests",
         testResult = "passed",
         time = "0.058 seconds"
       } },
@@ -118,6 +131,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppOnboarding/Tests/Modules/ConfirmPhoneNumber/ConfirmPhoneNumberViewModelTests.swift",
         name = "testOnLoadAsync_ShouldSetError_WhenDataFetchFailed",
         success = true,
+        target = "CalendarAppOnboardingTests",
         testResult = "passed",
         time = "0.020 seconds"
       }, {
@@ -126,6 +140,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppOnboarding/Tests/Modules/ConfirmPhoneNumber/ConfirmPhoneNumberViewModelTests.swift",
         name = "testOnLoadAsync_ShouldSetFormattedPrefix_WhenDataIsFetched",
         success = true,
+        target = "CalendarAppOnboardingTests",
         testResult = "passed",
         time = "0.001 seconds"
       }, {
@@ -134,6 +149,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppOnboarding/Tests/Modules/ConfirmPhoneNumber/ConfirmPhoneNumberViewModelTests.swift",
         name = "testOnLoadAsync_ShouldSetMaskedPhoneNumber_WhenDataIsFetched",
         success = true,
+        target = "CalendarAppOnboardingTests",
         testResult = "passed",
         time = "0.000 seconds"
       }, {
@@ -142,6 +158,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppOnboarding/Tests/Modules/ConfirmPhoneNumber/ConfirmPhoneNumberViewModelTests.swift",
         name = "testOnCloseTap_ShouldPresentAlert",
         success = true,
+        target = "CalendarAppOnboardingTests",
         testResult = "passed",
         time = "0.000 seconds"
       } },
@@ -151,6 +168,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppOnboarding/Tests/Modules/ConfirmPhoneNumber/ConfirmPhoneNumberViewTests.swift",
         name = "testView_ShouldRenderCorrectly",
         success = true,
+        target = "CalendarAppOnboardingTests",
         testResult = "passed",
         time = "0.061 seconds"
       }, {
@@ -159,6 +177,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppOnboarding/Tests/Modules/ConfirmPhoneNumber/ConfirmPhoneNumberViewTests.swift",
         name = "testView_ShouldRenderCorrectly_WhenProgressIsPresented",
         success = true,
+        target = "CalendarAppOnboardingTests",
         testResult = "passed",
         time = "0.072 seconds"
       } },
@@ -168,6 +187,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppOnboarding/Tests/Modules/Congratulations/CongratulationsViewTests.swift",
         name = "testView_ShouldRenderCorrectly",
         success = true,
+        target = "CalendarAppOnboardingTests",
         testResult = "passed",
         time = "0.063 seconds"
       } },
@@ -177,6 +197,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Modules/CreateConfirmation/CreateConfirmationViewTests.swift",
         name = "testView_ShouldRenderCorrectly_WhenCreateEventIsFailed",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.146 seconds"
       }, {
@@ -185,6 +206,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Modules/CreateConfirmation/CreateConfirmationViewTests.swift",
         name = "testView_ShouldRenderCorrectly_WhenCreateCustomerIsCancelled",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.118 seconds"
       }, {
@@ -193,6 +215,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Modules/CreateConfirmation/CreateConfirmationViewTests.swift",
         name = "testView_ShouldRenderCorrectly",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.147 seconds"
       } },
@@ -202,6 +225,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Modules/CreateCustomerConfirmAmount/CreateCustomerConfirmAmountViewModelTests.swift",
         name = "testOnCancelTap_ShouldPresentCancelAlert_WhenNoteIsInitiatedByAgent",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.000 seconds"
       }, {
@@ -210,6 +234,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Modules/CreateCustomerConfirmAmount/CreateCustomerConfirmAmountViewModelTests.swift",
         name = "testOnCancelTap_ShouldNotCancelNote_WhenAlertIsDismissed",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "1.006 seconds"
       }, {
@@ -218,6 +243,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Modules/CreateCustomerConfirmAmount/CreateCustomerConfirmAmountViewModelTests.swift",
         name = "testOnCancelTap_ShouldPresentCancelAlert_WhenNoteIsInitiatedByCustomer",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.001 seconds"
       }, {
@@ -226,6 +252,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Modules/CreateCustomerConfirmAmount/CreateCustomerConfirmAmountViewModelTests.swift",
         name = "testOnBackTap_ShouldCancelNote_WhenDestructiveActionIsTapped",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.005 seconds"
       }, {
@@ -234,6 +261,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Modules/CreateCustomerConfirmAmount/CreateCustomerConfirmAmountViewModelTests.swift",
         name = "testOnBackTap_ShouldNotPresentCancelAlert_WhenNoteIsInitiatedByCustomer",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.001 seconds"
       }, {
@@ -242,6 +270,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Modules/CreateCustomerConfirmAmount/CreateCustomerConfirmAmountViewModelTests.swift",
         name = "testOnBackTap_ShouldGoBack_WhenNoteCancelationFails",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.057 seconds"
       }, {
@@ -250,6 +279,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Modules/CreateCustomerConfirmAmount/CreateCustomerConfirmAmountViewModelTests.swift",
         name = "testOnCancelTap_ShouldCancelNote_WhenDestructiveActionIsTapped",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.002 seconds"
       }, {
@@ -258,6 +288,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Modules/CreateCustomerConfirmAmount/CreateCustomerConfirmAmountViewModelTests.swift",
         name = "testOnBackTap_ShouldNotCancelNote_WhenAlertIsDismissed",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "1.009 seconds"
       }, {
@@ -266,6 +297,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Modules/CreateCustomerConfirmAmount/CreateCustomerConfirmAmountViewModelTests.swift",
         name = "testOnBackTap_ShouldPresentCancelAlert_WhenNoteIsInitiatedByAgent",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.001 seconds"
       } },
@@ -275,6 +307,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Modules/CreateCustomerConfirmAmount/CreateCustomerConfirmAmountViewTests.swift",
         name = "testView_ShouldRenderCorrectly_WhenAmountIsConfirmed",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.090 seconds"
       }, {
@@ -283,6 +316,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Modules/CreateCustomerConfirmAmount/CreateCustomerConfirmAmountViewTests.swift",
         name = "testView_ShouldRenderCorrectly_WhenAmountIsNotConfirmed",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.058 seconds"
       } },
@@ -292,6 +326,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Modules/CreateCustomerDetails/CreateCustomerDetailsViewModelTests.swift",
         name = "testOnSanitizeAmount_ShouldSetFieldStateToDefault_WhenAmountIsEmpty",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.009 seconds"
       }, {
@@ -300,6 +335,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Modules/CreateCustomerDetails/CreateCustomerDetailsViewModelTests.swift",
         name = "testOnSanitizeAmount_ShouldSetFieldStateToDefault_WhenAmountIsValid",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.001 seconds"
       }, {
@@ -308,6 +344,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Modules/CreateCustomerDetails/CreateCustomerDetailsViewModelTests.swift",
         name = "testOnSanitizeAmount_ShouldSetFieldStateToDefault_WhenAmountIsSmallerThanMinCreate",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.001 seconds"
       }, {
@@ -316,6 +353,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Modules/CreateCustomerDetails/CreateCustomerDetailsViewModelTests.swift",
         name = "testOnSanitizeAmount_ShouldSetIsAmountValidToFalse_WhenAmountIsEmpty",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.001 seconds"
       }, {
@@ -324,6 +362,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Modules/CreateCustomerDetails/CreateCustomerDetailsViewModelTests.swift",
         name = "testOnSanitizeAmount_ShouldSetIsAmountValidToFalse_WhenAmountIsZero",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.000 seconds"
       }, {
@@ -332,6 +371,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Modules/CreateCustomerDetails/CreateCustomerDetailsViewModelTests.swift",
         name = "testOnSanitizeAmount_ShouldSetFieldStateToDefault_WhenAmountIsZero",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.000 seconds"
       }, {
@@ -340,6 +380,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Modules/CreateCustomerDetails/CreateCustomerDetailsViewModelTests.swift",
         name = "testOnSanitizeAmount_ShouldSetFieldStateToDestructive_WhenAmountIsBiggerThanMaxCreate",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.003 seconds"
       }, {
@@ -348,6 +389,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Modules/CreateCustomerDetails/CreateCustomerDetailsViewModelTests.swift",
         name = "testOnSanitizeAmount_ShouldSetIsAmountValidToTrue_WhenAmountIsValid",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.000 seconds"
       } },
@@ -357,6 +399,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Modules/CreateCustomerDetails/CreateCustomerDetailsViewTests.swift",
         name = "testView_ShouldRenderCorrectly",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.094 seconds"
       } },
@@ -366,6 +409,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Modules/CreateCustomerSummary/CreateCustomerSummaryViewModelTests.swift",
         name = "testOnDeclineTap_ShouldCancelTracking",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.023 seconds"
       }, {
@@ -374,6 +418,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Modules/CreateCustomerSummary/CreateCustomerSummaryViewModelTests.swift",
         name = "testOnAppear_ShouldUpdateCounter",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.002 seconds"
       }, {
@@ -382,6 +427,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Modules/CreateCustomerSummary/CreateCustomerSummaryViewModelTests.swift",
         name = "testOnAppear_ShouldTrackNoteStatus",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.001 seconds"
       }, {
@@ -390,6 +436,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Modules/CreateCustomerSummary/CreateCustomerSummaryViewModelTests.swift",
         name = "testOnBackTap_ShouldNotCancelNote_WhenAlertIsDismissed",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "1.007 seconds"
       }, {
@@ -398,6 +445,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Modules/CreateCustomerSummary/CreateCustomerSummaryViewModelTests.swift",
         name = "testOnBackTap_ShouldCancelNote_WhenDestructiveActionIsTapped",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.002 seconds"
       }, {
@@ -406,6 +454,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Modules/CreateCustomerSummary/CreateCustomerSummaryViewModelTests.swift",
         name = "testOnDeclineTap_ShouldPresentCancelAlert",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.001 seconds"
       }, {
@@ -414,6 +463,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Modules/CreateCustomerSummary/CreateCustomerSummaryViewModelTests.swift",
         name = "testOnDeclineTap_ShouldNotPresentAlert_WhenCounterIsInsufficient",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.001 seconds"
       }, {
@@ -422,6 +472,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Modules/CreateCustomerSummary/CreateCustomerSummaryViewModelTests.swift",
         name = "testNoteTracking_ShouldShowFailure_WhenNoteIsCancelled",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.056 seconds"
       }, {
@@ -430,6 +481,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Modules/CreateCustomerSummary/CreateCustomerSummaryViewModelTests.swift",
         name = "testOnBackTap_ShouldNotPresentAlert_WhenCounterIsInsufficient",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.005 seconds"
       }, {
@@ -438,6 +490,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Modules/CreateCustomerSummary/CreateCustomerSummaryViewModelTests.swift",
         name = "testOnBackTap_ShouldGoBack_WhenNoteCancelationFails",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.056 seconds"
       }, {
@@ -446,6 +499,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Modules/CreateCustomerSummary/CreateCustomerSummaryViewModelTests.swift",
         name = "testOnDeclineTap_ShouldCancelNote_WhenDestructiveActionIsTapped",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.003 seconds"
       }, {
@@ -454,6 +508,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Modules/CreateCustomerSummary/CreateCustomerSummaryViewModelTests.swift",
         name = "testOnBackTap_ShouldPresentCancelAlert",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.001 seconds"
       }, {
@@ -462,6 +517,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Modules/CreateCustomerSummary/CreateCustomerSummaryViewModelTests.swift",
         name = "testOnDeclineTap_ShouldNotCancelNote_WhenAlertIsDismissed",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "1.007 seconds"
       } },
@@ -471,6 +527,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Modules/CreateCustomerSummary/CreateCustomerSummaryViewTests.swift",
         name = "testView_ShouldRenderCorrectly",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.064 seconds"
       }, {
@@ -479,6 +536,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Modules/CreateCustomerSummary/CreateCustomerSummaryViewTests.swift",
         name = "testView_ShouldRenderCorrectly_WhenCounterIsInvalid",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.062 seconds"
       } },
@@ -488,6 +546,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Modules/CreateDetails/CreateDetailsViewModelTests.swift",
         name = "testOnNextTap_ShouldGenerateQRCode_WhenMethodIsAgentCreate",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.057 seconds"
       }, {
@@ -496,6 +555,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Modules/CreateDetails/CreateDetailsViewModelTests.swift",
         name = "testSanitizeAmount_ShouldSetStateToDefaultWithMinAmountMessage_WhenAmountIsSmallerThanMinAmount",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.000 seconds"
       }, {
@@ -504,6 +564,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Modules/CreateDetails/CreateDetailsViewModelTests.swift",
         name = "testOnSelectPaymentMethodTap_ShouldPresentMethodSelector",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.054 seconds"
       }, {
@@ -512,6 +573,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Modules/CreateDetails/CreateDetailsViewModelTests.swift",
         name = "testInit_ShouldSetEpaymentMethod_WhenModeIsAgentInsufficientCounter",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.001 seconds"
       }, {
@@ -520,6 +582,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Modules/CreateDetails/CreateDetailsViewModelTests.swift",
         name = "testSelectMethod_ShouldUpdateButtonTitleAndSelectedMethod_WhenMethodIsChanged",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.056 seconds"
       }, {
@@ -528,6 +591,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Modules/CreateDetails/CreateDetailsViewModelTests.swift",
         name = "testSanitizeAmount_ShouldHideError_WhenAmountIsEmpty",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.001 seconds"
       }, {
@@ -536,6 +600,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Modules/CreateDetails/CreateDetailsViewModelTests.swift",
         name = "testOnAppear_ShouldPresentMethodSelection_WhenMethodIsNotSelected",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.056 seconds"
       }, {
@@ -544,6 +609,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Modules/CreateDetails/CreateDetailsViewModelTests.swift",
         name = "testSanitizeAmount_ShouldSanitize",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.002 seconds"
       }, {
@@ -552,6 +618,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Modules/CreateDetails/CreateDetailsViewModelTests.swift",
         name = "testSanitizeAmount_ShouldNotShowFee_WhenFeeIsZero",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.055 seconds"
       }, {
@@ -560,6 +627,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Modules/CreateDetails/CreateDetailsViewModelTests.swift",
         name = "testOnAppear_ShouldRefreshCounter",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.057 seconds"
       }, {
@@ -568,6 +636,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Modules/CreateDetails/CreateDetailsViewModelTests.swift",
         name = "testOnNextTap_ShouldStartPaymentModule_WhenMethodIsEpayment",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.057 seconds"
       }, {
@@ -576,6 +645,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Modules/CreateDetails/CreateDetailsViewModelTests.swift",
         name = "testInit_ShouldNotSetSelectedMethod_WhenModeIsDefault",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.001 seconds"
       }, {
@@ -584,6 +654,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Modules/CreateDetails/CreateDetailsViewModelTests.swift",
         name = "testSanitizeAmount_ShouldShowFee_WhenSelectedMethodIsAgent",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.058 seconds"
       }, {
@@ -592,6 +663,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Modules/CreateDetails/CreateDetailsViewModelTests.swift",
         name = "testSanitizeAmount_ShouldSetStateToDefaultWithMaxAmountError_WhenAmountIsBiggerThanMaxAmount",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.001 seconds"
       } },
@@ -601,6 +673,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Modules/CreateDetails/CreateDetailsViewTests.swift",
         name = "testView_ShouldRenderCorrectly_WhenAgentMethodIsSelected",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.127 seconds"
       }, {
@@ -609,6 +682,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Modules/CreateDetails/CreateDetailsViewTests.swift",
         name = "testView_ShouldRenderCorrectly_WhenMethodIsNotSelected",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.086 seconds"
       }, {
@@ -617,6 +691,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Modules/CreateDetails/CreateDetailsViewTests.swift",
         name = "testView_ShouldRenderCorrectly_WhenEpaymentMethodIsSelected",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.084 seconds"
       } },
@@ -626,6 +701,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Services/CreateFeeCalculatorTests.swift",
         name = "testCalculateFee_ShouldCalculateCorrectly_WhenFeeTypeIsPercent",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.001 seconds"
       }, {
@@ -634,6 +710,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Services/CreateFeeCalculatorTests.swift",
         name = "testCalculateFee_ShouldFindCorrectRange",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.000 seconds"
       }, {
@@ -642,6 +719,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Services/CreateFeeCalculatorTests.swift",
         name = "testCalculateFee_ShouldReturnNil_WhenThereIsNoMatchingRange",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.001 seconds"
       }, {
@@ -650,6 +728,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Services/CreateFeeCalculatorTests.swift",
         name = "testCalculateFee_ShouldReturnNil_WhenFeeTypeIsZero",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.002 seconds"
       }, {
@@ -658,6 +737,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Services/CreateFeeCalculatorTests.swift",
         name = "testCalculateFee_ShouldReturnNil_WhenFeeRangesAreEmpty",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.000 seconds"
       } },
@@ -667,6 +747,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Modules/CreateMethod/CreateMethodViewTests.swift",
         name = "testView_ShouldRenderCorrectly",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.150 seconds"
       } },
@@ -676,6 +757,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Services/CreateNoteCountdownTests.swift",
         name = "testStartCountdown_ShouldRoundDown_WhenTwoMinutesThirtySecondsAreRemaining",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.058 seconds"
       }, {
@@ -684,6 +766,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Services/CreateNoteCountdownTests.swift",
         name = "testStartCountdown_ShouldShowSeconds_WhenOneMinuteThirtySecondsIsRemaining",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.053 seconds"
       }, {
@@ -692,6 +775,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Services/CreateNoteCountdownTests.swift",
         name = "testStartCountdown_ShouldExpire_WhenDateIsAfterExpiration",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.054 seconds"
       }, {
@@ -700,6 +784,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Services/CreateNoteCountdownTests.swift",
         name = "testStartCountdown_ShouldExpire",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.052 seconds"
       }, {
@@ -708,6 +793,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Services/CreateNoteCountdownTests.swift",
         name = "testStartCountdown_ShouldShowFullMinutes_WhenFiveMinutesAreRemaining",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.060 seconds"
       }, {
@@ -716,6 +802,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Services/CreateNoteCountdownTests.swift",
         name = "testStartCountdown_ShouldShowFullMinutes_WhenTenMinutesAreRemaining",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.057 seconds"
       } },
@@ -725,6 +812,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Services/CreateNoteManagerTests.swift",
         name = "testCreateNote_ShouldCreateNoteAndStartCountdown",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.011 seconds"
       }, {
@@ -733,6 +821,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Services/CreateNoteManagerTests.swift",
         name = "testCreateNote_ShouldNotify_WhenCountdownIsTriggered",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.055 seconds"
       }, {
@@ -741,6 +830,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Services/CreateNoteManagerTests.swift",
         name = "testCreateNote_ShouldNotify_WhenNoteIsExpired",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.056 seconds"
       }, {
@@ -749,6 +839,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Services/CreateNoteManagerTests.swift",
         name = "testCreateNote_ShouldNotify_WhenNoteIsConfirmed",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.165 seconds"
       }, {
@@ -757,6 +848,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Services/CreateNoteManagerTests.swift",
         name = "testCancelNote_ShouldNotify_WhenNoteIsCancelled",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.112 seconds"
       }, {
@@ -765,6 +857,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Services/CreateNoteManagerTests.swift",
         name = "testCreateNote_ShouldFetchNoteStatus_WhenTimerTriggers",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.057 seconds"
       }, {
@@ -773,6 +866,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Services/CreateNoteManagerTests.swift",
         name = "testCreateNote_ShouldNotify_WhenNoteIsCancelledOrFailed",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.115 seconds"
       } },
@@ -782,6 +876,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Modules/CreatePersonalQRCode/CreatePersonalQRCodeViewTests.swift",
         name = "testView_ShouldRenderCorrectly",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.138 seconds"
       } },
@@ -791,6 +886,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Modules/CreateQRCodeScanner/CreateQRCodeScannerViewModelTests.swift",
         name = "testOnConfirmTap_ShouldFetchNote_WhenNoteCodeIsProvided",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.416 seconds"
       }, {
@@ -799,6 +895,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Modules/CreateQRCodeScanner/CreateQRCodeScannerViewModelTests.swift",
         name = "testViewWillDisappear_ShouldStopCameraAndStopDetectingQRCodes",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.002 seconds"
       }, {
@@ -807,6 +904,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Modules/CreateQRCodeScanner/CreateQRCodeScannerViewModelTests.swift",
         name = "testOnScannerFinish_ShouldPresentError_WhenNoteCodeStatusIsConfirm",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.057 seconds"
       }, {
@@ -815,6 +913,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Modules/CreateQRCodeScanner/CreateQRCodeScannerViewModelTests.swift",
         name = "testOnScannerFinish_ShouldPresentError_WhenNoteCodeStatusIsFailed",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.055 seconds"
       }, {
@@ -823,6 +922,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Modules/CreateQRCodeScanner/CreateQRCodeScannerViewModelTests.swift",
         name = "testViewWillAppear_ShouldNotStartCamera_WhenModeIsFillIn",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.001 seconds"
       }, {
@@ -831,6 +931,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Modules/CreateQRCodeScanner/CreateQRCodeScannerViewModelTests.swift",
         name = "testOnScannerFinish_ShouldPresentSummary_WhenNoteCodeStatusIsPending",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.002 seconds"
       }, {
@@ -839,6 +940,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Modules/CreateQRCodeScanner/CreateQRCodeScannerViewModelTests.swift",
         name = "testViewDidAppear_ShouldStartDetectingQRCodes",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.001 seconds"
       }, {
@@ -847,6 +949,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Modules/CreateQRCodeScanner/CreateQRCodeScannerViewModelTests.swift",
         name = "testOnScannerFinish_ShouldPresentError_WhenFailure",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.055 seconds"
       }, {
@@ -855,6 +958,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Modules/CreateQRCodeScanner/CreateQRCodeScannerViewModelTests.swift",
         name = "testOnScannerFinish_ShouldFetchNote_WhenNoteCodeIsScanned",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.003 seconds"
       }, {
@@ -863,6 +967,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Modules/CreateQRCodeScanner/CreateQRCodeScannerViewModelTests.swift",
         name = "testViewDidLoad_ShouldStartCamera_WhenCameraPermissionHasBeenJustGranted",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.109 seconds"
       }, {
@@ -871,6 +976,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Modules/CreateQRCodeScanner/CreateQRCodeScannerViewModelTests.swift",
         name = "testOnScannerFinish_ShouldFetchCustomer_WhenPersonalCodeIsScanned",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.002 seconds"
       }, {
@@ -879,6 +985,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Modules/CreateQRCodeScanner/CreateQRCodeScannerViewModelTests.swift",
         name = "testViewWillAppear_ShouldStartCameraWithoutNotifying_WhenModeIsCameraAndHasCameraAccess",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.001 seconds"
       }, {
@@ -887,6 +994,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Modules/CreateQRCodeScanner/CreateQRCodeScannerViewModelTests.swift",
         name = "testOnScannerFinish_ShouldPresentError_WhenNoteCodeStatusIsCanceled",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.056 seconds"
       } },
@@ -896,6 +1004,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Modules/CreateQRCodeScanner/CreateQRCodeScannerViewTests.swift",
         name = "testView_ShouldRenderCorrectly_WhenThereIsNoCameraPermission",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.249 seconds"
       } },
@@ -905,6 +1014,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Modules/CreateQRCode/CreateQRCodeViewModelTests.swift",
         name = "testOnLoadAsync_ShouldExpireNote_WhenNoteIsExpiredAfterCreation",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.006 seconds"
       }, {
@@ -913,6 +1023,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Modules/CreateQRCode/CreateQRCodeViewModelTests.swift",
         name = "testOnBackTap_ShouldNotCancelNote_WhenAlertIsDismissed",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "1.010 seconds"
       }, {
@@ -921,6 +1032,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Modules/CreateQRCode/CreateQRCodeViewModelTests.swift",
         name = "testOnBackTap_ShouldGoBack_WhenNoteCancelationFails",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.060 seconds"
       }, {
@@ -929,6 +1041,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Modules/CreateQRCode/CreateQRCodeViewModelTests.swift",
         name = "testObservingNote_ShouldUpdateCountdown",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.061 seconds"
       }, {
@@ -937,6 +1050,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Modules/CreateQRCode/CreateQRCodeViewModelTests.swift",
         name = "testObservingNote_ShouldNotShowConfirmation_WhenNoteStatusIsNotConfirmed",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.061 seconds"
       }, {
@@ -945,6 +1059,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Modules/CreateQRCode/CreateQRCodeViewModelTests.swift",
         name = "testObservingNote_ShouldStartObserving_WhenQRCodeIsRegenerated",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.164 seconds"
       }, {
@@ -953,6 +1068,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Modules/CreateQRCode/CreateQRCodeViewModelTests.swift",
         name = "testOnLoadAsync_ShouldSetQRCode_WhenQRCodeGenerationSucceeded",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.005 seconds"
       }, {
@@ -961,6 +1077,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Modules/CreateQRCode/CreateQRCodeViewModelTests.swift",
         name = "testOnLoadAsync_ShouldSetError_WhenQRCodeGenerationFailed",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.003 seconds"
       }, {
@@ -969,6 +1086,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Modules/CreateQRCode/CreateQRCodeViewModelTests.swift",
         name = "testObservingNote_ShouldShowConfirmation_WhenNoteStatusIsConfirmed",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.059 seconds"
       }, {
@@ -977,6 +1095,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Modules/CreateQRCode/CreateQRCodeViewModelTests.swift",
         name = "testOnBackTap_ShouldCancelNote_WhenDestructiveActionIsTapped",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.060 seconds"
       }, {
@@ -985,6 +1104,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Modules/CreateQRCode/CreateQRCodeViewModelTests.swift",
         name = "testOnLoadAsync_ShouldCreateNoteAndSetupValues",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.004 seconds"
       }, {
@@ -993,6 +1113,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Modules/CreateQRCode/CreateQRCodeViewModelTests.swift",
         name = "testObservingNote_ShouldStopCountdownAndGenerateRedQRCode_WhenNoteIsExpired",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.110 seconds"
       }, {
@@ -1001,6 +1122,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Modules/CreateQRCode/CreateQRCodeViewModelTests.swift",
         name = "testOnBackTap_ShouldGoBack_WhenNoteIsExpired",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.057 seconds"
       }, {
@@ -1009,6 +1131,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Modules/CreateQRCode/CreateQRCodeViewModelTests.swift",
         name = "testOnCTATap_ShouldCreateNewNoteAndRegenerateQRCode_WhenNoteIsExpired",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.064 seconds"
       }, {
@@ -1017,6 +1140,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Modules/CreateQRCode/CreateQRCodeViewModelTests.swift",
         name = "testOnLoadAsync_ShouldShowError_WhenNoteCreationFailed",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.003 seconds"
       }, {
@@ -1025,6 +1149,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Modules/CreateQRCode/CreateQRCodeViewModelTests.swift",
         name = "testOnCTATap_ShouldPresentCancelAlert",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.002 seconds"
       }, {
@@ -1033,6 +1158,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Modules/CreateQRCode/CreateQRCodeViewModelTests.swift",
         name = "testOnBackTap_ShouldPresentCancelAlert",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.002 seconds"
       } },
@@ -1042,6 +1168,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Modules/CreateQRCode/CreateQRCodeViewTests.swift",
         name = "testView_ShouldRenderCorrectly",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.287 seconds"
       }, {
@@ -1050,6 +1177,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Modules/CreateQRCode/CreateQRCodeViewTests.swift",
         name = "testView_ShouldRenderCorrectly_WhenMissingDataError",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.057 seconds"
       }, {
@@ -1058,6 +1186,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Modules/CreateQRCode/CreateQRCodeViewTests.swift",
         name = "testView_ShouldRenderCorrectly_WhenRTLIsEnabled",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.073 seconds"
       }, {
@@ -1066,6 +1195,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCreate/Tests/Modules/CreateQRCode/CreateQRCodeViewTests.swift",
         name = "testView_ShouldRenderCorrectly_WhenNoteIsExpired",
         success = true,
+        target = "CalendarAppCreateTests",
         testResult = "passed",
         time = "0.067 seconds"
       } },
@@ -1075,6 +1205,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppDesignSystem/Tests/CurrencyFieldTests/CurrencyFieldTests.swift",
         name = "testView_ShouldRenderCorrectly_onEmpty",
         success = true,
+        target = "CalendarAppDesignSystemTests",
         testResult = "passed",
         time = "0.079 seconds"
       }, {
@@ -1083,6 +1214,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppDesignSystem/Tests/CurrencyFieldTests/CurrencyFieldTests.swift",
         name = "testView_ShouldRenderCorrectly_onCurrentState",
         success = true,
+        target = "CalendarAppDesignSystemTests",
         testResult = "passed",
         time = "0.103 seconds"
       } },
@@ -1092,6 +1224,7 @@
         filepath = "/rUsers/john/repositories/calendar-app-ios/CalendarAppSDK/Core/CalendarAppCore/Tests/DateTests.swift",
         name = "testAddDays_ShouldAddSuccessfully",
         success = true,
+        target = "CalendarAppCoreTests",
         testResult = "passed",
         time = "0.001 seconds"
       } },
@@ -1101,6 +1234,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppDeeplinks/Tests/DeeplinkParserTests.swift",
         name = "testParseDeeplink_ShouldReturnCreateDeeplink_WhenCreateParameterIsMissing",
         success = true,
+        target = "CalendarAppDeeplinksTests",
         testResult = "passed",
         time = "0.001 seconds"
       }, {
@@ -1109,6 +1243,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppDeeplinks/Tests/DeeplinkParserTests.swift",
         name = "testParseDeeplink_ShouldReturnNil_WhenValueIsInvalid",
         success = true,
+        target = "CalendarAppDeeplinksTests",
         testResult = "passed",
         time = "0.000 seconds"
       }, {
@@ -1117,6 +1252,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppDeeplinks/Tests/DeeplinkParserTests.swift",
         name = "testParseDeeplink_ShouldReturnNil_WhenNoteDetailsParameterIsMissing",
         success = true,
+        target = "CalendarAppDeeplinksTests",
         testResult = "passed",
         time = "0.000 seconds"
       }, {
@@ -1125,6 +1261,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppDeeplinks/Tests/DeeplinkParserTests.swift",
         name = "testParseDeeplink_ShouldReturnExpectedDeeplinkType_WhenCreateNoteCodeDeeplinkIsValid",
         success = true,
+        target = "CalendarAppDeeplinksTests",
         testResult = "passed",
         time = "0.000 seconds"
       }, {
@@ -1133,6 +1270,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppDeeplinks/Tests/DeeplinkParserTests.swift",
         name = "testParseDeeplink_ShouldParseCalendarOneDeeplink",
         success = true,
+        target = "CalendarAppDeeplinksTests",
         testResult = "passed",
         time = "0.001 seconds"
       }, {
@@ -1141,6 +1279,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppDeeplinks/Tests/DeeplinkParserTests.swift",
         name = "testParseDeeplink_ShouldReturnSendDeeplink",
         success = true,
+        target = "CalendarAppDeeplinksTests",
         testResult = "passed",
         time = "0.000 seconds"
       }, {
@@ -1149,6 +1288,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppDeeplinks/Tests/DeeplinkParserTests.swift",
         name = "testParseDeeplink_ShouldReturnExpectedDeeplinkType_WhenCreatePersonalCodeDeeplinkIsValid",
         success = true,
+        target = "CalendarAppDeeplinksTests",
         testResult = "passed",
         time = "0.000 seconds"
       }, {
@@ -1157,6 +1297,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppDeeplinks/Tests/DeeplinkParserTests.swift",
         name = "testParseDeeplink_ShouldReturnExpectedDeeplinkType_WhenNoteDetailsDeeplinkIsValid",
         success = true,
+        target = "CalendarAppDeeplinksTests",
         testResult = "passed",
         time = "0.000 seconds"
       } },
@@ -1166,6 +1307,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppDeeplinks/Tests/DeeplinkTapManagerTests.swift",
         name = "testTriggerPendingDeeplinks_ShouldShowPendingDeeplinkOnlyOnce",
         success = true,
+        target = "CalendarAppDeeplinksTests",
         testResult = "passed",
         time = "0.004 seconds"
       }, {
@@ -1174,6 +1316,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppDeeplinks/Tests/DeeplinkTapManagerTests.swift",
         name = "testHandleDeeplinkTap_ShouldShowSend_WhenUserIsSignedIn",
         success = true,
+        target = "CalendarAppDeeplinksTests",
         testResult = "passed",
         time = "0.000 seconds"
       }, {
@@ -1182,6 +1325,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppDeeplinks/Tests/DeeplinkTapManagerTests.swift",
         name = "testHandleDeeplinkTap_ShouldShowCreate_WhenUserIsSignedIn",
         success = true,
+        target = "CalendarAppDeeplinksTests",
         testResult = "passed",
         time = "0.000 seconds"
       }, {
@@ -1190,6 +1334,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppDeeplinks/Tests/DeeplinkTapManagerTests.swift",
         name = "testHandleDeeplinkTap_ShouldShowNoteDetails_WhenUserIsSignedIn",
         success = true,
+        target = "CalendarAppDeeplinksTests",
         testResult = "passed",
         time = "0.009 seconds"
       }, {
@@ -1198,6 +1343,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppDeeplinks/Tests/DeeplinkTapManagerTests.swift",
         name = "testHandleDeeplinkTap_ShouldReturnFalse_WhenDeeplinkIsInvalid",
         success = true,
+        target = "CalendarAppDeeplinksTests",
         testResult = "passed",
         time = "0.000 seconds"
       }, {
@@ -1206,6 +1352,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppDeeplinks/Tests/DeeplinkTapManagerTests.swift",
         name = "testTriggerPendingDeeplinks_ShouldShowNoteDetailsAfterSigningIn_WhenDeeplinkIsReceivedWhenUserIsNotSignedIn",
         success = true,
+        target = "CalendarAppDeeplinksTests",
         testResult = "passed",
         time = "0.000 seconds"
       } },
@@ -1215,6 +1362,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppBusinessLogic/Tests/Utils/EmailValidatorTests.swift",
         name = "testValidator_ShouldReturnIsValid_WhenEmailIsValid",
         success = true,
+        target = "CalendarAppBusinessLogicTests",
         testResult = "passed",
         time = "0.001 seconds"
       }, {
@@ -1223,6 +1371,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppBusinessLogic/Tests/Utils/EmailValidatorTests.swift",
         name = "testValidator_ShouldReturnIsNotValid_WhenEmailIContainsWhitespaces",
         success = true,
+        target = "CalendarAppBusinessLogicTests",
         testResult = "passed",
         time = "0.000 seconds"
       }, {
@@ -1231,6 +1380,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppBusinessLogic/Tests/Utils/EmailValidatorTests.swift",
         name = "testValidator_ShouldReturnIsNotValid_WhenEmailIsEmpty",
         success = true,
+        target = "CalendarAppBusinessLogicTests",
         testResult = "passed",
         time = "0.000 seconds"
       }, {
@@ -1239,6 +1389,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppBusinessLogic/Tests/Utils/EmailValidatorTests.swift",
         name = "testValidator_ShouldReturnIsNotValid_WhenEmailIsInvalid",
         success = true,
+        target = "CalendarAppBusinessLogicTests",
         testResult = "passed",
         time = "0.003 seconds"
       } },
@@ -1248,6 +1399,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppOnboarding/Tests/Modules/EnablePushNotification/EnablePushNotificationViewTests.swift",
         name = "testView_ShouldRenderCorrectly",
         success = true,
+        target = "CalendarAppOnboardingTests",
         testResult = "passed",
         time = "0.130 seconds"
       } },
@@ -1257,6 +1409,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppDesignSystem/Tests/ErrorViewTests/ErrorViewTests.swift",
         name = "testView_ShouldRenderCorrectly_WhenMissingDataError",
         success = true,
+        target = "CalendarAppDesignSystemTests",
         testResult = "passed",
         time = "0.091 seconds"
       }, {
@@ -1265,6 +1418,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppDesignSystem/Tests/ErrorViewTests/ErrorViewTests.swift",
         name = "testView_ShouldRenderCorrectly_WhenNoInternetError",
         success = true,
+        target = "CalendarAppDesignSystemTests",
         testResult = "passed",
         time = "0.037 seconds"
       }, {
@@ -1273,6 +1427,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppDesignSystem/Tests/ErrorViewTests/ErrorViewTests.swift",
         name = "testView_ShouldRenderCorrectly_WhenInvalidQrCodeError",
         success = true,
+        target = "CalendarAppDesignSystemTests",
         testResult = "passed",
         time = "0.034 seconds"
       } },
@@ -1282,6 +1437,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppEventCode/Tests/Modules/EventCodeBlocked/EventCodeBlockedViewModelTests.swift",
         name = "testOnAppear_ShouldSubscribeToTimer",
         success = true,
+        target = "CalendarAppEventCodeTests",
         testResult = "passed",
         time = "0.001 seconds"
       }, {
@@ -1290,6 +1446,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppEventCode/Tests/Modules/EventCodeBlocked/EventCodeBlockedViewModelTests.swift",
         name = "testOnCountdown_ShouldDismissOnce_WhenCountdownIsFinished",
         success = true,
+        target = "CalendarAppEventCodeTests",
         testResult = "passed",
         time = "0.001 seconds"
       }, {
@@ -1298,6 +1455,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppEventCode/Tests/Modules/EventCodeBlocked/EventCodeBlockedViewModelTests.swift",
         name = "testOnAppear_ShouldBlockAccount",
         success = true,
+        target = "CalendarAppEventCodeTests",
         testResult = "passed",
         time = "0.001 seconds"
       }, {
@@ -1306,6 +1464,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppEventCode/Tests/Modules/EventCodeBlocked/EventCodeBlockedViewModelTests.swift",
         name = "testOnCountdown_ShouldCountdownCorrectly",
         success = true,
+        target = "CalendarAppEventCodeTests",
         testResult = "passed",
         time = "0.001 seconds"
       }, {
@@ -1314,6 +1473,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppEventCode/Tests/Modules/EventCodeBlocked/EventCodeBlockedViewModelTests.swift",
         name = "testOnCountdown_ShouldUnblockAccount_WhenCountdownIsFinished",
         success = true,
+        target = "CalendarAppEventCodeTests",
         testResult = "passed",
         time = "0.001 seconds"
       } },
@@ -1323,6 +1483,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppEventCode/Tests/Modules/EventCodeBlocked/EventCodeBlockedViewTests.swift",
         name = "testView_ShouldRenderCorrectly",
         success = true,
+        target = "CalendarAppEventCodeTests",
         testResult = "passed",
         time = "0.122 seconds"
       } },
@@ -1332,6 +1493,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppEventCode/Tests/Modules/EventCodeChangeConfirmationView/EventCodeChangeConfirmationViewTests.swift",
         name = "testView_ShouldRenderCorrectly",
         success = true,
+        target = "CalendarAppEventCodeTests",
         testResult = "passed",
         time = "0.078 seconds"
       } },
@@ -1341,6 +1503,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppEventCode/Tests/Modules/EventCodeConfirm/EventCodeConfirmTransferViewTests.swift",
         name = "testView_ShouldRenderCorrectly_WhenRightToLeftIsSet",
         success = true,
+        target = "CalendarAppEventCodeTests",
         testResult = "passed",
         time = "0.043 seconds"
       }, {
@@ -1349,6 +1512,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppEventCode/Tests/Modules/EventCodeConfirm/EventCodeConfirmTransferViewTests.swift",
         name = "testView_ShouldRenderCorrectly_WhenEventIsNotCorrect",
         success = true,
+        target = "CalendarAppEventCodeTests",
         testResult = "passed",
         time = "0.040 seconds"
       }, {
@@ -1357,6 +1521,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppEventCode/Tests/Modules/EventCodeConfirm/EventCodeConfirmTransferViewTests.swift",
         name = "testView_ShouldRenderCorrectly_WhenStyleIsSetToSignIn",
         success = true,
+        target = "CalendarAppEventCodeTests",
         testResult = "passed",
         time = "0.096 seconds"
       }, {
@@ -1365,6 +1530,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppEventCode/Tests/Modules/EventCodeConfirm/EventCodeConfirmTransferViewTests.swift",
         name = "testView_ShouldRenderCorrectly",
         success = true,
+        target = "CalendarAppEventCodeTests",
         testResult = "passed",
         time = "0.040 seconds"
       } },
@@ -1374,6 +1540,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppEventCode/Tests/Modules/EventCodeConfirm/EventCodeConfirmViewModelTests.swift",
         name = "testEvent_ShouldSetError_WhenEventValidationThrows",
         success = true,
+        target = "CalendarAppEventCodeTests",
         testResult = "passed",
         time = "0.074 seconds"
       }, {
@@ -1382,6 +1549,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppEventCode/Tests/Modules/EventCodeConfirm/EventCodeConfirmViewModelTests.swift",
         name = "testEvent_ShouldHideError_WhenProvidedSomeDigit",
         success = true,
+        target = "CalendarAppEventCodeTests",
         testResult = "passed",
         time = "0.109 seconds"
       }, {
@@ -1392,6 +1560,7 @@
         message = { "XCTAssertTrue failed" },
         name = "testEvent_ShouldValidateEventAndSetCorrectStatus_WhenFourDigitsAreProvided",
         success = false,
+        target = "CalendarAppEventCodeTests",
         testResult = "failed",
         time = "0.460 seconds"
       }, {
@@ -1400,6 +1569,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppEventCode/Tests/Modules/EventCodeConfirm/EventCodeConfirmViewModelTests.swift",
         name = "testOnForgotEvent_ShouldClearInputState_WhenEventResetIsFinished",
         success = true,
+        target = "CalendarAppEventCodeTests",
         testResult = "passed",
         time = "0.055 seconds"
       }, {
@@ -1408,6 +1578,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppEventCode/Tests/Modules/EventCodeConfirm/EventCodeConfirmViewModelTests.swift",
         name = "testEvent_ShouldSanitizeEvent",
         success = true,
+        target = "CalendarAppEventCodeTests",
         testResult = "passed",
         time = "0.000 seconds"
       } },
@@ -1417,6 +1588,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppEventCode/Tests/Modules/EventCodeCreate/EventCodeCreateViewModelTests.swift",
         name = "testInputState_ShouldBeCleared_WhenEventConfirmationIsInvalid",
         success = true,
+        target = "CalendarAppEventCodeTests",
         testResult = "passed",
         time = "0.108 seconds"
       }, {
@@ -1425,6 +1597,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppEventCode/Tests/Modules/EventCodeCreate/EventCodeCreateViewModelTests.swift",
         name = "testEvent_ShouldBeCleared_WhenEventIsInvalid",
         success = true,
+        target = "CalendarAppEventCodeTests",
         testResult = "passed",
         time = "0.055 seconds"
       }, {
@@ -1433,6 +1606,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppEventCode/Tests/Modules/EventCodeCreate/EventCodeCreateViewModelTests.swift",
         name = "testOnCloseTap_ShouldCallRouter",
         success = true,
+        target = "CalendarAppEventCodeTests",
         testResult = "passed",
         time = "0.001 seconds"
       }, {
@@ -1441,6 +1615,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppEventCode/Tests/Modules/EventCodeCreate/EventCodeCreateViewModelTests.swift",
         name = "testEvent_ShouldBeSanitize_WhenEventChange",
         success = true,
+        target = "CalendarAppEventCodeTests",
         testResult = "passed",
         time = "0.055 seconds"
       }, {
@@ -1449,6 +1624,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppEventCode/Tests/Modules/EventCodeCreate/EventCodeCreateViewModelTests.swift",
         name = "testInputState_ShouldBeDestructive_WhenEventIsInvalid",
         success = true,
+        target = "CalendarAppEventCodeTests",
         testResult = "passed",
         time = "0.056 seconds"
       }, {
@@ -1457,6 +1633,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppEventCode/Tests/Modules/EventCodeCreate/EventCodeCreateViewModelTests.swift",
         name = "testEvent_ShouldShowError_WhenModeIsResetEventAndNewEventIsIncorrect",
         success = true,
+        target = "CalendarAppEventCodeTests",
         testResult = "passed",
         time = "0.112 seconds"
       }, {
@@ -1465,6 +1642,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppEventCode/Tests/Modules/EventCodeCreate/EventCodeCreateViewModelTests.swift",
         name = "testInputState_ShouldBeDestructive_WhenEventConfirmationIsInvalid",
         success = true,
+        target = "CalendarAppEventCodeTests",
         testResult = "passed",
         time = "0.109 seconds"
       }, {
@@ -1473,6 +1651,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppEventCode/Tests/Modules/EventCodeCreate/EventCodeCreateViewModelTests.swift",
         name = "testEvent_ShouldShowFlowForEventReset_WhenModeIsResetEvent",
         success = true,
+        target = "CalendarAppEventCodeTests",
         testResult = "passed",
         time = "0.167 seconds"
       }, {
@@ -1481,6 +1660,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppEventCode/Tests/Modules/EventCodeCreate/EventCodeCreateViewModelTests.swift",
         name = "testEvent_ShouldGoBackToNewEvent_WhenModeIsEventChangeAndNewEventIsIncorrect",
         success = true,
+        target = "CalendarAppEventCodeTests",
         testResult = "passed",
         time = "0.172 seconds"
       }, {
@@ -1489,6 +1669,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppEventCode/Tests/Modules/EventCodeCreate/EventCodeCreateViewModelTests.swift",
         name = "testEvent_ShouldBeCleared_WhenEventIsValid",
         success = true,
+        target = "CalendarAppEventCodeTests",
         testResult = "passed",
         time = "0.056 seconds"
       }, {
@@ -1497,6 +1678,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppEventCode/Tests/Modules/EventCodeCreate/EventCodeCreateViewModelTests.swift",
         name = "testEvent_ShouldShowSameEventError_WhenModeIsResetEventAndRequestReturnsSameEventError",
         success = true,
+        target = "CalendarAppEventCodeTests",
         testResult = "passed",
         time = "0.112 seconds"
       }, {
@@ -1505,6 +1687,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppEventCode/Tests/Modules/EventCodeCreate/EventCodeCreateViewModelTests.swift",
         name = "testEvent_ShouldShowFlowForEventChange_WhenModeIsEventChange",
         success = true,
+        target = "CalendarAppEventCodeTests",
         testResult = "passed",
         time = "0.166 seconds"
       }, {
@@ -1513,6 +1696,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppEventCode/Tests/Modules/EventCodeCreate/EventCodeCreateViewModelTests.swift",
         name = "testEvent_ShouldShowError_WhenModeIsResetEventAndResetEventRequestFailed",
         success = true,
+        target = "CalendarAppEventCodeTests",
         testResult = "passed",
         time = "0.104 seconds"
       }, {
@@ -1521,6 +1705,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppEventCode/Tests/Modules/EventCodeCreate/EventCodeCreateViewModelTests.swift",
         name = "testEvent_ShouldCreateEvent_WhenEventWasConfirmedCorrectly",
         success = true,
+        target = "CalendarAppEventCodeTests",
         testResult = "passed",
         time = "0.112 seconds"
       } },
@@ -1530,6 +1715,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppEventCode/Tests/Modules/EventCodeCreate/EventCodeCreateViewTests.swift",
         name = "testView_ShouldRenderCorrectly_OnDefaultWithHintInputState",
         success = true,
+        target = "CalendarAppEventCodeTests",
         testResult = "passed",
         time = "0.146 seconds"
       }, {
@@ -1538,6 +1724,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppEventCode/Tests/Modules/EventCodeCreate/EventCodeCreateViewTests.swift",
         name = "testView_ShouldRenderCorrectly_WithEventAndDestructiveState",
         success = true,
+        target = "CalendarAppEventCodeTests",
         testResult = "passed",
         time = "0.057 seconds"
       }, {
@@ -1546,6 +1733,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppEventCode/Tests/Modules/EventCodeCreate/EventCodeCreateViewTests.swift",
         name = "testView_ShouldRenderCorrectly",
         success = true,
+        target = "CalendarAppEventCodeTests",
         testResult = "passed",
         time = "0.042 seconds"
       }, {
@@ -1554,6 +1742,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppEventCode/Tests/Modules/EventCodeCreate/EventCodeCreateViewTests.swift",
         name = "testView_ShouldRenderCorrectly_OnDestructiveInputState",
         success = true,
+        target = "CalendarAppEventCodeTests",
         testResult = "passed",
         time = "0.042 seconds"
       }, {
@@ -1562,6 +1751,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppEventCode/Tests/Modules/EventCodeCreate/EventCodeCreateViewTests.swift",
         name = "testView_ShouldRenderCorrectly_WithEvent",
         success = true,
+        target = "CalendarAppEventCodeTests",
         testResult = "passed",
         time = "0.044 seconds"
       } },
@@ -1571,6 +1761,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppBusinessLogic/Tests/Utils/EventCodeSanitizerTests.swift",
         name = "testSanitize_ShouldReplaceArabicDigitWithEuropean",
         success = true,
+        target = "CalendarAppBusinessLogicTests",
         testResult = "passed",
         time = "0.034 seconds"
       }, {
@@ -1579,6 +1770,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppBusinessLogic/Tests/Utils/EventCodeSanitizerTests.swift",
         name = "testSanitize_ShouldLeaveOnlyNumbers",
         success = true,
+        target = "CalendarAppBusinessLogicTests",
         testResult = "passed",
         time = "0.000 seconds"
       }, {
@@ -1587,6 +1779,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppBusinessLogic/Tests/Utils/EventCodeSanitizerTests.swift",
         name = "testSanitize_ShouldReplaceMixedArabicAndEuropeanDigitWithEuropean",
         success = true,
+        target = "CalendarAppBusinessLogicTests",
         testResult = "passed",
         time = "0.000 seconds"
       } },
@@ -1596,6 +1789,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppBusinessLogic/Tests/Utils/EventCodeValidatorTests.swift",
         name = "testValidator_ShouldReturnIsInvalid_WhenEventIsRepetitive",
         success = true,
+        target = "CalendarAppBusinessLogicTests",
         testResult = "passed",
         time = "0.001 seconds"
       }, {
@@ -1604,6 +1798,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppBusinessLogic/Tests/Utils/EventCodeValidatorTests.swift",
         name = "testValidator_ShouldReturnIsInvalid_WhenEventIsAscendingSequence",
         success = true,
+        target = "CalendarAppBusinessLogicTests",
         testResult = "passed",
         time = "0.000 seconds"
       }, {
@@ -1612,6 +1807,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppBusinessLogic/Tests/Utils/EventCodeValidatorTests.swift",
         name = "testValidator_ShouldReturnIsValid_WhenEventIsValid",
         success = true,
+        target = "CalendarAppBusinessLogicTests",
         testResult = "passed",
         time = "0.001 seconds"
       }, {
@@ -1620,6 +1816,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppBusinessLogic/Tests/Utils/EventCodeValidatorTests.swift",
         name = "testValidator_ShouldReturnIsInvalid_WhenEventContainsLettersAndNumbers",
         success = true,
+        target = "CalendarAppBusinessLogicTests",
         testResult = "passed",
         time = "0.000 seconds"
       }, {
@@ -1628,6 +1825,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppBusinessLogic/Tests/Utils/EventCodeValidatorTests.swift",
         name = "testValidator_ShouldReturnIsInvalid_WhenEventIsDescendingSequence",
         success = true,
+        target = "CalendarAppBusinessLogicTests",
         testResult = "passed",
         time = "0.000 seconds"
       }, {
@@ -1636,6 +1834,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppBusinessLogic/Tests/Utils/EventCodeValidatorTests.swift",
         name = "testValidator_ShouldReturnIsInvalid_WhenEventContainsOnlyLetters",
         success = true,
+        target = "CalendarAppBusinessLogicTests",
         testResult = "passed",
         time = "0.000 seconds"
       } },
@@ -1645,6 +1844,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppMenu/Tests/Modules/EventMenuViewTests.swift",
         name = "testView_ShouldRenderCorrectly",
         success = true,
+        target = "CalendarAppMenuTests",
         testResult = "passed",
         time = "0.206 seconds"
       } },
@@ -1654,6 +1854,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppBusinessLogic/Tests/Utils/EventsAmountSanitizerTests.swift",
         name = "testSanitize_ShouldReplaceArabicDigitWithEuropean",
         success = true,
+        target = "CalendarAppBusinessLogicTests",
         testResult = "passed",
         time = "0.001 seconds"
       }, {
@@ -1662,6 +1863,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppBusinessLogic/Tests/Utils/EventsAmountSanitizerTests.swift",
         name = "testSanitize_ShouldSkipInvalidCharacters",
         success = true,
+        target = "CalendarAppBusinessLogicTests",
         testResult = "passed",
         time = "0.000 seconds"
       }, {
@@ -1670,6 +1872,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppBusinessLogic/Tests/Utils/EventsAmountSanitizerTests.swift",
         name = "testSanitize_ShouldReturnEmpty_WhenEmptyIsProvided",
         success = true,
+        target = "CalendarAppBusinessLogicTests",
         testResult = "passed",
         time = "0.000 seconds"
       }, {
@@ -1678,6 +1881,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppBusinessLogic/Tests/Utils/EventsAmountSanitizerTests.swift",
         name = "testSanitize_ShouldNotAllowSeparator_WhenNothingElseIsProvided",
         success = true,
+        target = "CalendarAppBusinessLogicTests",
         testResult = "passed",
         time = "0.000 seconds"
       }, {
@@ -1686,6 +1890,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppBusinessLogic/Tests/Utils/EventsAmountSanitizerTests.swift",
         name = "testSanitize_ShouldReplaceAnyPunctuationWithDecimalSeparator",
         success = true,
+        target = "CalendarAppBusinessLogicTests",
         testResult = "passed",
         time = "0.000 seconds"
       }, {
@@ -1694,6 +1899,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppBusinessLogic/Tests/Utils/EventsAmountSanitizerTests.swift",
         name = "testSanitize_ShouldReplaceArabicDigitWithEuropeanAtTheEnd",
         success = true,
+        target = "CalendarAppBusinessLogicTests",
         testResult = "passed",
         time = "0.000 seconds"
       }, {
@@ -1702,6 +1908,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppBusinessLogic/Tests/Utils/EventsAmountSanitizerTests.swift",
         name = "testSanitize_ShouldNotAllowMoreThanFiveDigits",
         success = true,
+        target = "CalendarAppBusinessLogicTests",
         testResult = "passed",
         time = "0.001 seconds"
       }, {
@@ -1710,6 +1917,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppBusinessLogic/Tests/Utils/EventsAmountSanitizerTests.swift",
         name = "testSanitize_ShouldAllowNineDigitsAndThreeDecimalPlaces",
         success = true,
+        target = "CalendarAppBusinessLogicTests",
         testResult = "passed",
         time = "0.000 seconds"
       }, {
@@ -1718,6 +1926,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppBusinessLogic/Tests/Utils/EventsAmountSanitizerTests.swift",
         name = "testSanitize_ShouldAllowOneDecimalSeparator",
         success = true,
+        target = "CalendarAppBusinessLogicTests",
         testResult = "passed",
         time = "0.000 seconds"
       }, {
@@ -1726,6 +1935,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppBusinessLogic/Tests/Utils/EventsAmountSanitizerTests.swift",
         name = "testSanitize_ShouldAllowFiveDigitsAndTwoDecimalPlaces",
         success = true,
+        target = "CalendarAppBusinessLogicTests",
         testResult = "passed",
         time = "0.000 seconds"
       }, {
@@ -1734,6 +1944,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppBusinessLogic/Tests/Utils/EventsAmountSanitizerTests.swift",
         name = "testSanitize_ShouldReturnSingleZero_WhenMultipleZerosAreProvided",
         success = true,
+        target = "CalendarAppBusinessLogicTests",
         testResult = "passed",
         time = "0.000 seconds"
       }, {
@@ -1742,6 +1953,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppBusinessLogic/Tests/Utils/EventsAmountSanitizerTests.swift",
         name = "testSanitize_ShouldAllowFiveDigits",
         success = true,
+        target = "CalendarAppBusinessLogicTests",
         testResult = "passed",
         time = "0.000 seconds"
       }, {
@@ -1750,6 +1962,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppBusinessLogic/Tests/Utils/EventsAmountSanitizerTests.swift",
         name = "testSanitize_ShouldAllowFiveDigitsAndThreeDecimalPlaces",
         success = true,
+        target = "CalendarAppBusinessLogicTests",
         testResult = "passed",
         time = "0.000 seconds"
       } },
@@ -1759,6 +1972,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppBusinessLogic/Tests/Utils/EventsFormatterTests.swift",
         name = "testConvertToDouble_ShouldReturnFailure_WhenCurrencyConfigurationIsNotLoaded",
         success = true,
+        target = "CalendarAppBusinessLogicTests",
         testResult = "passed",
         time = "0.001 seconds"
       }, {
@@ -1767,6 +1981,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppBusinessLogic/Tests/Utils/EventsFormatterTests.swift",
         name = "testEvents_ShouldReturnFailure_WhenConfigurationIsNotFound",
         success = true,
+        target = "CalendarAppBusinessLogicTests",
         testResult = "passed",
         time = "0.001 seconds"
       }, {
@@ -1775,6 +1990,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppBusinessLogic/Tests/Utils/EventsFormatterTests.swift",
         name = "testConvertToDouble_ShouldReturnSuccessWithCorrectValue",
         success = true,
+        target = "CalendarAppBusinessLogicTests",
         testResult = "passed",
         time = "0.001 seconds"
       }, {
@@ -1783,6 +1999,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppBusinessLogic/Tests/Utils/EventsFormatterTests.swift",
         name = "testString_ShouldReturnCorrectString_WhenCurrencyHasThreeDecimalPlaces",
         success = true,
+        target = "CalendarAppBusinessLogicTests",
         testResult = "passed",
         time = "0.001 seconds"
       }, {
@@ -1791,6 +2008,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppBusinessLogic/Tests/Utils/EventsFormatterTests.swift",
         name = "testEvents_ShouldReturnCorrectEvents_WhenUsingStrangeSeparator",
         success = true,
+        target = "CalendarAppBusinessLogicTests",
         testResult = "passed",
         time = "0.001 seconds"
       }, {
@@ -1799,6 +2017,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppBusinessLogic/Tests/Utils/EventsFormatterTests.swift",
         name = "testEvents_ShouldReturnSuccess_WhenNumberOfDecimalPlacesIsCorrect",
         success = true,
+        target = "CalendarAppBusinessLogicTests",
         testResult = "passed",
         time = "0.001 seconds"
       }, {
@@ -1807,6 +2026,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppBusinessLogic/Tests/Utils/EventsFormatterTests.swift",
         name = "testString_ShouldReturnCorrectString_WhenCurrencyHasTwoDecimalPlaces",
         success = true,
+        target = "CalendarAppBusinessLogicTests",
         testResult = "passed",
         time = "0.000 seconds"
       }, {
@@ -1815,6 +2035,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppBusinessLogic/Tests/Utils/EventsFormatterTests.swift",
         name = "testEvents_ShouldParseArabicNumber",
         success = true,
+        target = "CalendarAppBusinessLogicTests",
         testResult = "passed",
         time = "0.001 seconds"
       }, {
@@ -1823,6 +2044,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppBusinessLogic/Tests/Utils/EventsFormatterTests.swift",
         name = "testConvertToDouble_ShouldReturnSuccessWithCorrectValue_WhenCurrencyHasThreeDecimalPlaces",
         success = true,
+        target = "CalendarAppBusinessLogicTests",
         testResult = "passed",
         time = "0.000 seconds"
       }, {
@@ -1831,6 +2053,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppBusinessLogic/Tests/Utils/EventsFormatterTests.swift",
         name = "testEvents_ShouldReturnCorrectEvents_WhenCurrencyHasThreeDecimalPlaces",
         success = true,
+        target = "CalendarAppBusinessLogicTests",
         testResult = "passed",
         time = "0.000 seconds"
       }, {
@@ -1839,6 +2062,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppBusinessLogic/Tests/Utils/EventsFormatterTests.swift",
         name = "testEvents_ShouldReturnSuccess_WhenTheGivenNumberIsNotRepresentableByFloat",
         success = true,
+        target = "CalendarAppBusinessLogicTests",
         testResult = "passed",
         time = "0.000 seconds"
       }, {
@@ -1847,6 +2071,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppBusinessLogic/Tests/Utils/EventsFormatterTests.swift",
         name = "testGetSymbol_ShouldConvertCorrectly",
         success = true,
+        target = "CalendarAppBusinessLogicTests",
         testResult = "passed",
         time = "0.000 seconds"
       }, {
@@ -1855,6 +2080,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppBusinessLogic/Tests/Utils/EventsFormatterTests.swift",
         name = "testString_ShouldReturnFailure_WhenConfigurationIsNotFound",
         success = true,
+        target = "CalendarAppBusinessLogicTests",
         testResult = "passed",
         time = "0.000 seconds"
       }, {
@@ -1863,6 +2089,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppBusinessLogic/Tests/Utils/EventsFormatterTests.swift",
         name = "testEvents_ShouldReturnFailure_WhenNumberOfDecimalPlacesIsIncorrect",
         success = true,
+        target = "CalendarAppBusinessLogicTests",
         testResult = "passed",
         time = "0.000 seconds"
       }, {
@@ -1871,6 +2098,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppBusinessLogic/Tests/Utils/EventsFormatterTests.swift",
         name = "testEvents_ShouldReturnCorrectEvents_WhenCurrencyHasTwoDecimalPlaces",
         success = true,
+        target = "CalendarAppBusinessLogicTests",
         testResult = "passed",
         time = "0.000 seconds"
       }, {
@@ -1879,6 +2107,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppBusinessLogic/Tests/Utils/EventsFormatterTests.swift",
         name = "testString_ShouldReturnCorrectString_WhenUsingStrangeSeparator",
         success = true,
+        target = "CalendarAppBusinessLogicTests",
         testResult = "passed",
         time = "0.001 seconds"
       }, {
@@ -1887,6 +2116,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppBusinessLogic/Tests/Utils/EventsFormatterTests.swift",
         name = "testString_ShouldReturnCorrectString_WhenTrimmingCentsIsSetToTrue",
         success = true,
+        target = "CalendarAppBusinessLogicTests",
         testResult = "passed",
         time = "0.000 seconds"
       }, {
@@ -1895,6 +2125,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppBusinessLogic/Tests/Utils/EventsFormatterTests.swift",
         name = "testString_ShouldReturnAmountWithCurrency",
         success = true,
+        target = "CalendarAppBusinessLogicTests",
         testResult = "passed",
         time = "0.000 seconds"
       }, {
@@ -1903,6 +2134,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppBusinessLogic/Tests/Utils/EventsFormatterTests.swift",
         name = "testEvents_ShouldReturnFailure_WhenStringIsNotNumber",
         success = true,
+        target = "CalendarAppBusinessLogicTests",
         testResult = "passed",
         time = "0.000 seconds"
       } },
@@ -1912,6 +2144,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Core/CalendarAppCore/Tests/EventsTests.swift",
         name = "testEventsAdd_ShouldAddCorrectly",
         success = true,
+        target = "CalendarAppCoreTests",
         testResult = "passed",
         time = "0.003 seconds"
       }, {
@@ -1920,6 +2153,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Core/CalendarAppCore/Tests/EventsTests.swift",
         name = "testEventsSubtract_ShouldSubtractCorrectly",
         success = true,
+        target = "CalendarAppCoreTests",
         testResult = "passed",
         time = "0.000 seconds"
       }, {
@@ -1928,6 +2162,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Core/CalendarAppCore/Tests/EventsTests.swift",
         name = "testEventsDivide_ShouldDivideCorrectly",
         success = true,
+        target = "CalendarAppCoreTests",
         testResult = "passed",
         time = "0.000 seconds"
       }, {
@@ -1936,6 +2171,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Core/CalendarAppCore/Tests/EventsTests.swift",
         name = "testEventsMultiply_ShouldMultiplyCorrectly",
         success = true,
+        target = "CalendarAppCoreTests",
         testResult = "passed",
         time = "0.000 seconds"
       } },
@@ -1945,6 +2181,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppHome/Tests/Modules/Root/HomeViewTests.swift",
         name = "testView_ShouldRenderCorrectly_WhenNotesAreEmpty",
         success = true,
+        target = "CalendarAppHomeTests",
         testResult = "passed",
         time = "0.336 seconds"
       }, {
@@ -1953,6 +2190,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppHome/Tests/Modules/Root/HomeViewTests.swift",
         name = "testView_ShouldRenderCorrectly_WhenIsLoadingCustomer",
         success = true,
+        target = "CalendarAppHomeTests",
         testResult = "passed",
         time = "0.119 seconds"
       }, {
@@ -1961,6 +2199,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppHome/Tests/Modules/Root/HomeViewTests.swift",
         name = "testView_ShouldRenderCorrectly_WhenCounterIsHidden",
         success = true,
+        target = "CalendarAppHomeTests",
         testResult = "passed",
         time = "0.201 seconds"
       }, {
@@ -1969,6 +2208,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppHome/Tests/Modules/Root/HomeViewTests.swift",
         name = "testView_ShouldRenderCorrectly_WhenIsLoadingAgent",
         success = true,
+        target = "CalendarAppHomeTests",
         testResult = "passed",
         time = "0.113 seconds"
       }, {
@@ -1977,6 +2217,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppHome/Tests/Modules/Root/HomeViewTests.swift",
         name = "testView_ShouldRenderCorrectly",
         success = true,
+        target = "CalendarAppHomeTests",
         testResult = "passed",
         time = "0.216 seconds"
       }, {
@@ -1985,6 +2226,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppHome/Tests/Modules/Root/HomeViewTests.swift",
         name = "testView_ShouldRenderCorrectly_WhenRoleIsAgent",
         success = true,
+        target = "CalendarAppHomeTests",
         testResult = "passed",
         time = "0.185 seconds"
       } },
@@ -1994,6 +2236,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppEventCode/Tests/Modules/ForgotEventImage/ImageCodeViewModelTests.swift",
         name = "testOnAppear_ShouldShowSomethingWentWrongAndBlockImage_WhenUnexpectedErrorOcurred",
         success = true,
+        target = "CalendarAppEventCodeTests",
         testResult = "passed",
         time = "0.060 seconds"
       }, {
@@ -2002,6 +2245,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppEventCode/Tests/Modules/ForgotEventImage/ImageCodeViewModelTests.swift",
         name = "testOnAppear_ShouldShowSomethingWentWrong_WhenTooManyAttempts",
         success = true,
+        target = "CalendarAppEventCodeTests",
         testResult = "passed",
         time = "0.055 seconds"
       }, {
@@ -2010,6 +2254,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppEventCode/Tests/Modules/ForgotEventImage/ImageCodeViewModelTests.swift",
         name = "testCode_ShouldChangeStateToDefault_WhenStartedTyeventg",
         success = true,
+        target = "CalendarAppEventCodeTests",
         testResult = "passed",
         time = "0.163 seconds"
       }, {
@@ -2018,6 +2263,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppEventCode/Tests/Modules/ForgotEventImage/ImageCodeViewModelTests.swift",
         name = "testOnAppear_ShouldShowNoInternetConnectionError",
         success = true,
+        target = "CalendarAppEventCodeTests",
         testResult = "passed",
         time = "0.065 seconds"
       }, {
@@ -2026,6 +2272,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppEventCode/Tests/Modules/ForgotEventImage/ImageCodeViewModelTests.swift",
         name = "testOnCountdown_ShouldCountdownCorrectly",
         success = true,
+        target = "CalendarAppEventCodeTests",
         testResult = "passed",
         time = "0.067 seconds"
       }, {
@@ -2034,6 +2281,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppEventCode/Tests/Modules/ForgotEventImage/ImageCodeViewModelTests.swift",
         name = "testOnAppear_ShouldRequestImageAndStartTimer",
         success = true,
+        target = "CalendarAppEventCodeTests",
         testResult = "passed",
         time = "0.059 seconds"
       }, {
@@ -2042,6 +2290,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppEventCode/Tests/Modules/ForgotEventImage/ImageCodeViewModelTests.swift",
         name = "testOnHintTap_ShouldRequestImage_WhenCodeIsExpired",
         success = true,
+        target = "CalendarAppEventCodeTests",
         testResult = "passed",
         time = "0.172 seconds"
       }, {
@@ -2050,6 +2299,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppEventCode/Tests/Modules/ForgotEventImage/ImageCodeViewModelTests.swift",
         name = "testCode_ShouldShowSomethingWentWrong_WhenValidationFailedWitMaxNumberOfTriesReached",
         success = true,
+        target = "CalendarAppEventCodeTests",
         testResult = "passed",
         time = "0.057 seconds"
       }, {
@@ -2058,6 +2308,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppEventCode/Tests/Modules/ForgotEventImage/ImageCodeViewModelTests.swift",
         name = "testCode_ShouldShowNoInternetConnectionError_WhenValidationFailedWitNoInternetError",
         success = true,
+        target = "CalendarAppEventCodeTests",
         testResult = "passed",
         time = "0.055 seconds"
       }, {
@@ -2066,6 +2317,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppEventCode/Tests/Modules/ForgotEventImage/ImageCodeViewModelTests.swift",
         name = "testOnCountdown_ShouldShowCountdown_WhenStartedTyeventgAfterError",
         success = true,
+        target = "CalendarAppEventCodeTests",
         testResult = "passed",
         time = "0.165 seconds"
       }, {
@@ -2074,6 +2326,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppEventCode/Tests/Modules/ForgotEventImage/ImageCodeViewModelTests.swift",
         name = "testOnCountdown_ShouldNotShowCountdown_WhenErrorIsShown",
         success = true,
+        target = "CalendarAppEventCodeTests",
         testResult = "passed",
         time = "0.114 seconds"
       }, {
@@ -2082,6 +2335,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppEventCode/Tests/Modules/ForgotEventImage/ImageCodeViewModelTests.swift",
         name = "testCode_ShouldValidateOnlySanitizedCode_WhenArabicCodeIsEntered",
         success = true,
+        target = "CalendarAppEventCodeTests",
         testResult = "passed",
         time = "0.057 seconds"
       } },
@@ -2091,6 +2345,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppDesignSystem/Tests/InputFieldTests/InputFieldViewTests.swift",
         name = "testView_ShouldRenderCorrectly_WhenTextFieldIsDisabled",
         success = true,
+        target = "CalendarAppDesignSystemTests",
         testResult = "passed",
         time = "0.042 seconds"
       }, {
@@ -2099,6 +2354,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppDesignSystem/Tests/InputFieldTests/InputFieldViewTests.swift",
         name = "testView_ShouldRenderCorrectly_onCurrentStateAndValue",
         success = true,
+        target = "CalendarAppDesignSystemTests",
         testResult = "passed",
         time = "0.267 seconds"
       } },
@@ -2108,6 +2364,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppDesignSystem/Tests/ListItemViewTests/ListCounterViewTests.swift",
         name = "testView_ShouldRenderCorrectly_WhenTypeIsSet",
         success = true,
+        target = "CalendarAppDesignSystemTests",
         testResult = "passed",
         time = "0.115 seconds"
       }, {
@@ -2116,6 +2373,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppDesignSystem/Tests/ListItemViewTests/ListCounterViewTests.swift",
         name = "testView_ShouldRenderCorrectly_WhenSizeIsSet",
         success = true,
+        target = "CalendarAppDesignSystemTests",
         testResult = "passed",
         time = "0.010 seconds"
       } },
@@ -2125,6 +2383,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppDesignSystem/Tests/ListItemViewTests/ListItemViewTests.swift",
         name = "testView_ShouldRenderCorrectly_WhenDividerIsVisible",
         success = true,
+        target = "CalendarAppDesignSystemTests",
         testResult = "passed",
         time = "0.020 seconds"
       }, {
@@ -2133,6 +2392,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppDesignSystem/Tests/ListItemViewTests/ListItemViewTests.swift",
         name = "testView_ShouldRenderCorrectly_WhenNotePositiveTypeIsSet",
         success = true,
+        target = "CalendarAppDesignSystemTests",
         testResult = "passed",
         time = "0.011 seconds"
       }, {
@@ -2141,6 +2401,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppDesignSystem/Tests/ListItemViewTests/ListItemViewTests.swift",
         name = "testView_ShouldRenderCorrectly_WhenSizeIsSet",
         success = true,
+        target = "CalendarAppDesignSystemTests",
         testResult = "passed",
         time = "0.019 seconds"
       }, {
@@ -2149,6 +2410,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppDesignSystem/Tests/ListItemViewTests/ListItemViewTests.swift",
         name = "testView_ShouldRenderCorrectly_WhenAllElementsAreVisible",
         success = true,
+        target = "CalendarAppDesignSystemTests",
         testResult = "passed",
         time = "0.007 seconds"
       }, {
@@ -2157,6 +2419,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppDesignSystem/Tests/ListItemViewTests/ListItemViewTests.swift",
         name = "testView_ShouldRenderCorrectly_WhenCounterIsVisible",
         success = true,
+        target = "CalendarAppDesignSystemTests",
         testResult = "passed",
         time = "0.008 seconds"
       }, {
@@ -2165,6 +2428,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppDesignSystem/Tests/ListItemViewTests/ListItemViewTests.swift",
         name = "testView_ShouldRenderCorrectly_WhenLeadingElementIsVisible",
         success = true,
+        target = "CalendarAppDesignSystemTests",
         testResult = "passed",
         time = "0.045 seconds"
       }, {
@@ -2173,6 +2437,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppDesignSystem/Tests/ListItemViewTests/ListItemViewTests.swift",
         name = "testView_ShouldRenderCorrectly_WhenTrailingElementIsVisible",
         success = true,
+        target = "CalendarAppDesignSystemTests",
         testResult = "passed",
         time = "0.044 seconds"
       } },
@@ -2182,6 +2447,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Core/CalendarAppCore/Tests/NoteDateFormatterTests.swift",
         name = "testStringWithEnglishLocale_ShouldReturnAbsoluteDateWithoutYear_WhenDateIsInTheFutureTheSameYear",
         success = true,
+        target = "CalendarAppCoreTests",
         testResult = "passed",
         time = "0.013 seconds"
       }, {
@@ -2190,6 +2456,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Core/CalendarAppCore/Tests/NoteDateFormatterTests.swift",
         name = "testStringWithEnglishLocale_ShouldReturnAbsoluteDateWithYear_WhenDateIsInThePastPreviousYear",
         success = true,
+        target = "CalendarAppCoreTests",
         testResult = "passed",
         time = "0.001 seconds"
       }, {
@@ -2198,6 +2465,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Core/CalendarAppCore/Tests/NoteDateFormatterTests.swift",
         name = "testStringWithFrenchLocale_ShouldReturnAbsoluteDateWithYear_WhenDateIsInThePastPreviousYear",
         success = true,
+        target = "CalendarAppCoreTests",
         testResult = "passed",
         time = "0.003 seconds"
       }, {
@@ -2206,6 +2474,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Core/CalendarAppCore/Tests/NoteDateFormatterTests.swift",
         name = "testStringWithEnglishLocale_ShouldReturnAbsoluteDateWithYear_WhenDateIsInTheFutureNextYear",
         success = true,
+        target = "CalendarAppCoreTests",
         testResult = "passed",
         time = "0.001 seconds"
       }, {
@@ -2214,6 +2483,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Core/CalendarAppCore/Tests/NoteDateFormatterTests.swift",
         name = "testStringWithFrenchLocale_ShouldReturnAbsoluteDateWithoutYear_WhenDateIsInThePast",
         success = true,
+        target = "CalendarAppCoreTests",
         testResult = "passed",
         time = "0.001 seconds"
       }, {
@@ -2222,6 +2492,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Core/CalendarAppCore/Tests/NoteDateFormatterTests.swift",
         name = "testStringWithEnglishLocale_ShouldReturnRelativeDate_WhenDateIsYesterday",
         success = true,
+        target = "CalendarAppCoreTests",
         testResult = "passed",
         time = "0.001 seconds"
       }, {
@@ -2230,6 +2501,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Core/CalendarAppCore/Tests/NoteDateFormatterTests.swift",
         name = "testStringWithFrenchLocale_ShouldReturnAbsoluteDateWithoutYear_WhenDateIsInTheFutureTheSameYear",
         success = true,
+        target = "CalendarAppCoreTests",
         testResult = "passed",
         time = "0.000 seconds"
       }, {
@@ -2238,6 +2510,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Core/CalendarAppCore/Tests/NoteDateFormatterTests.swift",
         name = "testStringWithFrenchLocale_ShouldReturnRelativeDate_WhenDateIsYesterday",
         success = true,
+        target = "CalendarAppCoreTests",
         testResult = "passed",
         time = "0.001 seconds"
       }, {
@@ -2246,6 +2519,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Core/CalendarAppCore/Tests/NoteDateFormatterTests.swift",
         name = "testStringWithFrenchLocale_ShouldReturnRelativeDate_WhenDateIsToday",
         success = true,
+        target = "CalendarAppCoreTests",
         testResult = "passed",
         time = "0.000 seconds"
       }, {
@@ -2254,6 +2528,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Core/CalendarAppCore/Tests/NoteDateFormatterTests.swift",
         name = "testStringWithEnglishLocale_ShouldReturnAbsoluteDateWithoutYear_WhenDateIsInThePast",
         success = true,
+        target = "CalendarAppCoreTests",
         testResult = "passed",
         time = "0.001 seconds"
       }, {
@@ -2262,6 +2537,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Core/CalendarAppCore/Tests/NoteDateFormatterTests.swift",
         name = "testStringWithFrenchLocale_ShouldReturnAbsoluteDateWithYear_WhenDateIsInTheFutureNextYear",
         success = true,
+        target = "CalendarAppCoreTests",
         testResult = "passed",
         time = "0.001 seconds"
       }, {
@@ -2270,6 +2546,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Core/CalendarAppCore/Tests/NoteDateFormatterTests.swift",
         name = "testStringWithEnglishLocale_ShouldReturnRelativeDate_WhenDateIsToday",
         success = true,
+        target = "CalendarAppCoreTests",
         testResult = "passed",
         time = "0.001 seconds"
       } },
@@ -2279,6 +2556,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppDesignSystem/Tests/ListItemViewTests/NoteDescriptionViewTests.swift",
         name = "testView_ShouldRenderCorrectly_WhenStatusIsPositive",
         success = true,
+        target = "CalendarAppDesignSystemTests",
         testResult = "passed",
         time = "0.006 seconds"
       }, {
@@ -2287,6 +2565,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppDesignSystem/Tests/ListItemViewTests/NoteDescriptionViewTests.swift",
         name = "testView_ShouldRenderCorrectly_WhenStatusIsNegative",
         success = true,
+        target = "CalendarAppDesignSystemTests",
         testResult = "passed",
         time = "0.006 seconds"
       }, {
@@ -2295,6 +2574,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppDesignSystem/Tests/ListItemViewTests/NoteDescriptionViewTests.swift",
         name = "testView_ShouldRenderCorrectly_WhenStatusIsNotSet",
         success = true,
+        target = "CalendarAppDesignSystemTests",
         testResult = "passed",
         time = "0.005 seconds"
       } },
@@ -2304,6 +2584,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppNotesHistory/Tests/NotesHistory/NoteDetailsViewTests.swift",
         name = "testView_ShouldRenderCorrectly_WhenNoteIsNotNil",
         success = true,
+        target = "CalendarAppNotesHistoryTests",
         testResult = "passed",
         time = "0.184 seconds"
       }, {
@@ -2312,6 +2593,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppNotesHistory/Tests/NotesHistory/NoteDetailsViewTests.swift",
         name = "testView_ShouldRenderCorrectly_WhenIconIsLocalAsset",
         success = true,
+        target = "CalendarAppNotesHistoryTests",
         testResult = "passed",
         time = "0.081 seconds"
       }, {
@@ -2320,6 +2602,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppNotesHistory/Tests/NotesHistory/NoteDetailsViewTests.swift",
         name = "testView_ShouldRenderCorrectly_WhenIconIsAvatar",
         success = true,
+        target = "CalendarAppNotesHistoryTests",
         testResult = "passed",
         time = "0.079 seconds"
       } },
@@ -2329,6 +2612,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppNotesHistory/Tests/NotesHistory/NotesHistoryViewTests.swift",
         name = "testView_ShouldRenderCorrectly_WhenNoteTitleIsLong",
         success = true,
+        target = "CalendarAppNotesHistoryTests",
         testResult = "passed",
         time = "0.108 seconds"
       }, {
@@ -2337,6 +2621,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppNotesHistory/Tests/NotesHistory/NotesHistoryViewTests.swift",
         name = "testView_ShouldRenderCorrectly_WhenNoNotes",
         success = true,
+        target = "CalendarAppNotesHistoryTests",
         testResult = "passed",
         time = "0.081 seconds"
       }, {
@@ -2345,6 +2630,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppNotesHistory/Tests/NotesHistory/NotesHistoryViewTests.swift",
         name = "testView_ShouldRenderCorrectly_WhenOnlyPendingNotes",
         success = true,
+        target = "CalendarAppNotesHistoryTests",
         testResult = "passed",
         time = "0.087 seconds"
       }, {
@@ -2353,6 +2639,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppNotesHistory/Tests/NotesHistory/NotesHistoryViewTests.swift",
         name = "testView_ShouldRenderCorrectly_WhenMissingDataError",
         success = true,
+        target = "CalendarAppNotesHistoryTests",
         testResult = "passed",
         time = "0.083 seconds"
       }, {
@@ -2361,6 +2648,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppNotesHistory/Tests/NotesHistory/NotesHistoryViewTests.swift",
         name = "testView_ShouldRenderCorrectly",
         success = true,
+        target = "CalendarAppNotesHistoryTests",
         testResult = "passed",
         time = "0.109 seconds"
       }, {
@@ -2369,6 +2657,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppNotesHistory/Tests/NotesHistory/NotesHistoryViewTests.swift",
         name = "testView_ShouldRenderCorrectly_WhenNoPendingNotes",
         success = true,
+        target = "CalendarAppNotesHistoryTests",
         testResult = "passed",
         time = "0.088 seconds"
       }, {
@@ -2377,6 +2666,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppNotesHistory/Tests/NotesHistory/NotesHistoryViewTests.swift",
         name = "testView_ShouldRenderCorrectly_WhenRightToLeft",
         success = true,
+        target = "CalendarAppNotesHistoryTests",
         testResult = "passed",
         time = "0.108 seconds"
       }, {
@@ -2385,6 +2675,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppNotesHistory/Tests/NotesHistory/NotesHistoryViewTests.swift",
         name = "testView_ShouldRenderCorrectly_WhenNotesAreLoading",
         success = true,
+        target = "CalendarAppNotesHistoryTests",
         testResult = "passed",
         time = "0.084 seconds"
       } },
@@ -2394,6 +2685,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppTerms/Tests/Modules/PrivacyPolicy/PrivacyPolicyViewModelTests.swift",
         name = "testOnLoadAsync_ShouldShowError_WhenTermsServiceThrows",
         success = true,
+        target = "CalendarAppTermsTests",
         testResult = "passed",
         time = "0.002 seconds"
       }, {
@@ -2402,6 +2694,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppTerms/Tests/Modules/PrivacyPolicy/PrivacyPolicyViewModelTests.swift",
         name = "testOnSetUpTap_ShouldNotAcceptTerms_WhenModeIsSettings",
         success = true,
+        target = "CalendarAppTermsTests",
         testResult = "passed",
         time = "0.001 seconds"
       }, {
@@ -2410,6 +2703,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppTerms/Tests/Modules/PrivacyPolicy/PrivacyPolicyViewModelTests.swift",
         name = "testOnLoadAsync_ShouldSetPrivacyPolicy_WhenOnboardingServiceReturnsWithSuccess",
         success = true,
+        target = "CalendarAppTermsTests",
         testResult = "passed",
         time = "0.001 seconds"
       }, {
@@ -2418,6 +2712,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppTerms/Tests/Modules/PrivacyPolicy/PrivacyPolicyViewModelTests.swift",
         name = "testOnCloseTap_ShouldCallRouter",
         success = true,
+        target = "CalendarAppTermsTests",
         testResult = "passed",
         time = "0.000 seconds"
       }, {
@@ -2426,6 +2721,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppTerms/Tests/Modules/PrivacyPolicy/PrivacyPolicyViewModelTests.swift",
         name = "testOnSetUpTap_ShouldShowNextStep_WhenAcceptingPrivacyPolicySucceeds",
         success = true,
+        target = "CalendarAppTermsTests",
         testResult = "passed",
         time = "0.002 seconds"
       }, {
@@ -2434,6 +2730,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppTerms/Tests/Modules/PrivacyPolicy/PrivacyPolicyViewModelTests.swift",
         name = "testOnSetUpTap_ShouldPresentAlertError_WhenAcceptingPrivacyPolicyFails",
         success = true,
+        target = "CalendarAppTermsTests",
         testResult = "passed",
         time = "0.009 seconds"
       } },
@@ -2443,6 +2740,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppTerms/Tests/Modules/PrivacyPolicy/PrivacyPolicyViewTests.swift",
         name = "testView_ShouldRenderCorrectly",
         success = true,
+        target = "CalendarAppTermsTests",
         testResult = "passed",
         time = "0.182 seconds"
       }, {
@@ -2451,6 +2749,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppTerms/Tests/Modules/PrivacyPolicy/PrivacyPolicyViewTests.swift",
         name = "testView_ShouldRenderCorrectly_WhenOnboardingAndMissingDataError",
         success = true,
+        target = "CalendarAppTermsTests",
         testResult = "passed",
         time = "0.040 seconds"
       }, {
@@ -2459,6 +2758,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppTerms/Tests/Modules/PrivacyPolicy/PrivacyPolicyViewTests.swift",
         name = "testView_ShouldRenderCorrectly_WhenSettings",
         success = true,
+        target = "CalendarAppTermsTests",
         testResult = "passed",
         time = "0.066 seconds"
       }, {
@@ -2467,6 +2767,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppTerms/Tests/Modules/PrivacyPolicy/PrivacyPolicyViewTests.swift",
         name = "testView_ShouldRenderCorrectly_WhenSettingsAndMissingDataError",
         success = true,
+        target = "CalendarAppTermsTests",
         testResult = "passed",
         time = "0.034 seconds"
       } },
@@ -2476,6 +2777,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/PlatformFoundation/WKLUtils/Tests/QRCodeGeneratorTests.swift",
         name = "testGenerate_ShouldRenderCorrectly_WhenColorIsSet",
         success = true,
+        target = "WKLUtilsTests",
         testResult = "passed",
         time = "0.130 seconds"
       }, {
@@ -2484,6 +2786,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/PlatformFoundation/WKLUtils/Tests/QRCodeGeneratorTests.swift",
         name = "testGenerate_ShouldRenderCorrectly",
         success = true,
+        target = "WKLUtilsTests",
         testResult = "passed",
         time = "0.008 seconds"
       } },
@@ -2493,6 +2796,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCustomerSupport/Tests/Modules/ReportNoteIssueConfirmation/ReportNoteIssueConfirmationViewTests.swift",
         name = "testView_ShouldRenderCorrectly",
         success = true,
+        target = "CalendarAppCustomerSupportTests",
         testResult = "passed",
         time = "0.078 seconds"
       } },
@@ -2502,6 +2806,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppCustomerSupport/Tests/Modules/ReportNoteIssue/ReportNoteIssueViewTests.swift",
         name = "testView_ShouldRenderCorrectly",
         success = true,
+        target = "CalendarAppCustomerSupportTests",
         testResult = "passed",
         time = "0.187 seconds"
       } },
@@ -2511,6 +2816,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppSend/Tests/Modules/SendConfirmation/SendConfirmationViewTests.swift",
         name = "testView_ShouldRenderCorrectly",
         success = true,
+        target = "CalendarAppSendTests",
         testResult = "passed",
         time = "0.149 seconds"
       } },
@@ -2520,6 +2826,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppSend/Tests/Modules/SendContacts/SendContactsViewModelTests.swift",
         name = "testRequestContactPermission_ShouldNotBeCalled_WhenPermissionIsAuthorizedOnAppear",
         success = true,
+        target = "CalendarAppSendTests",
         testResult = "passed",
         time = "1.004 seconds"
       }, {
@@ -2528,6 +2835,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppSend/Tests/Modules/SendContacts/SendContactsViewModelTests.swift",
         name = "testShowAppSettings_ShouldBeCalled_WhenPermissionIsDeniedOnEnableContactTap",
         success = true,
+        target = "CalendarAppSendTests",
         testResult = "passed",
         time = "0.003 seconds"
       }, {
@@ -2536,6 +2844,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppSend/Tests/Modules/SendContacts/SendContactsViewModelTests.swift",
         name = "testSectionsEntries_ShouldBeSorted_WhenContactsAreFetched",
         success = true,
+        target = "CalendarAppSendTests",
         testResult = "passed",
         time = "0.057 seconds"
       }, {
@@ -2544,6 +2853,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppSend/Tests/Modules/SendContacts/SendContactsViewModelTests.swift",
         name = "testSections_ShouldBeSorted_WhenContactsAreFetched",
         success = true,
+        target = "CalendarAppSendTests",
         testResult = "passed",
         time = "0.059 seconds"
       }, {
@@ -2552,6 +2862,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppSend/Tests/Modules/SendContacts/SendContactsViewModelTests.swift",
         name = "testSearchResults_ShouldReturnCorrectlyFilteredResults_WhenPhraseContainsOnlyDigits",
         success = true,
+        target = "CalendarAppSendTests",
         testResult = "passed",
         time = "0.058 seconds"
       }, {
@@ -2560,6 +2871,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppSend/Tests/Modules/SendContacts/SendContactsViewModelTests.swift",
         name = "testSearchResults_ShouldHaveTheSameIdAsContactsList",
         success = true,
+        target = "CalendarAppSendTests",
         testResult = "passed",
         time = "0.058 seconds"
       }, {
@@ -2568,6 +2880,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppSend/Tests/Modules/SendContacts/SendContactsViewModelTests.swift",
         name = "testSearchResults_ShouldReturnCorrectlyFilteredResults_WhenPhraseIsEmoji",
         success = true,
+        target = "CalendarAppSendTests",
         testResult = "passed",
         time = "0.061 seconds"
       }, {
@@ -2576,6 +2889,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppSend/Tests/Modules/SendContacts/SendContactsViewModelTests.swift",
         name = "testSearchResults_ShouldReturnCorrectlyFilteredResults_WhenPhraseIsPlainText",
         success = true,
+        target = "CalendarAppSendTests",
         testResult = "passed",
         time = "0.057 seconds"
       }, {
@@ -2584,6 +2898,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppSend/Tests/Modules/SendContacts/SendContactsViewModelTests.swift",
         name = "testStatus_ShouldBeFinishedEmpty_WhenContactsIsEmpty",
         success = true,
+        target = "CalendarAppSendTests",
         testResult = "passed",
         time = "0.058 seconds"
       }, {
@@ -2592,6 +2907,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppSend/Tests/Modules/SendContacts/SendContactsViewModelTests.swift",
         name = "testContactPermission_ShouldBeTrue_WhenPermissionIsAuthorized",
         success = true,
+        target = "CalendarAppSendTests",
         testResult = "passed",
         time = "0.001 seconds"
       }, {
@@ -2600,6 +2916,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppSend/Tests/Modules/SendContacts/SendContactsViewModelTests.swift",
         name = "testContactPermission_ShouldBeFalse_WhenPermissionNotDetermined",
         success = true,
+        target = "CalendarAppSendTests",
         testResult = "passed",
         time = "0.001 seconds"
       }, {
@@ -2608,6 +2925,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppSend/Tests/Modules/SendContacts/SendContactsViewModelTests.swift",
         name = "testRequestContactPermission_ShouldBeCalled_WhenPermissionIsNotDeterminedOnAppear",
         success = true,
+        target = "CalendarAppSendTests",
         testResult = "passed",
         time = "0.001 seconds"
       }, {
@@ -2616,6 +2934,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppSend/Tests/Modules/SendContacts/SendContactsViewModelTests.swift",
         name = "testContactPermission_ShouldBeFalse_WhenPermissionIsDenied",
         success = true,
+        target = "CalendarAppSendTests",
         testResult = "passed",
         time = "0.000 seconds"
       }, {
@@ -2624,6 +2943,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppSend/Tests/Modules/SendContacts/SendContactsViewModelTests.swift",
         name = "testRequestContactPermission_ShouldNotBeCalled_WhenPermissionIsDeniedOnAppear",
         success = true,
+        target = "CalendarAppSendTests",
         testResult = "passed",
         time = "1.010 seconds"
       }, {
@@ -2632,6 +2952,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppSend/Tests/Modules/SendContacts/SendContactsViewModelTests.swift",
         name = "testSearchResults_ShouldReturnCorrectlyFilteredResults_WhenPhraseContainsPhoneNumber",
         success = true,
+        target = "CalendarAppSendTests",
         testResult = "passed",
         time = "0.057 seconds"
       }, {
@@ -2640,6 +2961,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppSend/Tests/Modules/SendContacts/SendContactsViewModelTests.swift",
         name = "testSearchResults_ShouldReturnCorrectlyFilteredResults_WhenPhraseIsSingleCharacter",
         success = true,
+        target = "CalendarAppSendTests",
         testResult = "passed",
         time = "0.061 seconds"
       }, {
@@ -2648,6 +2970,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppSend/Tests/Modules/SendContacts/SendContactsViewModelTests.swift",
         name = "testShowAppSettings_ShouldNotBeCalled_WhenPermissionIsDeniedOnAppear",
         success = true,
+        target = "CalendarAppSendTests",
         testResult = "passed",
         time = "1.007 seconds"
       }, {
@@ -2656,6 +2979,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppSend/Tests/Modules/SendContacts/SendContactsViewModelTests.swift",
         name = "testSearchResults_ShouldReturnAllContacts_WhenPhraseIsEmpty",
         success = true,
+        target = "CalendarAppSendTests",
         testResult = "passed",
         time = "0.056 seconds"
       } },
@@ -2665,6 +2989,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppSend/Tests/Modules/SendContacts/SendContactsViewTests.swift",
         name = "testView_ShouldRenderCorrectly_WhenSearchResultsArePresented",
         success = true,
+        target = "CalendarAppSendTests",
         testResult = "passed",
         time = "0.125 seconds"
       }, {
@@ -2673,6 +2998,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppSend/Tests/Modules/SendContacts/SendContactsViewTests.swift",
         name = "testView_ShouldRenderCorrectly_WhenStatusIsFinishedEmptyWithoutContactPermission",
         success = true,
+        target = "CalendarAppSendTests",
         testResult = "passed",
         time = "0.096 seconds"
       }, {
@@ -2681,6 +3007,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppSend/Tests/Modules/SendContacts/SendContactsViewTests.swift",
         name = "testView_ShouldRenderCorrectly_WhenStatusIsFinishedWithSections",
         success = true,
+        target = "CalendarAppSendTests",
         testResult = "passed",
         time = "0.091 seconds"
       }, {
@@ -2689,6 +3016,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppSend/Tests/Modules/SendContacts/SendContactsViewTests.swift",
         name = "testView_ShouldRenderCorrectly_WhenStatusIsInProgress",
         success = true,
+        target = "CalendarAppSendTests",
         testResult = "passed",
         time = "0.072 seconds"
       }, {
@@ -2697,6 +3025,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppSend/Tests/Modules/SendContacts/SendContactsViewTests.swift",
         name = "testView_ShouldRenderCorrectly_WhenStatusIsFinishedEmptyWithContactPermission",
         success = true,
+        target = "CalendarAppSendTests",
         testResult = "passed",
         time = "0.061 seconds"
       } },
@@ -2706,6 +3035,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppSend/Tests/Modules/SendInsufficientCounter/SendInsufficientCounterViewTests.swift",
         name = "testView_ShouldRenderCorrectly",
         success = true,
+        target = "CalendarAppSendTests",
         testResult = "passed",
         time = "0.252 seconds"
       } },
@@ -2715,6 +3045,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppSend/Tests/Modules/SendIntro/SendIntroViewTests.swift",
         name = "testView_ShouldRenderCorrectly",
         success = true,
+        target = "CalendarAppSendTests",
         testResult = "passed",
         time = "0.082 seconds"
       } },
@@ -2724,6 +3055,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppSend/Tests/Modules/SendToPhoneNumber/SendToPhoneNumberViewModelTests.swift",
         name = "testOnHintTap_ShouldNotShowShareDialog_WhenThereIsNoError",
         success = true,
+        target = "CalendarAppSendTests",
         testResult = "passed",
         time = "0.000 seconds"
       }, {
@@ -2732,6 +3064,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppSend/Tests/Modules/SendToPhoneNumber/SendToPhoneNumberViewModelTests.swift",
         name = "testNumber_ShouldShowErrorHint_WhenNumberIsInvalid",
         success = true,
+        target = "CalendarAppSendTests",
         testResult = "passed",
         time = "0.000 seconds"
       }, {
@@ -2740,6 +3073,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppSend/Tests/Modules/SendToPhoneNumber/SendToPhoneNumberViewModelTests.swift",
         name = "testNumber_ShouldShowHint_WhenNumberIsValid",
         success = true,
+        target = "CalendarAppSendTests",
         testResult = "passed",
         time = "0.000 seconds"
       }, {
@@ -2748,6 +3082,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppSend/Tests/Modules/SendToPhoneNumber/SendToPhoneNumberViewModelTests.swift",
         name = "testNumber_ShouldShowSameUserError_WhenNumberIsEqualOurNumber",
         success = true,
+        target = "CalendarAppSendTests",
         testResult = "passed",
         time = "0.001 seconds"
       }, {
@@ -2756,6 +3091,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppSend/Tests/Modules/SendToPhoneNumber/SendToPhoneNumberViewModelTests.swift",
         name = "testNumber_ShouldSetIsNumberValidBasedOnValidatorResult",
         success = true,
+        target = "CalendarAppSendTests",
         testResult = "passed",
         time = "0.000 seconds"
       }, {
@@ -2764,6 +3100,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppSend/Tests/Modules/SendToPhoneNumber/SendToPhoneNumberViewModelTests.swift",
         name = "testOnNextTap_ShouldSetError_WhenNoInternetConnection",
         success = true,
+        target = "CalendarAppSendTests",
         testResult = "passed",
         time = "0.019 seconds"
       }, {
@@ -2772,6 +3109,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppSend/Tests/Modules/SendToPhoneNumber/SendToPhoneNumberViewModelTests.swift",
         name = "testPlaceholder_ShouldReturnSampleNumber",
         success = true,
+        target = "CalendarAppSendTests",
         testResult = "passed",
         time = "0.000 seconds"
       }, {
@@ -2780,6 +3118,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppSend/Tests/Modules/SendToPhoneNumber/SendToPhoneNumberViewModelTests.swift",
         name = "testNumber_ShouldSanitizeNumber",
         success = true,
+        target = "CalendarAppSendTests",
         testResult = "passed",
         time = "0.000 seconds"
       }, {
@@ -2788,6 +3127,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppSend/Tests/Modules/SendToPhoneNumber/SendToPhoneNumberViewModelTests.swift",
         name = "testOnHintTap_ShouldShowShareDialog_WhenUserNotFoundIsThrown",
         success = true,
+        target = "CalendarAppSendTests",
         testResult = "passed",
         time = "0.001 seconds"
       }, {
@@ -2796,6 +3136,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppSend/Tests/Modules/SendToPhoneNumber/SendToPhoneNumberViewModelTests.swift",
         name = "testOnNextTap_ShouldShowTransferDetails_WhenUserIsFound",
         success = true,
+        target = "CalendarAppSendTests",
         testResult = "passed",
         time = "0.001 seconds"
       } },
@@ -2805,6 +3146,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppSend/Tests/Modules/SendToPhoneNumber/SendToPhoneNumberViewTests.swift",
         name = "testView_ShouldRenderCorrectly",
         success = true,
+        target = "CalendarAppSendTests",
         testResult = "passed",
         time = "0.094 seconds"
       } },
@@ -2814,6 +3156,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppSend/Tests/Modules/SendTransferDetails/SendTransferDetailsViewModelTests.swift",
         name = "testAmount_ShouldHideError_WhenAmountIsEmpty",
         success = true,
+        target = "CalendarAppSendTests",
         testResult = "passed",
         time = "0.007 seconds"
       }, {
@@ -2822,6 +3165,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppSend/Tests/Modules/SendTransferDetails/SendTransferDetailsViewModelTests.swift",
         name = "testOnAppear_ShouldFetchContactAndCounter",
         success = true,
+        target = "CalendarAppSendTests",
         testResult = "passed",
         time = "0.054 seconds"
       }, {
@@ -2830,6 +3174,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppSend/Tests/Modules/SendTransferDetails/SendTransferDetailsViewModelTests.swift",
         name = "testAmount_ShouldShowMaxAmountWarning_WhenAmountIsBiggerThanMaxLimit",
         success = true,
+        target = "CalendarAppSendTests",
         testResult = "passed",
         time = "0.001 seconds"
       }, {
@@ -2838,6 +3183,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppSend/Tests/Modules/SendTransferDetails/SendTransferDetailsViewModelTests.swift",
         name = "testOnHintTap_ShouldNotShowCreate_WhenMaxAmountWarningIsShown",
         success = true,
+        target = "CalendarAppSendTests",
         testResult = "passed",
         time = "0.001 seconds"
       }, {
@@ -2846,6 +3192,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppSend/Tests/Modules/SendTransferDetails/SendTransferDetailsViewModelTests.swift",
         name = "testAmount_ShouldSanitizeAmount",
         success = true,
+        target = "CalendarAppSendTests",
         testResult = "passed",
         time = "0.001 seconds"
       }, {
@@ -2854,6 +3201,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppSend/Tests/Modules/SendTransferDetails/SendTransferDetailsViewModelTests.swift",
         name = "testContactNumber_ShouldFormatNumberFromFetchedContact",
         success = true,
+        target = "CalendarAppSendTests",
         testResult = "passed",
         time = "0.056 seconds"
       }, {
@@ -2862,6 +3210,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppSend/Tests/Modules/SendTransferDetails/SendTransferDetailsViewModelTests.swift",
         name = "testAmount_ShouldUseCachedCounterAndShowInsufficientCounterWarning",
         success = true,
+        target = "CalendarAppSendTests",
         testResult = "passed",
         time = "0.053 seconds"
       }, {
@@ -2870,6 +3219,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppSend/Tests/Modules/SendTransferDetails/SendTransferDetailsViewModelTests.swift",
         name = "testCurrency_ShouldReturnCurrencyFromMarketConfig",
         success = true,
+        target = "CalendarAppSendTests",
         testResult = "passed",
         time = "0.055 seconds"
       }, {
@@ -2878,6 +3228,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppSend/Tests/Modules/SendTransferDetails/SendTransferDetailsViewModelTests.swift",
         name = "testContactInitials_ShouldReturnInitialsFromFetchedContact",
         success = true,
+        target = "CalendarAppSendTests",
         testResult = "passed",
         time = "0.053 seconds"
       }, {
@@ -2886,6 +3237,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppSend/Tests/Modules/SendTransferDetails/SendTransferDetailsViewModelTests.swift",
         name = "testOnNextTap_ShouldForwardError_WhenAuthorizationFailed",
         success = true,
+        target = "CalendarAppSendTests",
         testResult = "passed",
         time = "0.418 seconds"
       }, {
@@ -2894,6 +3246,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppSend/Tests/Modules/SendTransferDetails/SendTransferDetailsViewModelTests.swift",
         name = "testOnHintTap_ShouldShowCreate_WhenInsufficientCounterIsShown",
         success = true,
+        target = "CalendarAppSendTests",
         testResult = "passed",
         time = "0.058 seconds"
       }, {
@@ -2902,6 +3255,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppSend/Tests/Modules/SendTransferDetails/SendTransferDetailsViewModelTests.swift",
         name = "testOnNextTap_ShouldShowConfirmation_WhenNoteIsAuthorizedSuccessfully",
         success = true,
+        target = "CalendarAppSendTests",
         testResult = "passed",
         time = "0.419 seconds"
       }, {
@@ -2910,6 +3264,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppSend/Tests/Modules/SendTransferDetails/SendTransferDetailsViewModelTests.swift",
         name = "testOnNextTap_ShouldCreateNoteAndRequestEventCode",
         success = true,
+        target = "CalendarAppSendTests",
         testResult = "passed",
         time = "0.418 seconds"
       }, {
@@ -2918,6 +3273,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppSend/Tests/Modules/SendTransferDetails/SendTransferDetailsViewModelTests.swift",
         name = "testOnAppear_ShouldShowFullScreenError_WhenSendErrorIsThrown",
         success = true,
+        target = "CalendarAppSendTests",
         testResult = "passed",
         time = "0.056 seconds"
       }, {
@@ -2926,6 +3282,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppSend/Tests/Modules/SendTransferDetails/SendTransferDetailsViewModelTests.swift",
         name = "testContactName_ShouldReturnNameFromFetchedContact",
         success = true,
+        target = "CalendarAppSendTests",
         testResult = "passed",
         time = "0.058 seconds"
       }, {
@@ -2934,6 +3291,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppSend/Tests/Modules/SendTransferDetails/SendTransferDetailsViewModelTests.swift",
         name = "testAmount_ShouldShowMinAmountWarning_WhenAmountIsSmallerThanMinLimit",
         success = true,
+        target = "CalendarAppSendTests",
         testResult = "passed",
         time = "0.001 seconds"
       } },
@@ -2943,6 +3301,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppSend/Tests/Modules/SendTransferDetails/SendTransferDetailsViewTests.swift",
         name = "testView_ShouldRenderCorrectly_WhenMissingDataError",
         success = true,
+        target = "CalendarAppSendTests",
         testResult = "passed",
         time = "0.065 seconds"
       }, {
@@ -2951,6 +3310,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppSend/Tests/Modules/SendTransferDetails/SendTransferDetailsViewTests.swift",
         name = "testView_ShouldRenderCorrectly",
         success = true,
+        target = "CalendarAppSendTests",
         testResult = "passed",
         time = "0.087 seconds"
       }, {
@@ -2959,6 +3319,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppSend/Tests/Modules/SendTransferDetails/SendTransferDetailsViewTests.swift",
         name = "testView_ShouldRenderCorrectly_WhenPlaceholderLoading",
         success = true,
+        target = "CalendarAppSendTests",
         testResult = "passed",
         time = "0.044 seconds"
       } },
@@ -2968,6 +3329,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppSend/Tests/Modules/SendTransferUserError/SendTransferUserErrorViewTests.swift",
         name = "testView_ShouldRenderCorrectly_WhenUserIsNotFound",
         success = true,
+        target = "CalendarAppSendTests",
         testResult = "passed",
         time = "0.133 seconds"
       }, {
@@ -2976,6 +3338,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppSend/Tests/Modules/SendTransferUserError/SendTransferUserErrorViewTests.swift",
         name = "testView_ShouldRenderCorrectly_WhenCurrentUserNumber",
         success = true,
+        target = "CalendarAppSendTests",
         testResult = "passed",
         time = "0.078 seconds"
       }, {
@@ -2984,6 +3347,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppSend/Tests/Modules/SendTransferUserError/SendTransferUserErrorViewTests.swift",
         name = "testView_ShouldRenderCorrectly_WhenRegionNotSupported",
         success = true,
+        target = "CalendarAppSendTests",
         testResult = "passed",
         time = "0.077 seconds"
       } },
@@ -2993,6 +3357,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppNetworking/Tests/Modules/SessionStateTests.swift",
         name = "testUnblockAccount_ShouldSetIsAccountBlockedToFalse",
         success = true,
+        target = "CalendarAppNetworkingTests",
         testResult = "passed",
         time = "0.000 seconds"
       }, {
@@ -3001,6 +3366,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppNetworking/Tests/Modules/SessionStateTests.swift",
         name = "testBlockAccount_ShouldSignOutAndSetIsAccountBlocked",
         success = true,
+        target = "CalendarAppNetworkingTests",
         testResult = "passed",
         time = "0.000 seconds"
       }, {
@@ -3009,6 +3375,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppNetworking/Tests/Modules/SessionStateTests.swift",
         name = "testSessionState_ShouldSignOut_WhenTimeoutIsCalled",
         success = true,
+        target = "CalendarAppNetworkingTests",
         testResult = "passed",
         time = "0.000 seconds"
       }, {
@@ -3017,6 +3384,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppNetworking/Tests/Modules/SessionStateTests.swift",
         name = "testUpdateSessionInfo_ShouldStartTimer_WhenValidInfoIsSet",
         success = true,
+        target = "CalendarAppNetworkingTests",
         testResult = "passed",
         time = "0.000 seconds"
       }, {
@@ -3025,6 +3393,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppNetworking/Tests/Modules/SessionStateTests.swift",
         name = "testIsSignedIn_ShouldReturnFalse_WhenSessionInfoIsEmpty",
         success = true,
+        target = "CalendarAppNetworkingTests",
         testResult = "passed",
         time = "0.000 seconds"
       }, {
@@ -3033,6 +3402,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppNetworking/Tests/Modules/SessionStateTests.swift",
         name = "testUpdateSessionInfo_ShouldFinishTimer_WhenInfoIsRemoved",
         success = true,
+        target = "CalendarAppNetworkingTests",
         testResult = "passed",
         time = "0.001 seconds"
       }, {
@@ -3041,6 +3411,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppNetworking/Tests/Modules/SessionStateTests.swift",
         name = "testIsSignedIn_ShouldReturnTrue_WhenSessionInfoIsValid",
         success = true,
+        target = "CalendarAppNetworkingTests",
         testResult = "passed",
         time = "0.000 seconds"
       } },
@@ -3050,6 +3421,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppNetworking/Tests/Modules/SessionTimeoutTimerTests.swift",
         name = "testSessionTimeoutTimer_ShouldNotCallTimeout_WhenSessionDidFinish",
         success = true,
+        target = "CalendarAppNetworkingTests",
         testResult = "passed",
         time = "0.003 seconds"
       }, {
@@ -3058,6 +3430,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/DomainFoundation/CalendarAppNetworking/Tests/Modules/SessionTimeoutTimerTests.swift",
         name = "testSessionTimeoutTimer_ShouldCallTimeout_WhenTimerIsTriggered",
         success = true,
+        target = "CalendarAppNetworkingTests",
         testResult = "passed",
         time = "0.000 seconds"
       } },
@@ -3067,6 +3440,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppMenu/Tests/Modules/SettingsMenuViewTests.swift",
         name = "testView_ShouldRenderCorrectly",
         success = true,
+        target = "CalendarAppMenuTests",
         testResult = "passed",
         time = "0.070 seconds"
       } },
@@ -3076,6 +3450,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppOnboarding/Tests/Modules/WelcomeCarousel/WelcomeCarouselViewTests.swift",
         name = "testView_ShouldRenderCorrectly_WhenUserIsCustomer",
         success = true,
+        target = "CalendarAppOnboardingTests",
         testResult = "passed",
         time = "0.077 seconds"
       }, {
@@ -3084,6 +3459,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppOnboarding/Tests/Modules/WelcomeCarousel/WelcomeCarouselViewTests.swift",
         name = "testView_ShouldRenderCorrectly_WhenDeviceIsRTL",
         success = true,
+        target = "CalendarAppOnboardingTests",
         testResult = "passed",
         time = "0.066 seconds"
       }, {
@@ -3092,6 +3468,7 @@
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppOnboarding/Tests/Modules/WelcomeCarousel/WelcomeCarouselViewTests.swift",
         name = "testView_ShouldRenderCorrectly_WhenUserIsAgent",
         success = true,
+        target = "CalendarAppOnboardingTests",
         testResult = "passed",
         time = "0.067 seconds"
       } }

@@ -1,6 +1,7 @@
 local util = require("xcodebuild.util")
 local appdata = require("xcodebuild.appdata")
 local config = require("xcodebuild.config").options.logs
+local testSearch = require("xcodebuild.test_search")
 
 local M = {}
 
@@ -76,7 +77,11 @@ local function insert_test_results(report, prettyOutput)
     for _, testsPerClass in pairs(report.tests) do
       for _, test in ipairs(testsPerClass) do
         if not test.success then
-          local message = "    ✖ " .. test.class .. "." .. test.name
+          local message = "    ✖ "
+            .. (test.target and test.target .. "." or "")
+            .. test.class
+            .. "."
+            .. test.name
           if test.lineNumber then
             message = message .. ":" .. test.lineNumber
           end
@@ -175,9 +180,10 @@ local function open_test_file(tests)
     return
   end
 
-  local testClass, testName, line = string.match(currentLine, "(%w*)%.(.*)%:(%d+)")
+  local testTarget, testClass, testName, line = string.match(currentLine, "(%w*)%.?(%w*)%.(.*)%:(%d+)")
+  local key = testSearch.get_test_key(testTarget, testClass)
 
-  for _, test in ipairs(tests[testClass] or {}) do
+  for _, test in ipairs(tests[key] or {}) do
     if test.name == testName and test.filepath then
       vim.cmd("wincmd p | e " .. test.filepath .. " | " .. line)
       return

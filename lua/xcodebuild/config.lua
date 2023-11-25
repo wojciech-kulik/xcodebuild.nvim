@@ -10,6 +10,7 @@ local defaults = {
     file_matching = "filename_lsp", -- one of: filename, lsp, lsp_filename, filename_lsp. Check out README for details.
     target_matching = true, -- checks if the test file target matches the one from logs try disabling in case of not showing test results
     lsp_client = "sourcekit", -- name of your LSP for Swift files
+    lsp_timeout = 200, -- LSP timeout in milliseconds,
   },
   commands = {
     extra_build_args = "-parallelizeTargets", -- extra arguments for `xcodebuild build`

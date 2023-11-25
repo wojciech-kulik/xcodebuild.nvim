@@ -38,10 +38,6 @@ It is also my first Neovim plugin. Hopefully, a good one 😁.
 - [x] [telescope.nvim](https://github.com/nvim-telescope/telescope.nvim) integration to show pickers with selectable project options.
 - [x] Picker with all available actions.
 
-## 👷 Limitations
-
-- [ ] If you have multiple test classes named the same across the project, test results could be presented in the wrong file. So far, I couldn't find any reliable way to find the corresponding file path based on the class name and target name. The plugin first tries to find any swift file matching test class name - that's the fastest way. If there is no match, it tries to use LSP to locate that class.
-
 ## ⚡️ Requirements
 
 - [Neovim](https://neovim.io) (not sure which version, use the new one :D).
@@ -87,6 +83,7 @@ Xcodebuild.nvim comes with the following defaults:
     file_matching = "filename_lsp", -- one of: filename, lsp, lsp_filename, filename_lsp. Check out README for details.
     target_matching = true, -- checks if the test file target matches the one from logs try disabling in case of not showing test results
     lsp_client = "sourcekit", -- name of your LSP for Swift files
+    lsp_timeout = 200, -- LSP timeout in milliseconds,
   },
   commands = {
     extra_build_args = "-parallelizeTargets", -- extra arguments for `xcodebuild build`
@@ -130,6 +127,23 @@ Xcodebuild.nvim comes with the following defaults:
   },
 }
 ```
+
+### Test File Search - File Matching
+
+`xcodebuild` logs provide the following information about the test: target, test class, and test name. The plugin needs to find the file location based on that, which is not a trivial task.
+
+In order to support multiple cases, the plugin allows you to choose the search mode. It offers four modes to find a test class (set `test_search.file_matching`):
+
+- `filename` - it assumes that the test class name matches the file name. It finds matching files and then based on the build output, it checks whether the file belongs to the desired target.
+- `lsp` - it uses LSP to find the class symbol. Each match is checked if it belongs to the desired target.
+- `filename_lsp` first try `filename` mode, if it fails try `lsp` mode.
+- `lsp_filename` first try `lsp` mode, if it fails try `filename` mode.
+
+`filename_lsp` is the recommended mode, because `filename` search is faster than `lsp`, but you also have `lsp` fallback if there is no match from `filename`.
+
+If you notice that your test results don't appear or appear in incorrect files, try playing with these modes.
+
+If your test results don't appear, you can also try disabling `test_search.target_matching`. This way the plugin will always use the first match without checking its target. Target-file list comes from the build output and in some cases you may need to disable it.
 
 ### Setup Your Neovim For iOS Development
 

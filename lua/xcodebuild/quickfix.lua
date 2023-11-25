@@ -1,9 +1,8 @@
 local util = require("xcodebuild.util")
 local config = require("xcodebuild.config").options.quickfix
+local testSearch = require("xcodebuild.test_search")
 
-local M = {
-  targetsFilesMap = {},
-}
+local M = {}
 
 local function insert_build_errors(list, errors)
   local duplicates = {}
@@ -60,8 +59,8 @@ local function insert_diagnostics_for_test_errors(list, diagnostics)
   for _, diagnostic in ipairs(diagnostics) do
     local target, filename = string.match(diagnostic.filepath, "(.-)/(.+)")
 
-    if M.targetsFilesMap and M.targetsFilesMap[target] then
-      for _, filepath in ipairs(M.targetsFilesMap[target]) do
+    if testSearch.targetsFilesMap and testSearch.targetsFilesMap[target] then
+      for _, filepath in ipairs(testSearch.targetsFilesMap[target]) do
         if util.has_suffix(filepath, filename) then
           table.insert(list, {
             filename = filepath,
@@ -74,10 +73,6 @@ local function insert_diagnostics_for_test_errors(list, diagnostics)
       end
     end
   end
-end
-
-function M.set_targets_filemap(targets)
-  M.targetsFilesMap = targets
 end
 
 function M.set(report)

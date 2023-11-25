@@ -93,15 +93,14 @@ function M.send_build_finished(report, id, isCancelled)
   if isCancelled then
     M.send_warning("Build cancelled")
   elseif util.is_empty(report.buildErrors) then
-    local duration = buildState.buildDuration
-
     if not buildState.buildForTesting then
+      local duration = buildState.buildDuration
       local projectConfig = require("xcodebuild.project_config")
       projectConfig.settings.lastBuildTime = duration
       projectConfig.save_settings()
-    end
 
-    M.send(string.format("Build Succeeded [%d seconds]", duration))
+      M.send(string.format("Build Succeeded [%d seconds]", duration))
+    end
   else
     M.send_error("Build Failed [" .. #report.buildErrors .. " error(s)]")
   end

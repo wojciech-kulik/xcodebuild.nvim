@@ -30,8 +30,12 @@ local function flush_test(message)
     table.insert(lineData.message, message)
   end
 
-  tests[lineData.class] = tests[lineData.class] or {}
-  table.insert(tests[lineData.class], lineData)
+  local key = testSearch.get_test_key(lineData.target, lineData.class)
+  if key then
+    tests[key] = tests[key] or {}
+    table.insert(tests[key], lineData)
+  end
+
   lastTest = lineData
   lineType = BEGIN
   lineData = {}
@@ -184,6 +188,7 @@ local function parse_test_finished(line)
       lineData = {
         filepath = filepath,
         filename = filepath and util.get_filename(filepath) or nil,
+        target = filepath and testSearch.find_target_for_file(filepath),
         class = testClass,
         name = testName,
         lineNumber = filepath and find_test_line(filepath, testName) or nil,
@@ -211,6 +216,7 @@ local function parse_test_started(line)
   lineData = {
     filepath = filepath,
     filename = filepath and util.get_filename(filepath) or nil,
+    target = target,
     class = testClass,
     name = testName,
   }
@@ -226,6 +232,11 @@ local function process_line(line)
   -- BEGIN -> TEST_START -> TEST_ERROR -> (failed) -> BEGIN
 
   if string.find(line, "^Test Case.*started%.") then
+    -- build is finished - now it's time to load targets
+    if testsCount == 0 then
+      testSearch.load_targets_map()
+    end
+
     parse_test_started(line)
   elseif string.find(line, "^Test [Cc]ase.*passed") or string.find(line, "^Test [Cc]ase.*failed") then
     parse_test_finished(line)

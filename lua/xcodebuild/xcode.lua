@@ -17,6 +17,10 @@ function M.get_targets_filemap(appPath)
 
   searchPath = searchPath .. "/Intermediates.noindex"
 
+  if not util.dir_exists(searchPath) then
+    return {}
+  end
+
   local targetsFilesMap = {}
   local fileListFiles = util.shell("find '" .. searchPath .. "' -type f -iname *.SwiftFileList")
 

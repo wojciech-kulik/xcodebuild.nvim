@@ -9,11 +9,11 @@ local logs = require("xcodebuild.logs")
 local diagnostics = require("xcodebuild.diagnostics")
 local config = require("xcodebuild.config").options
 local snapshots = require("xcodebuild.snapshots")
+local testSearch = require("xcodebuild.test_search")
 
 local M = {
   report = {},
   currentJobId = nil,
-  targetsFilesMap = {},
 }
 local CANCELLED_CODE = 143
 
@@ -33,11 +33,6 @@ local function validate_testplan()
   end
 
   return true
-end
-
-local function load_targets_map()
-  M.targetsFilesMap = xcode.get_targets_filemap(projectConfig.settings.appPath)
-  quickfix.set_targets_filemap(M.targetsFilesMap)
 end
 
 function M.auto_save()
@@ -90,7 +85,6 @@ function M.load_last_report()
     parser.clear()
 
     vim.defer_fn(function()
-      load_targets_map()
       M.report = parser.parse_logs(log)
       quickfix.set(M.report)
       diagnostics.refresh_all_test_buffers(M.report)
@@ -265,7 +259,7 @@ function M.run_tests(testsToRun)
       return
     end
 
-    load_targets_map()
+    testSearch.load_targets_map()
     quickfix.set(M.report)
     diagnostics.refresh_all_test_buffers(M.report)
 
@@ -355,18 +349,6 @@ local function find_tests(opts)
   return selectedClass, selectedTests
 end
 
-function M.find_target_for_file(filepath)
-  if util.is_empty(M.targetsFilesMap) then
-    return nil
-  end
-
-  for target, files in pairs(M.targetsFilesMap) do
-    if util.contains(files, filepath) then
-      return target
-    end
-  end
-end
-
 function M.run_selected_tests(opts)
   if not validate_project() or not validate_testplan() then
     return
@@ -377,7 +359,7 @@ function M.run_selected_tests(opts)
   local start = function()
     local testsToRun = {}
     local testFilepath = vim.api.nvim_buf_get_name(0)
-    local target = M.find_target_for_file(testFilepath)
+    local target = testSearch.find_target_for_file(testFilepath)
 
     if not target then
       notifications.send_error("Could not detect test target. Please run build again.")
@@ -396,7 +378,7 @@ function M.run_selected_tests(opts)
 
     if opts.failingTests then
       for _, test in ipairs(selectedTests) do
-        local testTarget = M.find_target_for_file(test.filepath)
+        local testTarget = testSearch.find_target_for_file(test.filepath)
         if testTarget then
           table.insert(testsToRun, testTarget .. "/" .. test.class .. "/" .. test.name)
         end
@@ -411,10 +393,12 @@ function M.run_selected_tests(opts)
   end
 
   -- TODO: clear cache when a new swift test file is added
-  if util.is_empty(M.targetsFilesMap) then
+  testSearch.load_targets_map()
+
+  if util.is_empty(testSearch.targetsFilesMap) then
     notifications.send("Loading tests...")
     M.currentJobId = M.build_project(true, function()
-      load_targets_map()
+      testSearch.load_targets_map()
       start()
     end)
   else

@@ -30,7 +30,7 @@ function M.setup()
       group = autogroup,
       pattern = config.marks.file_pattern,
       callback = function(ev)
-        diagnostics.refresh_test_buffer(ev.buf, ev.file, coordinator.report)
+        diagnostics.refresh_test_buffer(ev.buf, coordinator.report)
       end,
     })
   end

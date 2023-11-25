@@ -1,7 +1,11 @@
 local config = require("xcodebuild.config").options.test_search
 local util = require("xcodebuild.util")
+local xcode = require("xcodebuild.xcode")
+local projectConfig = require("xcodebuild.project_config")
 
-local M = {}
+local M = {
+  targetsFilesMap = {},
+}
 
 local allSwiftFiles = {}
 local classesCache = {}
@@ -20,7 +24,6 @@ local function lsp_search(targetName, className)
     return LSPRESULT.SUCCESS, nil
   end
 
-  local find_target = require("xcodebuild.coordinator").find_target_for_file
   local lspResult, finished
   local bufnr = 0
 
@@ -34,13 +37,13 @@ local function lsp_search(targetName, className)
     lspResult = result
   end)
 
-  local counter = 0
-  while not finished and counter < 10 do
+  local time = 0
+  while not finished and time < config.lsp_timeout do
     vim.wait(10)
-    counter = counter + 1
+    time = time + 10
   end
 
-  if counter == 10 then
+  if time >= config.lsp_timeout then
     return LSPRESULT.TIMEOUT, nil
   end
 
@@ -49,7 +52,11 @@ local function lsp_search(targetName, className)
       if result.kind == 5 and result.name == className then
         local filepath = (result.location.uri:gsub("file://", ""))
 
-        if targetName == "" or not config.target_matching or find_target(filepath) == targetName then
+        if
+          targetName == ""
+          or not config.target_matching
+          or M.find_target_for_file(filepath) == targetName
+        then
           return LSPRESULT.SUCCESS, filepath
         end
       end
@@ -86,12 +93,16 @@ local function find_file_by_filename(targetName, className)
     return nil
   end
 
-  local find_target = require("xcodebuild.coordinator").find_target_for_file
-
   for _, file in ipairs(files) do
-    if targetName == "" or not config.target_matching or find_target(file) == targetName then
+    if targetName == "" or not config.target_matching or M.find_target_for_file(file) == targetName then
       return file
     end
+  end
+end
+
+local function load_targets_map_if_needed()
+  if util.is_empty(M.targetsFilesMap) then
+    M.load_targets_map()
   end
 end
 
@@ -99,6 +110,49 @@ function M.clear()
   allSwiftFiles = util.find_all_swift_files()
   classesCache = {}
   missingSymbols = {}
+end
+
+function M.load_targets_map()
+  M.targetsFilesMap = xcode.get_targets_filemap(projectConfig.settings.appPath)
+end
+
+function M.get_test_key(target, class)
+  if not class then
+    return nil
+  end
+
+  if config.target_matching then
+    return (target or "") .. ":" .. class
+  else
+    return class
+  end
+end
+
+function M.get_test_key_for_file(file, class)
+  if not class then
+    return nil
+  end
+
+  if config.target_matching then
+    local target = M.find_target_for_file(file)
+    return M.get_test_key(target, class)
+  end
+
+  return class
+end
+
+function M.find_target_for_file(filepath)
+  load_targets_map_if_needed()
+
+  if util.is_empty(M.targetsFilesMap) then
+    return nil
+  end
+
+  for target, files in pairs(M.targetsFilesMap) do
+    if util.contains(files, filepath) then
+      return target
+    end
+  end
 end
 
 function M.find_filepath(targetName, className)

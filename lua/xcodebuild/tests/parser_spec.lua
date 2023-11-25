@@ -15,6 +15,10 @@ local mockSwiftFiles = function()
   vim.fn.getcwd = function()
     return "/Users/john/repositories/calendar-app-ios"
   end
+
+  require("xcodebuild.xcode").get_targets_filemap = function(_)
+    return {}
+  end
 end
 
 local mockLSP = function()

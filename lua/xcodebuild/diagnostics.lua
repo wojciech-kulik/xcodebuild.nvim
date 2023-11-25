@@ -1,21 +1,25 @@
 local util = require("xcodebuild.util")
 local config = require("xcodebuild.config").options.marks
+local testSearch = require("xcodebuild.test_search")
 
 local M = {}
 
-local function find_test_class(bufnr, file, report)
-  -- Check if test class matching filename exists
-  local testClass = util.get_filename(file)
-  if testClass and (not report.tests or report.tests[testClass]) then
-    return testClass
+local function find_test_class(bufnr, report)
+  local filepath = vim.api.nvim_buf_get_name(bufnr)
+
+  -- check if a test class with matching filename exists
+  local filename = util.get_filename(filepath)
+  local testClassKey = testSearch.get_test_key_for_file(filepath, filename)
+  if testClassKey and (not report.tests or report.tests[testClassKey]) then
+    return testClassKey
   end
 
-  -- if not try to find it in source code
+  -- if not try finding the name in the source code
   local lines = vim.api.nvim_buf_get_lines(bufnr, 1, -1, false)
   for _, line in ipairs(lines) do
     local class = string.match(line, "class ([^:%s]+)%s*%:?")
     if class then
-      return class
+      return testSearch.get_test_key_for_file(filepath, class)
     end
   end
 
@@ -105,8 +109,8 @@ local function refresh_buf_marks(bufnr, testClass, tests)
   end
 end
 
-function M.refresh_test_buffer(bufnr, file, report)
-  local testClass = find_test_class(bufnr, file, report)
+function M.refresh_test_buffer(bufnr, report)
+  local testClass = find_test_class(bufnr, report)
   refresh_buf_diagnostics(bufnr, testClass, report)
   refresh_buf_marks(bufnr, testClass, report.tests)
 end
@@ -122,7 +126,7 @@ function M.refresh_all_test_buffers(report)
   local testBuffers = util.get_bufs_by_matching_name(regexPattern)
 
   for _, buffer in ipairs(testBuffers or {}) do
-    local testClass = find_test_class(buffer.bufnr, buffer.file, report)
+    local testClass = find_test_class(buffer.bufnr, report)
     refresh_buf_diagnostics(buffer.bufnr, testClass, report)
     refresh_buf_marks(buffer.bufnr, testClass, report.tests)
   end
