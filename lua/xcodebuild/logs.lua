@@ -168,6 +168,13 @@ local function open_test_file(tests)
   end
 
   local currentLine = vim.api.nvim_get_current_line()
+  local filepath, issueLine = string.match(currentLine, "[^/]*(/.+/[^/].+%.swift):?(%d*)")
+
+  if filepath then
+    vim.cmd("wincmd p | e " .. filepath .. " | " .. issueLine)
+    return
+  end
+
   local testClass, testName, line = string.match(currentLine, "(%w*)%.(.*)%:(%d+)")
 
   for _, test in ipairs(tests[testClass] or {}) do
@@ -255,7 +262,7 @@ function M.toggle_logs()
   end
 end
 
-function M.setup_buffer(bufnr, report)
+function M.setup_buffer(bufnr)
   local win = vim.fn.win_findbuf(bufnr)
 
   if win and win[1] then
@@ -277,7 +284,8 @@ function M.setup_buffer(bufnr, report)
   vim.api.nvim_buf_set_keymap(bufnr, "n", "q", "<cmd>close<cr>", {})
   vim.api.nvim_buf_set_keymap(bufnr, "n", "o", "", {
     callback = function()
-      open_test_file(report.tests)
+      local coordinator = require("xcodebuild.coordinator")
+      open_test_file(coordinator.report.tests)
     end,
   })
 end

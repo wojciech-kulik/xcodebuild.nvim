@@ -12,7 +12,7 @@ function M.setup()
     group = autogroup,
     pattern = "*" .. appdata.build_logs_filename,
     callback = function(ev)
-      logs.setup_buffer(ev.buf, coordinator.report)
+      logs.setup_buffer(ev.buf)
     end,
   })
 
