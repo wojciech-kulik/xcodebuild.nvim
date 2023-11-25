@@ -228,7 +228,7 @@ Xcodebuild.nvim comes with the following commands:
 | `XcodebuildSetup`            | Run configuration wizard to select project configuration |
 | `XcodebuildPicker`           | Show picker with all available actions                   |
 | `XcodebuildBuild`            | Build project                                            |
-| `XcodebuildCleanBuild`       | Build project (clean)                                    |
+| `XcodebuildCleanBuild`       | Build project (clean build)                              |
 | `XcodebuildBuildRun`         | Build & run app                                          |
 | `XcodebuildRun`              | Run app without building                                 |
 | `XcodebuildCancel`           | Cancel currently running action                          |

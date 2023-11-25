@@ -348,7 +348,7 @@ function M.show_all_actions()
   local actions = require("xcodebuild.actions")
   local actionsNames = {
     "Build Project",
-    "Build Project (Clean)",
+    "Build Project (Clean Build)",
     "Build & Run Project",
     "Run Without Building",
     "Cancel Running Action",
