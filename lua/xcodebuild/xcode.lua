@@ -180,6 +180,7 @@ function M.build_project(opts)
   -- stylua: ignore
   local action = opts.buildForTesting and "build-for-testing " or "build "
   local command = "xcodebuild "
+    .. (opts.clean and "clean " or "")
     .. action
     .. opts.projectCommand
     .. " -scheme '"

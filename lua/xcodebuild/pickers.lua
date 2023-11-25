@@ -331,11 +331,12 @@ function M.show_all_actions()
   local actions = require("xcodebuild.actions")
   local actionsNames = {
     "Build Project",
+    "Build Project (Clean)",
     "Build & Run Project",
     "Run Without Building",
     "Cancel Running Action",
 
-    "Run Test Plan (all tests)",
+    "Run Test Plan (All Tests)",
     "Run This Test Class",
     "Run This Test",
     "Run Selected Tests",
@@ -358,6 +359,7 @@ function M.show_all_actions()
   }
   local actionsPointers = {
     actions.build,
+    actions.clean_build,
     actions.build_and_run,
     actions.run,
     actions.cancel,
@@ -391,13 +393,13 @@ function M.show_all_actions()
 
   if require("xcodebuild.config").options.prepare_snapshot_test_previews then
     if #snapshots.get_failing_snapshots() > 0 then
-      table.insert(actionsNames, 10, "Preview Failing Snapshot Tests")
-      table.insert(actionsPointers, 10, actions.show_failing_snapshot_tests)
+      table.insert(actionsNames, 11, "Preview Failing Snapshot Tests")
+      table.insert(actionsPointers, 11, actions.show_failing_snapshot_tests)
     end
   end
 
   M.show("Xcodebuild Actions", actionsNames, function(_, index)
-    if index > 9 or #actionsNames == 1 then
+    if index > 10 or #actionsNames == 1 then
       actionsPointers[index]()
     else
       vim.defer_fn(actionsPointers[index], 100)

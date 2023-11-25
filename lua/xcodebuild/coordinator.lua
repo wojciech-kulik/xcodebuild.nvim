@@ -97,7 +97,7 @@ function M.build_and_run_app(waitForDebugger, callback)
     return
   end
 
-  M.build_project(false, function(report)
+  M.build_project({}, function(report)
     if util.is_not_empty(report.buildErrors) then
       notifications.send_error("Build Failed")
       logs.open_logs(true)
@@ -189,12 +189,14 @@ function M.uninstall_app(callback)
   end)
 end
 
-function M.build_project(buildForTesting, callback)
+function M.build_project(opts, callback)
+  opts = opts or {}
+
   if not validate_project() then
     return
   end
 
-  local buildId = notifications.send_build_started(buildForTesting)
+  local buildId = notifications.send_build_started(opts.buildForTesting)
   M.auto_save()
   snapshots.delete_snapshots()
   parser.clear()
@@ -227,7 +229,8 @@ function M.build_project(buildForTesting, callback)
     on_stdout = on_stdout,
     on_stderr = on_stdout,
 
-    buildForTesting = buildForTesting,
+    buildForTesting = opts.buildForTesting,
+    clean = opts.clean,
     destination = projectConfig.settings.destination,
     projectCommand = projectConfig.settings.projectCommand,
     scheme = projectConfig.settings.scheme,
@@ -397,7 +400,9 @@ function M.run_selected_tests(opts)
 
   if util.is_empty(testSearch.targetsFilesMap) then
     notifications.send("Loading tests...")
-    M.currentJobId = M.build_project(true, function()
+    M.currentJobId = M.build_project({
+      buildForTesting = true,
+    }, function()
       testSearch.load_targets_map()
       start()
     end)

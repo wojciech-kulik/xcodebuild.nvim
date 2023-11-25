@@ -18,6 +18,7 @@ function M.setup(options)
 
   -- Build
   vim.api.nvim_create_user_command("XcodebuildBuild", call(actions.build), { nargs = 0 })
+  vim.api.nvim_create_user_command("XcodebuildCleanBuild", call(actions.clean_build), { nargs = 0 })
   vim.api.nvim_create_user_command("XcodebuildBuildRun", call(actions.build_and_run), { nargs = 0 })
   vim.api.nvim_create_user_command("XcodebuildRun", call(actions.run), { nargs = 0 })
   vim.api.nvim_create_user_command("XcodebuildCancel", call(actions.cancel), { nargs = 0 })

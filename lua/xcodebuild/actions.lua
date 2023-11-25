@@ -40,7 +40,12 @@ end
 
 function M.build(callback)
   coordinator.cancel()
-  coordinator.build_project(false, callback)
+  coordinator.build_project({}, callback)
+end
+
+function M.clean_build(callback)
+  coordinator.cancel()
+  coordinator.build_project({ clean = true }, callback)
 end
 
 function M.cancel()

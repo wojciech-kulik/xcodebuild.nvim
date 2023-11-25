@@ -16,7 +16,7 @@ function M.build_and_debug(callback)
   xcode.kill_app(projectConfig.settings.productName)
   dap.continue()
 
-  coordinator.build_project(false, function(report)
+  coordinator.build_project({}, function(report)
     local success = util.is_empty(report.buildErrors)
 
     if success then

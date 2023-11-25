@@ -223,6 +223,7 @@ Xcodebuild.nvim comes with the following commands:
 | `XcodebuildSetup`            | Run configuration wizard to select project configuration |
 | `XcodebuildPicker`           | Show picker with all available actions                   |
 | `XcodebuildBuild`            | Build project                                            |
+| `XcodebuildCleanBuild`       | Build project (clean)                                    |
 | `XcodebuildBuildRun`         | Build & run app                                          |
 | `XcodebuildRun`              | Run app without building                                 |
 | `XcodebuildCancel`           | Cancel currently running action                          |
@@ -307,4 +308,3 @@ Sample `settings.json`:
 
 - [ ] Add Neovim documentation
 - [ ] List tests to browse and run. Something like a tree with tests?
-- [ ] Add clean build action. While testing this command was failing for some reasons, that's why for now it's postponed.
