@@ -124,9 +124,18 @@ function M.select_xcodeproj_if_needed(callback, opts)
 end
 
 function M.select_xcodeproj(callback, opts)
+  local maxdepth = require("xcodebuild.config").options.commands.project_search_max_depth
   local sanitizedFiles = {}
   local filenames = {}
-  local files = util.shell("find '" .. vim.fn.getcwd() .. "' -iname '*.xcodeproj'" .. " -not -path '*/.*'")
+  local files = util.shell(
+    "find '"
+      .. vim.fn.getcwd()
+      .. "' -maxdepth "
+      .. maxdepth
+      .. " -iname '*.xcodeproj'"
+      .. " -not -path '*/.*'"
+      .. " 2>/dev/null"
+  )
 
   for _, file in ipairs(files) do
     if util.trim(file) ~= "" then
@@ -148,6 +157,7 @@ function M.select_xcodeproj(callback, opts)
 end
 
 function M.select_project(callback, opts)
+  local maxdepth = require("xcodebuild.config").options.commands.project_search_max_depth
   local sanitizedFiles = {}
   local filenames = {}
   local files = util.shell(
@@ -155,6 +165,9 @@ function M.select_project(callback, opts)
       .. vim.fn.getcwd()
       .. "' \\( -iname '*.xcodeproj' -o -iname '*.xcworkspace' \\)"
       .. " -not -path '*/.*' -not -path '*xcodeproj/project.xcworkspace'"
+      .. " -maxdepth "
+      .. maxdepth
+      .. " 2>/dev/null"
   )
 
   for _, file in ipairs(files) do

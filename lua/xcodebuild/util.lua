@@ -76,7 +76,8 @@ function M.get_filename(filepath)
 end
 
 function M.find_all_swift_files()
-  local allFiles = M.shell("find '" .. vim.fn.getcwd() .. "' -type f -iname '*.swift' -not -path '*/.*'")
+  local allFiles =
+    M.shell("find '" .. vim.fn.getcwd() .. "' -type f -iname '*.swift' -not -path '*/.*' 2>/dev/null")
   local map = {}
 
   for _, filepath in ipairs(allFiles) do

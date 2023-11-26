@@ -16,6 +16,7 @@ local defaults = {
     cache_devices = true, -- cache recently loaded devices. Restart Neovim to clean cache.
     extra_build_args = "-parallelizeTargets", -- extra arguments for `xcodebuild build`
     extra_test_args = "-parallelizeTargets", -- extra arguments for `xcodebuild test`
+    project_search_max_depth = 3, -- maxdepth of xcodeproj/xcworkspace search while using configuration wizard
   },
   logs = {
     auto_open_on_success_tests = true, -- open logs when tests succeeded
