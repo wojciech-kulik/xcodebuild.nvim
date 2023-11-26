@@ -7,10 +7,10 @@ local defaults = {
   show_build_progress_bar = true, -- shows [ ...    ] progress bar during build, based on the last duration
   prepare_snapshot_test_previews = true, -- prepares a list with failing snapshot tests
   test_search = {
-    file_matching = "filename_lsp", -- one of: filename, lsp, lsp_filename, filename_lsp. Check out README for details.
-    target_matching = true, -- checks if the test file target matches the one from logs try disabling in case of not showing test results
+    file_matching = "filename_lsp", -- one of: filename, lsp, lsp_filename, filename_lsp. Check out README for details
+    target_matching = true, -- checks if the test file target matches the one from logs. Try disabling it in case of not showing test results
     lsp_client = "sourcekit", -- name of your LSP for Swift files
-    lsp_timeout = 200, -- LSP timeout in milliseconds,
+    lsp_timeout = 200, -- LSP timeout in milliseconds
   },
   commands = {
     cache_devices = true, -- cache recently loaded devices. Restart Neovim to clean cache.

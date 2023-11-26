@@ -81,10 +81,10 @@ Xcodebuild.nvim comes with the following defaults:
   show_build_progress_bar = true, -- shows [ ...    ] progress bar during build, based on the last duration
   prepare_snapshot_test_previews = true, -- prepares a list with failing snapshot tests
   test_search = {
-    file_matching = "filename_lsp", -- one of: filename, lsp, lsp_filename, filename_lsp. Check out README for details.
-    target_matching = true, -- checks if the test file target matches the one from logs try disabling in case of not showing test results
+    file_matching = "filename_lsp", -- one of: filename, lsp, lsp_filename, filename_lsp. Check out README for details
+    target_matching = true, -- checks if the test file target matches the one from logs. Try disabling it in case of not showing test results
     lsp_client = "sourcekit", -- name of your LSP for Swift files
-    lsp_timeout = 200, -- LSP timeout in milliseconds,
+    lsp_timeout = 200, -- LSP timeout in milliseconds
   },
   commands = {
     cache_devices = true, -- cache recently loaded devices. Restart Neovim to clean cache.
@@ -145,7 +145,7 @@ In order to support multiple cases, the plugin allows you to choose the search m
 
 👉 If you notice that your test results don't appear or appear in incorrect files, try playing with these modes.
 
-👉 If your test results don't appear, you can also try disabling `test_search.target_matching`. This way the plugin will always use the first match without checking its target. Target-file list comes from the build output and in some cases you may need to disable it.
+👉 If your test results don't appear, you can also try disabling `test_search.target_matching`. This way the plugin will always use the first match without checking its target.
 
 ### Setup Your Neovim For iOS Development
 
