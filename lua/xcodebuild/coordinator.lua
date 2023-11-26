@@ -35,6 +35,13 @@ local function validate_testplan()
   return true
 end
 
+local function before_new_run()
+  M.auto_save()
+  snapshots.delete_snapshots()
+  parser.clear()
+  testSearch.clear()
+end
+
 function M.auto_save()
   if config.auto_save then
     vim.cmd("silent wa!")
@@ -196,9 +203,7 @@ function M.build_project(opts, callback)
   end
 
   local buildId = notifications.send_build_started(opts.buildForTesting)
-  M.auto_save()
-  snapshots.delete_snapshots()
-  parser.clear()
+  before_new_run()
 
   local on_stdout = function(_, output)
     M.report = parser.parse_logs(output)
@@ -249,9 +254,7 @@ function M.run_tests(testsToRun)
   end
 
   notifications.send_tests_started()
-  M.auto_save()
-  snapshots.delete_snapshots()
-  parser.clear()
+  before_new_run()
 
   local on_stdout = function(_, output)
     M.report = parser.parse_logs(output)

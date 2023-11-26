@@ -276,8 +276,6 @@ function M.clear()
   warnings = {}
   diagnostics = {}
   xcresultFilepath = nil
-
-  testSearch.clear()
 end
 
 function M.parse_logs(logLines)
