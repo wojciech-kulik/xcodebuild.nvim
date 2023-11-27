@@ -25,6 +25,31 @@
       filepath = "CalendarAppTestMocks/Mocks.swift",
       lineNumber = 1513,
       message = <5>{ "Unexpectedly found nil while implicitly unwrapeventg an Optional value" }
+    }, {
+      filename = "Mocks",
+      filepath = "CalendarAppTestMocks/Mocks.swift",
+      lineNumber = 1513,
+      message = <6>{ "Unexpectedly found nil while implicitly unwrapeventg an Optional value" }
+    }, {
+      filename = "Mocks",
+      filepath = "CalendarAppTestMocks/Mocks.swift",
+      lineNumber = 1513,
+      message = <7>{ "Unexpectedly found nil while implicitly unwrapeventg an Optional value" }
+    }, {
+      filename = "Mocks",
+      filepath = "CalendarAppTestMocks/Mocks.swift",
+      lineNumber = 1513,
+      message = <8>{ "Unexpectedly found nil while implicitly unwrapeventg an Optional value" }
+    }, {
+      filename = "Mocks",
+      filepath = "CalendarAppTestMocks/Mocks.swift",
+      lineNumber = 1513,
+      message = <9>{ "Unexpectedly found nil while implicitly unwrapeventg an Optional value" }
+    }, {
+      filename = "Mocks",
+      filepath = "CalendarAppTestMocks/Mocks.swift",
+      lineNumber = 1513,
+      message = <10>{ "Unexpectedly found nil while implicitly unwrapeventg an Optional value" }
     } },
   failedTestsCount = 5,
   output = {},
@@ -125,7 +150,7 @@
         class = "ConfirmFullNameViewModelTests",
         filename = "ConfirmFullNameViewModelTests",
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppOnboarding/Tests/Modules/ConfirmFullName/ConfirmFullNameViewModelTests.swift",
-        message = <table 4>,
+        message = <table 7>,
         name = "testOnLoadAsync_ShouldSetCorrectValue_WhenDataIsFetched",
         success = false,
         target = "CalendarAppOnboardingTests",
@@ -134,7 +159,25 @@
         class = "ConfirmFullNameViewModelTests",
         filename = "ConfirmFullNameViewModelTests",
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppOnboarding/Tests/Modules/ConfirmFullName/ConfirmFullNameViewModelTests.swift",
-        message = <table 5>,
+        message = <table 8>,
+        name = "testOnLoadAsync_ShouldSetCorrectValue_WhenDataIsFetched",
+        success = false,
+        target = "CalendarAppOnboardingTests",
+        testResult = "failed"
+      }, {
+        class = "ConfirmFullNameViewModelTests",
+        filename = "ConfirmFullNameViewModelTests",
+        filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppOnboarding/Tests/Modules/ConfirmFullName/ConfirmFullNameViewModelTests.swift",
+        message = <table 9>,
+        name = "testOnLoadAsync_ShouldSetError_WhenDataFetchFailed",
+        success = false,
+        target = "CalendarAppOnboardingTests",
+        testResult = "failed"
+      }, {
+        class = "ConfirmFullNameViewModelTests",
+        filename = "ConfirmFullNameViewModelTests",
+        filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppOnboarding/Tests/Modules/ConfirmFullName/ConfirmFullNameViewModelTests.swift",
+        message = <table 10>,
         name = "testOnLoadAsync_ShouldSetError_WhenDataFetchFailed",
         success = false,
         target = "CalendarAppOnboardingTests",
@@ -164,6 +207,24 @@
         filename = "ConfirmPhoneNumberViewModelTests",
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppOnboarding/Tests/Modules/ConfirmPhoneNumber/ConfirmPhoneNumberViewModelTests.swift",
         message = <table 2>,
+        name = "testOnLoadAsync_ShouldSetMaskedPhoneNumber_WhenDataIsFetched",
+        success = false,
+        target = "CalendarAppOnboardingTests",
+        testResult = "failed"
+      }, {
+        class = "ConfirmPhoneNumberViewModelTests",
+        filename = "ConfirmPhoneNumberViewModelTests",
+        filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppOnboarding/Tests/Modules/ConfirmPhoneNumber/ConfirmPhoneNumberViewModelTests.swift",
+        message = <table 3>,
+        name = "testOnLoadAsync_ShouldSetError_WhenDataFetchFailed",
+        success = false,
+        target = "CalendarAppOnboardingTests",
+        testResult = "failed"
+      }, {
+        class = "ConfirmPhoneNumberViewModelTests",
+        filename = "ConfirmPhoneNumberViewModelTests",
+        filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppOnboarding/Tests/Modules/ConfirmPhoneNumber/ConfirmPhoneNumberViewModelTests.swift",
+        message = <table 4>,
         name = "testOnLoadAsync_ShouldSetError_WhenDataFetchFailed",
         success = false,
         target = "CalendarAppOnboardingTests",
@@ -181,7 +242,16 @@
         class = "ConfirmPhoneNumberViewModelTests",
         filename = "ConfirmPhoneNumberViewModelTests",
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppOnboarding/Tests/Modules/ConfirmPhoneNumber/ConfirmPhoneNumberViewModelTests.swift",
-        message = <table 3>,
+        message = <table 5>,
+        name = "testOnLoadAsync_ShouldSetFormattedPrefix_WhenDataIsFetched",
+        success = false,
+        target = "CalendarAppOnboardingTests",
+        testResult = "failed"
+      }, {
+        class = "ConfirmPhoneNumberViewModelTests",
+        filename = "ConfirmPhoneNumberViewModelTests",
+        filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppOnboarding/Tests/Modules/ConfirmPhoneNumber/ConfirmPhoneNumberViewModelTests.swift",
+        message = <table 6>,
         name = "testOnLoadAsync_ShouldSetFormattedPrefix_WhenDataIsFetched",
         success = false,
         target = "CalendarAppOnboardingTests",
