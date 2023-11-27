@@ -34,12 +34,18 @@ function M.save_failing_snapshots(reportPath, callback)
 end
 
 function M.get_failing_snapshots()
-  return util.filter(
+  local snapshots = util.filter(
     util.shell("find '" .. appdata.snapshots_dir .. "' -type f -iname '*.png' 2>/dev/null"),
     function(item)
       return item ~= ""
     end
   )
+
+  table.sort(snapshots, function(a, b)
+    return a < b
+  end)
+
+  return snapshots
 end
 
 function M.delete_snapshots()
