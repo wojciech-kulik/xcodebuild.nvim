@@ -5,6 +5,11 @@
       filepath = "CalendarEventTestMocks/Mocks.swift",
       lineNumber = 1513,
       message = <1>{ "Unexpectedly found nil while implicitly unwrapeventg an Optional value" }
+    }, {
+      filename = "Mocks",
+      filepath = "CalendarEventTestMocks/Mocks.swift",
+      lineNumber = 1513,
+      message = <2>{ "Unexpectedly found nil while implicitly unwrapeventg an Optional value" }
     } },
   failedTestsCount = 2,
   output = {},
@@ -97,6 +102,15 @@
         filename = "ConfirmFullNameViewModelTests",
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppOnboarding/Tests/Modules/ConfirmFullName/ConfirmFullNameViewModelTests.swift",
         message = <table 1>,
+        name = "testOnLoadAsync_ShouldSetCorrectValue_WhenDataIsFetched",
+        success = false,
+        target = "CalendarEventOnboardingTests",
+        testResult = "failed"
+      }, {
+        class = "ConfirmFullNameViewModelTests",
+        filename = "ConfirmFullNameViewModelTests",
+        filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppOnboarding/Tests/Modules/ConfirmFullName/ConfirmFullNameViewModelTests.swift",
+        message = <table 2>,
         name = "testOnLoadAsync_ShouldSetCorrectValue_WhenDataIsFetched",
         success = false,
         target = "CalendarEventOnboardingTests",

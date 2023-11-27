@@ -14,6 +14,7 @@ local BUILD_WARNING = "BUILD_WARNING"
 local lineType = BEGIN
 local lineData = {}
 local lastTest = nil
+local lastErrorTest = {}
 
 -- report fields
 local testsCount = 0
@@ -132,7 +133,17 @@ local function parse_test_error(line)
     string.match(line, "([^%s]*%.swift)%:(%d+)%:%d*%:? %w*%s*error%: (.*)")
 
   if filepath and message then
-    failedTestsCount = failedTestsCount + 1
+    -- count only the first error per test
+    if lastErrorTest == nil then
+      failedTestsCount = failedTestsCount + 1
+
+      -- we flush test with error whenever we find an empty line
+      -- however, a single test can fail multiple asserts
+      -- therefore, we need to remember the last test to
+      -- add the next failure to the report
+      lastErrorTest = util.shallow_copy(lineData)
+    end
+
     lineType = TEST_ERROR
     lineData.message = { sanitize(message) }
     lineData.testResult = "failed"
@@ -164,6 +175,8 @@ local function parse_warning(line)
 end
 
 local function parse_test_finished(line)
+  lastErrorTest = nil
+
   if string.find(line, "^Test Case .*.%-") then
     local testResult, time = string.match(line, "^Test Case .*.%-%[%w+%.%w+ %g+%]. (%w+)% %((.*)%)%.")
     if lastTest then
@@ -211,6 +224,7 @@ local function parse_test_started(line)
   local filepath = testSearch.find_filepath(target, testClass)
 
   testsCount = testsCount + 1
+  lastErrorTest = nil
   lastTest = nil
   lineType = TEST_START
   lineData = {
@@ -242,7 +256,14 @@ local function process_line(line)
     parse_test_finished(line)
   elseif string.find(line, "error%:") then
     flush()
-    if lineType == TEST_START then
+
+    -- found another failure within the same test
+    -- restore previous data
+    if testsCount > 0 and lineType == BEGIN and lastErrorTest then
+      lineData = lastErrorTest
+      lineType = TEST_START
+      parse_test_error(line)
+    elseif lineType == TEST_START then
       parse_test_error(line)
     elseif testsCount == 0 and lineType == BEGIN then
       parse_build_error(line)
@@ -265,6 +286,7 @@ end
 
 function M.clear()
   lastTest = nil
+  lastErrorTest = nil
   lineData = {}
   lineType = BEGIN
 
