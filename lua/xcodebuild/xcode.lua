@@ -345,6 +345,18 @@ function M.kill_app(productName)
   end
 end
 
+function M.get_code_coverage(archive, filepath, callback)
+  local command = "xcrun xccov view --file '" .. filepath .. "' '" .. archive .. "'"
+
+  return vim.fn.jobstart(command, {
+    stdout_buffered = true,
+    on_stdout = function(_, output)
+      callback(output)
+    end,
+    on_exit = function() end,
+  })
+end
+
 function M.run_tests(opts)
   -- stylua: ignore
   local command = "xcodebuild test -scheme '"

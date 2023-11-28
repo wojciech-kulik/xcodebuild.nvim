@@ -2,6 +2,7 @@ local notifications = require("xcodebuild.notifications")
 local coordinator = require("xcodebuild.coordinator")
 local pickers = require("xcodebuild.pickers")
 local logs = require("xcodebuild.logs")
+local coverage = require("xcodebuild.coverage")
 
 local M = {}
 
@@ -165,6 +166,22 @@ end
 
 function M.show_failing_snapshot_tests()
   coordinator.show_failing_snapshot_tests()
+end
+
+function M.toggle_code_coverage(isVisible)
+  coverage.toggle_code_coverage(isVisible)
+end
+
+function M.show_code_coverage_report()
+  coverage.show_report()
+end
+
+function M.jump_to_next_coverage()
+  coverage.jump_to_next_coverage()
+end
+
+function M.jump_to_previous_coverage()
+  coverage.jump_to_previous_coverage()
 end
 
 return M

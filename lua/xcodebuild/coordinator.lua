@@ -10,6 +10,7 @@ local diagnostics = require("xcodebuild.diagnostics")
 local config = require("xcodebuild.config").options
 local snapshots = require("xcodebuild.snapshots")
 local testSearch = require("xcodebuild.test_search")
+local coverage = require("xcodebuild.coverage")
 
 local M = {
   report = {},
@@ -256,6 +257,33 @@ function M.run_tests(testsToRun)
   notifications.send_tests_started()
   before_new_run()
 
+  local show_finish = function()
+    notifications.send_tests_finished(M.report, false)
+  end
+
+  local process_snapshots = function()
+    if M.report.failedTestsCount > 0 and config.prepare_snapshot_test_previews then
+      notifications.send_progress("Processing snapshots...")
+
+      snapshots.save_failing_snapshots(M.report.xcresultFilepath, show_finish)
+    else
+      show_finish()
+    end
+  end
+
+  local process_coverage = function()
+    if config.code_coverage.enabled then
+      notifications.send_progress("Gathering coverage...")
+
+      coverage.export_coverage(M.report.xcresultFilepath, function()
+        coverage.refresh_all_buffers()
+        process_snapshots()
+      end)
+    else
+      process_snapshots()
+    end
+  end
+
   local on_stdout = function(_, output)
     M.report = parser.parse_logs(output)
     notifications.show_tests_progress(M.report)
@@ -277,16 +305,7 @@ function M.run_tests(testsToRun)
     diagnostics.refresh_all_test_buffers(M.report)
 
     notifications.send_progress("Processing logs...")
-    logs.set_logs(M.report, true, function()
-      if M.report.failedTestsCount > 0 and config.prepare_snapshot_test_previews then
-        notifications.send_progress("Processing snapshots...")
-        snapshots.save_failing_snapshots(M.report.xcresultFilepath, function()
-          notifications.send_tests_finished(M.report, false)
-        end)
-      else
-        notifications.send_tests_finished(M.report, false)
-      end
-    end)
+    logs.set_logs(M.report, true, process_coverage)
   end
 
   M.currentJobId = xcode.run_tests({

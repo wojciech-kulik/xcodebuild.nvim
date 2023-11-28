@@ -379,9 +379,6 @@ function M.show_all_actions()
     "Select Test Plan",
 
     "Toggle Logs",
-    "Open Logs",
-    "Close Logs",
-
     "Clean DerivedData",
     "Show Current Configuration",
     "Show Configuration Wizard",
@@ -408,9 +405,6 @@ function M.show_all_actions()
     actions.select_testplan,
 
     actions.toggle_logs,
-    actions.open_logs,
-    actions.close_logs,
-
     actions.clean_derived_data,
     actions.show_current_config,
     actions.configure_project,
@@ -423,10 +417,22 @@ function M.show_all_actions()
     actionsPointers = { actions.configure_project }
   end
 
-  if require("xcodebuild.config").options.prepare_snapshot_test_previews then
+  local config = require("xcodebuild.config").options
+
+  if config.prepare_snapshot_test_previews then
     if util.is_not_empty(snapshots.get_failing_snapshots()) then
       table.insert(actionsNames, 11, "Preview Failing Snapshot Tests")
       table.insert(actionsPointers, 11, actions.show_failing_snapshot_tests)
+    end
+  end
+
+  if config.code_coverage.enabled then
+    table.insert(actionsNames, 11, "Toggle Code Coverage")
+    table.insert(actionsPointers, 11, actions.toggle_code_coverage)
+
+    if require("xcodebuild.coverage").is_code_coverage_available() then
+      table.insert(actionsNames, 12, "Show Code Coverage Report")
+      table.insert(actionsPointers, 12, actions.show_code_coverage_report)
     end
   end
 

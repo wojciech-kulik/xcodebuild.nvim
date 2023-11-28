@@ -6,15 +6,18 @@ local function call(action)
   end
 end
 
+-- stylua: ignore start
 function M.setup(options)
   require("xcodebuild.config").setup(options)
 
   local autocmd = require("xcodebuild.autocmd")
   local actions = require("xcodebuild.actions")
   local projectConfig = require("xcodebuild.project_config")
+  local coverage = require("xcodebuild.coverage")
 
   autocmd.setup()
   projectConfig.load_settings()
+  coverage.setup()
 
   -- Build
   vim.api.nvim_create_user_command("XcodebuildBuild", call(actions.build), { nargs = 0 })
@@ -29,11 +32,11 @@ function M.setup(options)
   vim.api.nvim_create_user_command("XcodebuildTestFunc", call(actions.run_func_test), { nargs = 0 })
   vim.api.nvim_create_user_command("XcodebuildTestSelected", call(actions.run_selected_tests), { nargs = 0 })
   vim.api.nvim_create_user_command("XcodebuildTestFailing", call(actions.run_failing_tests), { nargs = 0 })
-  vim.api.nvim_create_user_command(
-    "XcodebuildFailingSnapshots",
-    call(actions.show_failing_snapshot_tests),
-    { nargs = 0 }
-  )
+  vim.api.nvim_create_user_command("XcodebuildFailingSnapshots", call(actions.show_failing_snapshot_tests), { nargs = 0 })
+  vim.api.nvim_create_user_command("XcodebuildToggleCodeCoverage", call(actions.toggle_code_coverage), { nargs = 0 })
+  vim.api.nvim_create_user_command("XcodebuildShowCodeCoverageReport", call(actions.show_code_coverage_report), { nargs = 0 })
+  vim.api.nvim_create_user_command("XcodebuildJumpToNextCoverage", call(actions.jump_to_next_coverage), { nargs = 0 })
+  vim.api.nvim_create_user_command("XcodebuildJumpToPrevCoverage", call(actions.jump_to_previous_coverage), { nargs = 0 })
 
   -- Pickers
   vim.api.nvim_create_user_command("XcodebuildSetup", call(actions.configure_project), { nargs = 0 })
@@ -52,11 +55,7 @@ function M.setup(options)
   -- Other
   vim.api.nvim_create_user_command("XcodebuildShowConfig", call(actions.show_current_config), { nargs = 0 })
   vim.api.nvim_create_user_command("XcodebuildBootSimulator", call(actions.boot_simulator), { nargs = 0 })
-  vim.api.nvim_create_user_command(
-    "XcodebuildCleanDerivedData",
-    call(actions.clean_derived_data),
-    { nargs = 0 }
-  )
+  vim.api.nvim_create_user_command("XcodebuildCleanDerivedData", call(actions.clean_derived_data), { nargs = 0 })
   vim.api.nvim_create_user_command("XcodebuildUninstall", call(actions.uninstall), { nargs = 0 })
 end
 

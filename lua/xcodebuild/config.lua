@@ -54,6 +54,35 @@ local defaults = {
     show_errors_on_quickfixlist = true, -- add build/test errors to quickfix list
     show_warnings_on_quickfixlist = true, -- add build warnings to quickfix list
   },
+  code_coverage = {
+    enabled = false, -- generate code coverage report and show marks (requires xcov tool)
+    file_pattern = "*.swift", -- coverage will be shown in files matching this pattern
+    -- configuration of coverage presentation:
+    covered = {
+      sign_text = "",
+      sign_hl_group = "XcodebuildCoverageFull",
+      number_hl_group = nil,
+      line_hl_group = nil,
+    },
+    partially_covered = {
+      sign_text = "┃",
+      sign_hl_group = "XcodebuildCoveragePartial",
+      number_hl_group = nil,
+      line_hl_group = nil,
+    },
+    not_covered = {
+      sign_text = "┃",
+      sign_hl_group = "XcodebuildCoverageNone",
+      number_hl_group = nil,
+      line_hl_group = nil,
+    },
+    not_executable = {
+      sign_text = "",
+      sign_hl_group = "XcodebuildCoverageNotExecutable",
+      number_hl_group = nil,
+      line_hl_group = nil,
+    },
+  },
 }
 
 M.options = defaults

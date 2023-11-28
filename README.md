@@ -31,6 +31,7 @@ It is also my first Neovim plugin. Hopefully, a good one 😁.
 - [x] Showing test errors in diagnostics and on the quickfix list.
 - [x] Showing build errors and warnings on the quickfix list.
 - [x] Showing build progress bar based on the previous build time.
+- [x] Showing code coverage.
 - [x] Showing preview of failed snapshot tests (if you use [swift-snapshot-testing](https://github.com/pointfreeco/swift-snapshot-testing))
 - [x] Advanced log parser to detect all errors, warnings, and failing tests and to present them nicely formatted.
 - [x] Auto saving files before build or test actions.
@@ -41,20 +42,27 @@ It is also my first Neovim plugin. Hopefully, a good one 😁.
 
 ## ⚡️ Requirements
 
-- [Neovim](https://neovim.io) (not sure which version, use the new one :D).
-- [xcbeautify](https://github.com/tuist/xcbeautify) tool (`brew install xcbeautify`) or just turn it off in config.
-- [telescope.nvim](https://github.com/nvim-telescope/telescope.nvim) to present all pickers by the plugin.
+- [Neovim](https://neovim.io) (not sure which version, use the latest one 😅).
+- [xcbeautify](https://github.com/tuist/xcbeautify) tool or just turn it off in config.
+- [xcov](https://github.com/fastlane-community/xcov) tool for code coverage.
+- [telescope.nvim](https://github.com/nvim-telescope/telescope.nvim) used to present pickers by the plugin.
 - Xcode (make sure that `xcodebuild` and `xcrun simctl` work correctly).
 - To get the best experience with apps development, you should install and configure [nvim-dap](https://github.com/mfussenegger/nvim-dap) and [nvim-dap-ui](https://github.com/rcarriga/nvim-dap-ui) to be able to debug.
 - This plugin requires the project to be written in Swift. It was tested only with Xcode 15.
-- [lsp-trouble.nvim](https://github.com/simrat39/lsp-trouble.nvim) - if you want to see all issues nicely presented, you can use it with `quickfix` mode.
-- Make sure to configure LSP properly for iOS/macOS apps. You can read how to do that in my post: [How to develop iOS and macOS apps in Neovim?](https://wojciechkulik.pl/ios/how-to-develop-ios-and-macos-apps-in-other-ides-like-neovim-or-vs-code).
+- Make sure to configure LSP properly for iOS/macOS apps. You can read how to do that in my post: [The Complete Guide To iOS & macOS Development In Neovim](https://wojciechkulik.pl/ios/the-complete-guide-to-ios-macos-development-in-neovim).
+
+Install tools:
+
+```shell
+brew install xcbeautify
+sudo gem install xcov
+```
 
 ## 📦 Installation
 
-Install the plugin with your preferred package manager:
+Install the plugin using your preferred package manager:
 
-### [lazy.nvim](https://github.com/folke/lazy.nvim)
+### 💤 [lazy.nvim](https://github.com/folke/lazy.nvim)
 
 ```lua
 return {
@@ -69,8 +77,6 @@ return {
 ```
 
 ## ⚙️ Configuration
-
-### Setup
 
 Xcodebuild.nvim comes with the following defaults:
 
@@ -128,10 +134,39 @@ Xcodebuild.nvim comes with the following defaults:
     show_errors_on_quickfixlist = true, -- add build/test errors to quickfix list
     show_warnings_on_quickfixlist = true, -- add build warnings to quickfix list
   },
+  code_coverage = {
+    enabled = false, -- generate code coverage report and show marks (requires xcov tool)
+    file_pattern = "*.swift", -- coverage will be shown in files matching this pattern
+    -- configuration of coverage presentation:
+    covered = {
+      sign_text = "",
+      sign_hl_group = "XcodebuildCoverageFull",
+      number_hl_group = nil,
+      line_hl_group = nil,
+    },
+    partially_covered = {
+      sign_text = "┃",
+      sign_hl_group = "XcodebuildCoveragePartial",
+      number_hl_group = nil,
+      line_hl_group = nil,
+    },
+    not_covered = {
+      sign_text = "┃",
+      sign_hl_group = "XcodebuildCoverageNone",
+      number_hl_group = nil,
+      line_hl_group = nil,
+    },
+    not_executable = {
+      sign_text = "",
+      sign_hl_group = "XcodebuildCoverageNotExecutable",
+      number_hl_group = nil,
+      line_hl_group = nil,
+    },
+  },
 }
 ```
 
-### Test File Search - File Matching
+### 🔎 Test File Search - File Matching
 
 `xcodebuild` logs provide the following information about the test: target, test class, and test name. The plugin needs to find the file location based on that, which is not a trivial task.
 
@@ -148,7 +183,7 @@ In order to support multiple cases, the plugin allows you to choose the search m
 
 👉 If your test results don't appear, you can also try disabling `test_search.target_matching`. This way the plugin will always use the first match without checking its target.
 
-### Setup Your Neovim For iOS Development
+### 📱 Setup Your Neovim For iOS Development
 
 I wrote an article that sums up all steps to set up your Neovim from scratch to develop iOS and macOS apps:
 
@@ -156,11 +191,11 @@ I wrote an article that sums up all steps to set up your Neovim from scratch to 
 
 You can also check out a sample Neovim configuration that I prepared for iOS development: [ios-dev-starter-nvim](https://github.com/wojciech-kulik/ios-dev-starter-nvim)
 
-### Swift Packages Development
+### 📦 Swift Packages Development
 
 This plugin supports only iOS and macOS applications. However, if you develop Swift Package for one of those platforms, you can easily use this plugin by creating a sample iOS/macOS project in your root directory and adding your package as a dependency.
 
-### DAP Integration
+### 🔬 DAP Integration
 
 [nvim-dap](https://github.com/mfussenegger/nvim-dap) plugin lets you debug applications like in any other IDE. On top of that [nvim-dap-ui](https://github.com/rcarriga/nvim-dap-ui) extension will present for you all panels with stack, breakpoints, variables, logs, etc.
 
@@ -168,6 +203,9 @@ To configure DAP for development:
 
 - Download codelldb VS Code plugin from: [HERE](https://github.com/vadimcn/codelldb/releases). For macOS use `darwin` version. Just unzip `vsix` file and set paths below.
 - Install also [nvim-dap-ui](https://github.com/rcarriga/nvim-dap-ui) for a nice GUI to debug.
+
+<details>
+  <summary>👉 nvim-dap configuration</summary>
 
 ```lua
 return {
@@ -217,41 +255,47 @@ return {
 }
 ```
 
+</details>
+
 ## 🚀 Usage
 
 Make sure to open your project's root directory in Neovim and run `XcodebuildSetup` to configure the project. The plugin needs several information like project file, scheme, config, device, and test plan to be able to run commands.
 
-### Commands
+### 🔧 Commands
 
 Xcodebuild.nvim comes with the following commands:
 
-| Command                      | Description                                              |
-| ---------------------------- | -------------------------------------------------------- |
-| `XcodebuildSetup`            | Run configuration wizard to select project configuration |
-| `XcodebuildPicker`           | Show picker with all available actions                   |
-| `XcodebuildBuild`            | Build project                                            |
-| `XcodebuildCleanBuild`       | Build project (clean build)                              |
-| `XcodebuildBuildRun`         | Build & run app                                          |
-| `XcodebuildRun`              | Run app without building                                 |
-| `XcodebuildCancel`           | Cancel currently running action                          |
-| `XcodebuildTest`             | Run tests (whole test plan)                              |
-| `XcodebuildTestClass`        | Run test class (where the cursor is)                     |
-| `XcodebuildTestFunc`         | Run test (where the cursor is)                           |
-| `XcodebuildTestSelected`     | Run selected tests (using visual mode)                   |
-| `XcodebuildTestFailing`      | Rerun previously failed tests                            |
-| `XcodebuildFailingSnapshots` | Shows a picker with failing snapshot tests               |
-| `XcodebuildSelectProject`    | Show project file picker                                 |
-| `XcodebuildSelectScheme`     | Show scheme picker                                       |
-| `XcodebuildSelectConfig`     | Show build configuration picker                          |
-| `XcodebuildSelectDevice`     | Show device picker                                       |
-| `XcodebuildSelectTestPlan`   | Show test plan picker                                    |
-| `XcodebuildToggleLogs`       | Toggle logs panel                                        |
-| `XcodebuildOpenLogs`         | Open logs panel                                          |
-| `XcodebuildCloseLogs`        | Close logs panel                                         |
-| `XcodebuildCleanDerivedData` | Deletes project's DerivedData                            |
-| `XcodebuildShowConfig`       | Print current project configuration                      |
-| `XcodebuildBootSimulator`    | Boot selected simulator                                  |
-| `XcodebuildUninstall`        | Uninstall mobile app                                     |
+| Command                            | Description                                              |
+| ---------------------------------- | -------------------------------------------------------- |
+| `XcodebuildSetup`                  | Run configuration wizard to select project configuration |
+| `XcodebuildPicker`                 | Show picker with all available actions                   |
+| `XcodebuildBuild`                  | Build project                                            |
+| `XcodebuildCleanBuild`             | Build project (clean build)                              |
+| `XcodebuildBuildRun`               | Build & run app                                          |
+| `XcodebuildRun`                    | Run app without building                                 |
+| `XcodebuildCancel`                 | Cancel currently running action                          |
+| `XcodebuildTest`                   | Run tests (whole test plan)                              |
+| `XcodebuildTestClass`              | Run test class (where the cursor is)                     |
+| `XcodebuildTestFunc`               | Run test (where the cursor is)                           |
+| `XcodebuildTestSelected`           | Run selected tests (using visual mode)                   |
+| `XcodebuildTestFailing`            | Rerun previously failed tests                            |
+| `XcodebuildFailingSnapshots`       | Show a picker with failing snapshot tests                |
+| `XcodebuildToggleCodeCoverage`     | Toggle code coverage marks on the side bar               |
+| `XcodebuildShowCodeCoverageReport` | Open HTML code coverage report                           |
+| `XcodebuildJumpToNextCoverage`     | Jump to next code coverage mark                          |
+| `XcodebuildJumpToPrevCoverage`     | Jump to previous code coverage mark                      |
+| `XcodebuildSelectProject`          | Show project file picker                                 |
+| `XcodebuildSelectScheme`           | Show scheme picker                                       |
+| `XcodebuildSelectConfig`           | Show build configuration picker                          |
+| `XcodebuildSelectDevice`           | Show device picker                                       |
+| `XcodebuildSelectTestPlan`         | Show test plan picker                                    |
+| `XcodebuildToggleLogs`             | Toggle logs panel                                        |
+| `XcodebuildOpenLogs`               | Open logs panel                                          |
+| `XcodebuildCloseLogs`              | Close logs panel                                         |
+| `XcodebuildCleanDerivedData`       | Deletes project's DerivedData                            |
+| `XcodebuildShowConfig`             | Print current project configuration                      |
+| `XcodebuildBootSimulator`          | Boot selected simulator                                  |
+| `XcodebuildUninstall`              | Uninstall mobile app                                     |
 
 Sample key bindings:
 
@@ -266,15 +310,19 @@ vim.keymap.set("n", "<leader>X", "<cmd>XcodebuildPicker<cr>", { desc = "Show All
 vim.keymap.set("n", "<leader>xd", "<cmd>XcodebuildSelectDevice<cr>", { desc = "Select Device" })
 vim.keymap.set("n", "<leader>xp", "<cmd>XcodebuildSelectTestPlan<cr>", { desc = "Select Test Plan" })
 vim.keymap.set("n", "<leader>xs", "<cmd>XcodebuildFailingSnapshots<cr>", { desc = "Show Failing Snapshots" })
+vim.keymap.set("n", "<leader>xc", "<cmd>XcodebuildToggleCodeCoverage<cr>", { desc = "Toggle Code Coverage" })
+vim.keymap.set("n", "<leader>xC", "<cmd>XcodebuildShowCodeCoverageReport<cr>", { desc = "Show Code Coverage Report" })
+vim.keymap.set("n", "[r", "<cmd>XcodebuildJumpToPrevCoverage<cr>", { desc = "Jump To Previous Coverage" })
+vim.keymap.set("n", "]r", "<cmd>XcodebuildJumpToNextCoverage<cr>", { desc = "Jump To Next Coverage" })
 vim.keymap.set("n", "<leader>xq", "<cmd>Telescope quickfix<cr>", { desc = "Show QuickFix List" })
 ```
 
-### Logs Panel Key Bindings
+### 📋 Logs Panel Key Bindings
 
 - Press `o` on a failed test (in summary section) to jump to failing place.
 - Press `q` to close the panel.
 
-### Lualine Integration
+### 🚥 Lualine Integration
 
 ![Xcodebuild Lualine](./media/lualine.png)
 
@@ -304,7 +352,49 @@ Global variables that you can use:
 | `vim.g.xcodebuild_config`      | Selected build config (ex. Debug)           |
 | `vim.g.xcodebuild_scheme`      | Selected project scheme (ex. MyApp)         |
 
-### Snapshot Tests Preview
+### 🧪 Code Coverage
+
+![Xcodebuild Code Coverage](./media/code-coverage.png)
+
+Using xcodebuild.nvim you can also check the code coverage after running tests. To enable it you need to:
+
+1. Install [xcov](https://github.com/fastlane-community/xcov) tool:
+
+```shell
+sudo gem install xcov
+```
+
+2. Make sure that you enabled code coverage for desired targets in your test plan.
+3. Enable code coverage in xcodebuild [config](#%EF%B8%8F-configuration):
+
+```lua
+code_coverage = {
+  enabled = true,
+}
+```
+
+4. Toggle code coverage `:XcodebuildToggleCodeCoverage` or `:lua require("xcodebuild.actions").toggle_code_coverage(true)`.
+5. Run tests - once it's finished, code coverage should appear on the sidebar with line numbers.
+6. You can jump between code coverage marks using `:XcodebuildJumpToPrevCoverage` and `:XcodebuildJumpToNextCoverage`.
+7. If needed you can also check out the HTML report using `:XcodebuildShowCodeCoverageReport` command.
+
+The plugin sends `XcodebuildCoverageToggled` event that you can use to disable other plugins presenting lines on the side bar (like `gitsigns`). Example:
+
+```lua
+vim.api.nvim_create_autocmd("User", {
+  pattern = "XcodebuildCoverageToggled",
+  callback = function(event)
+    local isOn = event.data
+    require("gitsigns").toggle_signs(not isOn)
+  end,
+})
+```
+
+⚠️  In some cases code coverage may not be generated for some files (most likely because of Xcode's bug). Try running tests again then.
+
+⚠️  If you run tests, modify file and toggle code coverage AFTER that, the placement of marks will be incorrect (because it doesn't know about changes that you made). However, if you show code coverage and after that you modify the code, marks will be moving while you are editing the file.
+
+### 📸 Snapshot Tests Preview
 
 This plugin offers a nice list of failing snapshot tests. For each test it generates a preview image combining reference, failure, and difference images into one. It works with [swift-snapshot-testing](https://github.com/pointfreeco/swift-snapshot-testing) library.
 
@@ -312,11 +402,11 @@ Run `:XcodebuildFailingSnapshots` to see the list.
 
 ![Xcodebuild Snapshots](./media/snapshots.png)
 
-### API
+### 👨‍💻 API
 
 If you want to use functions directly instead of user commands, then please see [xcodebuild.actions](./lua/xcodebuild/actions.lua) module.
 
-## 🧰 Troubleshooting
+### 🧰 Troubleshooting
 
 Loading project configuration is a very complex task that relies on parsing multiple crazy outputs from `xcodebuild` commands. Those logs are a pure nightmare to parse. It may not always work. In case of any issues with that, you can try manually providing the configuration by adding `.nvim/xcodebuild/settings.json` file in your root directory.
 
