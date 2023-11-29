@@ -386,7 +386,10 @@ function M.run_selected_tests(opts)
     return
   end
 
-  local selectedClass, selectedTests = find_tests(opts)
+  local selectedClass, selectedTests
+  if not opts.currentTarget then
+    selectedClass, selectedTests = find_tests(opts)
+  end
 
   local start = function()
     local testsToRun = {}
@@ -394,8 +397,19 @@ function M.run_selected_tests(opts)
     local target = testSearch.find_target_for_file(testFilepath)
 
     if not target then
-      notifications.send_error("Could not detect test target. Please run build again.")
+      if opts.doNotBuild then
+        notifications.send_error("Could not detect test target. Please run build for testing.")
+      else
+        opts.doNotBuild = true
+        M.build_project({ buildForTesting = true }, function()
+          M.run_selected_tests(opts)
+        end)
+      end
       return
+    end
+
+    if opts.currentTarget then
+      table.insert(testsToRun, target)
     end
 
     if opts.currentClass and selectedClass then
@@ -429,9 +443,8 @@ function M.run_selected_tests(opts)
 
   if util.is_empty(testSearch.targetsFilesMap) then
     notifications.send("Loading tests...")
-    M.currentJobId = M.build_project({
-      buildForTesting = true,
-    }, function()
+    M.currentJobId = M.build_project({ buildForTesting = true }, function()
+      opts.doNotBuild = true
       testSearch.load_targets_map()
       start()
     end)

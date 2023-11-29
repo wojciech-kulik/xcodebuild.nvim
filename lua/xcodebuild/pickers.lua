@@ -363,10 +363,12 @@ function M.show_all_actions()
     "Build Project",
     "Build Project (Clean Build)",
     "Build & Run Project",
+    "Build For Testing",
     "Run Without Building",
     "Cancel Running Action",
 
     "Run Test Plan (All Tests)",
+    "Run This Test Target",
     "Run This Test Class",
     "Run This Test",
     "Run Selected Tests",
@@ -389,10 +391,12 @@ function M.show_all_actions()
     actions.build,
     actions.clean_build,
     actions.build_and_run,
+    actions.build_for_testing,
     actions.run,
     actions.cancel,
 
     actions.run_tests,
+    actions.run_target_tests,
     actions.run_class_tests,
     actions.run_func_test,
     actions.run_selected_tests,
@@ -421,23 +425,23 @@ function M.show_all_actions()
 
   if config.prepare_snapshot_test_previews then
     if util.is_not_empty(snapshots.get_failing_snapshots()) then
-      table.insert(actionsNames, 11, "Preview Failing Snapshot Tests")
-      table.insert(actionsPointers, 11, actions.show_failing_snapshot_tests)
+      table.insert(actionsNames, 13, "Preview Failing Snapshot Tests")
+      table.insert(actionsPointers, 13, actions.show_failing_snapshot_tests)
     end
   end
 
   if config.code_coverage.enabled then
-    table.insert(actionsNames, 11, "Toggle Code Coverage")
-    table.insert(actionsPointers, 11, actions.toggle_code_coverage)
+    table.insert(actionsNames, 13, "Toggle Code Coverage")
+    table.insert(actionsPointers, 13, actions.toggle_code_coverage)
 
     if require("xcodebuild.coverage").is_code_coverage_available() then
-      table.insert(actionsNames, 12, "Show Code Coverage Report")
-      table.insert(actionsPointers, 12, actions.show_code_coverage_report)
+      table.insert(actionsNames, 14, "Show Code Coverage Report")
+      table.insert(actionsPointers, 14, actions.show_code_coverage_report)
     end
   end
 
   M.show("Xcodebuild Actions", actionsNames, function(_, index)
-    if index > 10 or #actionsNames == 1 then
+    if index > 12 or #actionsNames == 1 then
       actionsPointers[index]()
     else
       vim.defer_fn(actionsPointers[index], 100)

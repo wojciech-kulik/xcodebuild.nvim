@@ -23,11 +23,13 @@ function M.setup(options)
   vim.api.nvim_create_user_command("XcodebuildBuild", call(actions.build), { nargs = 0 })
   vim.api.nvim_create_user_command("XcodebuildCleanBuild", call(actions.clean_build), { nargs = 0 })
   vim.api.nvim_create_user_command("XcodebuildBuildRun", call(actions.build_and_run), { nargs = 0 })
+  vim.api.nvim_create_user_command("XcodebuildBuildForTesting", call(actions.build_for_testing), { nargs = 0 })
   vim.api.nvim_create_user_command("XcodebuildRun", call(actions.run), { nargs = 0 })
   vim.api.nvim_create_user_command("XcodebuildCancel", call(actions.cancel), { nargs = 0 })
 
   -- Testing
   vim.api.nvim_create_user_command("XcodebuildTest", call(actions.run_tests), { nargs = 0 })
+  vim.api.nvim_create_user_command("XcodebuildTestTarget", call(actions.run_target_tests), { nargs = 0 })
   vim.api.nvim_create_user_command("XcodebuildTestClass", call(actions.run_class_tests), { nargs = 0 })
   vim.api.nvim_create_user_command("XcodebuildTestFunc", call(actions.run_func_test), { nargs = 0 })
   vim.api.nvim_create_user_command("XcodebuildTestSelected", call(actions.run_selected_tests), { nargs = 0 })

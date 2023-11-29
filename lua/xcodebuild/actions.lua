@@ -49,6 +49,11 @@ function M.clean_build(callback)
   coordinator.build_project({ clean = true }, callback)
 end
 
+function M.build_for_testing(callback)
+  coordinator.cancel()
+  coordinator.build_project({ buildForTesting = true }, callback)
+end
+
 function M.cancel()
   coordinator.cancel()
   notifications.send("Stopped")
@@ -72,6 +77,13 @@ end
 function M.run_tests()
   coordinator.cancel()
   coordinator.run_tests()
+end
+
+function M.run_target_tests()
+  coordinator.cancel()
+  coordinator.run_selected_tests({
+    currentTarget = true,
+  })
 end
 
 function M.run_class_tests()

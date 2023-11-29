@@ -74,9 +74,9 @@ function M.send_build_started(buildForTesting)
   local lastBuildTime = projectConfig.settings.lastBuildTime
 
   buildState.id = math.random(10000000)
-  buildState.timer = not buildForTesting and M.start_action_timer("Building", lastBuildTime)
+  buildState.timer =
+    M.start_action_timer(buildForTesting and "Building for Testing" or "Building", lastBuildTime)
   buildState.startTime = os.time()
-  buildState.buildForTesting = buildForTesting
 
   return buildState.id
 end
@@ -93,14 +93,12 @@ function M.send_build_finished(report, id, isCancelled)
   if isCancelled then
     M.send_warning("Build cancelled")
   elseif util.is_empty(report.buildErrors) then
-    if not buildState.buildForTesting then
-      local duration = buildState.buildDuration
-      local projectConfig = require("xcodebuild.project_config")
-      projectConfig.settings.lastBuildTime = duration
-      projectConfig.save_settings()
+    local duration = buildState.buildDuration
+    local projectConfig = require("xcodebuild.project_config")
+    projectConfig.settings.lastBuildTime = duration
+    projectConfig.save_settings()
 
-      M.send(string.format("Build Succeeded [%d seconds]", duration))
-    end
+    M.send(string.format("Build Succeeded [%d seconds]", duration))
   else
     M.send_error("Build Failed [" .. #report.buildErrors .. " error(s)]")
   end
@@ -114,7 +112,7 @@ end
 
 function M.show_tests_progress(report)
   if not next(report.tests) then
-    M.send_progress("Building Project...")
+    M.send_progress("Starting Tests...")
   else
     M.send_progress(
       "Running Tests [Executed: " .. report.testsCount .. ", Failed: " .. report.failedTestsCount .. "]"
