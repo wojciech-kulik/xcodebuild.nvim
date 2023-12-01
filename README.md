@@ -248,6 +248,14 @@ return {
       },
     }
 
+    -- disables annoying warning that requires hitting enter
+    local orig_notify = require("dap.utils").notify
+    require("dap.utils").notify = function(msg, log_level)
+      if not string.find(msg, "Either the adapter is slow") then
+        orig_notify(msg, log_level)
+      end
+    end
+
     -- sample keymaps to debug application
     vim.keymap.set("n", "<leader>dd", xcodebuild.build_and_debug, { desc = "Build & Debug" })
     vim.keymap.set("n", "<leader>dr", xcodebuild.debug_without_build, { desc = "Debug Without Building" })
