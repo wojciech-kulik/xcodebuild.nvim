@@ -434,7 +434,7 @@ function M.show_all_actions()
     table.insert(actionsNames, 13, "Toggle Code Coverage")
     table.insert(actionsPointers, 13, actions.toggle_code_coverage)
 
-    if require("xcodebuild.coverage").is_code_coverage_available() then
+    if require("xcodebuild.coverage_report").is_report_available() then
       table.insert(actionsNames, 14, "Show Code Coverage Report")
       table.insert(actionsPointers, 14, actions.show_code_coverage_report)
     end

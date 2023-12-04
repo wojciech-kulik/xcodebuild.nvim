@@ -55,9 +55,9 @@ local defaults = {
     show_warnings_on_quickfixlist = true, -- add build warnings to quickfix list
   },
   code_coverage = {
-    enabled = false, -- generate code coverage report and show marks (requires xcov tool)
+    enabled = false, -- generate code coverage report and show marks
     file_pattern = "*.swift", -- coverage will be shown in files matching this pattern
-    -- configuration of coverage presentation:
+    -- configuration of line coverage presentation:
     covered = {
       sign_text = "",
       sign_hl_group = "XcodebuildCoverageFull",
@@ -82,6 +82,14 @@ local defaults = {
       number_hl_group = nil,
       line_hl_group = nil,
     },
+  },
+  code_coverage_report = {
+    warning_coverage_level = 60,
+    warning_level_hl_group = "DiagnosticWarn",
+    error_coverage_level = 30,
+    error_level_hl_group = "DiagnosticError",
+    ok_level_hl_group = "DiagnosticOk",
+    open_expanded = false,
   },
 }
 

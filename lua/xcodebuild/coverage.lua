@@ -62,9 +62,7 @@ function M.setup()
 end
 
 function M.is_code_coverage_available()
-  local archive = appdata.xcov_dir .. "/xccovarchive-0.xccovarchive"
-
-  return util.dir_exists(archive)
+  return util.dir_exists(appdata.coverage_filepath)
 end
 
 function M.toggle_code_coverage(isVisible)
@@ -115,17 +113,23 @@ function M.refresh_all_buffers()
 end
 
 function M.show_report()
-  local report_filepath = appdata.xcov_dir .. "/index.html"
-
-  if not util.file_exists(report_filepath) then
-    notifications.send_error("xcov report does not exist at " .. report_filepath)
+  local success, _ = pcall(require, "nui.tree")
+  if not success then
+    notifications.send_error(
+      'nui.nvim is required to show code coverage report. Please add "MunifTanjim/nui.nvim" to dependencies of xcodebuild.nvim.'
+    )
     return
   end
 
-  vim.fn.jobstart("open " .. report_filepath, {
-    detach = true,
-    on_exit = function() end,
-  })
+  local coverageReport = require("xcodebuild.coverage_report")
+
+  if not coverageReport.is_report_available() then
+    notifications.send_error(
+      "Code coverage report does not exist. Make sure that you enabled code coverage for your test plan and run tests again."
+    )
+  else
+    coverageReport.open()
+  end
 end
 
 function M.export_coverage(xcresultFilepath, callback)
@@ -140,30 +144,16 @@ function M.export_coverage(xcresultFilepath, callback)
     return
   end
 
-  util.shell("rm -rf '" .. appdata.xcov_dir .. "'")
+  util.shell("rm -rf '" .. appdata.coverage_filepath .. "'")
+  util.shell("rm -rf '" .. appdata.coverage_report_filepath .. "'")
 
-  if util.shell("which xcov")[1] == "" then
-    callback_if_set()
-    notifications.send_error("xcov is not installed")
-    return
-  end
-
-  local command = "xcov -"
-    .. projectConfig.settings.projectCommand
-    .. " --scheme '"
-    .. projectConfig.settings.scheme
-    .. "' --configuration '"
-    .. projectConfig.settings.config
-    .. "' --xccov_file_direct_path '"
-    .. xcresultFilepath
-    .. "' --output_directory '"
-    .. appdata.xcov_dir
-    .. "' 2>/dev/null"
-
-  vim.fn.jobstart(command, {
-    stdout_buffered = true,
-    on_exit = callback_if_set,
-  })
+  xcode.export_code_coverage(xcresultFilepath, appdata.coverage_filepath, function()
+    if util.dir_exists(appdata.coverage_filepath) then
+      xcode.export_code_coverage_report(xcresultFilepath, appdata.coverage_report_filepath, callback_if_set)
+    else
+      callback_if_set()
+    end
+  end)
 end
 
 function M.jump_to_next_coverage()
@@ -188,9 +178,7 @@ function M.show_coverage(bufnr)
   vim.api.nvim_buf_clear_namespace(bufnr, ns, 0, -1)
   table.insert(buffersWithCoverage, bufnr)
 
-  local archive = appdata.xcov_dir .. "/xccovarchive-0.xccovarchive"
-
-  xcode.get_code_coverage(archive, vim.api.nvim_buf_get_name(bufnr), function(lines)
+  xcode.get_code_coverage(appdata.coverage_filepath, vim.api.nvim_buf_get_name(bufnr), function(lines)
     local bracketsCounter = 0
     local isPartial = false
     local lineNumber, count

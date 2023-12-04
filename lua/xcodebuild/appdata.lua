@@ -10,7 +10,8 @@ M.build_logs_filepath = M.appdir .. "/" .. M.build_logs_filename
 M.report_filename = "report.json"
 M.report_filepath = M.appdir .. "/" .. M.report_filename
 M.snapshots_dir = M.appdir .. "/failing-snapshots"
-M.xcov_dir = M.appdir .. "/xcov"
+M.coverage_filepath = M.appdir .. "/coverage.xccovarchive"
+M.coverage_report_filepath = M.appdir .. "/coverage.json"
 
 GETSNAPSHOTS_TOOL = "getsnapshots"
 

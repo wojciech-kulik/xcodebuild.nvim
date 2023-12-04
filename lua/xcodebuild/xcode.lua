@@ -3,6 +3,31 @@ local notifications = require("xcodebuild.notifications")
 
 local M = {}
 
+local function get_coverage_item_id(xcresultPath, callback)
+  local command = "xcrun xcresulttool get --format json --path '" .. xcresultPath .. "'"
+
+  return vim.fn.jobstart(command, {
+    stdout_buffered = true,
+    on_stdout = function(_, output)
+      local result = vim.fn.json_decode(output)
+      local _, coverageId = pcall(function()
+        local coverage = result["actions"]["_values"][1]["actionResult"]["coverage"]
+        if not coverage["archiveRef"] then
+          return nil
+        end
+        return coverage["archiveRef"]["id"]["_value"]
+      end, nil)
+
+      callback(coverageId)
+    end,
+    on_exit = function(_, code, _)
+      if code ~= 0 then
+        notifications.send_error("Could not export code coverage (code: " .. code .. ")")
+      end
+    end,
+  })
+end
+
 function M.get_targets_filemap(appPath)
   if not appPath then
     notifications.send_error("Could not locate build dir. Please run Build.")
@@ -354,6 +379,55 @@ function M.get_code_coverage(archive, filepath, callback)
       callback(output)
     end,
     on_exit = function() end,
+  })
+end
+
+function M.export_code_coverage(xcresultPath, outputPath, callback)
+  return get_coverage_item_id(xcresultPath, function(itemId)
+    if not itemId then
+      notifications.send(
+        "Could not export code coverage. Make sure that code coverage is enabled for your test plan"
+      )
+      if callback then
+        callback()
+      end
+      return
+    end
+
+    local command = "xcrun xcresulttool export --type directory"
+      .. " --id "
+      .. itemId
+      .. " --path '"
+      .. xcresultPath
+      .. "' --output-path '"
+      .. outputPath
+      .. "'"
+
+    vim.fn.jobstart(command, {
+      stdout_buffered = true,
+      on_exit = function(_, code, _)
+        if code ~= 0 then
+          notifications.send_error("Could not export code coverage (code: " .. code .. ")")
+        end
+
+        if callback then
+          callback()
+        end
+      end,
+    })
+  end)
+end
+
+function M.export_code_coverage_report(xcresultPath, outputPath, callback)
+  local command = "xcrun xccov view --report --json " .. xcresultPath .. " > " .. outputPath
+
+  vim.fn.jobstart(command, {
+    stdout_buffered = true,
+    on_exit = function()
+      if callback then
+        callback()
+      end
+    end,
   })
 end
 
