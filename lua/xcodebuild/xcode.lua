@@ -418,6 +418,19 @@ function M.export_code_coverage(xcresultPath, outputPath, callback)
   end)
 end
 
+function M.export_code_coverage_report(xcresultPath, outputPath, callback)
+  local command = "xcrun xccov view --report --json " .. xcresultPath .. " > " .. outputPath
+
+  vim.fn.jobstart(command, {
+    stdout_buffered = true,
+    on_exit = function()
+      if callback then
+        callback()
+      end
+    end,
+  })
+end
+
 function M.run_tests(opts)
   -- stylua: ignore
   local command = "xcodebuild test -scheme '"

@@ -113,7 +113,23 @@ function M.refresh_all_buffers()
 end
 
 function M.show_report()
-  print("TODO")
+  local success, _ = pcall(require, "nui.tree")
+  if not success then
+    notifications.send_error(
+      'nui.nvim is required to show code coverage report. Please add "MunifTanjim/nui.nvim" to dependencies of xcodebuild.nvim.'
+    )
+    return
+  end
+
+  local coverageReport = require("xcodebuild.coverage_report")
+
+  if not coverageReport.is_report_available() then
+    notifications.send_error(
+      "Code coverage report does not exist. Make sure that you enabled code coverage for your test plan and run tests again."
+    )
+  else
+    coverageReport.open()
+  end
 end
 
 function M.export_coverage(xcresultFilepath, callback)
@@ -129,8 +145,15 @@ function M.export_coverage(xcresultFilepath, callback)
   end
 
   util.shell("rm -rf '" .. appdata.coverage_filepath .. "'")
+  util.shell("rm -rf '" .. appdata.coverage_report_filepath .. "'")
 
-  xcode.export_code_coverage(xcresultFilepath, appdata.coverage_filepath, callback_if_set)
+  xcode.export_code_coverage(xcresultFilepath, appdata.coverage_filepath, function()
+    if util.dir_exists(appdata.coverage_filepath) then
+      xcode.export_code_coverage_report(xcresultFilepath, appdata.coverage_report_filepath, callback_if_set)
+    else
+      callback_if_set()
+    end
+  end)
 end
 
 function M.jump_to_next_coverage()

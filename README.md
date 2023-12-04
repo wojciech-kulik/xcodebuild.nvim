@@ -44,6 +44,7 @@ It is also my first Neovim plugin. Hopefully, a good one 😁.
 
 - [Neovim](https://neovim.io) (not sure which version, use the latest one 😅).
 - [telescope.nvim](https://github.com/nvim-telescope/telescope.nvim) used to present pickers by the plugin.
+- [nui.nvim](https://github.com/MunifTanjim/nui.nvim") used to present code coverage report.
 - [xcbeautify](https://github.com/tuist/xcbeautify) - Xcode logs formatter (optional - you can set a different tool or disable formatting in the config).
 - Xcode (make sure that `xcodebuild` and `xcrun simctl` work correctly).
 - To get the best experience with apps development, you should install and configure [nvim-dap](https://github.com/mfussenegger/nvim-dap) and [nvim-dap-ui](https://github.com/rcarriga/nvim-dap-ui) to be able to debug.
@@ -65,7 +66,10 @@ Install the plugin using your preferred package manager:
 ```lua
 return {
   "wojciech-kulik/xcodebuild.nvim",
-  dependencies = { "nvim-telescope/telescope.nvim" },
+  dependencies = {
+    "nvim-telescope/telescope.nvim",
+    "MunifTanjim/nui.nvim",
+  },
   config = function()
     require("xcodebuild").setup({
         -- put some options here or leave it empty to use default settings
@@ -135,7 +139,7 @@ Xcodebuild.nvim comes with the following defaults:
   code_coverage = {
     enabled = false, -- generate code coverage report and show marks
     file_pattern = "*.swift", -- coverage will be shown in files matching this pattern
-    -- configuration of coverage presentation:
+    -- configuration of line coverage presentation:
     covered = {
       sign_text = "",
       sign_hl_group = "XcodebuildCoverageFull",
@@ -160,6 +164,14 @@ Xcodebuild.nvim comes with the following defaults:
       number_hl_group = nil,
       line_hl_group = nil,
     },
+  },
+  code_coverage_report = {
+    warning_coverage_level = 60,
+    warning_level_hl_group = "DiagnosticWarn",
+    error_coverage_level = 30,
+    error_level_hl_group = "DiagnosticError",
+    ok_level_hl_group = "DiagnosticOk",
+    open_expanded = false,
   },
 }
 ```
@@ -364,8 +376,9 @@ Global variables that you can use:
 ### 🧪 Code Coverage
 
 ![Xcodebuild Code Coverage](./media/code-coverage.png)
+![Xcodebuild Code Coverage Report](./media/coverage-report.png)
 
-Using xcodebuild.nvim you can also check the code coverage after running tests. To enable it you need to:
+Using xcodebuild.nvim you can also check the code coverage after running tests.
 
 1. Make sure that you enabled code coverage for desired targets in your test plan.
 2. Enable code coverage in xcodebuild [config](#%EF%B8%8F-configuration):
@@ -379,7 +392,7 @@ code_coverage = {
 3. Toggle code coverage `:XcodebuildToggleCodeCoverage` or `:lua require("xcodebuild.actions").toggle_code_coverage(true)`.
 4. Run tests - once it's finished, code coverage should appear on the sidebar with line numbers.
 5. You can jump between code coverage marks using `:XcodebuildJumpToPrevCoverage` and `:XcodebuildJumpToNextCoverage`.
-6. If needed you can also check out the HTML report using `:XcodebuildShowCodeCoverageReport` command.
+6. You can also check out the report using `:XcodebuildShowCodeCoverageReport` command.
 
 The plugin sends `XcodebuildCoverageToggled` event that you can use to disable other plugins presenting lines on the side bar (like `gitsigns`). Example:
 
@@ -393,7 +406,14 @@ vim.api.nvim_create_autocmd("User", {
 })
 ```
 
-⚠️  In some cases code coverage may not be generated for some files (most likely because of Xcode's bug). Try running tests again then.
+Coverage Report Keys:
+
+| Key              | Description                         |
+| ---------------- | ----------------------------------- |
+| `enter` or `tab` | Expand or collapse the current node |
+| `o`              | Open source file                    |
+
+⚠️  From time to time, the code coverage may fail or some targets may be missing (Xcode's bug). Try running tests again then.
 
 ⚠️  If you run tests, modify file and toggle code coverage AFTER that, the placement of marks will be incorrect (because it doesn't know about changes that you made). However, if you show code coverage and after that you modify the code, marks will be moving while you are editing the file.
 
