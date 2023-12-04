@@ -113,6 +113,11 @@ function M.refresh_all_buffers()
 end
 
 function M.show_report()
+  if not config.enabled then
+    notifications.send_error("Code coverage is disabled in the config")
+    return
+  end
+
   local success, _ = pcall(require, "nui.tree")
   if not success then
     notifications.send_error(
