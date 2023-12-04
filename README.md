@@ -45,7 +45,6 @@ It is also my first Neovim plugin. Hopefully, a good one 😁.
 - [Neovim](https://neovim.io) (not sure which version, use the latest one 😅).
 - [telescope.nvim](https://github.com/nvim-telescope/telescope.nvim) used to present pickers by the plugin.
 - [xcbeautify](https://github.com/tuist/xcbeautify) - Xcode logs formatter (optional - you can set a different tool or disable formatting in the config).
-- [xcov](https://github.com/fastlane-community/xcov) - code coverage visualizer (optional - if you keep code coverage disabled in the config).
 - Xcode (make sure that `xcodebuild` and `xcrun simctl` work correctly).
 - To get the best experience with apps development, you should install and configure [nvim-dap](https://github.com/mfussenegger/nvim-dap) and [nvim-dap-ui](https://github.com/rcarriga/nvim-dap-ui) to be able to debug.
 - This plugin requires the project to be written in Swift. It was tested only with Xcode 15.
@@ -55,7 +54,6 @@ Install tools:
 
 ```shell
 brew install xcbeautify
-sudo gem install xcov
 ```
 
 ## 📦 Installation
@@ -135,7 +133,7 @@ Xcodebuild.nvim comes with the following defaults:
     show_warnings_on_quickfixlist = true, -- add build warnings to quickfix list
   },
   code_coverage = {
-    enabled = false, -- generate code coverage report and show marks (requires xcov tool)
+    enabled = false, -- generate code coverage report and show marks
     file_pattern = "*.swift", -- coverage will be shown in files matching this pattern
     -- configuration of coverage presentation:
     covered = {
@@ -369,14 +367,8 @@ Global variables that you can use:
 
 Using xcodebuild.nvim you can also check the code coverage after running tests. To enable it you need to:
 
-1. Install [xcov](https://github.com/fastlane-community/xcov) tool:
-
-```shell
-sudo gem install xcov
-```
-
-2. Make sure that you enabled code coverage for desired targets in your test plan.
-3. Enable code coverage in xcodebuild [config](#%EF%B8%8F-configuration):
+1. Make sure that you enabled code coverage for desired targets in your test plan.
+2. Enable code coverage in xcodebuild [config](#%EF%B8%8F-configuration):
 
 ```lua
 code_coverage = {
@@ -384,10 +376,10 @@ code_coverage = {
 }
 ```
 
-4. Toggle code coverage `:XcodebuildToggleCodeCoverage` or `:lua require("xcodebuild.actions").toggle_code_coverage(true)`.
-5. Run tests - once it's finished, code coverage should appear on the sidebar with line numbers.
-6. You can jump between code coverage marks using `:XcodebuildJumpToPrevCoverage` and `:XcodebuildJumpToNextCoverage`.
-7. If needed you can also check out the HTML report using `:XcodebuildShowCodeCoverageReport` command.
+3. Toggle code coverage `:XcodebuildToggleCodeCoverage` or `:lua require("xcodebuild.actions").toggle_code_coverage(true)`.
+4. Run tests - once it's finished, code coverage should appear on the sidebar with line numbers.
+5. You can jump between code coverage marks using `:XcodebuildJumpToPrevCoverage` and `:XcodebuildJumpToNextCoverage`.
+6. If needed you can also check out the HTML report using `:XcodebuildShowCodeCoverageReport` command.
 
 The plugin sends `XcodebuildCoverageToggled` event that you can use to disable other plugins presenting lines on the side bar (like `gitsigns`). Example:
 

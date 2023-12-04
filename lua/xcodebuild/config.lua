@@ -55,7 +55,7 @@ local defaults = {
     show_warnings_on_quickfixlist = true, -- add build warnings to quickfix list
   },
   code_coverage = {
-    enabled = false, -- generate code coverage report and show marks (requires xcov tool)
+    enabled = false, -- generate code coverage report and show marks
     file_pattern = "*.swift", -- coverage will be shown in files matching this pattern
     -- configuration of coverage presentation:
     covered = {
