@@ -44,7 +44,7 @@ It is also my first Neovim plugin. Hopefully, a good one 😁.
 
 - [Neovim](https://neovim.io) (not sure which version, use the latest one 😅).
 - [telescope.nvim](https://github.com/nvim-telescope/telescope.nvim) used to present pickers by the plugin.
-- [nui.nvim](https://github.com/MunifTanjim/nui.nvim") used to present code coverage report.
+- [nui.nvim](https://github.com/MunifTanjim/nui.nvim) used to present code coverage report.
 - [xcbeautify](https://github.com/tuist/xcbeautify) - Xcode logs formatter (optional - you can set a different tool or disable formatting in the config).
 - Xcode (make sure that `xcodebuild` and `xcrun simctl` work correctly).
 - To get the best experience with apps development, you should install and configure [nvim-dap](https://github.com/mfussenegger/nvim-dap) and [nvim-dap-ui](https://github.com/rcarriga/nvim-dap-ui) to be able to debug.
