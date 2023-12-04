@@ -12,6 +12,7 @@ local function update_global_variables()
   vim.g.xcodebuild_platform = M.settings.platform
   vim.g.xcodebuild_config = M.settings.config
   vim.g.xcodebuild_scheme = M.settings.scheme
+  vim.g.xcodebuild_test_plan = M.settings.testPlan
 end
 
 function M.load_settings()

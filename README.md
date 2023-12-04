@@ -354,9 +354,8 @@ Sample configuration:
 ```lua
 lualine_x = {
   { "diff" },
-  {
-    "vim.g.xcodebuild_platform == 'macOS' and '  macOS' or ' ' .. vim.g.xcodebuild_device_name",
-  },
+  { "'󰙨 ' .. vim.g.xcodebuild_test_plan" },
+  { "vim.g.xcodebuild_platform == 'macOS' and '  macOS' or ' ' .. vim.g.xcodebuild_device_name" },
   { "' ' .. vim.g.xcodebuild_os" },
   { "encoding" },
   { "filetype", icon_only = true },
@@ -372,6 +371,7 @@ Global variables that you can use:
 | `vim.g.xcodebuild_platform`    | Device platform (macOS or iPhone Simulator) |
 | `vim.g.xcodebuild_config`      | Selected build config (ex. Debug)           |
 | `vim.g.xcodebuild_scheme`      | Selected project scheme (ex. MyApp)         |
+| `vim.g.xcodebuild_test_plan`   | Selected Test Plan (ex. MyAppTests)         |
 
 ### 🧪 Code Coverage
 
