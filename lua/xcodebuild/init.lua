@@ -14,12 +14,12 @@ function M.setup(options)
   local actions = require("xcodebuild.actions")
   local projectConfig = require("xcodebuild.project_config")
   local coverage = require("xcodebuild.coverage")
-  local testsExplorer = require("xcodebuild.tests_explorer")
+  local testExplorer = require("xcodebuild.test_explorer")
 
   autocmd.setup()
   projectConfig.load_settings()
   coverage.setup()
-  testsExplorer.setup()
+  testExplorer.setup()
 
   -- Build
   vim.api.nvim_create_user_command("XcodebuildBuild", call(actions.build), { nargs = 0 })

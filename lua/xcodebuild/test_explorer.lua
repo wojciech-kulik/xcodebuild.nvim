@@ -1,4 +1,4 @@
-local config = require("xcodebuild.config").options.tests_explorer
+local config = require("xcodebuild.config").options.test_explorer
 
 local M = {}
 
@@ -27,7 +27,7 @@ local KIND_TEST = "test"
 
 local currentFrame = 1
 local last_update = nil
-local ns = vim.api.nvim_create_namespace("xcodebuild-tests-explorer")
+local ns = vim.api.nvim_create_namespace("xcodebuild-test-explorer")
 
 local function generate_report(tests)
   local targets = {}
@@ -82,15 +82,15 @@ end
 
 local function get_hl_for_status(status)
   if status == STATUS_NOT_EXECUTED then
-    return "XcodebuildTestsExplorerTestNotExecuted"
+    return "XcodebuildTestExplorerTestNotExecuted"
   elseif status == STATUS_RUNNING then
-    return "XcodebuildTestsExplorerTestInProgress"
+    return "XcodebuildTestExplorerTestInProgress"
   elseif status == STATUS_PASSED then
-    return "XcodebuildTestsExplorerTestPassed"
+    return "XcodebuildTestExplorerTestPassed"
   elseif status == STATUS_FAILED then
-    return "XcodebuildTestsExplorerTestFailed"
+    return "XcodebuildTestExplorerTestFailed"
   elseif status == STATUS_DISABLED then
-    return "XcodebuildTestsExplorerTestDisabled"
+    return "XcodebuildTestExplorerTestDisabled"
   else
     return "@text"
   end
@@ -114,13 +114,13 @@ end
 
 local function get_text_hl_for_kind(kind, status)
   if status == STATUS_DISABLED then
-    return "XcodebuildTestsExplorerTestDisabled"
+    return "XcodebuildTestExplorerTestDisabled"
   elseif kind == KIND_TEST then
-    return "XcodebuildTestsExplorerTest"
+    return "XcodebuildTestExplorerTest"
   elseif kind == KIND_CLASS then
-    return "XcodebuildTestsExplorerClass"
+    return "XcodebuildTestExplorerClass"
   elseif kind == KIND_TARGET then
-    return "XcodebuildTestsExplorerTarget"
+    return "XcodebuildTestExplorerTarget"
   end
 end
 
@@ -364,14 +364,14 @@ function M.show(tests)
 end
 
 function M.setup()
-  vim.api.nvim_set_hl(0, "XcodebuildTestsExplorerTest", { link = "@function", default = true })
-  vim.api.nvim_set_hl(0, "XcodebuildTestsExplorerClass", { link = "@type", default = true })
-  vim.api.nvim_set_hl(0, "XcodebuildTestsExplorerTarget", { link = "@keyword", default = true })
-  vim.api.nvim_set_hl(0, "XcodebuildTestsExplorerTestInProgress", { link = "@operator", default = true })
-  vim.api.nvim_set_hl(0, "XcodebuildTestsExplorerTestPassed", { link = "DiagnosticOk", default = true })
-  vim.api.nvim_set_hl(0, "XcodebuildTestsExplorerTestFailed", { link = "DiagnosticError", default = true })
-  vim.api.nvim_set_hl(0, "XcodebuildTestsExplorerTestDisabled", { link = "@comment", default = true })
-  vim.api.nvim_set_hl(0, "XcodebuildTestsExplorerTestNotExecuted", { link = "@text", default = true })
+  vim.api.nvim_set_hl(0, "XcodebuildTestExplorerTest", { link = "@function", default = true })
+  vim.api.nvim_set_hl(0, "XcodebuildTestExplorerClass", { link = "@type", default = true })
+  vim.api.nvim_set_hl(0, "XcodebuildTestExplorerTarget", { link = "@keyword", default = true })
+  vim.api.nvim_set_hl(0, "XcodebuildTestExplorerTestInProgress", { link = "@operator", default = true })
+  vim.api.nvim_set_hl(0, "XcodebuildTestExplorerTestPassed", { link = "DiagnosticOk", default = true })
+  vim.api.nvim_set_hl(0, "XcodebuildTestExplorerTestFailed", { link = "DiagnosticError", default = true })
+  vim.api.nvim_set_hl(0, "XcodebuildTestExplorerTestDisabled", { link = "@comment", default = true })
+  vim.api.nvim_set_hl(0, "XcodebuildTestExplorerTestNotExecuted", { link = "@text", default = true })
 end
 
 return M

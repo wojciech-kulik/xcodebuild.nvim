@@ -54,15 +54,15 @@ local defaults = {
     show_errors_on_quickfixlist = true, -- add build/test errors to quickfix list
     show_warnings_on_quickfixlist = true, -- add build warnings to quickfix list
   },
-  tests_explorer = {
-    auto_open = true, -- opens tests explorer when tests are started
-    open_command = "bo vertical split Tests Explorer", -- command used to open tests explorer
+  test_explorer = {
+    auto_open = true, -- opens Test Explorer when tests are started
+    open_command = "bo vertical split Test Explorer", -- command used to open Test Explorer
     success_sign = "✔", -- passed test icon
     failure_sign = "✖", -- failed test icon
     progress_sign = "…", -- progress icon (only used when animate_status=false)
     disabled_sign = "⏸", -- disabled test icon
     not_executed_sign = " ", -- not executed test icon
-    show_disabled_tests = false, -- show disabled tests
+    show_disabled_tests = true, -- show disabled tests
     animate_status = true, -- animate status while running tests
     cursor_follows_tests = true, -- moves cursor to the last test executed
   },

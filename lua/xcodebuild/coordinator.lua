@@ -11,7 +11,7 @@ local config = require("xcodebuild.config").options
 local snapshots = require("xcodebuild.snapshots")
 local testSearch = require("xcodebuild.test_search")
 local coverage = require("xcodebuild.coverage")
-local testsExplorer = require("xcodebuild.tests_explorer")
+local testExplorer = require("xcodebuild.test_explorer")
 
 local M = {
   report = {},
@@ -250,7 +250,7 @@ function M.build_project(opts, callback)
   })
 end
 
-function M.show_tests_explorer(callback)
+function M.show_test_explorer(callback)
   xcode.enumerate_tests({
     destination = projectConfig.settings.destination,
     projectCommand = projectConfig.settings.projectCommand,
@@ -258,7 +258,7 @@ function M.show_tests_explorer(callback)
     testPlan = projectConfig.settings.testPlan,
     extraTestArgs = config.commands.extra_test_args,
   }, function(tests)
-    testsExplorer.show(tests)
+    testExplorer.show(tests)
     util.call(callback)
   end)
 end
@@ -305,7 +305,7 @@ function M.run_tests(testsToRun)
   end
 
   local on_exit = function(_, code, _)
-    testsExplorer.finish_tests()
+    testExplorer.finish_tests()
 
     if code == CANCELLED_CODE then
       notifications.send_tests_finished(M.report, true)
@@ -324,8 +324,8 @@ function M.run_tests(testsToRun)
     logs.set_logs(M.report, true, process_coverage)
   end
 
-  M.show_tests_explorer(function()
-    testsExplorer.start_tests()
+  M.show_test_explorer(function()
+    testExplorer.start_tests()
 
     M.currentJobId = xcode.run_tests({
       on_exit = on_exit,
