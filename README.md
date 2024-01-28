@@ -391,6 +391,8 @@ vim.keymap.set("n", "<leader>xq", "<cmd>Telescope quickfix<cr>", { desc = "Show 
 - Press `R` to re-run recently selected tests
 - Press `[` to jump to the previous failed test
 - Press `]` to jump to the next failed test
+- Press `<cr>` to expand or collapse the current node
+- Press `<tab>` to expand or collapse all classes
 - Press `q` to close the Test Explorer
 
 ### 🚥 Lualine Integration

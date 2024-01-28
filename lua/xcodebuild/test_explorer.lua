@@ -5,19 +5,6 @@ local testSearch = require("xcodebuild.test_search")
 
 local M = {}
 
-local spinnerFrames = {
-  "⠋",
-  "⠙",
-  "⠹",
-  "⠸",
-  "⠼",
-  "⠴",
-  "⠦",
-  "⠧",
-  "⠇",
-  "⠏",
-}
-
 local STATUS_NOT_EXECUTED = "not_executed"
 local STATUS_RUNNING = "running"
 local STATUS_PASSED = "passed"
@@ -28,10 +15,12 @@ local KIND_TARGET = "target"
 local KIND_CLASS = "class"
 local KIND_TEST = "test"
 
+local spinnerFrames = { "⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏" }
 local currentFrame = 1
 local last_update = nil
 local line_to_test = {}
 local last_run_tests = {}
+local collapsed_ids = {}
 local ns = vim.api.nvim_create_namespace("xcodebuild-test-explorer")
 
 local function generate_report(tests)
@@ -58,6 +47,7 @@ local function generate_report(tests)
         kind = KIND_TARGET,
         status = test.enabled and STATUS_NOT_EXECUTED or STATUS_DISABLED,
         name = test.target,
+        hidden = false,
         classes = {},
       }
       table.insert(targets, current_target)
@@ -70,6 +60,7 @@ local function generate_report(tests)
         status = test.enabled and STATUS_NOT_EXECUTED or STATUS_DISABLED,
         name = test.class,
         filepath = filepath,
+        hidden = collapsed_ids[test.target] or false,
         tests = {},
       }
       table.insert(current_target.classes, current_class)
@@ -81,6 +72,7 @@ local function generate_report(tests)
       status = test.enabled and STATUS_NOT_EXECUTED or STATUS_DISABLED,
       name = test.name,
       filepath = filepath,
+      hidden = collapsed_ids[test.target] or collapsed_ids[test.target .. "/" .. test.class] or false,
     })
 
     ::continue::
@@ -199,7 +191,7 @@ local function get_aggregated_status(children)
   end
 end
 
-local function refresh_progress()
+local function refresh_explorer()
   if not M.bufnr then
     return
   end
@@ -209,7 +201,13 @@ local function refresh_progress()
   local row = 1
   local move_cursor_to_row = nil
 
+  line_to_test = {}
+
   local add_line = function(data)
+    if data.hidden then
+      return
+    end
+
     local text, hls = format_line(data, row)
     table.insert(lines, text)
 
@@ -265,7 +263,7 @@ end
 
 local function animate_status()
   M.timer = vim.fn.timer_start(100, function()
-    refresh_progress()
+    refresh_explorer()
     currentFrame = currentFrame % 10 + 1
   end, { ["repeat"] = -1 })
 end
@@ -314,6 +312,82 @@ local function setup_buffer()
     callback = M.open_selected_test,
     nowait = true,
   })
+  vim.api.nvim_buf_set_keymap(M.bufnr, "n", "<cr>", "", {
+    callback = M.toggle_current_node,
+    nowait = true,
+  })
+  vim.api.nvim_buf_set_keymap(M.bufnr, "n", "<tab>", "", {
+    callback = M.toggle_all_classes,
+    nowait = true,
+  })
+end
+
+function M.toggle_all_classes()
+  local newState = nil
+
+  for _, line in ipairs(line_to_test) do
+    if line.kind == KIND_CLASS then
+      if newState == nil then
+        newState = collapsed_ids[line.id] == nil or not collapsed_ids[line.id]
+      end
+
+      collapsed_ids[line.id] = newState
+
+      for _, test in ipairs(line.tests) do
+        test.hidden = newState
+      end
+    end
+  end
+
+  refresh_explorer()
+end
+
+function M.toggle_current_node()
+  local currentRow = vim.api.nvim_win_get_cursor(0)[1]
+  local line = line_to_test[currentRow]
+
+  if not line then
+    return
+  end
+
+  local newState = collapsed_ids[line.id] == nil or not collapsed_ids[line.id]
+
+  if line.kind == KIND_TEST then
+    for i = currentRow - 1, 1, -1 do
+      line = line_to_test[i]
+
+      if line.kind == KIND_CLASS then
+        collapsed_ids[line.id] = true
+
+        for _, test in ipairs(line.tests) do
+          test.hidden = true
+        end
+
+        vim.api.nvim_win_set_cursor(0, { i, 0 })
+
+        break
+      end
+    end
+  elseif line.kind == KIND_CLASS then
+    collapsed_ids[line.id] = newState
+
+    for _, test in ipairs(line.tests) do
+      test.hidden = newState
+    end
+  elseif line.kind == KIND_TARGET then
+    collapsed_ids[line.id] = newState
+
+    for _, class in ipairs(line.classes) do
+      class.hidden = newState
+      collapsed_ids[class.id] = newState
+
+      for _, test in ipairs(class.tests) do
+        test.hidden = newState
+      end
+    end
+  end
+
+  refresh_explorer()
 end
 
 function M.open_selected_test()
@@ -366,7 +440,7 @@ function M.start_tests(selectedTests)
   if config.animate_status then
     animate_status()
   else
-    refresh_progress()
+    refresh_explorer()
   end
 end
 
@@ -398,7 +472,7 @@ function M.finish_tests()
     end
   end
 
-  refresh_progress()
+  refresh_explorer()
 end
 
 function M.update_test_status(testId, status)
@@ -419,7 +493,7 @@ function M.update_test_status(testId, status)
           end
 
           if not config.animate_status then
-            refresh_progress()
+            refresh_explorer()
           end
 
           return
@@ -545,7 +619,7 @@ function M.show()
     setup_buffer()
   end
 
-  refresh_progress()
+  refresh_explorer()
 end
 
 function M.load_tests(tests)
