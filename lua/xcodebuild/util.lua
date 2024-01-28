@@ -80,9 +80,13 @@ end
 
 function M.focus_buffer(bufNr)
   local _, window = next(vim.fn.win_findbuf(bufNr))
+
   if window then
     vim.api.nvim_set_current_win(window)
+    return true
   end
+
+  return false
 end
 
 function M.get_filename(filepath)

@@ -1,4 +1,7 @@
+local util = require("xcodebuild.util")
 local config = require("xcodebuild.config").options.test_explorer
+local notifications = require("xcodebuild.notifications")
+local testSearch = require("xcodebuild.test_search")
 
 local M = {}
 
@@ -27,6 +30,7 @@ local KIND_TEST = "test"
 
 local currentFrame = 1
 local last_update = nil
+local line_to_test = {}
 local ns = vim.api.nvim_create_namespace("xcodebuild-test-explorer")
 
 local function generate_report(tests)
@@ -72,6 +76,7 @@ local function generate_report(tests)
       kind = KIND_TEST,
       status = test.enabled and STATUS_NOT_EXECUTED or STATUS_DISABLED,
       name = test.name,
+      filepath = testSearch.find_filepath(test.target, test.class),
     })
 
     ::continue::
@@ -209,6 +214,10 @@ local function refresh_progress()
       last_update = nil
     end
 
+    if data.kind == KIND_TEST then
+      line_to_test[row] = data
+    end
+
     row = row + 1
   end
 
@@ -254,6 +263,55 @@ local function animate_status()
     refresh_progress()
     currentFrame = currentFrame % 10 + 1
   end, { ["repeat"] = -1 })
+end
+
+local function setup_buffer()
+  vim.api.nvim_buf_set_option(M.bufnr, "modifiable", true)
+
+  vim.api.nvim_win_set_option(0, "fillchars", "eob: ")
+  vim.api.nvim_win_set_option(0, "wrap", false)
+  vim.api.nvim_win_set_option(0, "number", false)
+  vim.api.nvim_win_set_option(0, "relativenumber", false)
+  vim.api.nvim_win_set_option(0, "scl", "no")
+  vim.api.nvim_win_set_option(0, "spell", false)
+
+  vim.api.nvim_buf_set_option(M.bufnr, "fileencoding", "utf-8")
+  vim.api.nvim_buf_set_option(M.bufnr, "modified", false)
+  vim.api.nvim_buf_set_option(M.bufnr, "readonly", false)
+  vim.api.nvim_buf_set_option(M.bufnr, "modifiable", false)
+
+  vim.api.nvim_buf_set_keymap(M.bufnr, "n", "q", "<cmd>close<cr>", {})
+  vim.api.nvim_buf_set_keymap(M.bufnr, "n", "[", "", {
+    callback = function()
+      M.jump_to_failed_test(false)
+    end,
+    nowait = true,
+  })
+  vim.api.nvim_buf_set_keymap(M.bufnr, "n", "]", "", {
+    callback = function()
+      M.jump_to_failed_test(true)
+    end,
+    nowait = true,
+  })
+  vim.api.nvim_buf_set_keymap(M.bufnr, "n", "o", "", {
+    callback = M.open_selected_test,
+    nowait = true,
+  })
+end
+
+function M.open_selected_test()
+  local currentRow = vim.api.nvim_win_get_cursor(0)[1]
+  if not line_to_test[currentRow] then
+    return
+  end
+
+  local filepath = line_to_test[currentRow].filepath
+  if filepath then
+    vim.cmd("wincmd p | e " .. filepath)
+    vim.fn.search(line_to_test[currentRow].name, "")
+    vim.cmd("execute 'normal! zt'")
+    return
+  end
 end
 
 function M.start_tests()
@@ -311,7 +369,7 @@ function M.finish_tests()
   refresh_progress()
 end
 
-function M.update_test_status(test, status)
+function M.update_test_status(testId, status)
   if not M.report then
     return
   end
@@ -319,7 +377,7 @@ function M.update_test_status(test, status)
   for _, target in ipairs(M.report) do
     for _, class in ipairs(target.classes) do
       for _, t in ipairs(class.tests) do
-        if t.id == test then
+        if t.id == testId then
           t.status = t.status == STATUS_DISABLED and STATUS_DISABLED or status
           class.status = get_aggregated_status(class.tests)
           target.status = get_aggregated_status(target.classes)
@@ -339,28 +397,74 @@ function M.update_test_status(test, status)
   end
 end
 
-function M.show(tests)
-  M.finish_tests()
+function M.jump_to_failed_test(next)
+  if not M.report then
+    return
+  end
 
-  vim.cmd(config.open_command)
-  M.bufnr = vim.api.nvim_get_current_buf()
+  local winnr = vim.fn.win_findbuf(M.bufnr)
+  if not winnr or not winnr[1] then
+    return
+  end
 
-  vim.api.nvim_buf_set_option(M.bufnr, "modifiable", true)
+  local row = vim.api.nvim_win_get_cursor(winnr[1])[1]
+  local lines = next and vim.api.nvim_buf_get_lines(M.bufnr, row, -1, false)
+    or vim.fn.reverse(vim.api.nvim_buf_get_lines(M.bufnr, 0, row - 1, false))
 
-  vim.api.nvim_win_set_option(0, "fillchars", "eob: ")
-  vim.api.nvim_win_set_option(0, "wrap", false)
-  vim.api.nvim_win_set_option(0, "number", false)
-  vim.api.nvim_win_set_option(0, "relativenumber", false)
-  vim.api.nvim_win_set_option(0, "scl", "no")
-  vim.api.nvim_win_set_option(0, "spell", false)
+  for _, line in ipairs(lines) do
+    row = next and row + 1 or row - 1
 
-  vim.api.nvim_buf_set_option(M.bufnr, "fileencoding", "utf-8")
-  vim.api.nvim_buf_set_option(M.bufnr, "modified", false)
-  vim.api.nvim_buf_set_option(M.bufnr, "readonly", false)
-  vim.api.nvim_buf_set_option(M.bufnr, "modifiable", false)
+    if string.find(line, "    %[" .. config.failure_sign .. "%]") then
+      vim.api.nvim_win_set_cursor(winnr[1], { row, 0 })
+      return
+    end
+  end
+end
 
-  generate_report(tests)
+function M.toggle()
+  if not M.bufnr then
+    M.show()
+    return
+  end
+
+  local winnr = vim.fn.win_findbuf(M.bufnr)
+  if winnr and winnr[1] then
+    M.hide()
+  else
+    M.show()
+  end
+end
+
+function M.hide()
+  if M.bufnr then
+    local winnr = vim.fn.win_findbuf(M.bufnr)
+    if winnr and winnr[1] then
+      vim.api.nvim_win_close(winnr[1], true)
+    end
+  end
+end
+
+function M.show()
+  if not M.report then
+    notifications.send("Loading tests...")
+    require("xcodebuild.coordinator").show_test_explorer(function()
+      notifications.send("")
+    end)
+    return
+  end
+
+  if not M.bufnr or not util.focus_buffer(M.bufnr) then
+    vim.cmd(config.open_command)
+    M.bufnr = vim.api.nvim_get_current_buf()
+    setup_buffer()
+  end
+
   refresh_progress()
+end
+
+function M.load_tests(tests)
+  M.finish_tests()
+  generate_report(tests)
 end
 
 function M.setup()

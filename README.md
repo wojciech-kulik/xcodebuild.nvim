@@ -283,39 +283,64 @@ Make sure to open your project's root directory in Neovim and run `XcodebuildSet
 
 Xcodebuild.nvim comes with the following commands:
 
-| Command                            | Description                                              |
-| ---------------------------------- | -------------------------------------------------------- |
-| `XcodebuildSetup`                  | Run configuration wizard to select project configuration |
-| `XcodebuildPicker`                 | Show picker with all available actions                   |
-| `XcodebuildBuild`                  | Build project                                            |
-| `XcodebuildCleanBuild`             | Build project (clean build)                              |
-| `XcodebuildBuildRun`               | Build & run app                                          |
-| `XcodebuildBuildForTesting`        | Build for testing                                        |
-| `XcodebuildRun`                    | Run app without building                                 |
-| `XcodebuildCancel`                 | Cancel currently running action                          |
-| `XcodebuildTest`                   | Run tests (whole test plan)                              |
-| `XcodebuildTestTarget`             | Run test target (where the cursor is)                    |
-| `XcodebuildTestClass`              | Run test class (where the cursor is)                     |
-| `XcodebuildTestFunc`               | Run test (where the cursor is)                           |
-| `XcodebuildTestSelected`           | Run selected tests (using visual mode)                   |
-| `XcodebuildTestFailing`            | Rerun previously failed tests                            |
-| `XcodebuildFailingSnapshots`       | Show a picker with failing snapshot tests                |
-| `XcodebuildToggleCodeCoverage`     | Toggle code coverage marks on the side bar               |
-| `XcodebuildShowCodeCoverageReport` | Open HTML code coverage report                           |
-| `XcodebuildJumpToNextCoverage`     | Jump to next code coverage mark                          |
-| `XcodebuildJumpToPrevCoverage`     | Jump to previous code coverage mark                      |
-| `XcodebuildSelectProject`          | Show project file picker                                 |
-| `XcodebuildSelectScheme`           | Show scheme picker                                       |
-| `XcodebuildSelectConfig`           | Show build configuration picker                          |
-| `XcodebuildSelectDevice`           | Show device picker                                       |
-| `XcodebuildSelectTestPlan`         | Show test plan picker                                    |
-| `XcodebuildToggleLogs`             | Toggle logs panel                                        |
-| `XcodebuildOpenLogs`               | Open logs panel                                          |
-| `XcodebuildCloseLogs`              | Close logs panel                                         |
-| `XcodebuildCleanDerivedData`       | Deletes project's DerivedData                            |
-| `XcodebuildShowConfig`             | Print current project configuration                      |
-| `XcodebuildBootSimulator`          | Boot selected simulator                                  |
-| `XcodebuildUninstall`              | Uninstall mobile app                                     |
+### General
+
+| Command                      | Description                                              |
+| ---------------------------- | -------------------------------------------------------- |
+| `XcodebuildSetup`            | Run configuration wizard to select project configuration |
+| `XcodebuildPicker`           | Show picker with all available actions                   |
+| `XcodebuildBuild`            | Build project                                            |
+| `XcodebuildCleanBuild`       | Build project (clean build)                              |
+| `XcodebuildBuildRun`         | Build & run app                                          |
+| `XcodebuildBuildForTesting`  | Build for testing                                        |
+| `XcodebuildRun`              | Run app without building                                 |
+| `XcodebuildCancel`           | Cancel currently running action                          |
+| `XcodebuildCleanDerivedData` | Deletes project's DerivedData                            |
+| `XcodebuildToggleLogs`       | Toggle logs panel                                        |
+| `XcodebuildOpenLogs`         | Open logs panel                                          |
+| `XcodebuildCloseLogs`        | Close logs panel                                         |
+
+### Testing
+
+| Command                      | Description                               |
+| ---------------------------- | ----------------------------------------- |
+| `XcodebuildTest`             | Run tests (whole test plan)               |
+| `XcodebuildTestTarget`       | Run test target (where the cursor is)     |
+| `XcodebuildTestClass`        | Run test class (where the cursor is)      |
+| `XcodebuildTestFunc`         | Run test (where the cursor is)            |
+| `XcodebuildTestSelected`     | Run selected tests (using visual mode)    |
+| `XcodebuildTestFailing`      | Rerun previously failed tests             |
+| `XcodebuildFailingSnapshots` | Show a picker with failing snapshot tests |
+
+### Code Coverage
+
+| Command                            | Description                                |
+| ---------------------------------- | ------------------------------------------ |
+| `XcodebuildToggleCodeCoverage`     | Toggle code coverage marks on the side bar |
+| `XcodebuildShowCodeCoverageReport` | Open HTML code coverage report             |
+| `XcodebuildJumpToNextCoverage`     | Jump to next code coverage mark            |
+| `XcodebuildJumpToPrevCoverage`     | Jump to previous code coverage mark        |
+
+### Test Explorer
+
+| Command                        | Description          |
+| ------------------------------ | -------------------- |
+| `XcodebuildShowTestExplorer`   | Show Test Explorer   |
+| `XcodebuildHideTestExplorer`   | Hide Test Explorer   |
+| `XcodebuildToggleTestExplorer` | Toggle Test Explorer |
+
+### Configuration
+
+| Command                    | Description                         |
+| -------------------------- | ----------------------------------- |
+| `XcodebuildSelectProject`  | Show project file picker            |
+| `XcodebuildSelectScheme`   | Show scheme picker                  |
+| `XcodebuildSelectConfig`   | Show build configuration picker     |
+| `XcodebuildSelectDevice`   | Show device picker                  |
+| `XcodebuildSelectTestPlan` | Show test plan picker               |
+| `XcodebuildShowConfig`     | Print current project configuration |
+| `XcodebuildBootSimulator`  | Boot selected simulator             |
+| `XcodebuildUninstall`      | Uninstall mobile app                |
 
 Sample key bindings:
 
@@ -340,8 +365,15 @@ vim.keymap.set("n", "<leader>xq", "<cmd>Telescope quickfix<cr>", { desc = "Show 
 
 ### 📋 Logs Panel Key Bindings
 
-- Press `o` on a failed test (in summary section) to jump to failing place.
+- Press `o` on a failed test in the summary section to jump to the failing location
 - Press `q` to close the panel.
+
+### 🧪 Test Explorer Key Bindings
+
+- Press `o` on a test name to jump to the implementation.
+- Press `[` to jump to the previous failed test.
+- Press `]` to jump to the next failed test.
+- Press `q` to close the Test Explorer.
 
 ### 🚥 Lualine Integration
 

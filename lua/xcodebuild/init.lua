@@ -1,8 +1,8 @@
 local M = {}
 
-local function call(action)
+local function call(action, args)
   return function()
-    action()
+    action(args)
   end
 end
 
@@ -37,10 +37,17 @@ function M.setup(options)
   vim.api.nvim_create_user_command("XcodebuildTestSelected", call(actions.run_selected_tests), { nargs = 0 })
   vim.api.nvim_create_user_command("XcodebuildTestFailing", call(actions.run_failing_tests), { nargs = 0 })
   vim.api.nvim_create_user_command("XcodebuildFailingSnapshots", call(actions.show_failing_snapshot_tests), { nargs = 0 })
+
+  -- Coverage
   vim.api.nvim_create_user_command("XcodebuildToggleCodeCoverage", call(actions.toggle_code_coverage), { nargs = 0 })
   vim.api.nvim_create_user_command("XcodebuildShowCodeCoverageReport", call(actions.show_code_coverage_report), { nargs = 0 })
   vim.api.nvim_create_user_command("XcodebuildJumpToNextCoverage", call(actions.jump_to_next_coverage), { nargs = 0 })
   vim.api.nvim_create_user_command("XcodebuildJumpToPrevCoverage", call(actions.jump_to_previous_coverage), { nargs = 0 })
+
+  -- Test Explorer
+  vim.api.nvim_create_user_command("XcodebuildShowTestExplorer", call(actions.show_test_explorer), { nargs = 0 })
+  vim.api.nvim_create_user_command("XcodebuildHideTestExplorer", call(actions.hide_test_explorer), { nargs = 0 })
+  vim.api.nvim_create_user_command("XcodebuildToggleTestExplorer", call(actions.toggle_test_explorer), { nargs = 0 })
 
   -- Pickers
   vim.api.nvim_create_user_command("XcodebuildSetup", call(actions.configure_project), { nargs = 0 })

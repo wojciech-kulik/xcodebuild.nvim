@@ -3,6 +3,7 @@ local coordinator = require("xcodebuild.coordinator")
 local pickers = require("xcodebuild.pickers")
 local logs = require("xcodebuild.logs")
 local coverage = require("xcodebuild.coverage")
+local testExplorer = require("xcodebuild.test_explorer")
 
 local M = {}
 
@@ -194,6 +195,18 @@ end
 
 function M.jump_to_previous_coverage()
   coverage.jump_to_previous_coverage()
+end
+
+function M.show_test_explorer()
+  testExplorer.show()
+end
+
+function M.hide_test_explorer()
+  testExplorer.hide()
+end
+
+function M.toggle_test_explorer()
+  testExplorer.toggle()
 end
 
 return M

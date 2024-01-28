@@ -293,6 +293,7 @@ function M.setup_buffer(bufnr)
       local coordinator = require("xcodebuild.coordinator")
       open_test_file(coordinator.report.tests)
     end,
+    nowait = true,
   })
 end
 

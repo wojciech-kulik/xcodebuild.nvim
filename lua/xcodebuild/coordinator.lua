@@ -258,7 +258,8 @@ function M.show_test_explorer(callback)
     testPlan = projectConfig.settings.testPlan,
     extraTestArgs = config.commands.extra_test_args,
   }, function(tests)
-    testExplorer.show(tests)
+    testExplorer.load_tests(tests)
+    testExplorer.show()
     util.call(callback)
   end)
 end
