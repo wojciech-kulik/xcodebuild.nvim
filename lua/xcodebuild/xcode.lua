@@ -2,6 +2,7 @@ local util = require("xcodebuild.util")
 local notifications = require("xcodebuild.notifications")
 
 local M = {}
+local CANCELLED_CODE = 143
 
 local function get_coverage_item_id(xcresultPath, callback)
   local command = "xcrun xcresulttool get --format json --path '" .. xcresultPath .. "'"
@@ -440,8 +441,13 @@ function M.enumerate_tests(opts, callback)
     .. " -test-enumeration-style flat"
     .. (string.len(opts.extraTestArgs) > 0 and " " .. opts.extraTestArgs or "")
 
-  vim.fn.jobstart(command, {
+  return vim.fn.jobstart(command, {
     on_exit = function(_, code, _)
+      if code == CANCELLED_CODE then
+        notifications.send_warning("Task cancelled")
+        return util.call(callback, {})
+      end
+
       if code ~= 0 then
         notifications.send_error("Could not list tests (code: " .. code .. ")")
         return util.call(callback, {})

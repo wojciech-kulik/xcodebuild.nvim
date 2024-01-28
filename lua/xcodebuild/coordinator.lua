@@ -251,17 +251,24 @@ function M.build_project(opts, callback)
 end
 
 function M.show_test_explorer(callback)
-  xcode.enumerate_tests({
+  M.currentJobId = xcode.enumerate_tests({
     destination = projectConfig.settings.destination,
     projectCommand = projectConfig.settings.projectCommand,
     scheme = projectConfig.settings.scheme,
     testPlan = projectConfig.settings.testPlan,
     extraTestArgs = config.commands.extra_test_args,
   }, function(tests)
+    if util.is_empty(tests) then
+      notifications.send_error("Tests not found")
+      util.call(callback)
+      return
+    end
+
     testExplorer.load_tests(tests)
     if config.test_explorer.auto_open then
       testExplorer.show()
     end
+
     util.call(callback)
   end)
 end
