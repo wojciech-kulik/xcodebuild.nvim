@@ -418,6 +418,85 @@ function M.export_code_coverage(xcresultPath, outputPath, callback)
   end)
 end
 
+function M.enumerate_tests(opts, callback)
+  local appdata = require("xcodebuild.appdata")
+  local outputPath = appdata.tests_filepath
+  util.shell("rm -rf '" .. outputPath .. "'")
+
+  local command = "xcodebuild test-without-building"
+    .. " -enumerate-tests"
+    .. " -scheme '"
+    .. opts.scheme
+    .. "' -destination 'id="
+    .. opts.destination
+    .. "' "
+    .. opts.projectCommand
+    .. " -testPlan '"
+    .. opts.testPlan
+    .. "' -test-enumeration-format json"
+    .. " -test-enumeration-output-path '"
+    .. outputPath
+    .. "' -disableAutomaticPackageResolution -skipPackageUpdates -parallelizeTargets"
+    .. " -test-enumeration-style flat"
+    .. (string.len(opts.extraTestArgs) > 0 and " " .. opts.extraTestArgs or "")
+
+  vim.fn.jobstart(command, {
+    on_exit = function(_, code, _)
+      if code ~= 0 then
+        notifications.send_error("Could not list tests (code: " .. code .. ")")
+        return util.call(callback, {})
+      end
+
+      local readResult, jsonContent = pcall(vim.fn.readfile, outputPath)
+      if not readResult then
+        notifications.send_error("Could not read test list")
+        return util.call(callback, {})
+      end
+
+      local parseResult, json = pcall(vim.fn.json_decode, jsonContent)
+      if not parseResult then
+        notifications.send_error("Could not parse test list")
+        return util.call(callback, {})
+      end
+
+      if not json.values or not json.values[1] or not json.values[1].enabledTests then
+        notifications.send_error("Could not find tests")
+        return util.call(callback, {})
+      end
+
+      local tests = {}
+
+      for _, test in ipairs(json.values[1].enabledTests) do
+        local target, class, name = string.match(test.identifier, "([^%/]+)%/([^%/]+)%/(.+)")
+        if name then
+          table.insert(tests, {
+            id = test.identifier,
+            target = target,
+            class = class,
+            name = name,
+            enabled = true,
+          })
+        end
+      end
+
+      for _, test in ipairs(json.values[1].disabledTests) do
+        local target, class, name = string.match(test.identifier, "([^%/]+)%/([^%/]+)%/(.+)")
+        if name then
+          table.insert(tests, {
+            id = test.identifier,
+            target = target,
+            class = class,
+            name = name,
+            enabled = false,
+          })
+        end
+      end
+
+      util.call(callback, tests)
+    end,
+  })
+end
+
 function M.export_code_coverage_report(xcresultPath, outputPath, callback)
   local command = "xcrun xccov view --report --json " .. xcresultPath .. " > " .. outputPath
 

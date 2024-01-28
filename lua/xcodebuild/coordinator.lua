@@ -11,6 +11,7 @@ local config = require("xcodebuild.config").options
 local snapshots = require("xcodebuild.snapshots")
 local testSearch = require("xcodebuild.test_search")
 local coverage = require("xcodebuild.coverage")
+local testsExplorer = require("xcodebuild.tests_explorer")
 
 local M = {
   report = {},
@@ -249,6 +250,19 @@ function M.build_project(opts, callback)
   })
 end
 
+function M.show_tests_explorer(callback)
+  xcode.enumerate_tests({
+    destination = projectConfig.settings.destination,
+    projectCommand = projectConfig.settings.projectCommand,
+    scheme = projectConfig.settings.scheme,
+    testPlan = projectConfig.settings.testPlan,
+    extraTestArgs = config.commands.extra_test_args,
+  }, function(tests)
+    testsExplorer.show(tests)
+    util.call(callback)
+  end)
+end
+
 function M.run_tests(testsToRun)
   if not validate_project() or not validate_testplan() then
     return
@@ -291,6 +305,8 @@ function M.run_tests(testsToRun)
   end
 
   local on_exit = function(_, code, _)
+    testsExplorer.finish_tests()
+
     if code == CANCELLED_CODE then
       notifications.send_tests_finished(M.report, true)
       return
@@ -308,19 +324,23 @@ function M.run_tests(testsToRun)
     logs.set_logs(M.report, true, process_coverage)
   end
 
-  M.currentJobId = xcode.run_tests({
-    on_exit = on_exit,
-    on_stdout = on_stdout,
-    on_stderr = on_stdout,
+  M.show_tests_explorer(function()
+    testsExplorer.start_tests()
 
-    destination = projectConfig.settings.destination,
-    projectCommand = projectConfig.settings.projectCommand,
-    scheme = projectConfig.settings.scheme,
-    config = projectConfig.settings.config,
-    testPlan = projectConfig.settings.testPlan,
-    testsToRun = testsToRun,
-    extraTestArgs = config.commands.extra_test_args,
-  })
+    M.currentJobId = xcode.run_tests({
+      on_exit = on_exit,
+      on_stdout = on_stdout,
+      on_stderr = on_stdout,
+
+      destination = projectConfig.settings.destination,
+      projectCommand = projectConfig.settings.projectCommand,
+      scheme = projectConfig.settings.scheme,
+      config = projectConfig.settings.config,
+      testPlan = projectConfig.settings.testPlan,
+      testsToRun = testsToRun,
+      extraTestArgs = config.commands.extra_test_args,
+    })
+  end)
 end
 
 local function find_tests(opts)

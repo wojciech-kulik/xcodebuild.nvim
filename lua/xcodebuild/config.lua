@@ -54,6 +54,16 @@ local defaults = {
     show_errors_on_quickfixlist = true, -- add build/test errors to quickfix list
     show_warnings_on_quickfixlist = true, -- add build warnings to quickfix list
   },
+  tests_explorer = {
+    auto_open = true, -- opens tests explorer when tests are started
+    open_command = "bo vertical split Tests Explorer", -- command used to open tests explorer
+    success_sign = "✔", -- passed test icon
+    failure_sign = "✖", -- failed test icon
+    progress_sign = "…", -- progress icon (only used when animate_status=false)
+    disabled_sign = "⊝", -- disabled test icon
+    animate_status = true, -- animate status while running tests
+    cursor_follows_tests = true, -- moves cursor to the last test executed
+  },
   code_coverage = {
     enabled = false, -- generate code coverage report and show marks
     file_pattern = "*.swift", -- coverage will be shown in files matching this pattern

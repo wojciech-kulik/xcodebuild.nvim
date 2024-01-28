@@ -178,4 +178,12 @@ function M.find(tab, predicate)
   return nil
 end
 
+function M.call(fn, ...)
+  local args = { ... }
+
+  if fn then
+    return fn(unpack(args))
+  end
+end
+
 return M
