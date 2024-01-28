@@ -50,6 +50,8 @@ local function generate_report(tests)
       goto continue
     end
 
+    local filepath = testSearch.find_filepath(test.target, test.class)
+
     if test.target ~= current_target.name then
       current_target = {
         id = test.target,
@@ -67,6 +69,7 @@ local function generate_report(tests)
         kind = KIND_CLASS,
         status = test.enabled and STATUS_NOT_EXECUTED or STATUS_DISABLED,
         name = test.class,
+        filepath = filepath,
         tests = {},
       }
       table.insert(current_target.classes, current_class)
@@ -77,7 +80,7 @@ local function generate_report(tests)
       kind = KIND_TEST,
       status = test.enabled and STATUS_NOT_EXECUTED or STATUS_DISABLED,
       name = test.name,
-      filepath = testSearch.find_filepath(test.target, test.class),
+      filepath = filepath,
     })
 
     ::continue::
@@ -219,10 +222,7 @@ local function refresh_progress()
       last_update = nil
     end
 
-    if data.kind == KIND_TEST then
-      line_to_test[row] = data
-    end
-
+    line_to_test[row] = data
     row = row + 1
   end
 
@@ -323,11 +323,17 @@ function M.open_selected_test()
   end
 
   local filepath = line_to_test[currentRow].filepath
+
   if filepath then
+    local searchPhrase = line_to_test[currentRow].name
+
+    if line_to_test[currentRow].kind == KIND_CLASS then
+      searchPhrase = "class " .. searchPhrase
+    end
+
     vim.cmd("wincmd p | e " .. filepath)
-    vim.fn.search(line_to_test[currentRow].name, "")
+    vim.fn.search(searchPhrase, "")
     vim.cmd("execute 'normal! zt'")
-    return
   end
 end
 
@@ -458,6 +464,7 @@ function M.run_selected_tests()
 
   local containsDisabledTests = false
   local selectedTests = {}
+  local lastKind = nil
   local lineEnd = vim.api.nvim_win_get_cursor(0)[1]
   local lineStart = vim.fn.getpos("v")[2]
   if lineStart > lineEnd then
@@ -468,11 +475,17 @@ function M.run_selected_tests()
 
   for i = lineStart, lineEnd do
     local test = line_to_test[i]
+
     if test then
       if test.status == STATUS_DISABLED then
         containsDisabledTests = true
+      elseif test.kind == KIND_TEST and lastKind == KIND_CLASS then
+        -- skip tests if class is already added
+      elseif (test.kind == KIND_TEST or test.kind == KIND_CLASS) and lastKind == KIND_TARGET then
+        -- skip tests and classes if target is already added
       else
         table.insert(selectedTests, test.id)
+        lastKind = test.kind
       end
     end
   end
