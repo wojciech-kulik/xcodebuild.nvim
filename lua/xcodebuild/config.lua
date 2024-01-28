@@ -60,7 +60,9 @@ local defaults = {
     success_sign = "✔", -- passed test icon
     failure_sign = "✖", -- failed test icon
     progress_sign = "…", -- progress icon (only used when animate_status=false)
-    disabled_sign = "⊝", -- disabled test icon
+    disabled_sign = "⏸", -- disabled test icon
+    not_executed_sign = " ", -- not executed test icon
+    show_disabled_tests = false, -- show disabled tests
     animate_status = true, -- animate status while running tests
     cursor_follows_tests = true, -- moves cursor to the last test executed
   },
