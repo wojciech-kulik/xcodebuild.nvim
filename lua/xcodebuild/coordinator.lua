@@ -250,30 +250,55 @@ function M.build_project(opts, callback)
   })
 end
 
-function M.show_test_explorer(callback)
+function M.show_test_explorer(callback, opts)
+  opts = opts or {}
+
+  if not config.test_explorer.enabled then
+    util.call(callback)
+    return
+  end
+
+  local show = function()
+    if config.test_explorer.auto_open then
+      testExplorer.show()
+    end
+
+    util.call(callback)
+  end
+
+  if opts.skipEnumeration then
+    testExplorer.finish_tests()
+    show()
+    return
+  end
+
   M.currentJobId = xcode.enumerate_tests({
     destination = projectConfig.settings.destination,
     projectCommand = projectConfig.settings.projectCommand,
     scheme = projectConfig.settings.scheme,
     testPlan = projectConfig.settings.testPlan,
     extraTestArgs = config.commands.extra_test_args,
+    buildForTesting = opts.buildForTesting,
   }, function(tests)
     if util.is_empty(tests) then
-      notifications.send_error("Tests not found")
-      util.call(callback)
-      return
+      if not opts.buildForTesting then
+        notifications.send("Building for testing...")
+        opts.buildForTesting = true
+        M.show_test_explorer(callback, opts)
+      else
+        notifications.send_error("Tests not found")
+        util.call(callback)
+      end
+    else
+      testExplorer.load_tests(tests)
+      show()
     end
-
-    testExplorer.load_tests(tests)
-    if config.test_explorer.auto_open then
-      testExplorer.show()
-    end
-
-    util.call(callback)
   end)
 end
 
-function M.run_tests(testsToRun)
+function M.run_tests(testsToRun, opts)
+  opts = opts or {}
+
   if not validate_project() or not validate_testplan() then
     return
   end
@@ -350,7 +375,7 @@ function M.run_tests(testsToRun)
       testsToRun = testsToRun,
       extraTestArgs = config.commands.extra_test_args,
     })
-  end)
+  end, opts)
 end
 
 local function find_tests(opts)

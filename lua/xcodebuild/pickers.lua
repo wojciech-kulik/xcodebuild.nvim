@@ -381,7 +381,6 @@ function M.show_all_actions()
     "Select Test Plan",
 
     "Toggle Logs",
-    "Toggle Test Explorer",
     "Clean DerivedData",
     "Show Current Configuration",
     "Show Configuration Wizard",
@@ -410,7 +409,6 @@ function M.show_all_actions()
     actions.select_testplan,
 
     actions.toggle_logs,
-    actions.test_explorer_toggle,
     actions.clean_derived_data,
     actions.show_current_config,
     actions.configure_project,
@@ -440,6 +438,12 @@ function M.show_all_actions()
       table.insert(actionsNames, 14, "Show Code Coverage Report")
       table.insert(actionsPointers, 14, actions.show_code_coverage_report)
     end
+  end
+
+  if config.test_explorer.enabled then
+    local row = util.indexOf(actionsNames, "Toggle Logs")
+    table.insert(actionsNames, row + 1, "Toggle Test Explorer")
+    table.insert(actionsPointers, row + 1, actions.test_explorer_toggle)
   end
 
   M.show("Xcodebuild Actions", actionsNames, function(_, index)

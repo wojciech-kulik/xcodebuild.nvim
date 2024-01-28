@@ -424,7 +424,11 @@ function M.enumerate_tests(opts, callback)
   local outputPath = appdata.tests_filepath
   util.shell("rm -rf '" .. outputPath .. "'")
 
-  local command = "xcodebuild test-without-building"
+  local action = opts.buildForTesting and "test" or "test-without-building"
+  local spmParams = opts.buildForTesting and "" or " -disableAutomaticPackageResolution -skipPackageUpdates"
+
+  local command = "xcodebuild "
+    .. action
     .. " -enumerate-tests"
     .. " -scheme '"
     .. opts.scheme
@@ -437,7 +441,8 @@ function M.enumerate_tests(opts, callback)
     .. "' -test-enumeration-format json"
     .. " -test-enumeration-output-path '"
     .. outputPath
-    .. "' -disableAutomaticPackageResolution -skipPackageUpdates -parallelizeTargets"
+    .. "' -parallelizeTargets"
+    .. spmParams
     .. " -test-enumeration-style flat"
     .. (string.len(opts.extraTestArgs) > 0 and " " .. opts.extraTestArgs or "")
 

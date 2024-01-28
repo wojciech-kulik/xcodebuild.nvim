@@ -55,6 +55,7 @@ local defaults = {
     show_warnings_on_quickfixlist = true, -- add build warnings to quickfix list
   },
   test_explorer = {
+    enabled = true, -- enable Test Explorer
     auto_open = true, -- opens Test Explorer when tests are started
     open_command = "bo vertical split Test Explorer", -- command used to open Test Explorer
     success_sign = "✔", -- passed test icon

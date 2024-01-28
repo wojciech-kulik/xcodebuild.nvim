@@ -528,7 +528,7 @@ function M.repeat_last_run()
 
   local coordinator = require("xcodebuild.coordinator")
   coordinator.cancel()
-  coordinator.run_tests(last_run_tests)
+  coordinator.run_tests(last_run_tests, { skipEnumeration = true })
 end
 
 function M.run_selected_tests()
@@ -571,7 +571,7 @@ function M.run_selected_tests()
   if #selectedTests > 0 then
     local coordinator = require("xcodebuild.coordinator")
     coordinator.cancel()
-    coordinator.run_tests(selectedTests)
+    coordinator.run_tests(selectedTests, { skipEnumeration = true })
   else
     notifications.send_error("Tests not found")
   end
@@ -601,6 +601,10 @@ function M.hide()
 end
 
 function M.show()
+  if not config.enabled then
+    return
+  end
+
   if not M.report then
     vim.defer_fn(function()
       notifications.send("Loading tests...")
@@ -623,6 +627,10 @@ function M.show()
 end
 
 function M.load_tests(tests)
+  if not config.enabled then
+    return
+  end
+
   M.finish_tests()
   generate_report(tests)
 end
