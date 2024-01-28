@@ -381,6 +381,7 @@ function M.show_all_actions()
     "Select Test Plan",
 
     "Toggle Logs",
+    "Toggle Test Explorer",
     "Clean DerivedData",
     "Show Current Configuration",
     "Show Configuration Wizard",
@@ -409,6 +410,7 @@ function M.show_all_actions()
     actions.select_testplan,
 
     actions.toggle_logs,
+    actions.test_explorer_toggle,
     actions.clean_derived_data,
     actions.show_current_config,
     actions.configure_project,
@@ -417,7 +419,7 @@ function M.show_all_actions()
   }
 
   if not projectConfig.is_project_configured() then
-    actionsNames = { "Show Configuration Wizard " }
+    actionsNames = { "Show Configuration Wizard" }
     actionsPointers = { actions.configure_project }
   end
 

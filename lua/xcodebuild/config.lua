@@ -19,9 +19,9 @@ local defaults = {
     project_search_max_depth = 3, -- maxdepth of xcodeproj/xcworkspace search while using configuration wizard
   },
   logs = {
-    auto_open_on_success_tests = true, -- open logs when tests succeeded
-    auto_open_on_failed_tests = true, -- open logs when tests failed
-    auto_open_on_success_build = true, -- open logs when build succeeded
+    auto_open_on_success_tests = false, -- open logs when tests succeeded
+    auto_open_on_failed_tests = false, -- open logs when tests failed
+    auto_open_on_success_build = false, -- open logs when build succeeded
     auto_open_on_failed_build = true, -- open logs when build failed
     auto_close_on_app_launch = false, -- close logs when app is launched
     auto_close_on_success_build = false, -- close logs when build succeeded (only if auto_open_on_success_build=false)
@@ -62,7 +62,7 @@ local defaults = {
     progress_sign = "…", -- progress icon (only used when animate_status=false)
     disabled_sign = "⏸", -- disabled test icon
     not_executed_sign = " ", -- not executed test icon
-    show_disabled_tests = true, -- show disabled tests
+    show_disabled_tests = false, -- show disabled tests
     animate_status = true, -- animate status while running tests
     cursor_follows_tests = true, -- moves cursor to the last test executed
   },

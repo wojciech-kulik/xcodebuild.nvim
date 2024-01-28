@@ -45,9 +45,11 @@ function M.setup(options)
   vim.api.nvim_create_user_command("XcodebuildJumpToPrevCoverage", call(actions.jump_to_previous_coverage), { nargs = 0 })
 
   -- Test Explorer
-  vim.api.nvim_create_user_command("XcodebuildShowTestExplorer", call(actions.show_test_explorer), { nargs = 0 })
-  vim.api.nvim_create_user_command("XcodebuildHideTestExplorer", call(actions.hide_test_explorer), { nargs = 0 })
-  vim.api.nvim_create_user_command("XcodebuildToggleTestExplorer", call(actions.toggle_test_explorer), { nargs = 0 })
+  vim.api.nvim_create_user_command("XcodebuildTestExplorerShow", call(actions.test_explorer_show), { nargs = 0 })
+  vim.api.nvim_create_user_command("XcodebuildTestExplorerHide", call(actions.test_explorer_hide), { nargs = 0 })
+  vim.api.nvim_create_user_command("XcodebuildTestExplorerToggle", call(actions.test_explorer_toggle), { nargs = 0 })
+  vim.api.nvim_create_user_command("XcodebuildTestExplorerRunSelectedTests", call(actions.test_explorer_run_selected_tests), { nargs = 0 })
+  vim.api.nvim_create_user_command("XcodebuildTestExplorerRerunTests", call(actions.test_explorer_rerun_tests), { nargs = 0 })
 
   -- Pickers
   vim.api.nvim_create_user_command("XcodebuildSetup", call(actions.configure_project), { nargs = 0 })

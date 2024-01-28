@@ -181,6 +181,8 @@ function M.show_failing_snapshot_tests()
   coordinator.show_failing_snapshot_tests()
 end
 
+-- Code Coverage
+
 function M.toggle_code_coverage(isVisible)
   coverage.toggle_code_coverage(isVisible)
 end
@@ -197,16 +199,26 @@ function M.jump_to_previous_coverage()
   coverage.jump_to_previous_coverage()
 end
 
-function M.show_test_explorer()
+-- Test Explorer
+
+function M.test_explorer_show()
   testExplorer.show()
 end
 
-function M.hide_test_explorer()
+function M.test_explorer_hide()
   testExplorer.hide()
 end
 
-function M.toggle_test_explorer()
+function M.test_explorer_toggle()
   testExplorer.toggle()
+end
+
+function M.test_explorer_run_selected_tests()
+  testExplorer.run_selected_tests()
+end
+
+function M.test_explorer_rerun_tests()
+  testExplorer.repeat_last_run()
 end
 
 return M

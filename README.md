@@ -101,9 +101,9 @@ Xcodebuild.nvim comes with the following defaults:
     project_search_max_depth = 3, -- maxdepth of xcodeproj/xcworkspace search while using configuration wizard
   },
   logs = {
-    auto_open_on_success_tests = true, -- open logs when tests succeeded
-    auto_open_on_failed_tests = true, -- open logs when tests failed
-    auto_open_on_success_build = true, -- open logs when build succeeded
+    auto_open_on_success_tests = false, -- open logs when tests succeeded
+    auto_open_on_failed_tests = false, -- open logs when tests failed
+    auto_open_on_success_build = false, -- open logs when build succeeded
     auto_open_on_failed_build = true, -- open logs when build failed
     auto_close_on_app_launch = false, -- close logs when app is launched
     auto_close_on_success_build = false, -- close logs when build succeeded (only if auto_open_on_success_build=false)
@@ -135,6 +135,18 @@ Xcodebuild.nvim comes with the following defaults:
   quickfix = {
     show_errors_on_quickfixlist = true, -- add build/test errors to quickfix list
     show_warnings_on_quickfixlist = true, -- add build warnings to quickfix list
+  },
+  test_explorer = {
+    auto_open = true, -- opens Test Explorer when tests are started
+    open_command = "bo vertical split Test Explorer", -- command used to open Test Explorer
+    success_sign = "✔", -- passed test icon
+    failure_sign = "✖", -- failed test icon
+    progress_sign = "…", -- progress icon (only used when animate_status=false)
+    disabled_sign = "⏸", -- disabled test icon
+    not_executed_sign = " ", -- not executed test icon
+    show_disabled_tests = false, -- show disabled tests
+    animate_status = true, -- animate status while running tests
+    cursor_follows_tests = true, -- moves cursor to the last test executed
   },
   code_coverage = {
     enabled = false, -- generate code coverage report and show marks
@@ -323,11 +335,13 @@ Xcodebuild.nvim comes with the following commands:
 
 ### Test Explorer
 
-| Command                        | Description          |
-| ------------------------------ | -------------------- |
-| `XcodebuildShowTestExplorer`   | Show Test Explorer   |
-| `XcodebuildHideTestExplorer`   | Hide Test Explorer   |
-| `XcodebuildToggleTestExplorer` | Toggle Test Explorer |
+| Command                                  | Description                    |
+| ---------------------------------------- | ------------------------------ |
+| `XcodebuildTestExplorerShow`             | Show Test Explorer             |
+| `XcodebuildTestExplorerHide`             | Hide Test Explorer             |
+| `XcodebuildTestExplorerToggle`           | Toggle Test Explorer           |
+| `XcodebuildTestExplorerRunSelectedTests` | Run Selected Tests             |
+| `XcodebuildTestExplorerRerunTests`       | Re-run recently selected tests |
 
 ### Configuration
 
@@ -350,6 +364,7 @@ vim.keymap.set("n", "<leader>xl", "<cmd>XcodebuildToggleLogs<cr>", { desc = "Tog
 vim.keymap.set("n", "<leader>xb", "<cmd>XcodebuildBuild<cr>", { desc = "Build Project" })
 vim.keymap.set("n", "<leader>xr", "<cmd>XcodebuildBuildRun<cr>", { desc = "Build & Run Project" })
 vim.keymap.set("n", "<leader>xt", "<cmd>XcodebuildTest<cr>", { desc = "Run Tests" })
+vim.keymap.set("v", "<leader>xt", "<cmd>XcodebuildTestSelected<cr>", { desc = "Run Selected Tests" })
 vim.keymap.set("n", "<leader>xT", "<cmd>XcodebuildTestClass<cr>", { desc = "Run This Test Class" })
 vim.keymap.set("n", "<leader>xf", "<cmd>XcodebuildTestTarget<cr>", { desc = "Run This Test Target" })
 vim.keymap.set("n", "<leader>X", "<cmd>XcodebuildPicker<cr>", { desc = "Show All Xcodebuild Actions" })
@@ -358,6 +373,7 @@ vim.keymap.set("n", "<leader>xp", "<cmd>XcodebuildSelectTestPlan<cr>", { desc = 
 vim.keymap.set("n", "<leader>xs", "<cmd>XcodebuildFailingSnapshots<cr>", { desc = "Show Failing Snapshots" })
 vim.keymap.set("n", "<leader>xc", "<cmd>XcodebuildToggleCodeCoverage<cr>", { desc = "Toggle Code Coverage" })
 vim.keymap.set("n", "<leader>xC", "<cmd>XcodebuildShowCodeCoverageReport<cr>", { desc = "Show Code Coverage Report" })
+vim.keymap.set("n", "<leader>xe", "<cmd>XcodebuildTestExplorerToggle<cr>", { desc = "Toggle Test Explorer" })
 vim.keymap.set("n", "[r", "<cmd>XcodebuildJumpToPrevCoverage<cr>", { desc = "Jump To Previous Coverage" })
 vim.keymap.set("n", "]r", "<cmd>XcodebuildJumpToNextCoverage<cr>", { desc = "Jump To Next Coverage" })
 vim.keymap.set("n", "<leader>xq", "<cmd>Telescope quickfix<cr>", { desc = "Show QuickFix List" })
@@ -371,6 +387,8 @@ vim.keymap.set("n", "<leader>xq", "<cmd>Telescope quickfix<cr>", { desc = "Show 
 ### 🧪 Test Explorer Key Bindings
 
 - Press `o` to jump to the test implementation
+- Press `r` to run selected tests
+- Press `R` to re-run recently selected tests
 - Press `[` to jump to the previous failed test
 - Press `]` to jump to the next failed test
 - Press `q` to close the Test Explorer

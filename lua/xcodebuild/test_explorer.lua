@@ -31,6 +31,7 @@ local KIND_TEST = "test"
 local currentFrame = 1
 local last_update = nil
 local line_to_test = {}
+local last_run_tests = {}
 local ns = vim.api.nvim_create_namespace("xcodebuild-test-explorer")
 
 local function generate_report(tests)
@@ -196,6 +197,10 @@ local function get_aggregated_status(children)
 end
 
 local function refresh_progress()
+  if not M.bufnr then
+    return
+  end
+
   local lines = {}
   local highlights = {}
   local row = 1
@@ -281,6 +286,18 @@ local function setup_buffer()
   vim.api.nvim_buf_set_option(M.bufnr, "modifiable", false)
 
   vim.api.nvim_buf_set_keymap(M.bufnr, "n", "q", "<cmd>close<cr>", {})
+  vim.api.nvim_buf_set_keymap(M.bufnr, "n", "r", "", {
+    callback = M.run_selected_tests,
+    nowait = true,
+  })
+  vim.api.nvim_buf_set_keymap(M.bufnr, "v", "r", "", {
+    callback = M.run_selected_tests,
+    nowait = true,
+  })
+  vim.api.nvim_buf_set_keymap(M.bufnr, "n", "R", "", {
+    callback = M.repeat_last_run,
+    nowait = true,
+  })
   vim.api.nvim_buf_set_keymap(M.bufnr, "n", "[", "", {
     callback = function()
       M.jump_to_failed_test(false)
@@ -314,18 +331,27 @@ function M.open_selected_test()
   end
 end
 
-function M.start_tests()
+function M.start_tests(selectedTests)
   if not M.report then
     return
   end
 
+  last_run_tests = selectedTests
+
   for _, target in ipairs(M.report) do
     for _, class in ipairs(target.classes) do
       for _, test in ipairs(class.tests) do
-        if test.status ~= STATUS_DISABLED then
-          target.status = STATUS_RUNNING
-          class.status = STATUS_RUNNING
-          test.status = STATUS_RUNNING
+        if
+          util.is_empty(selectedTests)
+          or util.contains(selectedTests, target.id)
+          or util.contains(selectedTests, class.id)
+          or util.contains(selectedTests, test.id)
+        then
+          if test.status ~= STATUS_DISABLED then
+            target.status = STATUS_RUNNING
+            class.status = STATUS_RUNNING
+            test.status = STATUS_RUNNING
+          end
         end
       end
     end
@@ -410,6 +436,60 @@ function M.jump_to_failed_test(next)
   vim.fn.search("    \\[" .. config.failure_sign .. "\\]", next and "W" or "bW")
 end
 
+function M.repeat_last_run()
+  if not M.report then
+    return
+  end
+
+  if util.is_empty(last_run_tests) then
+    notifications.send_error("No tests to repeat")
+    return
+  end
+
+  local coordinator = require("xcodebuild.coordinator")
+  coordinator.cancel()
+  coordinator.run_tests(last_run_tests)
+end
+
+function M.run_selected_tests()
+  if not M.report then
+    return
+  end
+
+  local containsDisabledTests = false
+  local selectedTests = {}
+  local lineEnd = vim.api.nvim_win_get_cursor(0)[1]
+  local lineStart = vim.fn.getpos("v")[2]
+  if lineStart > lineEnd then
+    lineStart, lineEnd = lineEnd, lineStart
+  end
+
+  vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<esc>", true, false, true), "x", false)
+
+  for i = lineStart, lineEnd do
+    local test = line_to_test[i]
+    if test then
+      if test.status == STATUS_DISABLED then
+        containsDisabledTests = true
+      else
+        table.insert(selectedTests, test.id)
+      end
+    end
+  end
+
+  if containsDisabledTests then
+    notifications.send_warning("Disabled tests won't be executed")
+  end
+
+  if #selectedTests > 0 then
+    local coordinator = require("xcodebuild.coordinator")
+    coordinator.cancel()
+    coordinator.run_tests(selectedTests)
+  else
+    notifications.send_error("Tests not found")
+  end
+end
+
 function M.toggle()
   if not M.bufnr then
     M.show()
@@ -435,14 +515,18 @@ end
 
 function M.show()
   if not M.report then
-    notifications.send("Loading tests...")
+    vim.defer_fn(function()
+      notifications.send("Loading tests...")
+    end, 100)
+
     require("xcodebuild.coordinator").show_test_explorer(function()
       notifications.send("")
     end)
+
     return
   end
 
-  if not M.bufnr or not util.focus_buffer(M.bufnr) then
+  if not M.bufnr or util.is_empty(vim.fn.win_findbuf(M.bufnr)) then
     vim.cmd(config.open_command)
     M.bufnr = vim.api.nvim_get_current_buf()
     setup_buffer()

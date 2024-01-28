@@ -259,7 +259,9 @@ function M.show_test_explorer(callback)
     extraTestArgs = config.commands.extra_test_args,
   }, function(tests)
     testExplorer.load_tests(tests)
-    testExplorer.show()
+    if config.test_explorer.auto_open then
+      testExplorer.show()
+    end
     util.call(callback)
   end)
 end
@@ -326,7 +328,7 @@ function M.run_tests(testsToRun)
   end
 
   M.show_test_explorer(function()
-    testExplorer.start_tests()
+    testExplorer.start_tests(testsToRun)
 
     M.currentJobId = xcode.run_tests({
       on_exit = on_exit,
@@ -357,10 +359,12 @@ local function find_tests(opts)
   end
 
   if opts.selectedTests then
-    local vstart = vim.fn.getpos("'<")
-    local vend = vim.fn.getpos("'>")
-    local lineStart = vstart[2]
-    local lineEnd = vend[2]
+    local lineEnd = vim.api.nvim_win_get_cursor(0)[1]
+    local lineStart = vim.fn.getpos("v")[2]
+    if lineStart > lineEnd then
+      lineStart, lineEnd = lineEnd, lineStart
+    end
+    vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<esc>", true, false, true), "x", false)
 
     for i = lineStart, lineEnd do
       local test = string.match(lines[i], "func (test[^%s%(]+)")
