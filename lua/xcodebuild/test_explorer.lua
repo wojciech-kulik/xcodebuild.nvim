@@ -407,18 +407,7 @@ function M.jump_to_failed_test(next)
     return
   end
 
-  local row = vim.api.nvim_win_get_cursor(winnr[1])[1]
-  local lines = next and vim.api.nvim_buf_get_lines(M.bufnr, row, -1, false)
-    or vim.fn.reverse(vim.api.nvim_buf_get_lines(M.bufnr, 0, row - 1, false))
-
-  for _, line in ipairs(lines) do
-    row = next and row + 1 or row - 1
-
-    if string.find(line, "    %[" .. config.failure_sign .. "%]") then
-      vim.api.nvim_win_set_cursor(winnr[1], { row, 0 })
-      return
-    end
-  end
+  vim.fn.search("    \\[" .. config.failure_sign .. "\\]", next and "W" or "bW")
 end
 
 function M.toggle()

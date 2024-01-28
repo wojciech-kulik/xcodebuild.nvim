@@ -366,14 +366,14 @@ vim.keymap.set("n", "<leader>xq", "<cmd>Telescope quickfix<cr>", { desc = "Show 
 ### 📋 Logs Panel Key Bindings
 
 - Press `o` on a failed test in the summary section to jump to the failing location
-- Press `q` to close the panel.
+- Press `q` to close the panel
 
 ### 🧪 Test Explorer Key Bindings
 
-- Press `o` on a test name to jump to the implementation.
-- Press `[` to jump to the previous failed test.
-- Press `]` to jump to the next failed test.
-- Press `q` to close the Test Explorer.
+- Press `o` to jump to the test implementation
+- Press `[` to jump to the previous failed test
+- Press `]` to jump to the next failed test
+- Press `q` to close the Test Explorer
 
 ### 🚥 Lualine Integration
 
