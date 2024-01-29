@@ -6,6 +6,7 @@ local testSearch = require("xcodebuild.test_search")
 local M = {}
 
 local STATUS_NOT_EXECUTED = "not_executed"
+local STATUS_PARTIAL_EXECUTION = "partial_execution"
 local STATUS_RUNNING = "running"
 local STATUS_PASSED = "passed"
 local STATUS_FAILED = "failed"
@@ -84,6 +85,8 @@ end
 local function get_hl_for_status(status)
   if status == STATUS_NOT_EXECUTED then
     return "XcodebuildTestExplorerTestNotExecuted"
+  elseif status == STATUS_PARTIAL_EXECUTION then
+    return "XcodebuildTestExplorerTestPartialExecution"
   elseif status == STATUS_RUNNING then
     return "XcodebuildTestExplorerTestInProgress"
   elseif status == STATUS_PASSED then
@@ -100,6 +103,8 @@ end
 local function get_icon_for_status(status)
   if status == STATUS_NOT_EXECUTED then
     return config.not_executed_sign
+  elseif status == STATUS_PARTIAL_EXECUTION then
+    return config.partial_execution_sign
   elseif status == STATUS_RUNNING then
     return config.animate_status and spinnerFrames[currentFrame] or config.progress_sign
   elseif status == STATUS_PASSED then
@@ -163,6 +168,7 @@ local function get_aggregated_status(children)
   local passed = false
   local failed = false
   local disabled = false
+  local executed = false
   local notExecuted = false
 
   for _, child in ipairs(children) do
@@ -171,15 +177,20 @@ local function get_aggregated_status(children)
     elseif child.status == STATUS_FAILED then
       failed = true
       passed = false
+      executed = true
     elseif child.status == STATUS_PASSED then
       passed = not failed
+      executed = true
     elseif child.status == STATUS_NOT_EXECUTED then
       notExecuted = true
+    elseif child.status == STATUS_PARTIAL_EXECUTION then
+      notExecuted = true
+      executed = true
     end
   end
 
   if notExecuted then
-    return STATUS_NOT_EXECUTED
+    return executed and STATUS_PARTIAL_EXECUTION or STATUS_NOT_EXECUTED
   elseif failed then
     return STATUS_FAILED
   elseif passed then
@@ -644,14 +655,17 @@ function M.load_tests(tests)
 end
 
 function M.setup()
+  -- stylua: ignore start
   vim.api.nvim_set_hl(0, "XcodebuildTestExplorerTest", { link = "@function", default = true })
   vim.api.nvim_set_hl(0, "XcodebuildTestExplorerClass", { link = "@type", default = true })
   vim.api.nvim_set_hl(0, "XcodebuildTestExplorerTarget", { link = "@keyword", default = true })
   vim.api.nvim_set_hl(0, "XcodebuildTestExplorerTestInProgress", { link = "@operator", default = true })
   vim.api.nvim_set_hl(0, "XcodebuildTestExplorerTestPassed", { link = "DiagnosticOk", default = true })
   vim.api.nvim_set_hl(0, "XcodebuildTestExplorerTestFailed", { link = "DiagnosticError", default = true })
+  vim.api.nvim_set_hl(0, "XcodebuildTestExplorerTestPartialExecution", { link = "DiagnosticWarn", default = true })
   vim.api.nvim_set_hl(0, "XcodebuildTestExplorerTestDisabled", { link = "@comment", default = true })
   vim.api.nvim_set_hl(0, "XcodebuildTestExplorerTestNotExecuted", { link = "@text", default = true })
+  -- stylua: ignore end
 end
 
 return M

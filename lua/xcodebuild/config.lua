@@ -58,6 +58,7 @@ local defaults = {
     failure_sign = "✖", -- failed test icon
     progress_sign = "…", -- progress icon (only used when animate_status=false)
     disabled_sign = "⏸", -- disabled test icon
+    partial_execution_sign = "‐", -- icon for a class or target when only some tests were executed
     not_executed_sign = " ", -- not executed or partially executed test icon
     show_disabled_tests = false, -- show disabled tests
     animate_status = true, -- animate status while running tests
