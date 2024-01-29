@@ -81,7 +81,9 @@ function M.send_build_started(buildForTesting)
   return buildState.id
 end
 
-function M.send_build_finished(report, id, isCancelled)
+function M.send_build_finished(report, id, isCancelled, opts)
+  opts = opts or {}
+
   if id ~= buildState.id then
     return
   end
@@ -98,7 +100,9 @@ function M.send_build_finished(report, id, isCancelled)
     projectConfig.settings.lastBuildTime = duration
     projectConfig.save_settings()
 
-    M.send(string.format("Build Succeeded [%d seconds]", duration))
+    if not opts.doNotShowSuccess then
+      M.send(string.format("Build Succeeded [%d seconds]", duration))
+    end
   else
     M.send_error("Build Failed [" .. #report.buildErrors .. " error(s)]")
   end

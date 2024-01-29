@@ -417,7 +417,7 @@ function M.show_all_actions()
   }
 
   if not projectConfig.is_project_configured() then
-    actionsNames = { "Show Configuration Wizard " }
+    actionsNames = { "Show Configuration Wizard" }
     actionsPointers = { actions.configure_project }
   end
 
@@ -438,6 +438,12 @@ function M.show_all_actions()
       table.insert(actionsNames, 14, "Show Code Coverage Report")
       table.insert(actionsPointers, 14, actions.show_code_coverage_report)
     end
+  end
+
+  if config.test_explorer.enabled then
+    local row = util.indexOf(actionsNames, "Toggle Logs")
+    table.insert(actionsNames, row + 1, "Toggle Test Explorer")
+    table.insert(actionsPointers, row + 1, actions.test_explorer_toggle)
   end
 
   M.show("Xcodebuild Actions", actionsNames, function(_, index)

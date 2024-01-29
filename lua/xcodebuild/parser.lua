@@ -37,6 +37,11 @@ local function flush_test(message)
     table.insert(tests[key], lineData)
   end
 
+  require("xcodebuild.test_explorer").update_test_status(
+    lineData.target .. "/" .. lineData.class .. "/" .. lineData.name,
+    lineData.success and "passed" or "failed"
+  )
+
   lastTest = lineData
   lineType = BEGIN
   lineData = {}

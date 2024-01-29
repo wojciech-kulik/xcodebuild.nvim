@@ -43,9 +43,9 @@ local function get_nodes(coverage)
 end
 
 local function get_hl_group(coverage)
-  return coverage < config.error_coverage_level and config.error_level_hl_group
-    or coverage < config.warning_coverage_level and config.warning_level_hl_group
-    or config.ok_level_hl_group
+  return coverage < config.error_coverage_level and "XcodebuildCoverageReportError"
+    or coverage < config.warning_coverage_level and "XcodebuildCoverageReportWarning"
+    or "XcodebuildCoverageReportOk"
 end
 
 local function expand_all_nodes(tree)
@@ -165,6 +165,12 @@ function M.open()
   end, map_options)
 
   tree:render()
+end
+
+function M.setup()
+  vim.api.nvim_set_hl(0, "XcodebuildCoverageReportWarning", { link = "DiagnosticWarn", default = true })
+  vim.api.nvim_set_hl(0, "XcodebuildCoverageReportError", { link = "DiagnosticError", default = true })
+  vim.api.nvim_set_hl(0, "XcodebuildCoverageReportOk", { link = "DiagnosticOk", default = true })
 end
 
 return M

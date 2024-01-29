@@ -87,7 +87,8 @@ local function refresh_buf_marks(bufnr, testClass, tests)
     if config.show_test_duration then
       if test.time then
         local text = "(" .. test.time .. ")"
-        local highlight = test.success and config.success_test_duration_hl or config.failure_test_duration_hl
+        local highlight = test.success and "XcodebuildTestSuccessDurationSign"
+          or "XcodebuildTestFailureDurationSign"
         testDuration = { text, highlight }
       else
         testDuration = { "" }
@@ -96,7 +97,7 @@ local function refresh_buf_marks(bufnr, testClass, tests)
 
     if config.show_signs then
       signText = test.success and config.success_sign or config.failure_sign
-      signHighlight = test.success and config.success_sign_hl or config.failure_sign_hl
+      signHighlight = test.success and "XcodebuildTestSuccessSign" or "XcodebuildTestFailureSign"
     end
 
     if test.filepath and lineNumber then
@@ -107,6 +108,15 @@ local function refresh_buf_marks(bufnr, testClass, tests)
       })
     end
   end
+end
+
+function M.setup()
+  -- stylua: ignore start
+  vim.api.nvim_set_hl(0, "XcodebuildTestSuccessSign", { link = "DiagnosticSignOk", default = true })
+  vim.api.nvim_set_hl(0, "XcodebuildTestFailureSign", { link = "DiagnosticSignError", default = true })
+  vim.api.nvim_set_hl(0, "XcodebuildTestSuccessDurationSign", { link = "DiagnosticSignWarn", default = true })
+  vim.api.nvim_set_hl(0, "XcodebuildTestFailureDurationSign", { link = "DiagnosticSignError", default = true })
+  -- stylua: ignore end
 end
 
 function M.refresh_test_buffer(bufnr, report)

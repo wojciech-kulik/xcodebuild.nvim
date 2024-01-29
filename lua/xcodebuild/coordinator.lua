@@ -11,6 +11,7 @@ local config = require("xcodebuild.config").options
 local snapshots = require("xcodebuild.snapshots")
 local testSearch = require("xcodebuild.test_search")
 local coverage = require("xcodebuild.coverage")
+local testExplorer = require("xcodebuild.test_explorer")
 
 local M = {
   report = {},
@@ -225,7 +226,12 @@ function M.build_project(opts, callback)
     notifications.stop_build_timer()
     notifications.send_progress("Processing logs...")
     logs.set_logs(M.report, false, function()
-      notifications.send_build_finished(M.report, buildId, false)
+      notifications.send_build_finished(
+        M.report,
+        buildId,
+        false,
+        { doNotShowSuccess = opts.doNotShowSuccess }
+      )
     end)
 
     if callback then
@@ -249,7 +255,68 @@ function M.build_project(opts, callback)
   })
 end
 
-function M.run_tests(testsToRun)
+function M.show_test_explorer(callback, opts)
+  opts = opts or {}
+
+  local runBuild = function(completion)
+    M.build_project({ buildForTesting = true, doNotShowSuccess = true }, function(report)
+      if util.is_empty(report.buildErrors) then
+        util.call(completion)
+      end
+    end)
+  end
+
+  local show = function()
+    if config.test_explorer.auto_open then
+      testExplorer.show()
+    end
+
+    util.call(callback)
+  end
+
+  if not config.test_explorer.enabled then
+    runBuild(callback)
+    return
+  end
+
+  if opts.skipEnumeration then
+    runBuild(function()
+      testExplorer.finish_tests()
+      show()
+    end)
+    return
+  end
+
+  runBuild(function()
+    notifications.send("Loading Tests...")
+
+    M.currentJobId = xcode.enumerate_tests({
+      destination = projectConfig.settings.destination,
+      config = projectConfig.settings.config,
+      projectCommand = projectConfig.settings.projectCommand,
+      scheme = projectConfig.settings.scheme,
+      testPlan = projectConfig.settings.testPlan,
+      extraTestArgs = config.commands.extra_test_args,
+    }, function(tests)
+      -- workaround sometimes after cancel enumerate tests returns 0 code
+      if not M.currentJobId then
+        return
+      end
+
+      if util.is_empty(tests) then
+        notifications.send_error("Tests not found")
+        util.call(callback)
+      else
+        testExplorer.load_tests(tests)
+        show()
+      end
+    end)
+  end)
+end
+
+function M.run_tests(testsToRun, opts)
+  opts = opts or {}
+
   if not validate_project() or not validate_testplan() then
     return
   end
@@ -291,6 +358,8 @@ function M.run_tests(testsToRun)
   end
 
   local on_exit = function(_, code, _)
+    testExplorer.finish_tests()
+
     if code == CANCELLED_CODE then
       notifications.send_tests_finished(M.report, true)
       return
@@ -308,19 +377,25 @@ function M.run_tests(testsToRun)
     logs.set_logs(M.report, true, process_coverage)
   end
 
-  M.currentJobId = xcode.run_tests({
-    on_exit = on_exit,
-    on_stdout = on_stdout,
-    on_stderr = on_stdout,
+  -- Test Explorer also builds for testing
+  M.show_test_explorer(function()
+    testExplorer.start_tests(testsToRun)
 
-    destination = projectConfig.settings.destination,
-    projectCommand = projectConfig.settings.projectCommand,
-    scheme = projectConfig.settings.scheme,
-    config = projectConfig.settings.config,
-    testPlan = projectConfig.settings.testPlan,
-    testsToRun = testsToRun,
-    extraTestArgs = config.commands.extra_test_args,
-  })
+    M.currentJobId = xcode.run_tests({
+      on_exit = on_exit,
+      on_stdout = on_stdout,
+      on_stderr = on_stdout,
+
+      withoutBuilding = true,
+      destination = projectConfig.settings.destination,
+      projectCommand = projectConfig.settings.projectCommand,
+      scheme = projectConfig.settings.scheme,
+      config = projectConfig.settings.config,
+      testPlan = projectConfig.settings.testPlan,
+      testsToRun = testsToRun,
+      extraTestArgs = config.commands.extra_test_args,
+    })
+  end, opts)
 end
 
 local function find_tests(opts)
@@ -336,10 +411,12 @@ local function find_tests(opts)
   end
 
   if opts.selectedTests then
-    local vstart = vim.fn.getpos("'<")
-    local vend = vim.fn.getpos("'>")
-    local lineStart = vstart[2]
-    local lineEnd = vend[2]
+    local lineEnd = vim.api.nvim_win_get_cursor(0)[1]
+    local lineStart = vim.fn.getpos("v")[2]
+    if lineStart > lineEnd then
+      lineStart, lineEnd = lineEnd, lineStart
+    end
+    vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<esc>", true, false, true), "x", false)
 
     for i = lineStart, lineEnd do
       local test = string.match(lines[i], "func (test[^%s%(]+)")

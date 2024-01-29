@@ -2,6 +2,7 @@ local util = require("xcodebuild.util")
 local notifications = require("xcodebuild.notifications")
 
 local M = {}
+local CANCELLED_CODE = 143
 
 local function get_coverage_item_id(xcresultPath, callback)
   local command = "xcrun xcresulttool get --format json --path '" .. xcresultPath .. "'"
@@ -418,6 +419,48 @@ function M.export_code_coverage(xcresultPath, outputPath, callback)
   end)
 end
 
+function M.enumerate_tests(opts, callback)
+  local appdata = require("xcodebuild.appdata")
+  local outputPath = appdata.tests_filepath
+  util.shell("rm -rf '" .. outputPath .. "'")
+
+  local command = "xcodebuild test-without-building"
+    .. " -enumerate-tests"
+    .. " -scheme '"
+    .. opts.scheme
+    .. "' -destination 'id="
+    .. opts.destination
+    .. "' -configuration '"
+    .. opts.config
+    .. "' "
+    .. opts.projectCommand
+    .. " -testPlan '"
+    .. opts.testPlan
+    .. "' -test-enumeration-format json"
+    .. " -test-enumeration-output-path '"
+    .. outputPath
+    .. "' -disableAutomaticPackageResolution -skipPackageUpdates -parallelizeTargets"
+    .. " -test-enumeration-style flat"
+    .. (string.len(opts.extraTestArgs) > 0 and " " .. opts.extraTestArgs or "")
+
+  return vim.fn.jobstart(command, {
+    on_exit = function(_, code, _)
+      if code == CANCELLED_CODE then
+        notifications.send_warning("Loading tests cancelled")
+        return
+      end
+
+      if code ~= 0 then
+        notifications.send_error("Could not list tests (code: " .. code .. ")")
+        return
+      end
+
+      local tests = require("xcodebuild.test_enumeration_parser").parse(outputPath)
+      util.call(callback, tests)
+    end,
+  })
+end
+
 function M.export_code_coverage_report(xcresultPath, outputPath, callback)
   local command = "xcrun xccov view --report --json " .. xcresultPath .. " > " .. outputPath
 
@@ -432,8 +475,10 @@ function M.export_code_coverage_report(xcresultPath, outputPath, callback)
 end
 
 function M.run_tests(opts)
+  local action = opts.withoutBuilding and "test-without-building" or "test"
+
   -- stylua: ignore
-  local command = "xcodebuild test -scheme '"
+  local command = "xcodebuild " .. action .. " -scheme '"
     .. opts.scheme
     .. "' -destination 'id="
     .. opts.destination

@@ -80,9 +80,13 @@ end
 
 function M.focus_buffer(bufNr)
   local _, window = next(vim.fn.win_findbuf(bufNr))
+
   if window then
     vim.api.nvim_set_current_win(window)
+    return true
   end
+
+  return false
 end
 
 function M.get_filename(filepath)
@@ -172,6 +176,24 @@ function M.find(tab, predicate)
   for _, value in ipairs(tab) do
     if predicate(value) then
       return value
+    end
+  end
+
+  return nil
+end
+
+function M.call(fn, ...)
+  local args = { ... }
+
+  if fn then
+    return fn(unpack(args))
+  end
+end
+
+function M.indexOf(array, value)
+  for i, v in ipairs(array) do
+    if v == value then
+      return i
     end
   end
 
