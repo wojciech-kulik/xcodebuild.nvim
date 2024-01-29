@@ -53,7 +53,7 @@ local defaults = {
   test_explorer = {
     enabled = true, -- enable Test Explorer
     auto_open = true, -- opens Test Explorer when tests are started
-    open_command = "bo vertical split Test Explorer", -- command used to open Test Explorer
+    open_command = "bo vertical split Test Explorer | vertical resize 42", -- command used to open Test Explorer
     success_sign = "✔", -- passed test icon
     failure_sign = "✖", -- failed test icon
     progress_sign = "…", -- progress icon (only used when animate_status=false)

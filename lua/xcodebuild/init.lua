@@ -20,6 +20,27 @@ local function setupHighlights()
   end
 end
 
+local function warnAboutOldConfig()
+  local config = require("xcodebuild.config").options
+
+  if
+    config.code_coverage.covered
+    or config.code_coverage.partially_covered
+    or config.code_coverage.not_covered
+    or config.code_coverage.not_executable
+    or config.code_coverage_report.ok_level_hl_group
+    or config.code_coverage_report.warning_level_hl_group
+    or config.code_coverage_report.error_level_hl_group
+    or config.marks.success_sign_hl
+    or config.marks.failure_sign_hl
+    or config.marks.success_test_duration_hl
+    or config.marks.failure_test_duration_hl
+  then
+    print("xcodebuild.nvim: Code coverage and marks options related to higlights were changed.")
+    print("xcodebuild.nvim: Please see README.md and update your config.")
+  end
+end
+
 -- stylua: ignore start
 function M.setup(options)
   require("xcodebuild.config").setup(options)
@@ -39,6 +60,7 @@ function M.setup(options)
   coverageReport.setup()
   testExplorer.setup()
   setupHighlights()
+  warnAboutOldConfig()
 
   -- Build
   vim.api.nvim_create_user_command("XcodebuildBuild", call(actions.build), { nargs = 0 })
