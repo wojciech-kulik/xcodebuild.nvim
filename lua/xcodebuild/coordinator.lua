@@ -226,7 +226,12 @@ function M.build_project(opts, callback)
     notifications.stop_build_timer()
     notifications.send_progress("Processing logs...")
     logs.set_logs(M.report, false, function()
-      notifications.send_build_finished(M.report, buildId, false)
+      notifications.send_build_finished(
+        M.report,
+        buildId,
+        false,
+        { doNotShowSuccess = opts.doNotShowSuccess }
+      )
     end)
 
     if callback then
@@ -253,9 +258,12 @@ end
 function M.show_test_explorer(callback, opts)
   opts = opts or {}
 
-  if not config.test_explorer.enabled then
-    util.call(callback)
-    return
+  local runBuild = function(completion)
+    M.build_project({ buildForTesting = true, doNotShowSuccess = true }, function(report)
+      if util.is_empty(report.buildErrors) then
+        util.call(completion)
+      end
+    end)
   end
 
   local show = function()
@@ -266,38 +274,43 @@ function M.show_test_explorer(callback, opts)
     util.call(callback)
   end
 
-  if opts.skipEnumeration then
-    testExplorer.finish_tests()
-    show()
+  if not config.test_explorer.enabled then
+    runBuild(callback)
     return
   end
 
-  M.currentJobId = xcode.enumerate_tests({
-    destination = projectConfig.settings.destination,
-    projectCommand = projectConfig.settings.projectCommand,
-    scheme = projectConfig.settings.scheme,
-    testPlan = projectConfig.settings.testPlan,
-    extraTestArgs = config.commands.extra_test_args,
-    buildForTesting = opts.buildForTesting,
-  }, function(tests)
-    -- workaround sometimes after cancel enumerate tests returns 0 code
-    if not M.currentJobId then
-      return
-    end
+  if opts.skipEnumeration then
+    runBuild(function()
+      testExplorer.finish_tests()
+      show()
+    end)
+    return
+  end
 
-    if util.is_empty(tests) then
-      if not opts.buildForTesting then
-        notifications.send("Building for testing...")
-        opts.buildForTesting = true
-        M.show_test_explorer(callback, opts)
-      else
+  runBuild(function()
+    notifications.send("Loading Tests...")
+
+    M.currentJobId = xcode.enumerate_tests({
+      destination = projectConfig.settings.destination,
+      config = projectConfig.settings.config,
+      projectCommand = projectConfig.settings.projectCommand,
+      scheme = projectConfig.settings.scheme,
+      testPlan = projectConfig.settings.testPlan,
+      extraTestArgs = config.commands.extra_test_args,
+    }, function(tests)
+      -- workaround sometimes after cancel enumerate tests returns 0 code
+      if not M.currentJobId then
+        return
+      end
+
+      if util.is_empty(tests) then
         notifications.send_error("Tests not found")
         util.call(callback)
+      else
+        testExplorer.load_tests(tests)
+        show()
       end
-    else
-      testExplorer.load_tests(tests)
-      show()
-    end
+    end)
   end)
 end
 
@@ -364,6 +377,7 @@ function M.run_tests(testsToRun, opts)
     logs.set_logs(M.report, true, process_coverage)
   end
 
+  -- Test Explorer also builds for testing
   M.show_test_explorer(function()
     testExplorer.start_tests(testsToRun)
 
@@ -372,6 +386,7 @@ function M.run_tests(testsToRun, opts)
       on_stdout = on_stdout,
       on_stderr = on_stdout,
 
+      withoutBuilding = true,
       destination = projectConfig.settings.destination,
       projectCommand = projectConfig.settings.projectCommand,
       scheme = projectConfig.settings.scheme,

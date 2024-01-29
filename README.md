@@ -388,8 +388,9 @@ vim.keymap.set("n", "<leader>xq", "<cmd>Telescope quickfix<cr>", { desc = "Show 
 ### 🧪 Test Explorer Key Bindings
 
 - Press `o` to jump to the test implementation
-- Press `r` to run selected tests
-- Press `R` to re-run recently selected tests
+- Press `t` to run selected tests
+- Press `T` to re-run recently selected tests
+- Press `R` to reload test list
 - Press `[` to jump to the previous failed test
 - Press `]` to jump to the next failed test
 - Press `<cr>` to expand or collapse the current node

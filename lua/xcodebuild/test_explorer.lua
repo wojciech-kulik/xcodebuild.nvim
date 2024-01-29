@@ -17,7 +17,7 @@ local KIND_TEST = "test"
 
 local spinnerFrames = { "⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏" }
 local currentFrame = 1
-local last_update = nil
+local last_updated_id = nil
 local line_to_test = {}
 local last_run_tests = {}
 local collapsed_ids = {}
@@ -215,9 +215,9 @@ local function refresh_explorer()
       table.insert(highlights, hl)
     end
 
-    if config.cursor_follows_tests and last_update == data.id then
+    if config.cursor_follows_tests and last_updated_id == data.id then
       move_cursor_to_row = row
-      last_update = nil
+      last_updated_id = nil
     end
 
     line_to_test[row] = data
@@ -288,12 +288,20 @@ local function setup_buffer()
     callback = M.run_selected_tests,
     nowait = true,
   })
-  vim.api.nvim_buf_set_keymap(M.bufnr, "v", "r", "", {
+  vim.api.nvim_buf_set_keymap(M.bufnr, "v", "t", "", {
     callback = M.run_selected_tests,
     nowait = true,
   })
-  vim.api.nvim_buf_set_keymap(M.bufnr, "n", "R", "", {
+  vim.api.nvim_buf_set_keymap(M.bufnr, "n", "T", "", {
     callback = M.repeat_last_run,
+    nowait = true,
+  })
+  vim.api.nvim_buf_set_keymap(M.bufnr, "n", "R", "", {
+    callback = function()
+      require("xcodebuild.coordinator").show_test_explorer(function()
+        notifications.send("")
+      end)
+    end,
     nowait = true,
   })
   vim.api.nvim_buf_set_keymap(M.bufnr, "n", "[", "", {
@@ -489,7 +497,11 @@ function M.update_test_status(testId, status)
           target.status = get_aggregated_status(target.classes)
 
           if status == STATUS_PASSED or status == STATUS_FAILED then
-            last_update = t.id
+            if t.hidden then
+              last_updated_id = class.hidden and target.id or class.id
+            else
+              last_updated_id = t.id
+            end
           end
 
           if not config.animate_status then
@@ -606,10 +618,6 @@ function M.show()
   end
 
   if not M.report then
-    vim.defer_fn(function()
-      notifications.send("Loading tests...")
-    end, 100)
-
     require("xcodebuild.coordinator").show_test_explorer(function()
       notifications.send("")
     end)

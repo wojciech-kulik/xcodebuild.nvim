@@ -424,16 +424,14 @@ function M.enumerate_tests(opts, callback)
   local outputPath = appdata.tests_filepath
   util.shell("rm -rf '" .. outputPath .. "'")
 
-  local action = opts.buildForTesting and "test" or "test-without-building"
-  local spmParams = opts.buildForTesting and "" or " -disableAutomaticPackageResolution -skipPackageUpdates"
-
-  local command = "xcodebuild "
-    .. action
+  local command = "xcodebuild test-without-building"
     .. " -enumerate-tests"
     .. " -scheme '"
     .. opts.scheme
     .. "' -destination 'id="
     .. opts.destination
+    .. "' -configuration '"
+    .. opts.config
     .. "' "
     .. opts.projectCommand
     .. " -testPlan '"
@@ -441,68 +439,23 @@ function M.enumerate_tests(opts, callback)
     .. "' -test-enumeration-format json"
     .. " -test-enumeration-output-path '"
     .. outputPath
-    .. "' -parallelizeTargets"
-    .. spmParams
+    .. "' -disableAutomaticPackageResolution -skipPackageUpdates -parallelizeTargets"
     .. " -test-enumeration-style flat"
     .. (string.len(opts.extraTestArgs) > 0 and " " .. opts.extraTestArgs or "")
 
   return vim.fn.jobstart(command, {
     on_exit = function(_, code, _)
       if code == CANCELLED_CODE then
-        notifications.send_warning("Task cancelled")
+        notifications.send_warning("Loading tests cancelled")
         return
       end
 
       if code ~= 0 then
         notifications.send_error("Could not list tests (code: " .. code .. ")")
-        return util.call(callback, {})
+        return
       end
 
-      local readResult, jsonContent = pcall(vim.fn.readfile, outputPath)
-      if not readResult then
-        notifications.send_error("Could not read test list")
-        return util.call(callback, {})
-      end
-
-      local parseResult, json = pcall(vim.fn.json_decode, jsonContent)
-      if not parseResult then
-        notifications.send_error("Could not parse test list")
-        return util.call(callback, {})
-      end
-
-      if not json.values or not json.values[1] or not json.values[1].enabledTests then
-        notifications.send_error("Could not find tests")
-        return util.call(callback, {})
-      end
-
-      local tests = {}
-
-      for _, test in ipairs(json.values[1].enabledTests) do
-        local target, class, name = string.match(test.identifier, "([^%/]+)%/([^%/]+)%/(.+)")
-        if name then
-          table.insert(tests, {
-            id = test.identifier,
-            target = target,
-            class = class,
-            name = name,
-            enabled = true,
-          })
-        end
-      end
-
-      for _, test in ipairs(json.values[1].disabledTests) do
-        local target, class, name = string.match(test.identifier, "([^%/]+)%/([^%/]+)%/(.+)")
-        if name then
-          table.insert(tests, {
-            id = test.identifier,
-            target = target,
-            class = class,
-            name = name,
-            enabled = false,
-          })
-        end
-      end
-
+      local tests = require("xcodebuild.test_enumeration_parser").parse(outputPath)
       util.call(callback, tests)
     end,
   })
@@ -522,8 +475,10 @@ function M.export_code_coverage_report(xcresultPath, outputPath, callback)
 end
 
 function M.run_tests(opts)
+  local action = opts.withoutBuilding and "test-without-building" or "test"
+
   -- stylua: ignore
-  local command = "xcodebuild test -scheme '"
+  local command = "xcodebuild " .. action .. " -scheme '"
     .. opts.scheme
     .. "' -destination 'id="
     .. opts.destination
