@@ -280,6 +280,11 @@ function M.show_test_explorer(callback, opts)
     extraTestArgs = config.commands.extra_test_args,
     buildForTesting = opts.buildForTesting,
   }, function(tests)
+    -- workaround sometimes after cancel enumerate tests returns 0 code
+    if not M.currentJobId then
+      return
+    end
+
     if util.is_empty(tests) then
       if not opts.buildForTesting then
         notifications.send("Building for testing...")

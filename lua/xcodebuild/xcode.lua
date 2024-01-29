@@ -450,7 +450,7 @@ function M.enumerate_tests(opts, callback)
     on_exit = function(_, code, _)
       if code == CANCELLED_CODE then
         notifications.send_warning("Task cancelled")
-        return util.call(callback, {})
+        return
       end
 
       if code ~= 0 then

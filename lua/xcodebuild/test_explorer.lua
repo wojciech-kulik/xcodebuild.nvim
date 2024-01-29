@@ -513,7 +513,7 @@ function M.jump_to_failed_test(next)
     return
   end
 
-  vim.fn.search("    \\[" .. config.failure_sign .. "\\]", next and "W" or "bW")
+  vim.fn.search("\\[" .. config.failure_sign .. "\\]", next and "W" or "bW")
 end
 
 function M.repeat_last_run()
