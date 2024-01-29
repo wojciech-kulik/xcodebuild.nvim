@@ -42,11 +42,7 @@ local defaults = {
     show_signs = true, -- show each test result on the side bar
     success_sign = "✔", -- passed test icon
     failure_sign = "✖", -- failed test icon
-    success_sign_hl = "DiagnosticSignOk", -- highlight for success_sign
-    failure_sign_hl = "DiagnosticSignError", -- highlight for failure_sign
     show_test_duration = true, -- show each test duration next to its declaration
-    success_test_duration_hl = "DiagnosticWarn", -- test duration highlight when test passed
-    failure_test_duration_hl = "DiagnosticError", -- test duration highlight when test failed
     show_diagnostics = true, -- add test failures to diagnostics
     file_pattern = "*Tests.swift", -- test diagnostics will be loaded in files matching this pattern (if available)
   },
@@ -71,38 +67,21 @@ local defaults = {
     enabled = false, -- generate code coverage report and show marks
     file_pattern = "*.swift", -- coverage will be shown in files matching this pattern
     -- configuration of line coverage presentation:
-    covered = {
-      sign_text = "",
-      sign_hl_group = "XcodebuildCoverageFull",
-      number_hl_group = nil,
-      line_hl_group = nil,
-    },
-    partially_covered = {
-      sign_text = "┃",
-      sign_hl_group = "XcodebuildCoveragePartial",
-      number_hl_group = nil,
-      line_hl_group = nil,
-    },
-    not_covered = {
-      sign_text = "┃",
-      sign_hl_group = "XcodebuildCoverageNone",
-      number_hl_group = nil,
-      line_hl_group = nil,
-    },
-    not_executable = {
-      sign_text = "",
-      sign_hl_group = "XcodebuildCoverageNotExecutable",
-      number_hl_group = nil,
-      line_hl_group = nil,
-    },
+    covered_sign = "",
+    partially_covered_sign = "┃",
+    not_covered_sign = "┃",
+    not_executable_sign = "",
   },
   code_coverage_report = {
     warning_coverage_level = 60,
-    warning_level_hl_group = "DiagnosticWarn",
     error_coverage_level = 30,
-    error_level_hl_group = "DiagnosticError",
-    ok_level_hl_group = "DiagnosticOk",
     open_expanded = false,
+  },
+  highlights = {
+    -- you can override here any highlight group used by this plugin
+    -- simple color: XcodebuildCoverageReportOk = "#00ff00",
+    -- link highlights: XcodebuildCoverageReportOk = "DiagnosticOk",
+    -- full customization: XcodebuildCoverageReportOk = { fg = "#00ff00", bold = true },
   },
 }
 

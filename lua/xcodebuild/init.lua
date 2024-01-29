@@ -6,6 +6,20 @@ local function call(action, args)
   end
 end
 
+local function setupHighlights()
+  local highlights = require("xcodebuild.config").options.highlights or {}
+
+  for hl, color in pairs(highlights) do
+    if type(color) == "table" then
+      vim.api.nvim_set_hl(0, hl, color)
+    elseif vim.startswith(color, "#") then
+      vim.api.nvim_set_hl(0, hl, { fg = color })
+    else
+      vim.api.nvim_set_hl(0, hl, { link = color })
+    end
+  end
+end
+
 -- stylua: ignore start
 function M.setup(options)
   require("xcodebuild.config").setup(options)
@@ -14,12 +28,17 @@ function M.setup(options)
   local actions = require("xcodebuild.actions")
   local projectConfig = require("xcodebuild.project_config")
   local coverage = require("xcodebuild.coverage")
+  local coverageReport = require("xcodebuild.coverage_report")
   local testExplorer = require("xcodebuild.test_explorer")
+  local diagnostics = require("xcodebuild.diagnostics")
 
   autocmd.setup()
   projectConfig.load_settings()
+  diagnostics.setup()
   coverage.setup()
+  coverageReport.setup()
   testExplorer.setup()
+  setupHighlights()
 
   -- Build
   vim.api.nvim_create_user_command("XcodebuildBuild", call(actions.build), { nargs = 0 })

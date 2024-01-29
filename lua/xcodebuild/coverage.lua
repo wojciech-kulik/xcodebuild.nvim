@@ -55,10 +55,14 @@ local function jump_to_coverage(next)
 end
 
 function M.setup()
-  vim.api.nvim_set_hl(0, "XcodebuildCoverageFull", { fg = "#50fa7b", default = true })
-  vim.api.nvim_set_hl(0, "XcodebuildCoverageNone", { fg = "#ff5555", default = true })
-  vim.api.nvim_set_hl(0, "XcodebuildCoveragePartial", { fg = "#f1fa8c", default = true })
-  vim.api.nvim_set_hl(0, "XcodebuildCoverageNotExecutable", { fg = "Gray", default = true })
+  vim.api.nvim_set_hl(0, "XcodebuildCoverageFullSign", { link = "DiagnosticOk", default = true })
+  vim.api.nvim_set_hl(0, "XcodebuildCoverageNoneSign", { link = "DiagnosticError", default = true })
+  vim.api.nvim_set_hl(0, "XcodebuildCoveragePartialSign", { link = "DiagnosticWarn", default = true })
+  vim.api.nvim_set_hl(0, "XcodebuildCoverageNotExecutableSign", { link = "@comment", default = true })
+  -- XcodebuildCoverageFullNumber, XcodebuildCoveragePartialNumber
+  -- XcodebuildCoverageNoneNumber, XcodebuildCoverageNotExecutableNumber
+  -- XcodebuildCoverageFullLine, XcodebuildCoveragePartialLine
+  -- XcodebuildCoverageNoneLine, XcodebuildCoverageNotExecutableLine
 end
 
 function M.is_code_coverage_available()
@@ -200,17 +204,34 @@ function M.show_coverage(bufnr)
       bracketsCounter = bracketsCounter + openBrackets - closeBrackets
 
       if bracketsCounter == 0 and lineNumber and count then
-        local mark
+        local mark = {
+          sign_text = "",
+          sign_hl_group = "",
+          number_hl_group = nil,
+          line_hl_group = nil,
+        }
 
         if isPartial then
-          mark = config.partially_covered
+          mark.sign_text = config.partially_covered_sign
+          mark.sign_hl_group = "XcodebuildCoveragePartialSign"
+          mark.number_hl_group = "XcodebuildCoveragePartialNumber"
+          mark.line_hl_group = "XcodebuildCoveragePartialLine"
           isPartial = false
         elseif count == "*" then
-          mark = config.covered
+          mark.sign_text = config.not_executable_sign
+          mark.sign_hl_group = "XcodebuildCoverageNotExecutableSign"
+          mark.number_hl_group = "XcodebuildCoverageNotExecutableNumber"
+          mark.line_hl_group = "XcodebuildCoverageNotExecutableLine"
         elseif count == "0" then
-          mark = config.not_covered
+          mark.sign_text = config.not_covered_sign
+          mark.sign_hl_group = "XcodebuildCoverageNoneSign"
+          mark.number_hl_group = "XcodebuildCoverageNoneNumber"
+          mark.line_hl_group = "XcodebuildCoverageNoneLine"
         else
-          mark = config.not_executable
+          mark.sign_text = config.covered_sign
+          mark.sign_hl_group = "XcodebuildCoverageFullSign"
+          mark.number_hl_group = "XcodebuildCoverageFullNumber"
+          mark.line_hl_group = "XcodebuildCoverageFullLine"
         end
 
         if mark.sign_text ~= "" then

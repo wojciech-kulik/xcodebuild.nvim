@@ -80,7 +80,8 @@ return {
 
 ## ⚙️ Configuration
 
-Xcodebuild.nvim comes with the following defaults:
+<details>
+  <summary>See default Xcodebuild.nvim config</summary>
 
 ```lua
 {
@@ -124,11 +125,7 @@ Xcodebuild.nvim comes with the following defaults:
     show_signs = true, -- show each test result on the side bar
     success_sign = "✔", -- passed test icon
     failure_sign = "✖", -- failed test icon
-    success_sign_hl = "DiagnosticSignOk", -- highlight for success_sign
-    failure_sign_hl = "DiagnosticSignError", -- highlight for failure_sign
     show_test_duration = true, -- show each test duration next to its declaration
-    success_test_duration_hl = "DiagnosticWarn", -- test duration highlight when test passed
-    failure_test_duration_hl = "DiagnosticError", -- test duration highlight when test failed
     show_diagnostics = true, -- add test failures to diagnostics
     file_pattern = "*Tests.swift", -- test diagnostics will be loaded in files matching this pattern (if available)
   },
@@ -153,43 +150,85 @@ Xcodebuild.nvim comes with the following defaults:
     enabled = false, -- generate code coverage report and show marks
     file_pattern = "*.swift", -- coverage will be shown in files matching this pattern
     -- configuration of line coverage presentation:
-    covered = {
-      sign_text = "",
-      sign_hl_group = "XcodebuildCoverageFull",
-      number_hl_group = nil,
-      line_hl_group = nil,
-    },
-    partially_covered = {
-      sign_text = "┃",
-      sign_hl_group = "XcodebuildCoveragePartial",
-      number_hl_group = nil,
-      line_hl_group = nil,
-    },
-    not_covered = {
-      sign_text = "┃",
-      sign_hl_group = "XcodebuildCoverageNone",
-      number_hl_group = nil,
-      line_hl_group = nil,
-    },
-    not_executable = {
-      sign_text = "",
-      sign_hl_group = "XcodebuildCoverageNotExecutable",
-      number_hl_group = nil,
-      line_hl_group = nil,
-    },
+    covered_sign = "",
+    partially_covered_sign = "┃",
+    not_covered_sign = "┃",
+    not_executable_sign = "",
   },
   code_coverage_report = {
     warning_coverage_level = 60,
-    warning_level_hl_group = "DiagnosticWarn",
     error_coverage_level = 30,
-    error_level_hl_group = "DiagnosticError",
-    ok_level_hl_group = "DiagnosticOk",
     open_expanded = false,
+  },
+  highlights = {
+    -- you can override here any highlight group used by this plugin
+    -- simple color: XcodebuildCoverageReportOk = "#00ff00",
+    -- link highlights: XcodebuildCoverageReportOk = "DiagnosticOk",
+    -- full customization: XcodebuildCoverageReportOk = { fg = "#00ff00", bold = true },
   },
 }
 ```
 
+</details>
+
+### 🎨 Customize Highlights
+
+<details>
+  <summary>See all highlights</summary>
+
+#### Test File
+
+| Highlight Group                     | Description                     |
+| ----------------------------------- | ------------------------------- |
+| `XcodebuildTestSuccessSign`         | Test passed sign                |
+| `XcodebuildTestFailureSign`         | Test failed sign                |
+| `XcodebuildTestSuccessDurationSign` | Test duration for a passed test |
+| `XcodebuildTestFailureDurationSign` | Test duration for a failed test |
+
+#### Test Explorer
+
+| Highlight Group                         | Description            |
+| --------------------------------------- | ---------------------- |
+| `XcodebuildTestExplorerTest`            | Test name (function)   |
+| `XcodebuildTestExplorerClass`           | Test class             |
+| `XcodebuildTestExplorerTarget`          | Test target            |
+| `XcodebuildTestExplorerTestInProgress`  | Test in progress sign  |
+| `XcodebuildTestExplorerTestPassed`      | Test passed sign       |
+| `XcodebuildTestExplorerTestFailed`      | Test failed sign       |
+| `XcodebuildTestExplorerTestDisabled`    | Disabled test sign     |
+| `XcodebuildTestExplorerTestNotExecuted` | Test not executed sign |
+
+#### Code Coverage (inline)
+
+| Highlight Group                         | Description                          |
+| --------------------------------------- | ------------------------------------ |
+| `XcodebuildCoverageFullSign`            | Covered line - sign                  |
+| `XcodebuildCoverageFullNumber`          | Covered line - line number           |
+| `XcodebuildCoverageFullLine`            | Covered line - code                  |
+| `XcodebuildCoveragePartialSign`         | Partially covered line - sign        |
+| `XcodebuildCoveragePartialNumber`       | Partially covered line - line number |
+| `XcodebuildCoveragePartialLine`         | Partially covered line - code        |
+| `XcodebuildCoverageNoneSign`            | Not covered line - sign              |
+| `XcodebuildCoverageNoneNumber`          | Not covered line - line number       |
+| `XcodebuildCoverageNoneLine`            | Not covered line - code              |
+| `XcodebuildCoverageNotExecutableSign`   | Not executable line - sign           |
+| `XcodebuildCoverageNotExecutableNumber` | Not executable line - line number    |
+| `XcodebuildCoverageNotExecutableLine`   | Not executable line - code           |
+
+#### Code Coverage (report)
+
+| Highlight Group                   | Description                                          |
+| --------------------------------- | ---------------------------------------------------- |
+| `XcodebuildCoverageReportOk`      | Percentage color when above `warning_coverage_level` |
+| `XcodebuildCoverageReportWarning` | Percentage color when below `warning_coverage_level` |
+| `XcodebuildCoverageReportError`   | Percentage color when below `error_coverage_level`   |
+
+</details>
+
 ### 🔎 Test File Search - File Matching
+
+<details>
+  <summary>See all strategies</summary>
 
 `xcodebuild` logs provide the following information about the test: target, test class, and test name. The plugin needs to find the file location based on that, which is not a trivial task.
 
@@ -206,13 +245,16 @@ In order to support multiple cases, the plugin allows you to choose the search m
 
 👉 If your test results don't appear, you can also try disabling `test_search.target_matching`. This way the plugin will always use the first match without checking its target.
 
+</details>
+
 ### 📱 Setup Your Neovim For iOS Development
 
-I wrote an article that sums up all steps to set up your Neovim from scratch to develop iOS and macOS apps:
-
-[The Complete Guide To iOS & macOS Development In Neovim](https://wojciechkulik.pl/ios/the-complete-guide-to-ios-macos-development-in-neovim)
-
-You can also check out a sample Neovim configuration that I prepared for iOS development: [ios-dev-starter-nvim](https://github.com/wojciech-kulik/ios-dev-starter-nvim)
+> [!IMPORTANT]
+> I wrote an article that sums up all steps to set up your Neovim from scratch to develop iOS and macOS apps:
+>
+> [The Complete Guide To iOS & macOS Development In Neovim](https://wojciechkulik.pl/ios/the-complete-guide-to-ios-macos-development-in-neovim)
+>
+> You can also check out a sample Neovim configuration that I prepared for iOS development: [ios-dev-starter-nvim](https://github.com/wojciech-kulik/ios-dev-starter-nvim)
 
 ### 📦 Swift Packages Development
 
@@ -222,13 +264,13 @@ This plugin supports only iOS and macOS applications. However, if you develop Sw
 
 [nvim-dap](https://github.com/mfussenegger/nvim-dap) plugin lets you debug applications like in any other IDE. On top of that [nvim-dap-ui](https://github.com/rcarriga/nvim-dap-ui) extension will present for you all panels with stack, breakpoints, variables, logs, etc.
 
+<details>
+  <summary>See nvim-dap configuration</summary>
+
 To configure DAP for development:
 
 - Download codelldb VS Code plugin from: [HERE](https://github.com/vadimcn/codelldb/releases). For macOS use `darwin` version. Just unzip `vsix` file and set paths below.
 - Install also [nvim-dap-ui](https://github.com/rcarriga/nvim-dap-ui) for a nice GUI to debug.
-
-<details>
-  <summary>👉 nvim-dap configuration</summary>
 
 ```lua
 return {
@@ -290,9 +332,13 @@ return {
 
 ## 🚀 Usage
 
-Make sure to open your project's root directory in Neovim and run `XcodebuildSetup` to configure the project. The plugin needs several information like project file, scheme, config, device, and test plan to be able to run commands.
+> [!IMPORTANT]
+> Make sure to open your project's root directory in Neovim and run `XcodebuildSetup` to configure the project. The plugin needs several information like project file, scheme, config, device, and test plan to be able to run commands.
 
 ### 🔧 Commands
+
+<details>
+  <summary>👉 See all user commands</summary>
 
 Xcodebuild.nvim comes with the following commands:
 
@@ -357,10 +403,13 @@ Xcodebuild.nvim comes with the following commands:
 | `XcodebuildBootSimulator`  | Boot selected simulator             |
 | `XcodebuildUninstall`      | Uninstall mobile app                |
 
-Sample key bindings:
+</details>
+
+### ⌘ Sample Key Bindings
 
 ```lua
 -- Lua
+vim.keymap.set("n", "<leader>X", "<cmd>XcodebuildPicker<cr>", { desc = "Show All Xcodebuild Actions" })
 vim.keymap.set("n", "<leader>xl", "<cmd>XcodebuildToggleLogs<cr>", { desc = "Toggle Xcodebuild Logs" })
 vim.keymap.set("n", "<leader>xb", "<cmd>XcodebuildBuild<cr>", { desc = "Build Project" })
 vim.keymap.set("n", "<leader>xr", "<cmd>XcodebuildBuildRun<cr>", { desc = "Build & Run Project" })
@@ -368,7 +417,6 @@ vim.keymap.set("n", "<leader>xt", "<cmd>XcodebuildTest<cr>", { desc = "Run Tests
 vim.keymap.set("v", "<leader>xt", "<cmd>XcodebuildTestSelected<cr>", { desc = "Run Selected Tests" })
 vim.keymap.set("n", "<leader>xT", "<cmd>XcodebuildTestClass<cr>", { desc = "Run This Test Class" })
 vim.keymap.set("n", "<leader>xf", "<cmd>XcodebuildTestTarget<cr>", { desc = "Run This Test Target" })
-vim.keymap.set("n", "<leader>X", "<cmd>XcodebuildPicker<cr>", { desc = "Show All Xcodebuild Actions" })
 vim.keymap.set("n", "<leader>xd", "<cmd>XcodebuildSelectDevice<cr>", { desc = "Select Device" })
 vim.keymap.set("n", "<leader>xp", "<cmd>XcodebuildSelectTestPlan<cr>", { desc = "Select Test Plan" })
 vim.keymap.set("n", "<leader>xs", "<cmd>XcodebuildFailingSnapshots<cr>", { desc = "Show Failing Snapshots" })
@@ -380,12 +428,15 @@ vim.keymap.set("n", "]r", "<cmd>XcodebuildJumpToNextCoverage<cr>", { desc = "Jum
 vim.keymap.set("n", "<leader>xq", "<cmd>Telescope quickfix<cr>", { desc = "Show QuickFix List" })
 ```
 
-### 📋 Logs Panel Key Bindings
+> [!TIP]
+> Press `<leader>X` to access the picker with all commands.
+
+### 📋 Logs Panel
 
 - Press `o` on a failed test in the summary section to jump to the failing location
 - Press `q` to close the panel
 
-### 🧪 Test Explorer Key Bindings
+### 🧪 Test Explorer
 
 - Press `o` to jump to the test implementation
 - Press `t` to run selected tests
@@ -399,11 +450,12 @@ vim.keymap.set("n", "<leader>xq", "<cmd>Telescope quickfix<cr>", { desc = "Show 
 
 ### 🚥 Lualine Integration
 
-![Xcodebuild Lualine](./media/lualine.png)
-
 You can also integrate this plugin with [lualine.nvim](https://github.com/nvim-lualine/lualine.nvim).
 
-Sample configuration:
+![Xcodebuild Lualine](./media/lualine.png)
+
+<details>
+    <summary>See Lualine configuration</summary>
 
 ```lua
 lualine_x = {
@@ -427,11 +479,14 @@ Global variables that you can use:
 | `vim.g.xcodebuild_scheme`      | Selected project scheme (ex. MyApp)         |
 | `vim.g.xcodebuild_test_plan`   | Selected Test Plan (ex. MyAppTests)         |
 
+</details>
+
 ### 🧪 Code Coverage
 
-![Xcodebuild Code Coverage](./media/code-coverage.png)
 ![Xcodebuild Code Coverage Report](./media/coverage-report.png)
 
+<details>
+    <summary>See how to configure</summary>
 Using xcodebuild.nvim you can also check the code coverage after running tests.
 
 1. Make sure that you enabled code coverage for desired targets in your test plan.
@@ -467,9 +522,12 @@ Coverage Report Keys:
 | `enter` or `tab` | Expand or collapse the current node |
 | `o`              | Open source file                    |
 
-⚠️  From time to time, the code coverage may fail or some targets may be missing (Xcode's bug). Try running tests again then.
+> [!CAUTION]
+> From time to time, the code coverage may fail or some targets may be missing (Xcode's bug). Try running tests again then.
+>
+> If you run tests, modify file and toggle code coverage AFTER that, the placement of marks will be incorrect (because it doesn't know about changes that you made). However, if you show code coverage and after that you modify the code, marks will be moving while you are editing the file.
 
-⚠️  If you run tests, modify file and toggle code coverage AFTER that, the placement of marks will be incorrect (because it doesn't know about changes that you made). However, if you show code coverage and after that you modify the code, marks will be moving while you are editing the file.
+</details>
 
 ### 📸 Snapshot Tests Preview
 

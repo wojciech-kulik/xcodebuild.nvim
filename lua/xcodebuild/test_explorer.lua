@@ -284,7 +284,7 @@ local function setup_buffer()
   vim.api.nvim_buf_set_option(M.bufnr, "modifiable", false)
 
   vim.api.nvim_buf_set_keymap(M.bufnr, "n", "q", "<cmd>close<cr>", {})
-  vim.api.nvim_buf_set_keymap(M.bufnr, "n", "r", "", {
+  vim.api.nvim_buf_set_keymap(M.bufnr, "n", "t", "", {
     callback = M.run_selected_tests,
     nowait = true,
   })
