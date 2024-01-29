@@ -2,9 +2,9 @@
 
 A plugin that lets you move your iOS, iPadOS and macOS apps development to Neovim. It supports most of Xcode actions that are required to work with a project, including device selection, building, launching, and testing.
 
-![Xcodebuild Debugging](./media/tests.png)
+https://github.com/wojciech-kulik/xcodebuild.nvim/assets/3128467/3acdb8f7-0b51-4955-bdbc-25912ff3db80
 
-![Xcodebuild Testing](./media/debug.png)
+![Xcodebuild Debugging](./media/debug.png)
 
 ## 🚧 Disclaimer
 
@@ -23,6 +23,7 @@ It is also my first Neovim plugin. Hopefully, a good one 😁.
 - [x] Configuration wizard to setup: project file, scheme, config, device, and test plan.
 - [x] Built based on core command line tools like `xcodebuild` and `xcrun simctl`. It doesn't require any external tools, only `xcbeautify` to format logs, but it could be changed in configuration.
 - [x] Build, run and test actions.
+- [x] Test Explorer to visually present all tests and results.
 - [x] App deployment to selected iOS simulator.
 - [x] Uninstall mobile app.
 - [x] Running only selected tests (one test, one class, selected tests in visual mode, whole test plan).
@@ -178,12 +179,12 @@ return {
 
 #### Test File
 
-| Highlight Group                     | Description                     |
-| ----------------------------------- | ------------------------------- |
-| `XcodebuildTestSuccessSign`         | Test passed sign                |
-| `XcodebuildTestFailureSign`         | Test failed sign                |
-| `XcodebuildTestSuccessDurationSign` | Test duration for a passed test |
-| `XcodebuildTestFailureDurationSign` | Test duration for a failed test |
+| Highlight Group                     | Description                    |
+| ----------------------------------- | ------------------------------ |
+| `XcodebuildTestSuccessSign`         | Test passed sign               |
+| `XcodebuildTestFailureSign`         | Test failed sign               |
+| `XcodebuildTestSuccessDurationSign` | Test duration of a passed test |
+| `XcodebuildTestFailureDurationSign` | Test duration of a failed test |
 
 #### Test Explorer
 
@@ -195,7 +196,7 @@ return {
 | `XcodebuildTestExplorerTestInProgress`  | Test in progress sign  |
 | `XcodebuildTestExplorerTestPassed`      | Test passed sign       |
 | `XcodebuildTestExplorerTestFailed`      | Test failed sign       |
-| `XcodebuildTestExplorerTestDisabled`    | Disabled test sign     |
+| `XcodebuildTestExplorerTestDisabled`    | Test disabled sign     |
 | `XcodebuildTestExplorerTestNotExecuted` | Test not executed sign |
 
 #### Code Coverage (inline)
