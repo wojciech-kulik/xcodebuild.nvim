@@ -115,7 +115,7 @@ function M.setup()
   vim.api.nvim_set_hl(0, "XcodebuildTestSuccessSign", { link = "DiagnosticSignOk", default = true })
   vim.api.nvim_set_hl(0, "XcodebuildTestFailureSign", { link = "DiagnosticSignError", default = true })
   vim.api.nvim_set_hl(0, "XcodebuildTestSuccessDurationSign", { link = "DiagnosticSignWarn", default = true })
-  vim.api.nvim_set_hl( 0, "XcodebuildTestFailureDurationSign", { link = "DiagnosticSignError", default = true })
+  vim.api.nvim_set_hl(0, "XcodebuildTestFailureDurationSign", { link = "DiagnosticSignError", default = true })
   -- stylua: ignore end
 end
 

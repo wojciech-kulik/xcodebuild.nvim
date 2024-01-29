@@ -134,33 +134,35 @@ local function format_line(line, row)
   local status = line.status
   local kind = line.kind
   local name = line.name
-  local icon = get_icon_for_status(status)
-  local icon_len = string.len(icon)
-  local text_hl = get_text_hl_for_kind(kind, status)
 
-  local get_highlights = function(col_start, text_highlight)
+  local icon = get_icon_for_status(status)
+  local text_hl = get_text_hl_for_kind(kind, status)
+  local status_hl = get_hl_for_status(status)
+  local icon_len = string.len(icon)
+
+  local get_highlights = function(col_start)
     return {
       {
         row = row,
         col_start = col_start,
         col_end = icon_len + col_start + 2,
-        group = get_hl_for_status(status),
+        group = status_hl,
       },
       {
         row = row,
         col_start = icon_len + col_start + 2,
         col_end = -1,
-        group = text_highlight,
+        group = text_hl,
       },
     }
   end
 
   if kind == KIND_TEST then
-    return string.format("    [%s] %s", icon, name), get_highlights(4, text_hl)
+    return string.format("    [%s] %s", icon, name), get_highlights(4)
   elseif kind == KIND_CLASS then
-    return string.format("  [%s] %s", icon, name), get_highlights(2, text_hl)
+    return string.format("  [%s] %s", icon, name), get_highlights(2)
   elseif kind == KIND_TARGET then
-    return string.format("[%s] %s", icon, name), get_highlights(0, text_hl)
+    return string.format("[%s] %s", icon, name), get_highlights(0)
   end
 end
 
@@ -186,6 +188,8 @@ local function get_aggregated_status(children)
     elseif child.status == STATUS_PARTIAL_EXECUTION then
       notExecuted = true
       executed = true
+    elseif child.status == STATUS_DISABLED then
+      disabled = true
     end
   end
 
@@ -295,18 +299,12 @@ local function setup_buffer()
   vim.api.nvim_buf_set_option(M.bufnr, "modifiable", false)
 
   vim.api.nvim_buf_set_keymap(M.bufnr, "n", "q", "<cmd>close<cr>", {})
-  vim.api.nvim_buf_set_keymap(M.bufnr, "n", "t", "", {
-    callback = M.run_selected_tests,
-    nowait = true,
-  })
-  vim.api.nvim_buf_set_keymap(M.bufnr, "v", "t", "", {
-    callback = M.run_selected_tests,
-    nowait = true,
-  })
-  vim.api.nvim_buf_set_keymap(M.bufnr, "n", "T", "", {
-    callback = M.repeat_last_run,
-    nowait = true,
-  })
+  vim.api.nvim_buf_set_keymap(M.bufnr, "n", "t", "", { callback = M.run_selected_tests, nowait = true })
+  vim.api.nvim_buf_set_keymap(M.bufnr, "v", "t", "", { callback = M.run_selected_tests, nowait = true })
+  vim.api.nvim_buf_set_keymap(M.bufnr, "n", "T", "", { callback = M.repeat_last_run, nowait = true })
+  vim.api.nvim_buf_set_keymap(M.bufnr, "n", "o", "", { callback = M.open_selected_test, nowait = true })
+  vim.api.nvim_buf_set_keymap(M.bufnr, "n", "<cr>", "", { callback = M.toggle_current_node, nowait = true })
+  vim.api.nvim_buf_set_keymap(M.bufnr, "n", "<tab>", "", { callback = M.toggle_all_classes, nowait = true })
   vim.api.nvim_buf_set_keymap(M.bufnr, "n", "R", "", {
     callback = function()
       require("xcodebuild.coordinator").show_test_explorer(function()
@@ -325,18 +323,6 @@ local function setup_buffer()
     callback = function()
       M.jump_to_failed_test(true)
     end,
-    nowait = true,
-  })
-  vim.api.nvim_buf_set_keymap(M.bufnr, "n", "o", "", {
-    callback = M.open_selected_test,
-    nowait = true,
-  })
-  vim.api.nvim_buf_set_keymap(M.bufnr, "n", "<cr>", "", {
-    callback = M.toggle_current_node,
-    nowait = true,
-  })
-  vim.api.nvim_buf_set_keymap(M.bufnr, "n", "<tab>", "", {
-    callback = M.toggle_all_classes,
     nowait = true,
   })
 end
@@ -383,7 +369,6 @@ function M.toggle_current_node()
         end
 
         vim.api.nvim_win_set_cursor(0, { i, 0 })
-
         break
       end
     end
