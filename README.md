@@ -4,7 +4,7 @@ A plugin that lets you move your iOS, iPadOS and macOS apps development to Neovi
 
 ![Xcodebuild Testing](./media/testing.png)
 
-![Xcodebuild Debugging](./media/debug.png)
+![Xcodebuild Debugging](./media/debugging.png)
 
 ## 🚧 Disclaimer
 
