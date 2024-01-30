@@ -111,7 +111,7 @@ return {
     auto_close_on_success_build = false, -- close logs when build succeeded (only if auto_open_on_success_build=false)
     auto_focus = true, -- focus logs buffer when opened
     filetype = "objc", -- file type set for buffer with logs
-    open_command = "silent bo split {path} | resize 20", -- command used to open logs panel. You must use {path} variable to load the log file
+    open_command = "silent botright 20split {path}", -- command used to open logs panel. You must use {path} variable to load the log file
     logs_formatter = "xcbeautify --disable-colored-output", -- command used to format logs, you can use "" to skip formatting
     only_summary = false, -- if true logs won't be displayed, just xcodebuild.nvim summary
     show_warnings = true, -- show warnings in logs summary
@@ -137,7 +137,7 @@ return {
   test_explorer = {
     enabled = true, -- enable Test Explorer
     auto_open = true, -- opens Test Explorer when tests are started
-    open_command = "bo vertical split Test Explorer | vertical resize 42", -- command used to open Test Explorer
+    open_command = "botright 42vsplit Test Explorer", -- command used to open Test Explorer
     success_sign = "✔", -- passed test icon
     failure_sign = "✖", -- failed test icon
     progress_sign = "…", -- progress icon (only used when animate_status=false)
