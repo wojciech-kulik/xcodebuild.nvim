@@ -2,7 +2,7 @@
 
 A plugin that lets you move your iOS, iPadOS and macOS apps development to Neovim. It supports most of Xcode actions that are required to work with a project, including device selection, building, launching, and testing.
 
-https://github.com/wojciech-kulik/xcodebuild.nvim/assets/3128467/3acdb8f7-0b51-4955-bdbc-25912ff3db80
+![Xcodebuild Testing](./media/testing.png)
 
 ![Xcodebuild Debugging](./media/debug.png)
 
