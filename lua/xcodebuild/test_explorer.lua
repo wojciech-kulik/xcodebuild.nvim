@@ -641,15 +641,15 @@ end
 
 function M.setup()
   -- stylua: ignore start
-  vim.api.nvim_set_hl(0, "XcodebuildTestExplorerTest", { link = "@function", default = true })
-  vim.api.nvim_set_hl(0, "XcodebuildTestExplorerClass", { link = "@type", default = true })
-  vim.api.nvim_set_hl(0, "XcodebuildTestExplorerTarget", { link = "@keyword", default = true })
-  vim.api.nvim_set_hl(0, "XcodebuildTestExplorerTestInProgress", { link = "@operator", default = true })
+  vim.api.nvim_set_hl(0, "XcodebuildTestExplorerTest", { link = "Function", default = true })
+  vim.api.nvim_set_hl(0, "XcodebuildTestExplorerClass", { link = "Type", default = true })
+  vim.api.nvim_set_hl(0, "XcodebuildTestExplorerTarget", { link = "Keyword", default = true })
+  vim.api.nvim_set_hl(0, "XcodebuildTestExplorerTestInProgress", { link = "Operator", default = true })
   vim.api.nvim_set_hl(0, "XcodebuildTestExplorerTestPassed", { link = "DiagnosticOk", default = true })
   vim.api.nvim_set_hl(0, "XcodebuildTestExplorerTestFailed", { link = "DiagnosticError", default = true })
   vim.api.nvim_set_hl(0, "XcodebuildTestExplorerTestPartialExecution", { link = "DiagnosticWarn", default = true })
-  vim.api.nvim_set_hl(0, "XcodebuildTestExplorerTestDisabled", { link = "@comment", default = true })
-  vim.api.nvim_set_hl(0, "XcodebuildTestExplorerTestNotExecuted", { link = "@text", default = true })
+  vim.api.nvim_set_hl(0, "XcodebuildTestExplorerTestDisabled", { link = "Comment", default = true })
+  vim.api.nvim_set_hl(0, "XcodebuildTestExplorerTestNotExecuted", { link = "Normal", default = true })
   -- stylua: ignore end
 end
 
