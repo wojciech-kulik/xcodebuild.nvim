@@ -11,6 +11,7 @@
         message = { "Failed" },
         name = "testCrash",
         success = false,
+        target = "ShortcutRecorderCrashTests",
         testResult = "failed",
         time = "0.000 seconds"
       }, {
@@ -20,6 +21,7 @@
         message = { "Failed" },
         name = "testExample",
         success = false,
+        target = "ShortcutRecorderCrashTests",
         testResult = "failed",
         time = "0.109 seconds"
       }, {
@@ -29,6 +31,7 @@
         message = { "Failed" },
         name = "testFail",
         success = false,
+        target = "ShortcutRecorderCrashTests",
         testResult = "failed",
         time = "0.001 seconds"
       }, {
@@ -37,6 +40,7 @@
         filepath = "/Users/john/repo/something/ShortcutRecorder.swift",
         name = "testOK",
         success = true,
+        target = "ShortcutRecorderCrashTests",
         testResult = "passed",
         time = "0.000 seconds"
       } },
@@ -47,6 +51,7 @@
         message = { "Failed" },
         name = "testSomething_ShouldCrash",
         success = false,
+        target = "ViewModelTests",
         testResult = "failed",
         time = "0.000 seconds"
       }, {
@@ -56,6 +61,7 @@
         message = { "Failed" },
         name = "testSomething_ShouldFail",
         success = false,
+        target = "ViewModelTests",
         testResult = "failed",
         time = "0.105 seconds"
       }, {
@@ -64,6 +70,7 @@
         filepath = "/Users/john/repo/something/Tests/ViewModel.swift",
         name = "testSomething_ShouldPass",
         success = true,
+        target = "ViewModelTests",
         testResult = "passed",
         time = "0.000 seconds"
       }, {
@@ -73,6 +80,7 @@
         message = { "Failed" },
         name = "testSomething_ShouldReturnFail",
         success = false,
+        target = "ViewModelTests",
         testResult = "failed",
         time = "0.001 seconds"
       } }

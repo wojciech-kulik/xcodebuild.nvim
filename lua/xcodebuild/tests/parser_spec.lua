@@ -17,7 +17,14 @@ local mockSwiftFiles = function()
   end
 
   require("xcodebuild.xcode").get_targets_filemap = function(_)
-    return {}
+    return {
+      ["ShortcutRecorderCrashTests"] = {
+        "/Users/john/repo/something/ShortcutRecorder.swift",
+      },
+      ["ViewModelTests"] = {
+        "/Users/john/repo/something/Tests/ViewModel.swift",
+      },
+    }
   end
 end
 
