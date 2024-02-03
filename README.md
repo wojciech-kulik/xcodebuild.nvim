@@ -1,6 +1,6 @@
 # 🛠️ xcodebuild.nvim
 
-A plugin that lets you move your iOS, iPadOS and macOS apps development to Neovim. It supports most of Xcode actions that are required to work with a project, including device selection, building, launching, and testing.
+A plugin designed to let you migrate your iOS, iPadOS, and macOS app development to Neovim. It provides all essential actions for development, including building, launching, and testing.
 
 ![Xcodebuild Testing](./media/testing.png)
 
@@ -8,13 +8,11 @@ A plugin that lets you move your iOS, iPadOS and macOS apps development to Neovi
 
 ## 🚧 Disclaimer
 
-This plugin is in the early stage of development. It was tested on a limited number of projects and configurations. Therefore, it still could be buggy. If you find any issue don't hesitate to fix it and create a pull request or just report it.
+This plugin is in the early stage of development. It was tested on a limited number of projects and configurations. Therefore, it still could be buggy. If you find any issue don't hesitate to fix it or just report it.
 
-I've been looking for a solution to move my development to any other IDE than Xcode for a long time. It seems that this plugin + [nvim-dap](https://github.com/mfussenegger/nvim-dap) + [nvim-dap-ui](https://github.com/rcarriga/nvim-dap-ui) + [nvim-lspconfig](https://github.com/neovim/nvim-lspconfig) + [xcode-build-server](https://github.com/SolaWing/xcode-build-server), all together, provide everything that is needed to move to Neovim with iOS, iPadOS, and macOS apps development.
+I've been looking for a solution to move my development to any other IDE than Xcode for a long time. It seems that this plugin + [nvim-dap](https://github.com/mfussenegger/nvim-dap) + [nvim-dap-ui](https://github.com/rcarriga/nvim-dap-ui) + [nvim-lspconfig](https://github.com/neovim/nvim-lspconfig) + [xcode-build-server](https://github.com/SolaWing/xcode-build-server), provide everything that is needed to move to Neovim with iOS, iPadOS, and macOS apps development.
 
 Of course, you will still need Xcode for some project setup & management. Also, you may need to migrate to [tuist](https://github.com/tuist/tuist) or [xcodegen](https://github.com/yonaskolb/XcodeGen) to be able to add new files easily.
-
-It is also my first Neovim plugin. Hopefully, a good one 😁.
 
 ## ✨ Features
 
