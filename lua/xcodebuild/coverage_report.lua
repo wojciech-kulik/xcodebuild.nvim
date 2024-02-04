@@ -3,6 +3,7 @@ local Line = require("nui.line")
 local Text = require("nui.text")
 local Tree = require("nui.tree")
 local event = require("nui.utils.autocmd").event
+local events = require("xcodebuild.events")
 
 local config = require("xcodebuild.config").options.code_coverage_report
 local appdata = require("xcodebuild.appdata")
@@ -88,10 +89,12 @@ function M.open()
   })
 
   popup:mount()
+  events.toggled_code_coverage_report(true, vim.api.nvim_win_get_buf(popup.winid), popup.winid)
 
   popup:on({ event.BufLeave }, function()
     vim.schedule(function()
       popup:unmount()
+      events.toggled_code_coverage_report(false, nil, nil)
     end)
   end, { once = true })
 

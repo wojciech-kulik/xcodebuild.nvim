@@ -3,6 +3,7 @@ local projectConfig = require("xcodebuild.project_config")
 local util = require("xcodebuild.util")
 local notifications = require("xcodebuild.notifications")
 local snapshots = require("xcodebuild.snapshots")
+local events = require("xcodebuild.events")
 
 local telescopePickers = require("telescope.pickers")
 local telescopeFinders = require("telescope.finders")
@@ -249,6 +250,7 @@ function M.select_testplan(callback, opts)
   M.show("Select Test Plan", {}, function(value, _)
     projectConfig.settings.testPlan = value
     projectConfig.save_settings()
+    events.project_settings_updated(projectConfig.settings)
 
     if callback then
       callback(value)

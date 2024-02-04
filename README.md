@@ -226,6 +226,51 @@ return {
 
 </details>
 
+### 🤖 Customize Behaviors
+
+<details>
+  <summary>See all auto commands</summary>
+
+You can customize integration with xcodebuild.nvim plugin by subscribing to notifications.
+
+Example:
+
+```lua
+vim.api.nvim_create_autocmd("User", {
+  pattern = "XcodebuildTestsFinished",
+  callback = function(event)
+    print("Tests finished (passed: "
+        .. event.data.passedCount
+        .. ", failed: "
+        .. event.data.failedCount
+        .. ")"
+    )
+  end,
+})
+```
+
+Use `print(vim.inspect(event.data))` to see what is exactly provided in the payload.
+
+Below you can find a list of all available auto commands.
+
+| Pattern                            | Provided Data (`event.data`)                                    |
+| ---------------------------------- | --------------------------------------------------------------- |
+| `XcodebuildBuildStarted`           | `forTesting (Boolean)`                                          |
+| `XcodebuildBuildStatus`            | `forTesting (Boolean), progress (Int? [0-100]), duration (Int)` |
+| `XcodebuildBuildFinished`          | `forTesting (Boolean), success (Boolean), errors (Table)`       |
+| `XcodebuildTestsStarted`           | `passedCount (Int), failedCount (Int)`                          |
+| `XcodebuildTestsStatus`            | `passedCount (Int), failedCount (Int)`                          |
+| `XcodebuildTestsFinished`          | `passedCount (Int), failedCount (Int)`                          |
+| `XcodebuildApplicationLaunched`    | none                                                            |
+| `XcodebuildActionCancelled`        | none                                                            |
+| `XcodebuildProjectSettingsUpdated` | `(Table)`                                                       |
+| `XcodebuildTestExplorerToggled`    | `visible (Boolean), bufnr (Int?), winnr (Int?)`                 |
+| `XcodebuildCoverageToggled`        | `(Boolean)`                                                     |
+| `XcodebuildCoverageReportToggled`  | `visible (Boolean), bufnr (Int?), winnr (Int?)`                 |
+| `XcodebuildLogsToggled`            | `visible (Boolean), bufnr (Int?), winnr (Int?)`                 |
+
+</details>
+
 ### 🔎 Test File Search - File Matching
 
 <details>

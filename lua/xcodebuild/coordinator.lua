@@ -12,6 +12,7 @@ local snapshots = require("xcodebuild.snapshots")
 local testSearch = require("xcodebuild.test_search")
 local coverage = require("xcodebuild.coverage")
 local testExplorer = require("xcodebuild.test_explorer")
+local events = require("xcodebuild.events")
 
 local M = {
   report = {},
@@ -82,7 +83,10 @@ end
 
 function M.cancel()
   if M.currentJobId then
-    vim.fn.jobstop(M.currentJobId)
+    if vim.fn.jobstop(M.currentJobId) == 1 then
+      events.action_cancelled()
+    end
+
     M.currentJobId = nil
   end
 end
@@ -147,6 +151,7 @@ function M.run_app(waitForDebugger, callback)
       notifications.send("Launching application...")
       M.currentJobId = xcode.launch_app(settings.destination, settings.bundleId, waitForDebugger, function()
         notifications.send("Application has been launched")
+        events.application_launched()
 
         if callback then
           callback()
@@ -214,6 +219,7 @@ function M.build_project(opts, callback)
   local on_exit = function(_, code, _)
     if code == CANCELLED_CODE then
       notifications.send_build_finished(M.report, buildId, true)
+      events.build_finished(opts.buildForTesting or false, false, nil)
       return
     end
 
@@ -237,7 +243,15 @@ function M.build_project(opts, callback)
     if callback then
       callback(M.report)
     end
+
+    events.build_finished(
+      opts.buildForTesting or false,
+      util.is_empty(M.report.buildErrors),
+      M.report.buildErrors
+    )
   end
+
+  events.build_started(opts.buildForTesting or false)
 
   M.currentJobId = xcode.build_project({
     on_exit = on_exit,
@@ -355,6 +369,7 @@ function M.run_tests(testsToRun, opts)
     M.report = parser.parse_logs(output)
     notifications.show_tests_progress(M.report)
     diagnostics.refresh_all_test_buffers(M.report)
+    events.tests_status(M.report.testsCount - M.report.failedTestsCount, M.report.failedTestsCount)
   end
 
   local on_exit = function(_, code, _)
@@ -362,6 +377,7 @@ function M.run_tests(testsToRun, opts)
 
     if code == CANCELLED_CODE then
       notifications.send_tests_finished(M.report, true)
+      events.tests_finished(M.report.testsCount - M.report.failedTestsCount, M.report.failedTestsCount)
       return
     end
 
@@ -375,7 +391,11 @@ function M.run_tests(testsToRun, opts)
 
     notifications.send_progress("Processing logs...")
     logs.set_logs(M.report, true, process_coverage)
+
+    events.tests_finished(M.report.testsCount - M.report.failedTestsCount, M.report.failedTestsCount)
   end
+
+  events.tests_started()
 
   -- Test Explorer also builds for testing
   M.show_test_explorer(function()

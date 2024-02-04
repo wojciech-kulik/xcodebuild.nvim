@@ -2,6 +2,7 @@ local util = require("xcodebuild.util")
 local config = require("xcodebuild.config").options.test_explorer
 local notifications = require("xcodebuild.notifications")
 local testSearch = require("xcodebuild.test_search")
+local events = require("xcodebuild.events")
 
 local M = {}
 
@@ -604,6 +605,7 @@ function M.hide()
     local winnr = vim.fn.win_findbuf(M.bufnr)
     if winnr and winnr[1] then
       vim.api.nvim_win_close(winnr[1], true)
+      events.toggled_test_explorer(false, nil, nil)
     end
   end
 end
@@ -625,6 +627,7 @@ function M.show()
     vim.cmd(config.open_command)
     M.bufnr = vim.api.nvim_get_current_buf()
     setup_buffer()
+    events.toggled_test_explorer(true, M.bufnr, vim.api.nvim_get_current_win())
   end
 
   refresh_explorer()

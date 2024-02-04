@@ -8,6 +8,7 @@ function M.setup()
   local diagnostics = require("xcodebuild.diagnostics")
   local logs = require("xcodebuild.logs")
   local coverage = require("xcodebuild.coverage")
+  local events = require("xcodebuild.events")
   local autogroup = vim.api.nvim_create_augroup("xcodebuild.nvim", { clear = true })
 
   vim.api.nvim_create_autocmd({ "BufReadPost" }, {
@@ -54,10 +55,7 @@ function M.setup()
         projectConfig.load_settings()
 
         if coverage.is_code_coverage_available() and projectConfig.settings.show_coverage then
-          vim.api.nvim_exec_autocmds("User", {
-            pattern = "XcodebuildCoverageToggled",
-            data = true,
-          })
+          events.toggled_code_coverage(true)
         end
       end,
     })

@@ -4,6 +4,7 @@ local pickers = require("xcodebuild.pickers")
 local logs = require("xcodebuild.logs")
 local coverage = require("xcodebuild.coverage")
 local testExplorer = require("xcodebuild.test_explorer")
+local events = require("xcodebuild.events")
 
 local M = {}
 
@@ -17,6 +18,7 @@ local function update_settings(callback)
   defer_send("Updating project settings...")
   coordinator.update_settings(function()
     notifications.send("Project settings updated")
+    events.project_settings_updated(require("xcodebuild.project_config").settings)
 
     if callback then
       callback()

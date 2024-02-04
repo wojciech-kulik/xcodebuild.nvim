@@ -2,6 +2,7 @@ local util = require("xcodebuild.util")
 local appdata = require("xcodebuild.appdata")
 local config = require("xcodebuild.config").options.logs
 local testSearch = require("xcodebuild.test_search")
+local events = require("xcodebuild.events")
 
 local M = {}
 
@@ -239,6 +240,7 @@ function M.open_logs(scrollToBottom)
   end
 
   split(logsFilepath)
+  events.toggled_logs(true, vim.api.nvim_win_get_buf(0), vim.api.nvim_get_current_win())
 
   if scrollToBottom then -- new buffer should be scrolled
     local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
@@ -255,6 +257,7 @@ function M.close_logs()
 
   if winnr then
     vim.api.nvim_win_close(winnr, true)
+    events.toggled_logs(false, nil, nil)
   end
 end
 

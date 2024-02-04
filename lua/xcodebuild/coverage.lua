@@ -4,6 +4,7 @@ local xcode = require("xcodebuild.xcode")
 local projectConfig = require("xcodebuild.project_config")
 local notifications = require("xcodebuild.notifications")
 local config = require("xcodebuild.config").options.code_coverage
+local events = require("xcodebuild.events")
 
 local M = {}
 
@@ -90,10 +91,7 @@ function M.toggle_code_coverage(isVisible)
   M.refresh_all_buffers()
   notifications.send("Code Coverage: " .. (projectConfig.settings.show_coverage and "on" or "off"))
 
-  vim.api.nvim_exec_autocmds("User", {
-    pattern = "XcodebuildCoverageToggled",
-    data = projectConfig.settings.show_coverage,
-  })
+  events.toggled_code_coverage(projectConfig.settings.show_coverage)
 end
 
 function M.refresh_all_buffers()

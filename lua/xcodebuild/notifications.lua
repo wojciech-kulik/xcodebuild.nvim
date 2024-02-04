@@ -28,9 +28,11 @@ local progressFrames = {
   "......... ",
 }
 
+---@diagnostic disable-next-line: param-type-mismatch
 math.randomseed(tonumber(tostring(os.time()):reverse():sub(1, 9)))
 
-function M.start_action_timer(actionTitle, expectedDuration)
+function M.start_action_timer(buildForTesting, expectedDuration)
+  local actionTitle = buildForTesting and "Building for Testing" or "Building"
   local startTime = os.time()
   local shouldShowProgressBar = require("xcodebuild.config").options.show_build_progress_bar
 
@@ -40,6 +42,8 @@ function M.start_action_timer(actionTitle, expectedDuration)
     if expectedDuration and shouldShowProgressBar then
       local progress
       local numberOfDots = math.floor(duration / expectedDuration * 10.0)
+      local progressPercentage = math.min(100, math.floor(duration / expectedDuration * 100.0))
+      require("xcodebuild.events").build_status(buildForTesting, progressPercentage, duration)
 
       if numberOfDots <= 10 then
         progress = string.rep(".", numberOfDots) .. string.rep(" ", 10 - numberOfDots)
@@ -51,6 +55,7 @@ function M.start_action_timer(actionTitle, expectedDuration)
       M.send_progress(string.format("[ %s ] %s (%d seconds)", progress, actionTitle, duration))
     else
       M.send_progress(string.format("%s [%d seconds]", actionTitle, duration))
+      require("xcodebuild.events").build_status(buildForTesting, nil, duration)
     end
   end, { ["repeat"] = -1 })
 
@@ -74,8 +79,7 @@ function M.send_build_started(buildForTesting)
   local lastBuildTime = projectConfig.settings.lastBuildTime
 
   buildState.id = math.random(10000000)
-  buildState.timer =
-    M.start_action_timer(buildForTesting and "Building for Testing" or "Building", lastBuildTime)
+  buildState.timer = M.start_action_timer(buildForTesting or false, lastBuildTime)
   buildState.startTime = os.time()
 
   return buildState.id
