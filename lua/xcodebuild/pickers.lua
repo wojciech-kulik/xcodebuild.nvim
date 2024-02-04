@@ -444,8 +444,10 @@ function M.show_all_actions()
 
   if config.test_explorer.enabled then
     local row = util.indexOf(actionsNames, "Toggle Logs")
-    table.insert(actionsNames, row + 1, "Toggle Test Explorer")
-    table.insert(actionsPointers, row + 1, actions.test_explorer_toggle)
+    if row then
+      table.insert(actionsNames, row + 1, "Toggle Test Explorer")
+      table.insert(actionsPointers, row + 1, actions.test_explorer_toggle)
+    end
   end
 
   M.show("Xcodebuild Actions", actionsNames, function(_, index)
