@@ -16,10 +16,10 @@ function M.build_status(forTesting, progress, duration)
   })
 end
 
-function M.build_finished(forTesting, success, errors)
+function M.build_finished(forTesting, success, cancelled, errors)
   vim.api.nvim_exec_autocmds("User", {
     pattern = "XcodebuildBuildFinished",
-    data = { forTesting = forTesting, success = success, errors = errors },
+    data = { forTesting = forTesting, success = success, cancelled = cancelled, errors = errors },
   })
 end
 
@@ -38,10 +38,10 @@ function M.tests_status(passedCount, failedCount)
   })
 end
 
-function M.tests_finished(passedCount, failedCount)
+function M.tests_finished(passedCount, failedCount, cancelled)
   vim.api.nvim_exec_autocmds("User", {
     pattern = "XcodebuildTestsFinished",
-    data = { passedCount = passedCount, failedCount = failedCount },
+    data = { passedCount = passedCount, failedCount = failedCount, cancelled = cancelled },
   })
 end
 

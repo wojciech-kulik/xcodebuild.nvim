@@ -47,7 +47,7 @@ function M.build_project(opts, callback)
   local on_exit = function(_, code, _)
     if code == CANCELLED_CODE then
       notifications.send_build_finished(appdata.report, buildId, true)
-      events.build_finished(opts.buildForTesting or false, false, nil)
+      events.build_finished(opts.buildForTesting or false, false, true, {})
       return
     end
 
@@ -73,6 +73,7 @@ function M.build_project(opts, callback)
     events.build_finished(
       opts.buildForTesting or false,
       util.is_empty(appdata.report.buildErrors),
+      false,
       appdata.report.buildErrors
     )
   end

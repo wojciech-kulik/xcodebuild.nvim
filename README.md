@@ -253,21 +253,21 @@ Use `print(vim.inspect(event.data))` to see what is exactly provided in the payl
 
 Below you can find a list of all available auto commands.
 
-| Pattern                            | Provided Data (`event.data`)                                    |
-| ---------------------------------- | --------------------------------------------------------------- |
-| `XcodebuildBuildStarted`           | `forTesting (Boolean)`                                          |
-| `XcodebuildBuildStatus`            | `forTesting (Boolean), progress (Int? [0-100]), duration (Int)` |
-| `XcodebuildBuildFinished`          | `forTesting (Boolean), success (Boolean), errors (Table)`       |
-| `XcodebuildTestsStarted`           | `passedCount (Int), failedCount (Int)`                          |
-| `XcodebuildTestsStatus`            | `passedCount (Int), failedCount (Int)`                          |
-| `XcodebuildTestsFinished`          | `passedCount (Int), failedCount (Int)`                          |
-| `XcodebuildApplicationLaunched`    | none                                                            |
-| `XcodebuildActionCancelled`        | none                                                            |
-| `XcodebuildProjectSettingsUpdated` | `(Table)`                                                       |
-| `XcodebuildTestExplorerToggled`    | `visible (Boolean), bufnr (Int?), winnr (Int?)`                 |
-| `XcodebuildCoverageToggled`        | `(Boolean)`                                                     |
-| `XcodebuildCoverageReportToggled`  | `visible (Boolean), bufnr (Int?), winnr (Int?)`                 |
-| `XcodebuildLogsToggled`            | `visible (Boolean), bufnr (Int?), winnr (Int?)`                 |
+| Pattern                            | Provided Data (`event.data`)                                          |
+| ---------------------------------- | --------------------------------------------------------------------- |
+| `XcodebuildBuildStarted`           | `forTesting (Bool)`                                                   |
+| `XcodebuildBuildStatus`            | `forTesting (Bool), progress (Int? [0-100]), duration (Int)`          |
+| `XcodebuildBuildFinished`          | `forTesting (Bool), success (Bool), cancelled (Bool), errors (Table)` |
+| `XcodebuildTestsStarted`           | `passedCount (Int), failedCount (Int)`                                |
+| `XcodebuildTestsStatus`            | `passedCount (Int), failedCount (Int)`                                |
+| `XcodebuildTestsFinished`          | `passedCount (Int), failedCount (Int), cancelled (Bool)`              |
+| `XcodebuildApplicationLaunched`    | none                                                                  |
+| `XcodebuildActionCancelled`        | none                                                                  |
+| `XcodebuildProjectSettingsUpdated` | `(Table)`                                                             |
+| `XcodebuildTestExplorerToggled`    | `visible (Bool), bufnr (Int?), winnr (Int?)`                          |
+| `XcodebuildCoverageToggled`        | `(Bool)`                                                              |
+| `XcodebuildCoverageReportToggled`  | `visible (Bool), bufnr (Int?), winnr (Int?)`                          |
+| `XcodebuildLogsToggled`            | `visible (Bool), bufnr (Int?), winnr (Int?)`                          |
 
 </details>
 

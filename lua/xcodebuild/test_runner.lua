@@ -142,7 +142,8 @@ function M.run_tests(testsToRun, opts)
       notifications.send_tests_finished(appdata.report, true)
       events.tests_finished(
         appdata.report.testsCount - appdata.report.failedTestsCount,
-        appdata.report.failedTestsCount
+        appdata.report.failedTestsCount,
+        true
       )
       return
     end
@@ -160,7 +161,8 @@ function M.run_tests(testsToRun, opts)
 
     events.tests_finished(
       appdata.report.testsCount - appdata.report.failedTestsCount,
-      appdata.report.failedTestsCount
+      appdata.report.failedTestsCount,
+      false
     )
   end
 
