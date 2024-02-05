@@ -1,3 +1,5 @@
+local xcode = require("xcodebuild.xcode")
+
 local M = {
   settings = {},
 }
@@ -41,6 +43,58 @@ function M.is_project_configured()
     and settings.bundleId
     and settings.appPath
     and settings.productName
+end
+
+function M.update_settings(callback)
+  xcode.get_build_settings(
+    M.settings.platform,
+    M.settings.projectCommand,
+    M.settings.scheme,
+    M.settings.config,
+    function(buildSettings)
+      M.settings.appPath = buildSettings.appPath
+      M.settings.productName = buildSettings.productName
+      M.settings.bundleId = buildSettings.bundleId
+      M.save_settings()
+      if callback then
+        callback()
+      end
+    end
+  )
+end
+
+function M.configure_project()
+  local appdata = require("xcodebuild.appdata")
+  local notifications = require("xcodebuild.notifications")
+
+  appdata.create_app_dir()
+
+  local pickers = require("xcodebuild.pickers")
+  local defer_print = function(text)
+    vim.defer_fn(function()
+      notifications.send(text)
+    end, 100)
+  end
+
+  pickers.select_project(function()
+    pickers.select_xcodeproj_if_needed(function()
+      defer_print("Loading project information...")
+      pickers.select_config(function(projectInfo)
+        pickers.select_scheme(projectInfo.schemes, function()
+          defer_print("Loading devices...")
+          pickers.select_destination(function()
+            defer_print("Updating settings...")
+            M.update_settings(function()
+              defer_print("Loading test plans...")
+              pickers.select_testplan(function()
+                defer_print("Xcodebuild configuration has been saved!")
+              end, { close_on_select = true })
+            end)
+          end)
+        end)
+      end)
+    end)
+  end)
 end
 
 return M

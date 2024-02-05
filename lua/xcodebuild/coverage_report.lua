@@ -3,11 +3,11 @@ local Line = require("nui.line")
 local Text = require("nui.text")
 local Tree = require("nui.tree")
 local event = require("nui.utils.autocmd").event
-local events = require("xcodebuild.events")
 
 local config = require("xcodebuild.config").options.code_coverage_report
 local appdata = require("xcodebuild.appdata")
 local util = require("xcodebuild.util")
+local events = require("xcodebuild.events")
 
 local M = {}
 

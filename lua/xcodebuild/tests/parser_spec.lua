@@ -16,6 +16,7 @@ local mockSwiftFiles = function()
     return "/Users/john/repositories/calendar-app-ios"
   end
 
+  ---@diagnostic disable-next-line: duplicate-set-field
   require("xcodebuild.xcode").get_targets_filemap = function(_)
     return {
       ["ShortcutRecorderCrashTests"] = {

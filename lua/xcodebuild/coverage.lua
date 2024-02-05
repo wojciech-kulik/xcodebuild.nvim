@@ -5,20 +5,12 @@ local projectConfig = require("xcodebuild.project_config")
 local notifications = require("xcodebuild.notifications")
 local config = require("xcodebuild.config").options.code_coverage
 local events = require("xcodebuild.events")
+local helpers = require("xcodebuild.helpers")
 
 local M = {}
 
 local buffersWithCoverage = {}
 local ns = vim.api.nvim_create_namespace("xcodebuild-coverage")
-
-local function validate_project()
-  if not projectConfig.is_project_configured() then
-    notifications.send_error("The project is missing some details. Please run XcodebuildSetup first.")
-    return false
-  end
-
-  return true
-end
 
 local function jump_to_coverage(next)
   if not projectConfig.settings.show_coverage or not config.enabled then
@@ -71,7 +63,7 @@ function M.is_code_coverage_available()
 end
 
 function M.toggle_code_coverage(isVisible)
-  if not validate_project() then
+  if not helpers.validate_project() then
     return
   elseif not config.enabled then
     notifications.send_error("Code coverage is disabled in xcodebuild.nvim config")

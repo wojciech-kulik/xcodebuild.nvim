@@ -2,7 +2,6 @@ local M = {}
 
 function M.setup()
   local appdata = require("xcodebuild.appdata")
-  local coordinator = require("xcodebuild.coordinator")
   local config = require("xcodebuild.config").options
   local projectConfig = require("xcodebuild.project_config")
   local diagnostics = require("xcodebuild.diagnostics")
@@ -24,7 +23,7 @@ function M.setup()
       group = autogroup,
       pattern = "*",
       once = true,
-      callback = coordinator.load_last_report,
+      callback = appdata.load_last_report,
     })
   end
 
@@ -33,7 +32,7 @@ function M.setup()
       group = autogroup,
       pattern = config.marks.file_pattern,
       callback = function(ev)
-        diagnostics.refresh_test_buffer(ev.buf, coordinator.report)
+        diagnostics.refresh_test_buffer(ev.buf, appdata.report)
       end,
     })
   end

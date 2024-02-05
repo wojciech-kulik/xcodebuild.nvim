@@ -2,6 +2,7 @@ local util = require("xcodebuild.util")
 
 local M = {}
 
+M.report = {}
 M.appdir = vim.fn.getcwd() .. "/.nvim/xcodebuild"
 M.original_logs_filename = "original_logs.log"
 M.original_logs_filepath = M.appdir .. "/" .. M.original_logs_filename
@@ -55,6 +56,25 @@ end
 
 function M.write_build_logs(data)
   vim.fn.writefile(data, M.build_logs_filepath)
+end
+
+function M.load_last_report()
+  local parser = require("xcodebuild.parser")
+  local quickfix = require("xcodebuild.quickfix")
+  local diagnostics = require("xcodebuild.diagnostics")
+  local config = require("xcodebuild.config").options
+  local testSearch = require("xcodebuild.test_search")
+
+  parser.clear()
+  M.report = M.read_report() or {}
+
+  if util.is_not_empty(M.report) then
+    vim.defer_fn(function()
+      testSearch.load_targets_map()
+      quickfix.set(M.report)
+      diagnostics.refresh_all_test_buffers(M.report)
+    end, vim.startswith(config.test_search.file_matching, "lsp") and 1000 or 500)
+  end
 end
 
 return M

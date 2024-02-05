@@ -2,6 +2,7 @@ local config = require("xcodebuild.config").options.test_search
 local util = require("xcodebuild.util")
 local xcode = require("xcodebuild.xcode")
 local projectConfig = require("xcodebuild.project_config")
+local helpers = require("xcodebuild.helpers")
 
 local M = {
   targetsFilesMap = {},
@@ -107,7 +108,7 @@ local function load_targets_map_if_needed()
 end
 
 function M.clear()
-  allSwiftFiles = util.find_all_swift_files()
+  allSwiftFiles = helpers.find_all_swift_files()
   classesCache = {}
   missingSymbols = {}
 end

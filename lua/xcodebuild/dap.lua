@@ -2,7 +2,8 @@ local notifications = require("xcodebuild.notifications")
 local util = require("xcodebuild.util")
 local projectConfig = require("xcodebuild.project_config")
 local xcode = require("xcodebuild.xcode")
-local coordinator = require("xcodebuild.coordinator")
+local projectBuilder = require("xcodebuild.project_builder")
+local simulator = require("xcodebuild.simulator")
 
 local M = {}
 
@@ -16,11 +17,11 @@ function M.build_and_debug(callback)
   xcode.kill_app(projectConfig.settings.productName)
   dap.continue()
 
-  coordinator.build_project({}, function(report)
+  projectBuilder.build_project({}, function(report)
     local success = util.is_empty(report.buildErrors)
 
     if success then
-      coordinator.run_app(false, callback)
+      simulator.run_app(false, callback)
     else
       dap.terminate()
 
@@ -41,7 +42,7 @@ function M.debug_without_build(callback)
 
   xcode.kill_app(projectConfig.settings.productName)
   dap.continue()
-  coordinator.run_app(false, callback)
+  simulator.run_app(false, callback)
 end
 
 function M.get_program_path()

@@ -293,8 +293,7 @@ function M.setup_buffer(bufnr)
   vim.api.nvim_buf_set_keymap(bufnr, "n", "q", "<cmd>close<cr>", {})
   vim.api.nvim_buf_set_keymap(bufnr, "n", "o", "", {
     callback = function()
-      local coordinator = require("xcodebuild.coordinator")
-      open_test_file(coordinator.report.tests)
+      open_test_file(appdata.report.tests)
     end,
     nowait = true,
   })

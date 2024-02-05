@@ -6,9 +6,7 @@ local M = {}
 
 function M.save_failing_snapshots(reportPath, callback)
   if not reportPath then
-    if callback then
-      callback()
-    end
+    util.call(callback)
     return
   end
 
@@ -21,9 +19,7 @@ function M.save_failing_snapshots(reportPath, callback)
   return vim.fn.jobstart(command, {
     on_exit = function(_, code)
       if code == 0 then
-        if callback then
-          callback()
-        end
+        util.call(callback)
       else
         notifications.send_error(
           "Saving snapshots failed. Make sure that you have this file: " .. getsnapshotPath

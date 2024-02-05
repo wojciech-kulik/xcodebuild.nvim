@@ -1,10 +1,14 @@
 local notifications = require("xcodebuild.notifications")
-local coordinator = require("xcodebuild.coordinator")
 local pickers = require("xcodebuild.pickers")
 local logs = require("xcodebuild.logs")
 local coverage = require("xcodebuild.coverage")
 local testExplorer = require("xcodebuild.test_explorer")
 local events = require("xcodebuild.events")
+local simulator = require("xcodebuild.simulator")
+local projectBuilder = require("xcodebuild.project_builder")
+local testRunner = require("xcodebuild.test_runner")
+local projectConfig = require("xcodebuild.project_config")
+local helpers = require("xcodebuild.helpers")
 
 local M = {}
 
@@ -16,7 +20,7 @@ end
 
 local function update_settings(callback)
   defer_send("Updating project settings...")
-  coordinator.update_settings(function()
+  projectConfig.update_settings(function()
     notifications.send("Project settings updated")
     events.project_settings_updated(require("xcodebuild.project_config").settings)
 
@@ -42,83 +46,81 @@ function M.show_picker()
   pickers.show_all_actions()
 end
 
-function M.build(callback)
-  coordinator.cancel()
-  coordinator.build_project({}, callback)
-end
-
-function M.clean_build(callback)
-  coordinator.cancel()
-  coordinator.build_project({ clean = true }, callback)
-end
-
-function M.build_for_testing(callback)
-  coordinator.cancel()
-  coordinator.build_project({ buildForTesting = true }, callback)
-end
-
 function M.cancel()
-  coordinator.cancel()
+  helpers.cancel_actions()
   notifications.send("Stopped")
 end
 
 function M.configure_project()
-  coordinator.cancel()
-  coordinator.configure_project()
+  helpers.cancel_actions()
+  projectConfig.configure_project()
+end
+
+function M.build(callback)
+  helpers.cancel_actions()
+  projectBuilder.build_project({}, callback)
+end
+
+function M.clean_build(callback)
+  helpers.cancel_actions()
+  projectBuilder.build_project({ clean = true }, callback)
+end
+
+function M.build_for_testing(callback)
+  helpers.cancel_actions()
+  projectBuilder.build_project({ buildForTesting = true }, callback)
 end
 
 function M.build_and_run(callback)
-  coordinator.cancel()
-  coordinator.build_and_run_app(false, callback)
+  helpers.cancel_actions()
+  projectBuilder.build_and_run_app(false, callback)
+end
+
+function M.clean_derived_data()
+  projectBuilder.clean_derived_data()
 end
 
 function M.run(callback)
-  coordinator.cancel()
-  coordinator.run_app(false, callback)
+  helpers.cancel_actions()
+  simulator.run_app(false, callback)
 end
 
 function M.run_tests()
-  coordinator.cancel()
-  coordinator.run_tests()
+  helpers.cancel_actions()
+  testRunner.run_tests()
 end
 
 function M.run_target_tests()
-  coordinator.cancel()
-  coordinator.run_selected_tests({
-    currentTarget = true,
-  })
+  helpers.cancel_actions()
+  testRunner.run_selected_tests({ currentTarget = true })
 end
 
 function M.run_class_tests()
-  coordinator.cancel()
-  coordinator.run_selected_tests({
-    currentClass = true,
-  })
+  helpers.cancel_actions()
+  testRunner.run_selected_tests({ currentClass = true })
 end
 
 function M.run_func_test()
-  coordinator.cancel()
-  coordinator.run_selected_tests({
-    currentTest = true,
-  })
+  helpers.cancel_actions()
+  testRunner.run_selected_tests({ currentTest = true })
 end
 
 function M.run_selected_tests()
-  coordinator.cancel()
-  coordinator.run_selected_tests({
-    selectedTests = true,
-  })
+  helpers.cancel_actions()
+  testRunner.run_selected_tests({ selectedTests = true })
 end
 
 function M.run_failing_tests()
-  coordinator.cancel()
-  coordinator.run_selected_tests({
-    failingTests = true,
-  })
+  helpers.cancel_actions()
+  testRunner.run_selected_tests({ failingTests = true })
+end
+
+function M.show_failing_snapshot_tests()
+  testRunner.show_failing_snapshot_tests()
 end
 
 function M.select_project(callback)
-  coordinator.cancel()
+  helpers.cancel_actions()
   pickers.select_project(function()
     pickers.select_xcodeproj_if_needed(function()
       update_settings(callback)
@@ -128,7 +130,7 @@ end
 
 function M.select_scheme(callback)
   defer_send("Loading schemes...")
-  coordinator.cancel()
+  helpers.cancel_actions()
 
   pickers.select_xcodeproj_if_needed(function()
     pickers.select_scheme(nil, function()
@@ -139,7 +141,7 @@ end
 
 function M.select_config(callback)
   defer_send("Loading schemes...")
-  coordinator.cancel()
+  helpers.cancel_actions()
 
   pickers.select_xcodeproj_if_needed(function()
     pickers.select_config(function()
@@ -150,37 +152,35 @@ end
 
 function M.select_testplan(callback)
   defer_send("Loading test plans...")
-  coordinator.cancel()
+  helpers.cancel_actions()
   pickers.select_testplan(callback, { close_on_select = true })
 end
 
 function M.select_device(callback)
   defer_send("Loading devices...")
-  coordinator.cancel()
+  helpers.cancel_actions()
   pickers.select_destination(function()
     update_settings(callback)
   end, { close_on_select = true })
 end
 
 function M.show_current_config()
-  coordinator.show_current_config()
-end
+  if not helpers.validate_project() then
+    return
+  end
 
-function M.clean_derived_data()
-  coordinator.clean_derived_data()
+  vim.defer_fn(function()
+    notifications.send_project_settings(projectConfig.settings)
+  end, 100)
 end
 
 function M.uninstall(callback)
-  coordinator.cancel()
-  coordinator.uninstall_app(callback)
+  helpers.cancel_actions()
+  simulator.uninstall_app(callback)
 end
 
 function M.boot_simulator(callback)
-  coordinator.boot_simulator(callback)
-end
-
-function M.show_failing_snapshot_tests()
-  coordinator.show_failing_snapshot_tests()
+  simulator.boot_simulator(callback)
 end
 
 -- Code Coverage

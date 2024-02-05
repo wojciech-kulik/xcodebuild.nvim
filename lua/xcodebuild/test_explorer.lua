@@ -308,7 +308,7 @@ local function setup_buffer()
   vim.api.nvim_buf_set_keymap(M.bufnr, "n", "<tab>", "", { callback = M.toggle_all_classes, nowait = true })
   vim.api.nvim_buf_set_keymap(M.bufnr, "n", "R", "", {
     callback = function()
-      require("xcodebuild.coordinator").show_test_explorer(function()
+      require("xcodebuild.test_runner").show_test_explorer(function()
         notifications.send("")
       end)
     end,
@@ -535,9 +535,8 @@ function M.repeat_last_run()
     return
   end
 
-  local coordinator = require("xcodebuild.coordinator")
-  coordinator.cancel()
-  coordinator.run_tests(last_run_tests, { skipEnumeration = true })
+  require("xcodebuild.helpers").cancel_actions()
+  require("xcodebuild.test_runner").run_tests(last_run_tests, { skipEnumeration = true })
 end
 
 function M.run_selected_tests()
@@ -578,9 +577,8 @@ function M.run_selected_tests()
   end
 
   if #selectedTests > 0 then
-    local coordinator = require("xcodebuild.coordinator")
-    coordinator.cancel()
-    coordinator.run_tests(selectedTests, { skipEnumeration = true })
+    require("xcodebuild.helpers").cancel_actions()
+    require("xcodebuild.test_runner").run_tests(selectedTests, { skipEnumeration = true })
   else
     notifications.send_error("Tests not found")
   end
@@ -616,7 +614,7 @@ function M.show()
   end
 
   if not M.report then
-    require("xcodebuild.coordinator").show_test_explorer(function()
+    require("xcodebuild.test_runner").show_test_explorer(function()
       notifications.send("")
     end)
 

@@ -93,22 +93,6 @@ function M.get_filename(filepath)
   return string.match(filepath, ".*%/([^/]*)%..+$")
 end
 
-function M.find_all_swift_files()
-  local allFiles =
-    M.shell("find '" .. vim.fn.getcwd() .. "' -type f -iname '*.swift' -not -path '*/.*' 2>/dev/null")
-  local map = {}
-
-  for _, filepath in ipairs(allFiles) do
-    local filename = M.get_filename(filepath)
-    if filename then
-      map[filename] = map[filename] or {}
-      table.insert(map[filename], filepath)
-    end
-  end
-
-  return map
-end
-
 function M.shell(cmd)
   local handle = io.popen(cmd)
 
