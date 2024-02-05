@@ -462,7 +462,7 @@ function M.enumerate_tests(opts, callback)
 end
 
 function M.export_code_coverage_report(xcresultPath, outputPath, callback)
-  local command = "xcrun xccov view --report --json " .. xcresultPath .. " > " .. outputPath
+  local command = "xcrun xccov view --report --json '" .. xcresultPath .. "' > '" .. outputPath .. "'"
 
   vim.fn.jobstart(command, {
     stdout_buffered = true,
