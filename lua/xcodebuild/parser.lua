@@ -26,6 +26,10 @@ local warnings = {}
 local diagnostics = {}
 local xcresultFilepath = nil
 
+-- patterns
+local swiftFilePattern = "[^%:]+%.swift"
+local xcTestLogPattern = "%s+%w+%[%d+%:%d+%]"
+
 local function flush_test(message)
   if message then
     table.insert(lineData.message, message)
@@ -52,6 +56,16 @@ local function flush_error(line)
     table.insert(lineData.message, line)
   end
 
+  for _, item in ipairs(buildErrors) do
+    if
+      item.filepath == lineData.filepath
+      and item.lineNumber == lineData.lineNumber
+      and item.message[1] == lineData.message[1]
+    then
+      return
+    end
+  end
+
   table.insert(buildErrors, lineData)
   lineType = BEGIN
   lineData = {}
@@ -62,12 +76,32 @@ local function flush_warning(line)
     table.insert(lineData.message, line)
   end
 
+  for _, item in ipairs(warnings) do
+    if
+      item.filepath == lineData.filepath
+      and item.lineNumber == lineData.lineNumber
+      and item.message[1] == lineData.message[1]
+    then
+      return
+    end
+  end
+
   table.insert(warnings, lineData)
   lineType = BEGIN
   lineData = {}
 end
 
 local function flush_diagnostic(filepath, filename, lineNumber)
+  for _, item in ipairs(diagnostics) do
+    if
+      item.filepath == filepath
+      and item.lineNumber == lineNumber
+      and item.message[1] == lineData.message[1]
+    then
+      return
+    end
+  end
+
   table.insert(diagnostics, {
     filepath = filepath,
     filename = filename,
@@ -106,9 +140,13 @@ local function find_test_line(filepath, testName)
 end
 
 local function parse_build_error(line)
-  if string.find(line, "[^%s]*%.swift%:%d+%:%d*%:? %w*%s*error%: .*") then
+  if string.find(line, xcTestLogPattern) then
+    return
+  end
+
+  if string.find(line, swiftFilePattern .. "%:%d+%:%d*%:? %w*%s*error%: .*") then
     local filepath, lineNumber, colNumber, message =
-      string.match(line, "([^%s]*%.swift)%:(%d+)%:(%d*)%:? %w*%s*error%: (.*)")
+      string.match(line, "(" .. swiftFilePattern .. ")%:(%d+)%:(%d*)%:? %w*%s*error%: (.*)")
     if filepath and message then
       lineType = BUILD_ERROR
       lineData = {
@@ -134,8 +172,12 @@ local function parse_build_error(line)
 end
 
 local function parse_test_error(line)
+  if string.find(line, xcTestLogPattern) then
+    return
+  end
+
   local filepath, lineNumber, message =
-    string.match(line, "([^%s]*%.swift)%:(%d+)%:%d*%:? %w*%s*error%: (.*)")
+    string.match(line, "(" .. swiftFilePattern .. ")%:(%d+)%:%d*%:? %w*%s*error%: (.*)")
 
   if filepath and message then
     -- count only the first error per test
@@ -166,8 +208,12 @@ local function parse_test_error(line)
 end
 
 local function parse_warning(line)
+  if string.find(line, xcTestLogPattern) then
+    return
+  end
+
   local filepath, lineNumber, columnNumber, message =
-    string.match(line, "([^%s]*%.swift)%:(%d+)%:(%d*)%:? %w*%s*warning%: (.*)")
+    string.match(line, "(" .. swiftFilePattern .. ")%:(%d+)%:(%d*)%:? %w*%s*warning%: (.*)")
 
   if filepath and message and util.has_prefix(filepath, vim.fn.getcwd()) then
     lineType = BUILD_WARNING

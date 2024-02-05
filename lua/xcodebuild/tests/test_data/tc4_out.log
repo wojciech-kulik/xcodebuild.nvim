@@ -5,31 +5,6 @@
       filepath = "CalendarAppTestMocks/Mocks.swift",
       lineNumber = 1513,
       message = <1>{ "Unexpectedly found nil while implicitly unwrapeventg an Optional value" }
-    }, {
-      filename = "Mocks",
-      filepath = "CalendarAppTestMocks/Mocks.swift",
-      lineNumber = 1513,
-      message = <2>{ "Unexpectedly found nil while implicitly unwrapeventg an Optional value" }
-    }, {
-      filename = "Mocks",
-      filepath = "CalendarAppTestMocks/Mocks.swift",
-      lineNumber = 1513,
-      message = <3>{ "Unexpectedly found nil while implicitly unwrapeventg an Optional value" }
-    }, {
-      filename = "Mocks",
-      filepath = "CalendarAppTestMocks/Mocks.swift",
-      lineNumber = 1513,
-      message = <4>{ "Unexpectedly found nil while implicitly unwrapeventg an Optional value" }
-    }, {
-      filename = "Mocks",
-      filepath = "CalendarAppTestMocks/Mocks.swift",
-      lineNumber = 1513,
-      message = <5>{ "Unexpectedly found nil while implicitly unwrapeventg an Optional value" }
-    }, {
-      filename = "Mocks",
-      filepath = "CalendarAppTestMocks/Mocks.swift",
-      lineNumber = 1513,
-      message = <6>{ "Unexpectedly found nil while implicitly unwrapeventg an Optional value" }
     } },
   failedTestsCount = 3,
   output = {},
@@ -168,16 +143,7 @@
         class = "ConfirmPhoneNumberViewModelTests",
         filename = "ConfirmPhoneNumberViewModelTests",
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppOnboarding/Tests/Modules/ConfirmPhoneNumber/ConfirmPhoneNumberViewModelTests.swift",
-        message = <table 2>,
-        name = "testOnLoadAsync_ShouldSetMaskedPhoneNumber_WhenDataIsFetched",
-        success = false,
-        target = "CalendarAppOnboardingTests",
-        testResult = "failed"
-      }, {
-        class = "ConfirmPhoneNumberViewModelTests",
-        filename = "ConfirmPhoneNumberViewModelTests",
-        filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppOnboarding/Tests/Modules/ConfirmPhoneNumber/ConfirmPhoneNumberViewModelTests.swift",
-        message = <table 3>,
+        message = { "Unexpectedly found nil while implicitly unwrapeventg an Optional value" },
         name = "testOnLoadAsync_ShouldSetFormattedPrefix_WhenDataIsFetched",
         success = false,
         target = "CalendarAppOnboardingTests",
@@ -186,25 +152,7 @@
         class = "ConfirmPhoneNumberViewModelTests",
         filename = "ConfirmPhoneNumberViewModelTests",
         filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppOnboarding/Tests/Modules/ConfirmPhoneNumber/ConfirmPhoneNumberViewModelTests.swift",
-        message = <table 4>,
-        name = "testOnLoadAsync_ShouldSetFormattedPrefix_WhenDataIsFetched",
-        success = false,
-        target = "CalendarAppOnboardingTests",
-        testResult = "failed"
-      }, {
-        class = "ConfirmPhoneNumberViewModelTests",
-        filename = "ConfirmPhoneNumberViewModelTests",
-        filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppOnboarding/Tests/Modules/ConfirmPhoneNumber/ConfirmPhoneNumberViewModelTests.swift",
-        message = <table 5>,
-        name = "testOnLoadAsync_ShouldSetError_WhenDataFetchFailed",
-        success = false,
-        target = "CalendarAppOnboardingTests",
-        testResult = "failed"
-      }, {
-        class = "ConfirmPhoneNumberViewModelTests",
-        filename = "ConfirmPhoneNumberViewModelTests",
-        filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppOnboarding/Tests/Modules/ConfirmPhoneNumber/ConfirmPhoneNumberViewModelTests.swift",
-        message = <table 6>,
+        message = { "Unexpectedly found nil while implicitly unwrapeventg an Optional value" },
         name = "testOnLoadAsync_ShouldSetError_WhenDataFetchFailed",
         success = false,
         target = "CalendarAppOnboardingTests",
