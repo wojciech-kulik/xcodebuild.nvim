@@ -258,7 +258,7 @@ Below you can find a list of all available auto commands.
 | `XcodebuildBuildStarted`           | `forTesting (Bool)`                                                   |
 | `XcodebuildBuildStatus`            | `forTesting (Bool), progress (Int? [0-100]), duration (Int)`          |
 | `XcodebuildBuildFinished`          | `forTesting (Bool), success (Bool), cancelled (Bool), errors (Table)` |
-| `XcodebuildTestsStarted`           | `passedCount (Int), failedCount (Int)`                                |
+| `XcodebuildTestsStarted`           | none                                                                  |
 | `XcodebuildTestsStatus`            | `passedCount (Int), failedCount (Int)`                                |
 | `XcodebuildTestsFinished`          | `passedCount (Int), failedCount (Int), cancelled (Bool)`              |
 | `XcodebuildApplicationLaunched`    | none                                                                  |
