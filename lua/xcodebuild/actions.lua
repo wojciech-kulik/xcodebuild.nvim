@@ -9,6 +9,7 @@ local projectBuilder = require("xcodebuild.project_builder")
 local testRunner = require("xcodebuild.test_runner")
 local projectConfig = require("xcodebuild.project_config")
 local helpers = require("xcodebuild.helpers")
+local projectManager = require("xcodebuild.project_manager")
 
 local M = {}
 
@@ -221,6 +222,52 @@ end
 
 function M.test_explorer_rerun_tests()
   testExplorer.repeat_last_run()
+end
+
+-- Project Management
+
+function M.create_new_file()
+  projectManager.create_new_file()
+end
+
+function M.add_current_file()
+  projectManager.add_current_file()
+end
+
+function M.rename_current_file()
+  projectManager.rename_current_file()
+end
+
+function M.delete_current_file()
+  projectManager.delete_current_file()
+end
+
+function M.create_new_group()
+  projectManager.create_new_group()
+end
+
+function M.add_current_group()
+  projectManager.add_current_group()
+end
+
+function M.rename_current_group()
+  projectManager.rename_current_group()
+end
+
+function M.delete_current_group()
+  projectManager.delete_current_group()
+end
+
+function M.show_current_file_targets()
+  projectManager.show_current_file_targets()
+end
+
+function M.update_current_file_targets()
+  projectManager.update_current_file_targets()
+end
+
+function M.show_project_manager_actions()
+  projectManager.show_action_picker()
 end
 
 return M

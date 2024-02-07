@@ -17,6 +17,7 @@ M.coverage_filepath = M.appdir .. "/coverage.xccovarchive"
 M.coverage_report_filepath = M.appdir .. "/coverage.json"
 
 GETSNAPSHOTS_TOOL = "getsnapshots"
+PROJECT_HELPER_TOOL = "project_helper.rb"
 
 function M.tool_path(name)
   local pathComponents = vim.split(debug.getinfo(1).source:sub(2), "/", { plain = true })

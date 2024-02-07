@@ -6,18 +6,11 @@ A plugin designed to let you migrate your iOS, iPadOS, and macOS app development
 
 ![Xcodebuild Debugging](./media/debugging.png)
 
-## 🚧 Disclaimer
-
-This plugin is in the early stage of development. It was tested on a limited number of projects and configurations. Therefore, it still could be buggy. If you find any issue don't hesitate to fix it or just report it.
-
-I've been looking for a solution to move my development to any other IDE than Xcode for a long time. It seems that this plugin + [nvim-dap](https://github.com/mfussenegger/nvim-dap) + [nvim-dap-ui](https://github.com/rcarriga/nvim-dap-ui) + [nvim-lspconfig](https://github.com/neovim/nvim-lspconfig) + [xcode-build-server](https://github.com/SolaWing/xcode-build-server), provide everything that is needed to move to Neovim with iOS, iPadOS, and macOS apps development.
-
-Of course, you will still need Xcode for some project setup & management. Also, you may need to migrate to [tuist](https://github.com/tuist/tuist) or [xcodegen](https://github.com/yonaskolb/XcodeGen) to be able to add new files easily.
-
 ## ✨ Features
 
 - [x] Support for iOS, iPadOS, and macOS apps.
 - [x] Project-based configuration.
+- [x] Project Manager to manage files without using Xcode.
 - [x] Configuration wizard to setup: project file, scheme, config, device, and test plan.
 - [x] Built based on core command line tools like `xcodebuild` and `xcrun simctl`. It doesn't require any external tools, only `xcbeautify` to format logs, but it could be changed in configuration.
 - [x] Build, run and test actions.
@@ -45,6 +38,7 @@ Of course, you will still need Xcode for some project setup & management. Also, 
 - [telescope.nvim](https://github.com/nvim-telescope/telescope.nvim) used to present pickers by the plugin.
 - [nui.nvim](https://github.com/MunifTanjim/nui.nvim) used to present code coverage report.
 - [xcbeautify](https://github.com/tuist/xcbeautify) - Xcode logs formatter (optional - you can set a different tool or disable formatting in the config).
+- [Xcodeproj](https://github.com/CocoaPods/Xcodeproj) - required by Project Manager to manage project files.
 - Xcode (make sure that `xcodebuild` and `xcrun simctl` work correctly).
 - To get the best experience with apps development, you should install and configure [nvim-dap](https://github.com/mfussenegger/nvim-dap) and [nvim-dap-ui](https://github.com/rcarriga/nvim-dap-ui) to be able to debug.
 - This plugin requires the project to be written in Swift. It was tested only with Xcode 15.
@@ -54,6 +48,7 @@ Install tools:
 
 ```shell
 brew install xcbeautify
+gem install xcodeproj
 ```
 
 ## 📦 Installation
@@ -405,6 +400,25 @@ Xcodebuild.nvim comes with the following commands:
 | `XcodebuildOpenLogs`         | Open logs panel                                          |
 | `XcodebuildCloseLogs`        | Close logs panel                                         |
 
+### Project Manager
+
+| Command                              | Description                                                |
+| ------------------------------------ | ---------------------------------------------------------- |
+| `XcodebuildProjectManager`           | Show picker with all Project Manager actions               |
+| `XcodebuildCreateNewFile`            | Create a new file and add it to target(s)                  |
+| `XcodebuildAddCurrentFile`           | Add the active file to target(s)                           |
+| `XcodebuildRenameCurrentFile`        | Rename the current file                                    |
+| `XcodebuildDeleteCurrentFile`        | Delete the current file                                    |
+| `XcodebuildCreateNewGroup`           | Create a new directory and add it to the project           |
+| `XcodebuildAddCurrentGroup`          | Add the parent directory of the active file to the project |
+| `XcodebuildRenameCurrentGroup`       | Rename the current directory                               |
+| `XcodebuildDeleteCurrentGroup`       | Delete the current directory including all files inside    |
+| `XcodebuildUpdateCurrentFileTargets` | Update target membership of the active file                |
+| `XcodebuildShowCurrentFileTargets`   | Show target membership of the active file                  |
+
+> [!TIP]
+> To add a file to multiple targets use multi-select feature (by default `tab`).
+
 ### Testing
 
 | Command                      | Description                               |
@@ -454,28 +468,32 @@ Xcodebuild.nvim comes with the following commands:
 ### ⌘ Sample Key Bindings
 
 ```lua
--- Lua
-vim.keymap.set("n", "<leader>X", "<cmd>XcodebuildPicker<cr>", { desc = "Show All Xcodebuild Actions" })
-vim.keymap.set("n", "<leader>xl", "<cmd>XcodebuildToggleLogs<cr>", { desc = "Toggle Xcodebuild Logs" })
+vim.keymap.set("n", "<leader>X", "<cmd>XcodebuildPicker<cr>", { desc = "Show Xcodebuild Actions" })
+vim.keymap.set("n", "<leader>xf", "<cmd>XcodebuildProjectManager<cr>", { desc = "Show Project Manager Actions" })
+
 vim.keymap.set("n", "<leader>xb", "<cmd>XcodebuildBuild<cr>", { desc = "Build Project" })
+vim.keymap.set("n", "<leader>xB", "<cmd>XcodebuildBuildForTesting<cr>", { desc = "Build For Testing" })
 vim.keymap.set("n", "<leader>xr", "<cmd>XcodebuildBuildRun<cr>", { desc = "Build & Run Project" })
+
 vim.keymap.set("n", "<leader>xt", "<cmd>XcodebuildTest<cr>", { desc = "Run Tests" })
 vim.keymap.set("v", "<leader>xt", "<cmd>XcodebuildTestSelected<cr>", { desc = "Run Selected Tests" })
 vim.keymap.set("n", "<leader>xT", "<cmd>XcodebuildTestClass<cr>", { desc = "Run This Test Class" })
-vim.keymap.set("n", "<leader>xf", "<cmd>XcodebuildTestTarget<cr>", { desc = "Run This Test Target" })
-vim.keymap.set("n", "<leader>xd", "<cmd>XcodebuildSelectDevice<cr>", { desc = "Select Device" })
-vim.keymap.set("n", "<leader>xp", "<cmd>XcodebuildSelectTestPlan<cr>", { desc = "Select Test Plan" })
-vim.keymap.set("n", "<leader>xs", "<cmd>XcodebuildFailingSnapshots<cr>", { desc = "Show Failing Snapshots" })
+
+vim.keymap.set("n", "<leader>xl", "<cmd>XcodebuildToggleLogs<cr>", { desc = "Toggle Xcodebuild Logs" })
 vim.keymap.set("n", "<leader>xc", "<cmd>XcodebuildToggleCodeCoverage<cr>", { desc = "Toggle Code Coverage" })
 vim.keymap.set("n", "<leader>xC", "<cmd>XcodebuildShowCodeCoverageReport<cr>", { desc = "Show Code Coverage Report" })
 vim.keymap.set("n", "<leader>xe", "<cmd>XcodebuildTestExplorerToggle<cr>", { desc = "Toggle Test Explorer" })
-vim.keymap.set("n", "[r", "<cmd>XcodebuildJumpToPrevCoverage<cr>", { desc = "Jump To Previous Coverage" })
-vim.keymap.set("n", "]r", "<cmd>XcodebuildJumpToNextCoverage<cr>", { desc = "Jump To Next Coverage" })
+vim.keymap.set("n", "<leader>xs", "<cmd>XcodebuildFailingSnapshots<cr>", { desc = "Show Failing Snapshots" })
+
+vim.keymap.set("n", "<leader>xd", "<cmd>XcodebuildSelectDevice<cr>", { desc = "Select Device" })
+vim.keymap.set("n", "<leader>xp", "<cmd>XcodebuildSelectTestPlan<cr>", { desc = "Select Test Plan" })
 vim.keymap.set("n", "<leader>xq", "<cmd>Telescope quickfix<cr>", { desc = "Show QuickFix List" })
 ```
 
 > [!TIP]
 > Press `<leader>X` to access the picker with all commands.
+>
+> Press `<leader>xf` to access the picker with all Project Manager commands.
 
 ### 📋 Logs Panel
 

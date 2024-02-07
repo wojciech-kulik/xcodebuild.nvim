@@ -109,23 +109,23 @@ function M.clean_derived_data()
     return
   end
 
-  local dir = string.match(derivedDataPath, "/([^/]+)$")
-
   vim.defer_fn(function()
-    vim.ui.input({ prompt = "Delete " .. dir .. "? [y/n]" }, function(input)
-      if input == "y" then
-        notifications.send("Deleting: " .. derivedDataPath .. "...")
-        vim.fn.jobstart("rm -rf '" .. derivedDataPath .. "'", {
-          on_exit = function(_, code)
-            if code == 0 then
-              notifications.send("Deleted: " .. derivedDataPath)
-            else
-              notifications.send_error("Failed to delete: " .. derivedDataPath)
-            end
-          end,
-        })
-      end
-    end)
+    local input = vim.fn.input("Delete " .. derivedDataPath .. "? (y/n) ", "")
+    vim.cmd("echom ''")
+
+    if input == "y" then
+      notifications.send("Deleting: " .. derivedDataPath .. "...")
+
+      vim.fn.jobstart("rm -rf '" .. derivedDataPath .. "'", {
+        on_exit = function(_, code)
+          if code == 0 then
+            notifications.send("Deleted: " .. derivedDataPath)
+          else
+            notifications.send_error("Failed to delete: " .. derivedDataPath)
+          end
+        end,
+      })
+    end
   end, 200)
 end
 

@@ -10,6 +10,7 @@ local telescopeFinders = require("telescope.finders")
 local telescopeConfig = require("telescope.config").values
 local telescopeActions = require("telescope.actions")
 local telescopeState = require("telescope.actions.state")
+local telescopeActionsUtils = require("telescope.actions.utils")
 
 local M = {}
 
@@ -76,6 +77,8 @@ function M.show(title, items, callback, opts)
     currentJobId = nil
   end
 
+  opts = opts or {}
+
   activePicker = telescopePickers.new(require("telescope.themes").get_dropdown({}), {
     prompt_title = title,
     finder = telescopeFinders.new_table({
@@ -86,12 +89,27 @@ function M.show(title, items, callback, opts)
       telescopeActions.select_default:replace(function()
         local selection = telescopeState.get_selected_entry()
 
+        local results = {}
+        if opts.multiselect then
+          telescopeActionsUtils.map_selections(prompt_bufnr, function(sel)
+            table.insert(results, sel[1])
+          end)
+
+          if util.is_empty(results) and selection then
+            table.insert(results, selection[1])
+          end
+        end
+
         if opts and opts.close_on_select and selection then
           telescopeActions.close(prompt_bufnr)
         end
 
         if callback and selection then
-          callback(selection[1], selection.index)
+          if opts.multiselect then
+            callback(results)
+          else
+            callback(selection[1], selection.index)
+          end
         end
       end)
       return true
@@ -383,10 +401,11 @@ function M.show_all_actions()
     "Select Test Plan",
 
     "Toggle Logs",
-    "Clean DerivedData",
+    "Show Project Manager",
     "Show Current Configuration",
     "Show Configuration Wizard",
     "Boot Selected Simulator",
+    "Clean DerivedData",
     "Uninstall Application",
   }
   local actionsPointers = {
@@ -411,10 +430,11 @@ function M.show_all_actions()
     actions.select_testplan,
 
     actions.toggle_logs,
-    actions.clean_derived_data,
+    actions.show_project_manager_actions,
     actions.show_current_config,
     actions.configure_project,
     actions.boot_simulator,
+    actions.clean_derived_data,
     actions.uninstall,
   }
 

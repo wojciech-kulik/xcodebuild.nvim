@@ -106,6 +106,19 @@ function M.setup(options)
   vim.api.nvim_create_user_command("XcodebuildOpenLogs", call(actions.open_logs), { nargs = 0 })
   vim.api.nvim_create_user_command("XcodebuildCloseLogs", call(actions.close_logs), { nargs = 0 })
 
+  -- Project Manager
+  vim.api.nvim_create_user_command("XcodebuildProjectManager", call(actions.show_project_manager_actions), { nargs = 0 })
+  vim.api.nvim_create_user_command("XcodebuildCreateNewFile", call(actions.create_new_file), { nargs = 0 })
+  vim.api.nvim_create_user_command("XcodebuildAddCurrentFile", call(actions.add_current_file), { nargs = 0 })
+  vim.api.nvim_create_user_command("XcodebuildDeleteCurrentFile", call(actions.delete_current_file), { nargs = 0 })
+  vim.api.nvim_create_user_command("XcodebuildRenameCurrentFile", call(actions.rename_current_file), { nargs = 0 })
+  vim.api.nvim_create_user_command("XcodebuildCreateNewGroup", call(actions.create_new_group), { nargs = 0 })
+  vim.api.nvim_create_user_command("XcodebuildAddCurrentGroup", call(actions.add_current_group), { nargs = 0 })
+  vim.api.nvim_create_user_command("XcodebuildRenameCurrentGroup", call(actions.rename_current_group), { nargs = 0 })
+  vim.api.nvim_create_user_command("XcodebuildDeleteCurrentGroup", call(actions.delete_current_group), { nargs = 0 })
+  vim.api.nvim_create_user_command("XcodebuildUpdateCurrentFileTargets", call(actions.update_current_file_targets), { nargs = 0 })
+  vim.api.nvim_create_user_command("XcodebuildShowCurrentFileTargets", call(actions.show_current_file_targets), { nargs = 0 })
+
   -- Other
   vim.api.nvim_create_user_command("XcodebuildShowConfig", call(actions.show_current_config), { nargs = 0 })
   vim.api.nvim_create_user_command("XcodebuildBootSimulator", call(actions.boot_simulator), { nargs = 0 })
