@@ -92,6 +92,18 @@ function M.set(report)
     insert_diagnostics_for_test_errors(quickfix, report.diagnostics or {})
   end
 
+  table.sort(quickfix, function(a, b)
+    if a.filename == b.filename then
+      if a.lnum == b.lnum then
+        return (a.col or 0) < (b.col or 0)
+      end
+
+      return a.lnum < b.lnum
+    end
+
+    return a.filename < b.filename
+  end)
+
   vim.fn.setqflist(quickfix, "r")
 end
 
