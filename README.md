@@ -416,8 +416,7 @@ Xcodebuild.nvim comes with the following commands:
 | `XcodebuildUpdateCurrentFileTargets` | Update target membership of the active file                |
 | `XcodebuildShowCurrentFileTargets`   | Show target membership of the active file                  |
 
-> [!TIP]
-> To add a file to multiple targets use multi-select feature (by default `tab`).
+👉 To add a file to multiple targets use multi-select feature (by default `tab`).
 
 ### Testing
 
