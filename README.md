@@ -8,30 +8,22 @@ A plugin designed to let you migrate your iOS, iPadOS, and macOS app development
 
 ## ✨ Features
 
-- [x] Support for iOS, iPadOS, and macOS apps.
+- [x] Support for iOS, iPadOS, and macOS apps built using Swift.
 - [x] Project-based configuration.
-- [x] Project Manager to manage files without using Xcode.
-- [x] Configuration wizard to setup: project file, scheme, config, device, and test plan.
-- [x] Built based on core command line tools like `xcodebuild` and `xcrun simctl`. It doesn't require any external tools, only `xcbeautify` to format logs, but it could be changed in configuration.
-- [x] Build, run and test actions.
-- [x] Test Explorer to visually present all tests and results.
+- [x] Project Manager to deal with project files without using Xcode.
+- [x] Test Explorer to visually present a tree with all tests and results.
+- [x] Built using official command line tools like `xcodebuild` and `xcrun simctl`.
+- [x] Actions to build, run, debug, and test apps.
 - [x] App deployment to selected iOS simulator.
-- [x] Uninstall mobile app.
-- [x] Running only selected tests (one test, one class, selected tests in visual mode, whole test plan).
-- [x] Showing icons with test result next to each test.
-- [x] Showing test duration next to each test.
-- [x] Showing test errors in diagnostics and on the quickfix list.
-- [x] Showing build errors and warnings on the quickfix list.
-- [x] Showing build progress bar based on the previous build time.
-- [x] Showing code coverage.
-- [x] Showing preview of failed snapshot tests (if you use [swift-snapshot-testing](https://github.com/pointfreeco/swift-snapshot-testing))
-- [x] Advanced log parser to detect all errors, warnings, and failing tests and to present them nicely formatted.
-- [x] Auto saving files before build or test actions.
+- [x] Buffer integration with test results (code coverage, success & failure marks, duration, extra diagnostics).
+- [x] Code coverage report with customizable levels.
+- [x] Browser of failing snapshot tests with a diff preview (if you use [swift-snapshot-testing](https://github.com/pointfreeco/swift-snapshot-testing)).
+- [x] Advanced log parser to detect all errors, warnings, and failing tests to present them nicely formatted.
 - [x] [nvim-dap](https://github.com/mfussenegger/nvim-dap) helper functions to let you easily build, run, and attach the debugger.
 - [x] [nvim-dap-ui](https://github.com/rcarriga/nvim-dap-ui) integration with console window to show app logs.
-- [x] [lualine.nvim](https://github.com/nvim-lualine/lualine.nvim) integration to show current device and project settings.
-- [x] [telescope.nvim](https://github.com/nvim-telescope/telescope.nvim) integration to show pickers with selectable project options.
+- [x] [lualine.nvim](https://github.com/nvim-lualine/lualine.nvim) integration to show selected device, test plan, and other project settings.
 - [x] Picker with all available actions.
+- [x] Highly customizable (many config options, auto commands, highlights, and user commands).
 
 ## ⚡️ Requirements
 
@@ -41,9 +33,9 @@ A plugin designed to let you migrate your iOS, iPadOS, and macOS app development
 - [xcbeautify](https://github.com/tuist/xcbeautify) - Xcode logs formatter (optional - you can set a different tool or disable formatting in the config).
 - [Xcodeproj](https://github.com/CocoaPods/Xcodeproj) - required by Project Manager to manage project files.
 - Xcode (make sure that `xcodebuild` and `xcrun simctl` work correctly).
-- To get the best experience with apps development, you should install and configure [nvim-dap](https://github.com/mfussenegger/nvim-dap) and [nvim-dap-ui](https://github.com/rcarriga/nvim-dap-ui) to be able to debug.
-- This plugin requires the project to be written in Swift. It was tested only with Xcode 15.
-- Make sure to configure LSP properly for iOS/macOS apps. You can read how to do that in my post: [The Complete Guide To iOS & macOS Development In Neovim](https://wojciechkulik.pl/ios/the-complete-guide-to-ios-macos-development-in-neovim).
+- To get the best experience, you should install and configure [nvim-dap](https://github.com/mfussenegger/nvim-dap) and [nvim-dap-ui](https://github.com/rcarriga/nvim-dap-ui) to be able to debug.
+- This plugin requires the project to be built using Swift. It was tested only with Xcode 15.
+- Make sure to configure LSP properly. You can read how to do that in my post: [The Complete Guide To iOS & macOS Development In Neovim](https://wojciechkulik.pl/ios/the-complete-guide-to-ios-macos-development-in-neovim).
 
 Install tools:
 
@@ -54,7 +46,7 @@ gem install xcodeproj
 
 ## 📦 Installation
 
-Install the plugin using your preferred package manager:
+Install the plugin using your preferred package manager.
 
 ### 💤 [lazy.nvim](https://github.com/folke/lazy.nvim)
 
@@ -309,7 +301,7 @@ In order to support multiple cases, the plugin allows you to choose the search m
 
 ### 📦 Swift Packages Development
 
-This plugin supports only iOS and macOS applications. However, if you develop Swift Package for one of those platforms, you can easily use this plugin by creating a sample iOS/macOS project in your root directory and adding your package as a dependency.
+This plugin supports only iOS and macOS applications. However, if you develop Swift Package for one of those platforms, you can easily use this plugin by creating a sample iOS/macOS project in your root directory and by adding your package as a dependency.
 
 ### 🔬 DAP Integration
 
@@ -384,12 +376,12 @@ return {
 
 ### 🐛 Simulator Logs
 
-If you installed `nvim-dap` and `nvim-dap-ui`, you can easily track your app logs. The plugin automatically transfers simulator logs to the `console` window provided by `nvim-dap-ui`.
+If you installed [nvim-dap](https://github.com/mfussenegger/nvim-dap) and [nvim-dap-ui](https://github.com/rcarriga/nvim-dap-ui), you can easily track your app logs. The plugin automatically sends simulator logs to the `console` window provided by [nvim-dap-ui](https://github.com/rcarriga/nvim-dap-ui).
 
 > [!TIP]
 > Config options allow you to filter and format each line.
 
-To see logs you don't need to run the debugger. You can just show the `console` and run the app (remember that the app needs to be launched by xcodebuild.nvim).
+To see logs you don't need to run the debugger. You can just show the `console` and run the app (remember that the app must be launched by xcodebuild.nvim).
 
 ```
 :lua require("dapui").toggle()
@@ -398,20 +390,21 @@ To see logs you don't need to run the debugger. You can just show the `console` 
 > [!IMPORTANT]
 > Logs printed by `NSLog` will appear only if the debugger is NOT attached.
 
-> [!TIP]
-> You can use the command below to clear the console
->
-> ```
-> :lua require("xcodebuild.dap").clear_console()
-> ```
+Use this command to clear the console:
+
+```
+:lua require("xcodebuild.dap").clear_console()
+```
 
 #### Logs without using nvim-dap
 
-If you don't want to use `nvim-dap` you can always print logs directly to your terminal by calling (from your project root directory):
+If you don't want to use [nvim-dap](https://github.com/mfussenegger/nvim-dap) you can always print logs directly to your terminal by calling (from your project root directory):
 
 ```bash
 tail -f .nvim/xcodebuild/simulator_logs.log
 ```
+
+This approach works especially well if you are using tmux.
 
 ## 🚀 Usage
 
@@ -648,26 +641,35 @@ If you want to use functions directly instead of user commands, then please see 
 
 ### 🧰 Troubleshooting
 
-Loading project configuration is a very complex task that relies on parsing multiple crazy outputs from `xcodebuild` commands. Those logs are a pure nightmare to parse. It may not always work. In case of any issues with that, you can try manually providing the configuration by adding `.nvim/xcodebuild/settings.json` file in your root directory.
+Processing the project configuration is a very complex task that relies on parsing multiple crazy outputs from `xcodebuild` commands. Those logs are a pure nightmare to work with. This process may not always work.
 
-Sample `settings.json`:
+In case of any issues with, you can try manually providing the configuration file `.nvim/xcodebuild/settings.json` in your root directory.
+
+<details>
+    <summary>See a sample settings.json file</summary>
 
 ```json
 {
-  "platform": "iOS",
-  "testPlan": "UnitTests",
-  "config": "Debug",
-  "xcodeproj": "/path/to/project/App.xcodeproj",
-  "projectFile": "/path/to/project/App.xcworkspace",
-  "projectCommand": "-workspace '/path/to/project/App.xcworkspace'",
   "bundleId": "com.company.bundle-id",
-  "destination": "00006000-000C58DC1ED8801E",
-  "productName": "App",
+  "show_coverage": false,
+  "deviceName": "iPhone 15",
+  "destination": "28B52DAA-BC2F-410B-A5BE-F485A3AFB0BC",
+  "config": "Debug",
+  "testPlan": "YourTestPlanName",
+  "projectFile": "/path/to/project/App.xcodeproj",
   "scheme": "App",
+  "platform": "iOS Simulator",
+  "productName": "App",
+  "projectCommand": "-workspace '/path/to/project/App.xcworkspace'",
+  "xcodeproj": "/path/to/project/App.xcodeproj",
+  "lastBuildTime": 10,
+  "os": "17.2",
   "appPath": "/Users/YOU/Library/Developer/Xcode/DerivedData/App-abafsafasdfasdf/Build/Products/Debug/App.app"
 }
 ```
 
-- `platform` - `macOS` or `iOS`
+- `platform` - `macOS` or `iOS Simulator`
 - `destination` - simulator ID
 - `projectFile` / `projectCommand` - can be `xcodeproj` or `xcworkspace`, the main project file that you use
+
+</details>
