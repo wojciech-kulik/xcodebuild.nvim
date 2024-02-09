@@ -297,23 +297,60 @@ function M.install_app(destination, appPath, callback)
 end
 
 function M.launch_app(destination, bundleId, waitForDebugger, callback)
-  local command = "xcrun simctl launch --terminate-running-process '" .. destination .. "' " .. bundleId
+  local command = "xcrun simctl launch --terminate-running-process --console-pty '"
+    .. destination
+    .. "' "
+    .. bundleId
+  local logFile = require("xcodebuild.appdata").simulator_logs_filepath
 
   if waitForDebugger then
     command = command .. " --wait-for-debugger"
   end
 
+  local config = require("xcodebuild.config").options.console_logs
+  local write_logs = function(_, output)
+    if output[#output] == "" then
+      table.remove(output, #output)
+    end
+
+    for index, line in ipairs(output) do
+      output[index] = line:gsub("\r", "")
+    end
+
+    vim.fn.writefile(output, logFile, "a")
+
+    if config.enabled then
+      local log_lines = {}
+      for _, line in ipairs(output) do
+        if config.filter_line(line) then
+          table.insert(log_lines, config.format_line(line))
+        end
+      end
+
+      require("xcodebuild.dap").update_console(log_lines)
+    end
+  end
+
+  -- clear log file
+  if config.enabled then
+    require("xcodebuild.dap").clear_console()
+  end
+  vim.fn.writefile({}, logFile)
+
+  util.call(callback)
+
   return vim.fn.jobstart(command, {
-    stdout_buffered = true,
+    stdout_buffered = false,
+    stderr_buffered = false,
     detach = true,
+    on_stdout = write_logs,
+    on_stderr = write_logs,
     on_exit = function(_, code, _)
       if code ~= 0 then
         notifications.send_error("Could not launch app (code: " .. code .. ")")
         if code == 149 then
           notifications.send_warning("Make sure that the simulator is booted")
         end
-      else
-        callback()
       end
     end,
   })

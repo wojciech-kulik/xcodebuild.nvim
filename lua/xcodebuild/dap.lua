@@ -76,11 +76,68 @@ function M.wait_for_pid()
 
     if not tonumber(pid) then
       notifications.send_error("Launching the application timed out")
+
+      ---@diagnostic disable-next-line: deprecated
       co.close(dap_run_co)
     end
 
     co.resume(dap_run_co, pid)
   end)
+end
+
+function M.clear_console()
+  local success, dapui = pcall(require, "dapui")
+  if not success then
+    return
+  end
+
+  local bufnr = dapui.elements.console.buffer()
+  if not bufnr then
+    return
+  end
+
+  vim.bo[bufnr].modifiable = true
+  vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, {})
+  vim.bo[bufnr].modified = false
+  vim.bo[bufnr].modifiable = false
+end
+
+function M.update_console(output)
+  local success, dapui = pcall(require, "dapui")
+  if not success then
+    return
+  end
+
+  local bufnr = dapui.elements.console.buffer()
+  if not bufnr then
+    return
+  end
+
+  if util.is_empty(output) then
+    return
+  end
+
+  vim.bo[bufnr].modifiable = true
+
+  local autoscroll = false
+  local winnr = vim.fn.win_findbuf(bufnr)[1]
+  if winnr then
+    local currentWinnr = vim.api.nvim_get_current_win()
+    local lastLine = vim.api.nvim_buf_line_count(bufnr)
+    local currentLine = vim.api.nvim_win_get_cursor(winnr)[1]
+    autoscroll = currentWinnr ~= winnr or currentLine == lastLine
+  end
+
+  vim.api.nvim_buf_set_lines(bufnr, -1, -1, false, output)
+
+  if autoscroll then
+    vim.api.nvim_win_call(winnr, function()
+      vim.cmd("normal! G")
+    end)
+  end
+
+  vim.bo[bufnr].modified = false
+  vim.bo[bufnr].modifiable = false
 end
 
 return M

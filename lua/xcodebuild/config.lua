@@ -1,3 +1,5 @@
+---@diagnostic disable: unused-local
+
 local M = {}
 
 -- luacheck: no max line length
@@ -18,7 +20,7 @@ local defaults = {
     extra_test_args = "-parallelizeTargets", -- extra arguments for `xcodebuild test`
     project_search_max_depth = 3, -- maxdepth of xcodeproj/xcworkspace search while using configuration wizard
   },
-  logs = {
+  logs = { -- build & test logs
     auto_open_on_success_tests = false, -- open logs when tests succeeded
     auto_open_on_failed_tests = false, -- open logs when tests failed
     auto_open_on_success_build = false, -- open logs when build succeeded
@@ -36,6 +38,15 @@ local defaults = {
     end,
     notify_progress = function(message) -- function to show live progress (like during tests)
       vim.cmd("echo '" .. message .. "'")
+    end,
+  },
+  console_logs = {
+    enabled = true, -- enable console logs in dap-ui
+    format_line = function(line) -- format each line of logs
+      return line
+    end,
+    filter_line = function(line) -- filter each line of logs
+      return true
     end,
   },
   marks = {

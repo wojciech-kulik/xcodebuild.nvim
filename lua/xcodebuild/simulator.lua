@@ -36,7 +36,6 @@ function M.run_app(waitForDebugger, callback)
 
     notifications.send("Installing application...")
     M.currentJobId = xcode.install_app(settings.destination, settings.appPath, function()
-      notifications.send("Launching application...")
       M.currentJobId = xcode.launch_app(settings.destination, settings.bundleId, waitForDebugger, function()
         notifications.send("Application has been launched")
         events.application_launched()

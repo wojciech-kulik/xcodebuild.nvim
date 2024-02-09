@@ -4,6 +4,8 @@ local M = {}
 
 M.report = {}
 M.appdir = vim.fn.getcwd() .. "/.nvim/xcodebuild"
+M.simulator_logs_filename = "simulator_logs.log"
+M.simulator_logs_filepath = M.appdir .. "/" .. M.simulator_logs_filename
 M.original_logs_filename = "original_logs.log"
 M.original_logs_filepath = M.appdir .. "/" .. M.original_logs_filename
 M.build_logs_filename = "xcodebuild.log"

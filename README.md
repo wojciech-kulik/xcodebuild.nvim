@@ -28,6 +28,7 @@ A plugin designed to let you migrate your iOS, iPadOS, and macOS app development
 - [x] Advanced log parser to detect all errors, warnings, and failing tests and to present them nicely formatted.
 - [x] Auto saving files before build or test actions.
 - [x] [nvim-dap](https://github.com/mfussenegger/nvim-dap) helper functions to let you easily build, run, and attach the debugger.
+- [x] [nvim-dap-ui](https://github.com/rcarriga/nvim-dap-ui) integration with console window to show app logs.
 - [x] [lualine.nvim](https://github.com/nvim-lualine/lualine.nvim) integration to show current device and project settings.
 - [x] [telescope.nvim](https://github.com/nvim-telescope/telescope.nvim) integration to show pickers with selectable project options.
 - [x] Picker with all available actions.
@@ -95,7 +96,7 @@ return {
     extra_test_args = "-parallelizeTargets", -- extra arguments for `xcodebuild test`
     project_search_max_depth = 3, -- maxdepth of xcodeproj/xcworkspace search while using configuration wizard
   },
-  logs = {
+  logs = { -- build & test logs
     auto_open_on_success_tests = false, -- open logs when tests succeeded
     auto_open_on_failed_tests = false, -- open logs when tests failed
     auto_open_on_success_build = false, -- open logs when build succeeded
@@ -113,6 +114,15 @@ return {
     end,
     notify_progress = function(message) -- function to show live progress (like during tests)
       vim.cmd("echo '" .. message .. "'")
+    end,
+  },
+  console_logs = {
+    enabled = true, -- enable console logs in dap-ui
+    format_line = function(line) -- format each line of logs
+      return line
+    end,
+    filter_line = function(line) -- filter each line of logs
+      return true
     end,
   },
   marks = {
@@ -312,6 +322,7 @@ To configure DAP for development:
 
 - Download codelldb VS Code plugin from: [HERE](https://github.com/vadimcn/codelldb/releases). For macOS use `darwin` version. Just unzip `vsix` file and set paths below.
 - Install also [nvim-dap-ui](https://github.com/rcarriga/nvim-dap-ui) for a nice GUI to debug.
+- Make sure to enable `console` window from `nvim-dap-ui` to see simulator logs.
 
 ```lua
 return {
@@ -370,6 +381,34 @@ return {
 ```
 
 </details>
+
+### 🐛 Simulator Logs
+
+If you installed `nvim-dap` and `nvim-dap-ui`, you can easily track your app logs. The plugin automatically transfers simulator logs to the `console` window provided by `nvim-dap-ui`.
+
+> [!TIP]
+> Config options allow you to filter and format each line.
+
+To see logs you don't need to run the debugger. You can just show the `console` and run the app (remember that the app needs to be launched by xcodebuild.nvim).
+
+```
+:lua require("dapui").toggle()
+```
+
+> [!TIP]
+> You can use the command below to clear the console
+>
+> ```
+> :lua require("xcodebuild.dap").clear_console()
+> ```
+
+#### Logs without using nvim-dap
+
+If you don't want to use `nvim-dap` you can always print logs directly to your terminal by calling (from your project root directory):
+
+```bash
+tail -f .nvim/xcodebuild/simulator_logs.log
+```
 
 ## 🚀 Usage
 
