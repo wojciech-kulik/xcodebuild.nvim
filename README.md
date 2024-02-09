@@ -395,6 +395,9 @@ To see logs you don't need to run the debugger. You can just show the `console` 
 :lua require("dapui").toggle()
 ```
 
+> [!IMPORTANT]
+> Logs printed by `NSLog` will appear only if the debugger is NOT attached.
+
 > [!TIP]
 > You can use the command below to clear the console
 >
