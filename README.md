@@ -557,13 +557,13 @@ You can also integrate this plugin with [lualine.nvim](https://github.com/nvim-l
 
 ```lua
 lualine_x = {
-  { "diff" },
-  { "'󰙨 ' .. vim.g.xcodebuild_test_plan" },
-  { "vim.g.xcodebuild_platform == 'macOS' and '  macOS' or ' ' .. vim.g.xcodebuild_device_name" },
-  { "' ' .. vim.g.xcodebuild_os" },
-  { "encoding" },
-  { "filetype", icon_only = true },
-}
+  { "'󰙨 ' .. vim.g.xcodebuild_test_plan", color = { fg = "#a6e3a1", bg = "#161622" } },
+  {
+    "vim.g.xcodebuild_platform == 'macOS' and '  macOS' or"
+      .. " ' ' .. vim.g.xcodebuild_device_name .. ' (' .. vim.g.xcodebuild_os .. ')'",
+    color = { fg = "#f9e2af", bg = "#161622" },
+  },
+},
 ```
 
 Global variables that you can use:
