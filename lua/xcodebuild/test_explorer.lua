@@ -43,6 +43,10 @@ local function generate_report(tests)
 
     local filepath = testSearch.find_filepath(test.target, test.class)
 
+    if not config.open_expanded and util.is_empty(M.report) then
+      collapsed_ids[test.target .. "/" .. test.class] = true
+    end
+
     if test.target ~= current_target.name then
       current_target = {
         id = test.target,
