@@ -85,6 +85,7 @@ function M.show(title, items, callback, opts)
       results = items,
     }),
     sorter = telescopeConfig.generic_sorter(),
+    file_ignore_patterns = {},
     attach_mappings = function(prompt_bufnr, _)
       telescopeActions.select_default:replace(function()
         local selection = telescopeState.get_selected_entry()
