@@ -630,6 +630,10 @@ function M.show()
     M.bufnr = vim.api.nvim_get_current_buf()
     setup_buffer()
     events.toggled_test_explorer(true, M.bufnr, vim.api.nvim_get_current_win())
+
+    if not config.auto_focus then
+      vim.cmd("wincmd p")
+    end
   end
 
   refresh_explorer()

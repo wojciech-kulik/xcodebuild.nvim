@@ -132,6 +132,7 @@ return {
   test_explorer = {
     enabled = true, -- enable Test Explorer
     auto_open = true, -- open Test Explorer when tests are started
+    auto_focus = true, -- focus Test Explorer when opened
     open_command = "botright 42vsplit Test Explorer", -- command used to open Test Explorer
     open_expanded = true, -- open Test Explorer with expanded classes
     success_sign = "✔", -- passed test icon
@@ -625,11 +626,6 @@ Coverage Report Keys:
 | ---------------- | ----------------------------------- |
 | `enter` or `tab` | Expand or collapse the current node |
 | `o`              | Open source file                    |
-
-> [!CAUTION]
-> From time to time, the code coverage may fail or some targets may be missing (Xcode's bug). Try running tests again then.
->
-> If you run tests, modify file and toggle code coverage AFTER that, the placement of marks will be incorrect (because it doesn't know about changes that you made). However, if you show code coverage and after that you modify the code, marks will be moving while you are editing the file.
 
 </details>
 

@@ -64,6 +64,7 @@ local defaults = {
   test_explorer = {
     enabled = true, -- enable Test Explorer
     auto_open = true, -- open Test Explorer when tests are started
+    auto_focus = true, -- focus Test Explorer when opened
     open_command = "botright 42vsplit Test Explorer", -- command used to open Test Explorer
     open_expanded = true, -- open Test Explorer with expanded classes
     success_sign = "✔", -- passed test icon
