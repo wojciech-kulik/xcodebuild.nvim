@@ -19,7 +19,7 @@ A plugin designed to let you migrate your iOS, iPadOS, and macOS app development
 - [x] Code coverage report with customizable levels.
 - [x] Browser of failing snapshot tests with a diff preview (if you use [swift-snapshot-testing](https://github.com/pointfreeco/swift-snapshot-testing)).
 - [x] Advanced log parser to detect all errors, warnings, and failing tests to present them nicely formatted.
-- [x] [nvim-dap](https://github.com/mfussenegger/nvim-dap) helper functions to let you easily build, run, and attach the debugger.
+- [x] [nvim-dap](https://github.com/mfussenegger/nvim-dap) helper functions to let you easily build, run, and debug apps.
 - [x] [nvim-dap-ui](https://github.com/rcarriga/nvim-dap-ui) integration with console window to show app logs.
 - [x] [lualine.nvim](https://github.com/nvim-lualine/lualine.nvim) integration to show selected device, test plan, and other project settings.
 - [x] Picker with all available actions.
@@ -369,6 +369,11 @@ return {
     -- sample keymaps to debug application
     vim.keymap.set("n", "<leader>dd", xcodebuild.build_and_debug, { desc = "Build & Debug" })
     vim.keymap.set("n", "<leader>dr", xcodebuild.debug_without_build, { desc = "Debug Without Building" })
+    vim.keymap.set("n", "<leader>dt", xcodebuild.debug_tests, { desc = "Debug Tests" })
+
+    -- you can also debug smaller scope tests:
+    -- debug_target_tests, debug_class_tests, debug_func_test,
+    -- debug_selected_tests, debug_failing_tests
   end,
 }
 ```
