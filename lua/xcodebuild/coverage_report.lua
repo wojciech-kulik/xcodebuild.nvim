@@ -69,9 +69,10 @@ function M.open()
   local popup = Popup({
     enter = true,
     position = "50%",
+    relative = "editor",
     size = {
-      width = "60%",
-      height = "60%",
+      width = "40%",
+      height = "40%",
     },
     border = {
       style = "rounded",
@@ -85,6 +86,7 @@ function M.open()
     },
     win_options = {
       winhighlight = "Normal:Normal,FloatBorder:Normal",
+      spell = false,
     },
   })
 
