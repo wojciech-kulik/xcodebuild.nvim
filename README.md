@@ -32,7 +32,7 @@ Xcodebuild.nvim is integrated with [nvim-tree](https://github.com/nvim-tree/nvim
 
 Every change in the file tree presented by [nvim-tree](https://github.com/nvim-tree/nvim-tree.lua) will be automatically reflected in the Xcode project.
 
-https://github.com/wojciech-kulik/xcodebuild.nvim/assets/3128467/04c35614-e27d-45b5-bae5-37624eecd09c
+https://github.com/wojciech-kulik/xcodebuild.nvim/assets/3128467/ed7d2d2e-eaa4-44ea-a1e6-0027ace4fb97
 
 ## ⚡️ Requirements
 
