@@ -37,9 +37,15 @@ local function run(action, params)
 
   local stderr_file = io.open(errorFile, "r")
   if stderr_file then
-    local stderr = stderr_file:read("*all")
-    if stderr ~= "" then
-      error(stderr)
+    if stderr_file:read("*all") ~= "" then
+      vim.notify(
+        "Could not update Xcode project file.\n"
+          .. "To see more details please check /tmp/xcodebuild_nvimtree.\n"
+          .. "If you are trying to add files to SPM packages, you may want to filter them out in the config using: integrations.nvim_tree.should_update_project.\n"
+          .. "If the error is unexpected, please open an issue on GitHub.",
+        vim.log.levels.ERROR
+      )
+      return {}
     end
   end
 
