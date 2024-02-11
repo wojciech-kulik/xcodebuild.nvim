@@ -19,11 +19,20 @@ A plugin designed to let you migrate your iOS, iPadOS, and macOS app development
 - [x] Code coverage report with customizable levels.
 - [x] Browser of failing snapshot tests with a diff preview (if you use [swift-snapshot-testing](https://github.com/pointfreeco/swift-snapshot-testing)).
 - [x] Advanced log parser to detect all errors, warnings, and failing tests to present them nicely formatted.
+- [x] [nvim-tree](https://github.com/nvim-tree/nvim-tree.lua) integration that automatically reflects all file tree operations and updates Xcode project file.
 - [x] [nvim-dap](https://github.com/mfussenegger/nvim-dap) helper functions to let you easily build, run, and debug apps.
 - [x] [nvim-dap-ui](https://github.com/rcarriga/nvim-dap-ui) integration with console window to show app logs.
 - [x] [lualine.nvim](https://github.com/nvim-lualine/lualine.nvim) integration to show selected device, test plan, and other project settings.
 - [x] Picker with all available actions.
 - [x] Highly customizable (many config options, auto commands, highlights, and user commands).
+
+## 🌳 Nvim-tree Integration
+
+Xcodebuild.nvim is integrated with [nvim-tree](https://github.com/nvim-tree/nvim-tree.lua) to let you manage your project and files in a convenient way.
+
+Every change in the file tree presented by [nvim-tree](https://github.com/nvim-tree/nvim-tree.lua) will be automatically reflected in the Xcode project.
+
+https://github.com/wojciech-kulik/xcodebuild.nvim/assets/3128467/04c35614-e27d-45b5-bae5-37624eecd09c
 
 ## ⚡️ Requirements
 
@@ -32,6 +41,7 @@ A plugin designed to let you migrate your iOS, iPadOS, and macOS app development
 - [nui.nvim](https://github.com/MunifTanjim/nui.nvim) used to present code coverage report.
 - [xcbeautify](https://github.com/tuist/xcbeautify) - Xcode logs formatter (optional - you can set a different tool or disable formatting in the config).
 - [Xcodeproj](https://github.com/CocoaPods/Xcodeproj) - required by Project Manager to manage project files.
+- [nvim-tree](https://github.com/nvim-tree/nvim-tree.lua) required if you want to visually manage your project files.
 - Xcode (make sure that `xcodebuild` and `xcrun simctl` work correctly).
 - To get the best experience, you should install and configure [nvim-dap](https://github.com/mfussenegger/nvim-dap) and [nvim-dap-ui](https://github.com/rcarriga/nvim-dap-ui) to be able to debug.
 - This plugin requires the project to be built using Swift. It was tested only with Xcode 15.
@@ -56,6 +66,7 @@ return {
   dependencies = {
     "nvim-telescope/telescope.nvim",
     "MunifTanjim/nui.nvim",
+    "nvim-tree/nvim-tree.lua", -- if you want the integration with file tree
   },
   config = function()
     require("xcodebuild").setup({
@@ -158,6 +169,15 @@ return {
     warning_coverage_level = 60,
     error_coverage_level = 30,
     open_expanded = false,
+  },
+  integrations = {
+    nvim_tree = {
+      enabled = true, -- enable updating Xcode project files when using nvim-tree
+      should_update_project = function(path) -- path can lead to directory or file
+        -- it could be useful if you mix Xcode project with SPM for example
+        return true
+      end,
+    },
   },
   highlights = {
     -- you can override here any highlight group used by this plugin

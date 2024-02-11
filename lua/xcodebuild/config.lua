@@ -91,6 +91,15 @@ local defaults = {
     error_coverage_level = 30,
     open_expanded = false,
   },
+  integrations = {
+    nvim_tree = {
+      enabled = true, -- enable updating Xcode project files when using nvim-tree
+      should_update_project = function(path) -- path can lead to directory or file
+        -- it could be useful if you mix Xcode project with SPM for example
+        return true
+      end,
+    },
+  },
   highlights = {
     -- you can override here any highlight group used by this plugin
     -- simple color: XcodebuildCoverageReportOk = "#00ff00",

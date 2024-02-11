@@ -36,43 +36,47 @@ local function run(action, params)
   return output
 end
 
-local function select_targets(callback)
+local function run_select_targets(callback)
   local targets = run("list_targets")
   pickers.show("Select Target(s)", targets, callback, { close_on_select = true, multiselect = true })
 end
 
-local function add_file_to_targets(filepath, targets)
+local function run_add_file_to_targets(filepath, targets)
   local targetsJoined = table.concat(targets, ",")
   run("add_file", { targetsJoined, filepath })
 end
 
-local function update_file_targets(filepath, targets)
+local function run_update_file_targets(filepath, targets)
   local targetsJoined = table.concat(targets, ",")
   run("update_file_targets", { targetsJoined, filepath })
 end
 
-local function delete_file(filepath)
+local function run_delete_file(filepath)
   run("delete_file", { filepath })
-  vim.fn.delete(filepath)
 end
 
-local function rename_file(oldPath, newPath)
+local function run_rename_file(oldPath, newPath)
   run("rename_file", { oldPath, newPath })
-  vim.fn.rename(oldPath, newPath)
 end
 
-local function add_group(path)
+local function run_move_file(oldPath, newPath)
+  run("move_file", { oldPath, newPath })
+end
+
+local function run_add_group(path)
   run("add_group", { path })
 end
 
-local function rename_group(oldPath, newPath)
+local function run_rename_group(oldPath, newPath)
   run("rename_group", { oldPath, newPath })
-  vim.fn.rename(oldPath, newPath)
 end
 
-local function delete_group(path)
+local function run_move_group(oldPath, newPath)
+  run("move_group", { oldPath, newPath })
+end
+
+local function run_delete_group(path)
   run("delete_group", { path })
-  vim.fn.system("rm -rf '" .. path .. "'")
 end
 
 local function replace_file(path)
@@ -103,19 +107,44 @@ function M.create_new_file()
   M.add_current_file()
 end
 
-function M.add_current_file()
+function M.add_file(filepath)
   if not helpers.validate_project() or not validate_xcodeproj_tool() then
     return
   end
 
-  M.add_current_group()
-
-  local filepath = vim.fn.expand("%:p")
-
-  select_targets(function(targets)
-    add_file_to_targets(filepath, targets)
+  run_select_targets(function(targets)
+    local dir = vim.fs.dirname(filepath)
+    M.add_group(dir, { silent = true })
+    run_add_file_to_targets(filepath, targets)
     notifications.send("File has been added to targets")
   end)
+end
+
+function M.add_current_file()
+  M.add_file(vim.fn.expand("%:p"))
+end
+
+function M.move_file(oldFilePath, newFilePath)
+  if not helpers.validate_project() or not validate_xcodeproj_tool() then
+    return
+  end
+
+  run_move_file(oldFilePath, newFilePath)
+
+  if vim.fs.basename(oldFilePath) == vim.fs.basename(newFilePath) then
+    notifications.send("File has been moved")
+  else
+    notifications.send("File has been renamed")
+  end
+end
+
+function M.rename_file(oldFilePath, newFilePath)
+  if not helpers.validate_project() or not validate_xcodeproj_tool() then
+    return
+  end
+
+  run_rename_file(oldFilePath, newFilePath)
+  notifications.send("File has been renamed")
 end
 
 function M.rename_current_file()
@@ -132,9 +161,19 @@ function M.rename_current_file()
   end
 
   local newFilePath = vim.fn.expand("%:p:h") .. "/" .. newFilename
-  rename_file(oldFilePath, newFilePath)
+  run_rename_file(oldFilePath, newFilePath)
+  vim.fn.rename(oldFilePath, newFilePath)
   replace_file(newFilePath)
   notifications.send("File has been renamed")
+end
+
+function M.delete_file(filepath)
+  if not helpers.validate_project() or not validate_xcodeproj_tool() then
+    return
+  end
+
+  run_delete_file(filepath)
+  notifications.send("File has been deleted")
 end
 
 function M.delete_current_file()
@@ -147,7 +186,8 @@ function M.delete_current_file()
   vim.cmd("echom ''")
 
   if input == "y" then
-    delete_file(filepath)
+    run_delete_file(filepath)
+    vim.fn.delete(filepath)
     vim.cmd("bd!")
     notifications.send("File has been deleted")
   end
@@ -168,18 +208,34 @@ function M.create_new_group()
   local groupPath = path .. "/" .. groupName
   vim.fn.system("mkdir -p '" .. groupPath .. "'")
 
-  add_group(groupPath)
+  run_add_group(groupPath)
   notifications.send("Group has been added")
 end
 
-function M.add_current_group()
+function M.add_group(path, opts)
   if not helpers.validate_project() or not validate_xcodeproj_tool() then
     return
   end
 
-  local path = vim.fn.expand("%:p:h")
-  add_group(path)
-  notifications.send("Group has been added")
+  opts = opts or {}
+  run_add_group(path)
+
+  if not opts.silent then
+    notifications.send("Group has been added")
+  end
+end
+
+function M.add_current_group()
+  M.add_group(vim.fn.expand("%:p:h"))
+end
+
+function M.rename_group(oldGroupPath, newGroupPath)
+  if not helpers.validate_project() or not validate_xcodeproj_tool() then
+    return
+  end
+
+  run_rename_group(oldGroupPath, newGroupPath)
+  notifications.send("Group has been renamed")
 end
 
 function M.rename_current_group()
@@ -196,12 +252,36 @@ function M.rename_current_group()
   end
 
   local newGroupPath = vim.fn.expand("%:p:h:h") .. "/" .. newGroupName
-  rename_group(oldGroupPath, newGroupPath)
+  run_rename_group(oldGroupPath, newGroupPath)
+  vim.fn.rename(oldGroupPath, newGroupPath)
 
   local newFilepath = newGroupPath .. "/" .. vim.fn.expand("%:t")
   replace_file(newFilepath)
 
   notifications.send("Group has been renamed")
+end
+
+function M.move_or_rename_group(oldGroupPath, newGroupPath)
+  if not helpers.validate_project() or not validate_xcodeproj_tool() then
+    return
+  end
+
+  if vim.fs.basename(oldGroupPath) == vim.fs.basename(newGroupPath) then
+    run_move_group(oldGroupPath, newGroupPath)
+    notifications.send("Group has been moved")
+  else
+    run_rename_group(oldGroupPath, newGroupPath)
+    notifications.send("Group has been renamed")
+  end
+end
+
+function M.delete_group(groupPath)
+  if not helpers.validate_project() or not validate_xcodeproj_tool() then
+    return
+  end
+
+  run_delete_group(groupPath)
+  notifications.send("Group has been deleted")
 end
 
 function M.delete_current_group()
@@ -214,7 +294,8 @@ function M.delete_current_group()
   vim.cmd("echom ''")
 
   if input == "y" then
-    delete_group(groupPath)
+    run_delete_group(groupPath)
+    vim.fn.system("rm -rf '" .. groupPath .. "'")
     vim.cmd("bd!")
     notifications.send("Group has been deleted")
   end
@@ -227,8 +308,8 @@ function M.update_current_file_targets()
 
   local filepath = vim.fn.expand("%:p")
 
-  select_targets(function(targets)
-    update_file_targets(filepath, targets)
+  run_select_targets(function(targets)
+    run_update_file_targets(filepath, targets)
     notifications.send("File targets have been updated")
   end)
 end
