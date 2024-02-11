@@ -28,9 +28,19 @@ local function run(action, params)
     allParams = allParams .. " '" .. param .. "'"
   end
 
-  local output = util.shell(helper .. " " .. action .. allParams)
+  local errorFile = "/tmp/xcodebuild_nvimtree"
+  local output = util.shell(helper .. " " .. action .. allParams .. " 2> " .. errorFile)
+
   if output[#output] == "" then
     table.remove(output, #output)
+  end
+
+  local stderr_file = io.open(errorFile, "r")
+  if stderr_file then
+    local stderr = stderr_file:read("*all")
+    if stderr ~= "" then
+      error(stderr)
+    end
   end
 
   return output
