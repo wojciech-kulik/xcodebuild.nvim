@@ -59,7 +59,8 @@ function M.get_targets_filemap(appPath)
         targetsFilesMap[target] = targetsFilesMap[target] or {}
 
         for _, line in ipairs(content) do
-          table.insert(targetsFilesMap[target], line)
+          local sanitizedLine = string.gsub(line, "%\\", "")
+          table.insert(targetsFilesMap[target], sanitizedLine)
         end
       end
     end
@@ -531,7 +532,7 @@ function M.run_tests(opts)
 
   if opts.testsToRun then
     for _, test in ipairs(opts.testsToRun) do
-      command = command .. " -only-testing " .. test
+      command = command .. " -only-testing '" .. test .. "'"
     end
   end
 

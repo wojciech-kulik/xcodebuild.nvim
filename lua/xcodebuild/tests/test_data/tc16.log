@@ -1,0 +1,156 @@
+Command line invocation:
+
+/Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild build-for-testing -project "/Users/john/Desktop/Some Test/Some Test.xcodeproj" -scheme "Some Test" -destination id=28B52DAA-BC2F-410B-A5BE-F485A3AFB0BC -configuration Debug -parallelizeTargets
+
+
+User defaults from command line:
+    IDEPackageSupportUseBuiltinSCM = YES
+
+
+--- xcodebuild: WARNING: Using the first of multiple matching destinations:
+{ platform:iOS Simulator, id:28B52DAA-BC2F-410B-A5BE-F485A3AFB0BC, OS:17.2, name:iPhone 15 }
+{ platform:iOS Simulator, id:28B52DAA-BC2F-410B-A5BE-F485A3AFB0BC, OS:17.2, name:iPhone 15 }
+
+Prepare packages
+
+
+
+ComputeTargetDependencyGraph
+
+note: Building targets in dependency order
+
+note: Target dependency graph (3 targets)
+    Target 'Some TestUITests' in project 'Some Test'
+        ➜ Explicit dependency on target 'Some Test' in project 'Some Test'
+    Target 'Some TestTests' in project 'Some Test'
+        ➜ Explicit dependency on target 'Some Test' in project 'Some Test'
+    Target 'Some Test' in project 'Some Test' (no dependencies)
+
+
+
+GatherProvisioningInputs
+
+
+
+CreateBuildDescription
+
+
+
+ClangStatCache /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang-stat-cache /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator17.2.sdk /Users/john/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator17.2-21C52-4f2951bfe8f3cd53c99228b0131e163e.sdkstatcache
+    cd /Users/john/Desktop/Some\ Test/Some\ Test.xcodeproj
+    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang-stat-cache /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator17.2.sdk -o /Users/john/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator17.2-21C52-4f2951bfe8f3cd53c99228b0131e163e.sdkstatcache
+
+
+
+ProcessInfoPlistFile /Users/john/Library/Developer/Xcode/DerivedData/Some_Test-ghskumgqpreuafeligineebzxlbq/Build/Products/Debug-iphonesimulator/Some\ Test.app/Info.plist /Users/john/Library/Developer/Xcode/DerivedData/Some_Test-ghskumgqpreuafeligineebzxlbq/Build/Intermediates.noindex/Some\ Test.build/Debug-iphonesimulator/Some\ Test.build/empty-Some\ Test.plist (in target 'Some Test' from project 'Some Test')
+    cd /Users/john/Desktop/Some\ Test
+    builtin-infoPlistUtility /Users/john/Library/Developer/Xcode/DerivedData/Some_Test-ghskumgqpreuafeligineebzxlbq/Build/Intermediates.noindex/Some\ Test.build/Debug-iphonesimulator/Some\ Test.build/empty-Some\ Test.plist -producttype com.apple.product-type.application -genpkginfo /Users/john/Library/Developer/Xcode/DerivedData/Some_Test-ghskumgqpreuafeligineebzxlbq/Build/Products/Debug-iphonesimulator/Some\ Test.app/PkgInfo -expandbuildsettings -format binary -platform iphonesimulator -additionalcontentfile /Users/john/Library/Developer/Xcode/DerivedData/Some_Test-ghskumgqpreuafeligineebzxlbq/Build/Intermediates.noindex/Some\ Test.build/Debug-iphonesimulator/Some\ Test.build/assetcatalog_generated_info.plist -o /Users/john/Library/Developer/Xcode/DerivedData/Some_Test-ghskumgqpreuafeligineebzxlbq/Build/Products/Debug-iphonesimulator/Some\ Test.app/Info.plist
+
+
+
+CopySwiftLibs /Users/john/Library/Developer/Xcode/DerivedData/Some_Test-ghskumgqpreuafeligineebzxlbq/Build/Products/Debug-iphonesimulator/Some\ Test.app (in target 'Some Test' from project 'Some Test')
+    cd /Users/john/Desktop/Some\ Test
+    builtin-swiftStdLibTool --copy --verbose --sign - --scan-executable /Users/john/Library/Developer/Xcode/DerivedData/Some_Test-ghskumgqpreuafeligineebzxlbq/Build/Products/Debug-iphonesimulator/Some\ Test.app/Some\ Test --scan-folder /Users/john/Library/Developer/Xcode/DerivedData/Some_Test-ghskumgqpreuafeligineebzxlbq/Build/Products/Debug-iphonesimulator/Some\ Test.app/Frameworks --scan-folder /Users/john/Library/Developer/Xcode/DerivedData/Some_Test-ghskumgqpreuafeligineebzxlbq/Build/Products/Debug-iphonesimulator/Some\ Test.app/PlugIns --scan-folder /Users/john/Library/Developer/Xcode/DerivedData/Some_Test-ghskumgqpreuafeligineebzxlbq/Build/Products/Debug-iphonesimulator/Some\ Test.app/SystemExtensions --scan-folder /Users/john/Library/Developer/Xcode/DerivedData/Some_Test-ghskumgqpreuafeligineebzxlbq/Build/Products/Debug-iphonesimulator/Some\ Test.app/Extensions --platform iphonesimulator --toolchain /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain --destination /Users/john/Library/Developer/Xcode/DerivedData/Some_Test-ghskumgqpreuafeligineebzxlbq/Build/Products/Debug-iphonesimulator/Some\ Test.app/Frameworks --strip-bitcode --strip-bitcode-tool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/bitcode_strip --emit-dependency-info /Users/john/Library/Developer/Xcode/DerivedData/Some_Test-ghskumgqpreuafeligineebzxlbq/Build/Intermediates.noindex/Some\ Test.build/Debug-iphonesimulator/Some\ Test.build/SwiftStdLibToolInputDependencies.dep --filter-for-swift-os
+
+
+
+ProcessInfoPlistFile /Users/john/Library/Developer/Xcode/DerivedData/Some_Test-ghskumgqpreuafeligineebzxlbq/Build/Products/Debug-iphonesimulator/Some\ Test.app/PlugIns/Some\ TestTests.xctest/Info.plist /Users/john/Library/Developer/Xcode/DerivedData/Some_Test-ghskumgqpreuafeligineebzxlbq/Build/Intermediates.noindex/Some\ Test.build/Debug-iphonesimulator/Some\ TestTests.build/empty-Some\ TestTests.plist (in target 'Some TestTests' from project 'Some Test')
+    cd /Users/john/Desktop/Some\ Test
+    builtin-infoPlistUtility /Users/john/Library/Developer/Xcode/DerivedData/Some_Test-ghskumgqpreuafeligineebzxlbq/Build/Intermediates.noindex/Some\ Test.build/Debug-iphonesimulator/Some\ TestTests.build/empty-Some\ TestTests.plist -producttype com.apple.product-type.bundle.unit-test -expandbuildsettings -format binary -platform iphonesimulator -o /Users/john/Library/Developer/Xcode/DerivedData/Some_Test-ghskumgqpreuafeligineebzxlbq/Build/Products/Debug-iphonesimulator/Some\ Test.app/PlugIns/Some\ TestTests.xctest/Info.plist
+
+
+
+Ld /Users/john/Library/Developer/Xcode/DerivedData/Some_Test-ghskumgqpreuafeligineebzxlbq/Build/Products/Debug-iphonesimulator/Some\ Test.app/PlugIns/Some\ TestTests.xctest/Some\ TestTests normal (in target 'Some TestTests' from project 'Some Test')
+    cd /Users/john/Desktop/Some\ Test
+    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -Xlinker -reproducible -target arm64-apple-ios17.2-simulator -bundle -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator17.2.sdk -O0 -L/Users/john/Library/Developer/Xcode/DerivedData/Some_Test-ghskumgqpreuafeligineebzxlbq/Build/Intermediates.noindex/EagerLinkingTBDs/Debug-iphonesimulator -L/Users/john/Library/Developer/Xcode/DerivedData/Some_Test-ghskumgqpreuafeligineebzxlbq/Build/Products/Debug-iphonesimulator -L/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/lib -F/Users/john/Library/Developer/Xcode/DerivedData/Some_Test-ghskumgqpreuafeligineebzxlbq/Build/Intermediates.noindex/EagerLinkingTBDs/Debug-iphonesimulator -F/Users/john/Library/Developer/Xcode/DerivedData/Some_Test-ghskumgqpreuafeligineebzxlbq/Build/Products/Debug-iphonesimulator -iframework /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks -iframework /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator17.2.sdk/Developer/Library/Frameworks -filelist /Users/john/Library/Developer/Xcode/DerivedData/Some_Test-ghskumgqpreuafeligineebzxlbq/Build/Intermediates.noindex/Some\ Test.build/Debug-iphonesimulator/Some\ TestTests.build/Objects-normal/arm64/Some\ TestTests.LinkFileList -Xlinker -rpath -Xlinker @loader_path/Frameworks -Xlinker -rpath -Xlinker @executable_path/Frameworks -dead_strip -bundle_loader /Users/john/Library/Developer/Xcode/DerivedData/Some_Test-ghskumgqpreuafeligineebzxlbq/Build/Products/Debug-iphonesimulator/Some\ Test.app//Some\ Test -Xlinker -object_path_lto -Xlinker /Users/john/Library/Developer/Xcode/DerivedData/Some_Test-ghskumgqpreuafeligineebzxlbq/Build/Intermediates.noindex/Some\ Test.build/Debug-iphonesimulator/Some\ TestTests.build/Objects-normal/arm64/Some\ TestTests_lto.o -Xlinker -export_dynamic -Xlinker -no_deduplicate -Xlinker -objc_abi_version -Xlinker 2 -Xlinker -debug_variant -fobjc-link-runtime -fprofile-instr-generate -L/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphonesimulator -L/usr/lib/swift -Xlinker -add_ast_path -Xlinker /Users/john/Library/Developer/Xcode/DerivedData/Some_Test-ghskumgqpreuafeligineebzxlbq/Build/Intermediates.noindex/Some\ Test.build/Debug-iphonesimulator/Some\ TestTests.build/Objects-normal/arm64/Some_TestTests.swiftmodule -framework XCTest -Xlinker -no_adhoc_codesign -Xlinker -dependency_info -Xlinker /Users/john/Library/Developer/Xcode/DerivedData/Some_Test-ghskumgqpreuafeligineebzxlbq/Build/Intermediates.noindex/Some\ Test.build/Debug-iphonesimulator/Some\ TestTests.build/Objects-normal/arm64/Some\ TestTests_dependency_info.dat -o /Users/john/Library/Developer/Xcode/DerivedData/Some_Test-ghskumgqpreuafeligineebzxlbq/Build/Products/Debug-iphonesimulator/Some\ Test.app/PlugIns/Some\ TestTests.xctest/Some\ TestTests
+
+
+
+CopySwiftLibs /Users/john/Library/Developer/Xcode/DerivedData/Some_Test-ghskumgqpreuafeligineebzxlbq/Build/Products/Debug-iphonesimulator/Some\ Test.app/PlugIns/Some\ TestTests.xctest (in target 'Some TestTests' from project 'Some Test')
+    cd /Users/john/Desktop/Some\ Test
+    builtin-swiftStdLibTool --copy --verbose --sign - --scan-executable /Users/john/Library/Developer/Xcode/DerivedData/Some_Test-ghskumgqpreuafeligineebzxlbq/Build/Products/Debug-iphonesimulator/Some\ Test.app/PlugIns/Some\ TestTests.xctest/Some\ TestTests --scan-folder /Users/john/Library/Developer/Xcode/DerivedData/Some_Test-ghskumgqpreuafeligineebzxlbq/Build/Products/Debug-iphonesimulator/Some\ Test.app/PlugIns/Some\ TestTests.xctest/Frameworks --scan-folder /Users/john/Library/Developer/Xcode/DerivedData/Some_Test-ghskumgqpreuafeligineebzxlbq/Build/Products/Debug-iphonesimulator/Some\ Test.app/PlugIns/Some\ TestTests.xctest/PlugIns --scan-folder /Users/john/Library/Developer/Xcode/DerivedData/Some_Test-ghskumgqpreuafeligineebzxlbq/Build/Products/Debug-iphonesimulator/Some\ Test.app/PlugIns/Some\ TestTests.xctest/SystemExtensions --scan-folder /Users/john/Library/Developer/Xcode/DerivedData/Some_Test-ghskumgqpreuafeligineebzxlbq/Build/Products/Debug-iphonesimulator/Some\ Test.app/PlugIns/Some\ TestTests.xctest/Extensions --platform iphonesimulator --toolchain /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain --destination /Users/john/Library/Developer/Xcode/DerivedData/Some_Test-ghskumgqpreuafeligineebzxlbq/Build/Products/Debug-iphonesimulator/Some\ Test.app/PlugIns/Some\ TestTests.xctest/Frameworks --strip-bitcode --scan-executable /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/lib/libXCTestSwiftSupport.dylib --strip-bitcode-tool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/bitcode_strip --emit-dependency-info /Users/john/Library/Developer/Xcode/DerivedData/Some_Test-ghskumgqpreuafeligineebzxlbq/Build/Intermediates.noindex/Some\ Test.build/Debug-iphonesimulator/Some\ TestTests.build/SwiftStdLibToolInputDependencies.dep --filter-for-swift-os
+
+
+
+ExtractAppIntentsMetadata (in target 'Some TestTests' from project 'Some Test')
+    cd /Users/john/Desktop/Some\ Test
+    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/apeventtentsmetadataprocessor --output /Users/john/Library/Developer/Xcode/DerivedData/Some_Test-ghskumgqpreuafeligineebzxlbq/Build/Products/Debug-iphonesimulator/Some\ Test.app/PlugIns/Some\ TestTests.xctest --toolchain-dir /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain --module-name Some_TestTests --sdk-root /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator17.2.sdk --platform-family iOS --deployment-target 17.2 --target-triple arm64-apple-ios17.2-simulator --source-files /Users/john/Desktop/Some\ Test/Some\ TestTests/Some_TestTests.swift --binary-file /Users/john/Library/Developer/Xcode/DerivedData/Some_Test-ghskumgqpreuafeligineebzxlbq/Build/Products/Debug-iphonesimulator/Some\ Test.app/PlugIns/Some\ TestTests.xctest/Some\ TestTests --dependency-file /Users/john/Library/Developer/Xcode/DerivedData/Some_Test-ghskumgqpreuafeligineebzxlbq/Build/Intermediates.noindex/Some\ Test.build/Debug-iphonesimulator/Some\ TestTests.build/Objects-normal/arm64/Some\ TestTests_dependency_info.dat --swift-const-vals /Users/john/Library/Developer/Xcode/DerivedData/Some_Test-ghskumgqpreuafeligineebzxlbq/Build/Intermediates.noindex/Some\ Test.build/Debug-iphonesimulator/Some\ TestTests.build/Objects-normal/arm64/Some_TestTests.swiftconstvalues --stringsdata-file /Users/john/Library/Developer/Xcode/DerivedData/Some_Test-ghskumgqpreuafeligineebzxlbq/Build/Intermediates.noindex/Some\ Test.build/Debug-iphonesimulator/Some\ TestTests.build/Objects-normal/arm64/ExtractedAppShortcutsMetadata.stringsdata --compile-time-extraction
+note: Metadata extraction skipped. No AppIntents.framework dependency found. (in target 'Some TestTests' from project 'Some Test')
+
+
+CodeSign /Users/john/Library/Developer/Xcode/DerivedData/Some_Test-ghskumgqpreuafeligineebzxlbq/Build/Products/Debug-iphonesimulator/Some\ Test.app/PlugIns/Some\ TestTests.xctest (in target 'Some TestTests' from project 'Some Test')
+    cd /Users/john/Desktop/Some\ Test
+
+    Signing Identity:     "-"
+
+    /usr/bin/codesign --force --sign - --timestamp\=none --generate-entitlement-der /Users/john/Library/Developer/Xcode/DerivedData/Some_Test-ghskumgqpreuafeligineebzxlbq/Build/Products/Debug-iphonesimulator/Some\ Test.app/PlugIns/Some\ TestTests.xctest
+
+
+
+CodeSign /Users/john/Library/Developer/Xcode/DerivedData/Some_Test-ghskumgqpreuafeligineebzxlbq/Build/Products/Debug-iphonesimulator/Some\ Test.app (in target 'Some Test' from project 'Some Test')
+    cd /Users/john/Desktop/Some\ Test
+
+    Signing Identity:     "-"
+
+    /usr/bin/codesign --force --sign - --entitlements /Users/john/Library/Developer/Xcode/DerivedData/Some_Test-ghskumgqpreuafeligineebzxlbq/Build/Intermediates.noindex/Some\ Test.build/Debug-iphonesimulator/Some\ Test.build/Some\ Test.app.xcent --timestamp\=none --generate-entitlement-der /Users/john/Library/Developer/Xcode/DerivedData/Some_Test-ghskumgqpreuafeligineebzxlbq/Build/Products/Debug-iphonesimulator/Some\ Test.app
+
+/Users/john/Library/Developer/Xcode/DerivedData/Some_Test-ghskumgqpreuafeligineebzxlbq/Build/Products/Debug-iphonesimulator/Some Test.app: replacing existing signature
+
+
+
+Validate /Users/john/Library/Developer/Xcode/DerivedData/Some_Test-ghskumgqpreuafeligineebzxlbq/Build/Products/Debug-iphonesimulator/Some\ Test.app (in target 'Some Test' from project 'Some Test')
+    cd /Users/john/Desktop/Some\ Test
+    builtin-validationUtility /Users/john/Library/Developer/Xcode/DerivedData/Some_Test-ghskumgqpreuafeligineebzxlbq/Build/Products/Debug-iphonesimulator/Some\ Test.app
+
+
+ProcessInfoPlistFile /Users/john/Library/Developer/Xcode/DerivedData/Some_Test-ghskumgqpreuafeligineebzxlbq/Build/Products/Debug-iphonesimulator/Some\ TestUITests-Runner.app/PlugIns/Some\ TestUITests.xctest/Info.plist /Users/john/Library/Developer/Xcode/DerivedData/Some_Test-ghskumgqpreuafeligineebzxlbq/Build/Intermediates.noindex/Some\ Test.build/Debug-iphonesimulator/Some\ TestUITests.build/empty-Some\ TestUITests.plist (in target 'Some TestUITests' from project 'Some Test')
+    cd /Users/john/Desktop/Some\ Test
+    builtin-infoPlistUtility /Users/john/Library/Developer/Xcode/DerivedData/Some_Test-ghskumgqpreuafeligineebzxlbq/Build/Intermediates.noindex/Some\ Test.build/Debug-iphonesimulator/Some\ TestUITests.build/empty-Some\ TestUITests.plist -producttype com.apple.product-type.bundle.ui-testing -expandbuildsettings -format binary -platform iphonesimulator -additionalcontentfile /Users/john/Library/Developer/Xcode/DerivedData/Some_Test-ghskumgqpreuafeligineebzxlbq/Build/Intermediates.noindex/Some\ Test.build/Debug-iphonesimulator/Some\ TestUITests.build/ProductTypeInfoPlistAdditions.plist -o /Users/john/Library/Developer/Xcode/DerivedData/Some_Test-ghskumgqpreuafeligineebzxlbq/Build/Products/Debug-iphonesimulator/Some\ TestUITests-Runner.app/PlugIns/Some\ TestUITests.xctest/Info.plist
+
+
+
+** TEST BUILD SUCCEEDED ** [5.961 sec]
+
+
+
+
+Command line invocation:
+
+/Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild test-without-building -scheme "Some Test" -destination id=28B52DAA-BC2F-410B-A5BE-F485A3AFB0BC -project "/Users/john/Desktop/Some Test/Some Test.xcodeproj" -testPlan "Some Test" -configuration Debug -parallelizeTargets
+
+User defaults from command line:
+    IDEPackageSupportUseBuiltinSCM = YES
+
+
+--- xcodebuild: WARNING: Using the first of multiple matching destinations:
+{ platform:iOS Simulator, id:28B52DAA-BC2F-410B-A5BE-F485A3AFB0BC, OS:17.2, name:iPhone 15 }
+{ platform:iOS Simulator, id:28B52DAA-BC2F-410B-A5BE-F485A3AFB0BC, OS:17.2, name:iPhone 15 }
+
+2024-02-12 00:30:59.018 xcodebuild[50302:10107557] [MT] IDETestOperationsObserverDebug: 108.950 elapsed -- Testing started completed.
+
+2024-02-12 00:30:59.018 xcodebuild[50302:10107557] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
+2024-02-12 00:30:59.018 xcodebuild[50302:10107557] [MT] IDETestOperationsObserverDebug: 108.950 sec, +108.950 sec -- end
+
+
+Test session results, code coverage, and logs:
+	/Users/john/Library/Developer/Xcode/DerivedData/Some_Test-ghskumgqpreuafeligineebzxlbq/Logs/Test/Test-Some Test-2024.02.12_00-29-09-+0100.xcresult
+
+
+** TEST EXECUTE SUCCEEDED ** [109.328 sec]
+
+
+Testing started
+Test suite 'Some_TestTests' started on 'Clone 1 of iPhone 15 - Some Test (51733)'
+Test case 'Some_TestTests.testExample()' passed on 'Clone 1 of iPhone 15 - Some Test (51733)' (0.001 seconds)
+Test suite 'Some_TestUITests' started on 'Clone 2 of iPhone 15 - Some TestUITests-Runner (51728)'
+Test case 'Some_TestTests.testPerformanceExample()' passed on 'Clone 1 of iPhone 15 - Some Test (51733)' (0.507 seconds)
+Test suite 'Some_TestUITestsLaunchTests' started on 'Clone 1 of iPhone 15 - Some TestUITests-Runner (51791)'
+Test case 'Some_TestUITests.testExample()' passed on 'Clone 2 of iPhone 15 - Some TestUITests-Runner (51728)' (2.825 seconds)
+Test case 'Some_TestUITestsLaunchTests.testLaunch()' passed on 'Clone 1 of iPhone 15 - Some TestUITests-Runner (51791)' (2.134 seconds)
+Test case 'Some_TestUITestsLaunchTests.testLaunch()' passed on 'Clone 1 of iPhone 15 - Some TestUITests-Runner (51791)' (3.506 seconds)
+Test case 'Some_TestUITestsLaunchTests.testLaunch()' passed on 'Clone 1 of iPhone 15 - Some TestUITests-Runner (51791)' (3.768 seconds)
+Test case 'Some_TestUITestsLaunchTests.testLaunch()' passed on 'Clone 1 of iPhone 15 - Some TestUITests-Runner (51791)' (3.251 seconds)
+Test case 'Some_TestUITests.testLaunchPerformance()' passed on 'Clone 2 of iPhone 15 - Some TestUITests-Runner (51728)' (15.957 seconds)
+
+
+

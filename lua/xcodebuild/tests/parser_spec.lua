@@ -25,6 +25,15 @@ local mockSwiftFiles = function()
       ["ViewModelTests"] = {
         "/Users/john/repo/something/Tests/ViewModel.swift",
       },
+      ["Some_TestUITestsLaunchTests"] = {
+        "/Users/john/repo/something/Tests/SomeFile1.swift",
+      },
+      ["Some_TestUITests"] = {
+        "/Users/john/repo/something/Tests/SomeFile2.swift",
+      },
+      ["Some_TestTests"] = {
+        "/Users/john/repo/something/Tests/SomeFile3.swift",
+      },
     }
   end
 end
@@ -42,6 +51,9 @@ local mockLSP = function()
 
   filetreeMap["ShortcutRecorderCrashTests"] = "/Users/john/repo/something/ShortcutRecorder.swift"
   filetreeMap["ViewModelTests"] = "/Users/john/repo/something/Tests/ViewModel.swift"
+  filetreeMap["Some_TestUITestsLaunchTests"] = "/Users/john/repo/something/Tests/SomeFile1.swift"
+  filetreeMap["Some_TestUITests"] = "/Users/john/repo/something/Tests/SomeFile2.swift"
+  filetreeMap["Some_TestTests"] = "/Users/john/repo/something/Tests/SomeFile3.swift"
 
   vim.lsp.get_active_clients = function(_)
     return { { id = 1 } }
@@ -213,6 +225,16 @@ describe("ensure xcodebuild logs are processed correctly", function()
         local expectedResult, result = runTestCase(12)
         assert.are.same(expectedResult, result)
       end)
+    end)
+  end)
+
+  --
+  -- fresh project
+  --
+  describe("when the project is newly created with tests", function()
+    it("should parse test results", function()
+      local expectedResult, result = runTestCase(16)
+      assert.are.same(expectedResult, result)
     end)
   end)
 end)

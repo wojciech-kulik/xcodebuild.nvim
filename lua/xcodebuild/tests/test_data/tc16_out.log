@@ -1,0 +1,86 @@
+{
+  buildErrors = {},
+  diagnostics = {},
+  failedTestsCount = 0,
+  output = {},
+  tests = {
+    Some_TestTests = { {
+        class = "Some_TestTests",
+        filename = "SomeFile3",
+        filepath = "/Users/john/repo/something/Tests/SomeFile3.swift",
+        name = "testExample",
+        success = true,
+        target = "Some_TestTests",
+        testResult = "passed",
+        time = "0.001 seconds"
+      }, {
+        class = "Some_TestTests",
+        filename = "SomeFile3",
+        filepath = "/Users/john/repo/something/Tests/SomeFile3.swift",
+        name = "testPerformanceExample",
+        success = true,
+        target = "Some_TestTests",
+        testResult = "passed",
+        time = "0.507 seconds"
+      } },
+    Some_TestUITests = { {
+        class = "Some_TestUITests",
+        filename = "SomeFile2",
+        filepath = "/Users/john/repo/something/Tests/SomeFile2.swift",
+        name = "testExample",
+        success = true,
+        target = "Some_TestUITests",
+        testResult = "passed",
+        time = "2.825 seconds"
+      }, {
+        class = "Some_TestUITests",
+        filename = "SomeFile2",
+        filepath = "/Users/john/repo/something/Tests/SomeFile2.swift",
+        name = "testLaunchPerformance",
+        success = true,
+        target = "Some_TestUITests",
+        testResult = "passed",
+        time = "15.957 seconds"
+      } },
+    Some_TestUITestsLaunchTests = { {
+        class = "Some_TestUITestsLaunchTests",
+        filename = "SomeFile1",
+        filepath = "/Users/john/repo/something/Tests/SomeFile1.swift",
+        name = "testLaunch",
+        success = true,
+        target = "Some_TestUITestsLaunchTests",
+        testResult = "passed",
+        time = "2.134 seconds"
+      }, {
+        class = "Some_TestUITestsLaunchTests",
+        filename = "SomeFile1",
+        filepath = "/Users/john/repo/something/Tests/SomeFile1.swift",
+        name = "testLaunch",
+        success = true,
+        target = "Some_TestUITestsLaunchTests",
+        testResult = "passed",
+        time = "3.506 seconds"
+      }, {
+        class = "Some_TestUITestsLaunchTests",
+        filename = "SomeFile1",
+        filepath = "/Users/john/repo/something/Tests/SomeFile1.swift",
+        name = "testLaunch",
+        success = true,
+        target = "Some_TestUITestsLaunchTests",
+        testResult = "passed",
+        time = "3.768 seconds"
+      }, {
+        class = "Some_TestUITestsLaunchTests",
+        filename = "SomeFile1",
+        filepath = "/Users/john/repo/something/Tests/SomeFile1.swift",
+        name = "testLaunch",
+        success = true,
+        target = "Some_TestUITestsLaunchTests",
+        testResult = "passed",
+        time = "3.251 seconds"
+      } }
+  },
+  testsCount = 8,
+  warnings = {},
+  xcresultFilepath = "/Users/john/Library/Developer/Xcode/DerivedData/Some_Test-ghskumgqpreuafeligineebzxlbq/Logs/Test/Test-Some Test-2024.02.12_00-29-09-+0100.xcresult"
+}

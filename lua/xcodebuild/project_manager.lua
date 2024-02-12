@@ -106,7 +106,7 @@ function M.create_new_file()
 
   local path = vim.fn.expand("%:p:h")
   local filename = vim.fn.input("File name: ", "")
-  local extension = filename:match("%.(%w+)$") or ""
+  local extension = filename:match("%.([%w_]+)$") or ""
 
   if vim.trim(filename) == "" then
     return

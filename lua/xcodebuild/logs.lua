@@ -181,7 +181,7 @@ local function open_test_file(tests)
     return
   end
 
-  local testTarget, testClass, testName, line = string.match(currentLine, "(%w*)%.?(%w*)%.(.*)%:(%d+)")
+  local testTarget, testClass, testName, line = string.match(currentLine, "([%w_]*)%.?([%w_]*)%.(.*)%:(%d+)")
   local key = testSearch.get_test_key(testTarget, testClass)
 
   for _, test in ipairs(tests[key] or {}) do
