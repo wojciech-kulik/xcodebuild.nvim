@@ -81,7 +81,158 @@ gem install xcodeproj
 > 
 > You will find there a collection of useful code snippets and tips for iOS/macOS development in Neovim.
 
+## 📱 Setup Your Neovim For iOS Development
+
+I wrote an article that sums up all the steps required to set up your Neovim from scratch to develop iOS and macOS apps:
+
+[The Complete Guide To iOS & macOS Development In Neovim](https://wojciechkulik.pl/ios/the-complete-guide-to-ios-macos-development-in-neovim)
+
+You can also check out the sample Neovim configuration that I prepared for iOS development: [ios-dev-starter-nvim](https://github.com/wojciech-kulik/ios-dev-starter-nvim)
+
+## 🚀 Usage
+
+> [!IMPORTANT]
+> Make sure to open your project's root directory in Neovim and run `XcodebuildSetup` to configure the project. The plugin needs several information like project file, scheme, config, device, and test plan to be able to run commands.
+
+### 🔧 Commands
+
+<details>
+  <summary>👉 See all user commands</summary>
+
+Xcodebuild.nvim comes with the following commands:
+
+### General
+
+| Command                      | Description                                              |
+| ---------------------------- | -------------------------------------------------------- |
+| `XcodebuildSetup`            | Run configuration wizard to select project configuration |
+| `XcodebuildPicker`           | Show picker with all available actions                   |
+| `XcodebuildBuild`            | Build project                                            |
+| `XcodebuildCleanBuild`       | Build project (clean build)                              |
+| `XcodebuildBuildRun`         | Build & run app                                          |
+| `XcodebuildBuildForTesting`  | Build for testing                                        |
+| `XcodebuildRun`              | Run app without building                                 |
+| `XcodebuildCancel`           | Cancel currently running action                          |
+| `XcodebuildCleanDerivedData` | Deletes project's DerivedData                            |
+| `XcodebuildToggleLogs`       | Toggle logs panel                                        |
+| `XcodebuildOpenLogs`         | Open logs panel                                          |
+| `XcodebuildCloseLogs`        | Close logs panel                                         |
+
+### Project Manager
+
+| Command                              | Description                                                |
+| ------------------------------------ | ---------------------------------------------------------- |
+| `XcodebuildProjectManager`           | Show picker with all Project Manager actions               |
+| `XcodebuildCreateNewFile`            | Create a new file and add it to target(s)                  |
+| `XcodebuildAddCurrentFile`           | Add the active file to target(s)                           |
+| `XcodebuildRenameCurrentFile`        | Rename the current file                                    |
+| `XcodebuildDeleteCurrentFile`        | Delete the current file                                    |
+| `XcodebuildCreateNewGroup`           | Create a new directory and add it to the project           |
+| `XcodebuildAddCurrentGroup`          | Add the parent directory of the active file to the project |
+| `XcodebuildRenameCurrentGroup`       | Rename the current directory                               |
+| `XcodebuildDeleteCurrentGroup`       | Delete the current directory including all files inside    |
+| `XcodebuildUpdateCurrentFileTargets` | Update target membership of the active file                |
+| `XcodebuildShowCurrentFileTargets`   | Show target membership of the active file                  |
+
+👉 To add a file to multiple targets use multi-select feature (by default `tab`).
+
+### Testing
+
+| Command                      | Description                               |
+| ---------------------------- | ----------------------------------------- |
+| `XcodebuildTest`             | Run tests (whole test plan)               |
+| `XcodebuildTestTarget`       | Run test target (where the cursor is)     |
+| `XcodebuildTestClass`        | Run test class (where the cursor is)      |
+| `XcodebuildTestFunc`         | Run test (where the cursor is)            |
+| `XcodebuildTestSelected`     | Run selected tests (using visual mode)    |
+| `XcodebuildTestFailing`      | Rerun previously failed tests             |
+| `XcodebuildFailingSnapshots` | Show a picker with failing snapshot tests |
+
+### Code Coverage
+
+| Command                            | Description                                |
+| ---------------------------------- | ------------------------------------------ |
+| `XcodebuildToggleCodeCoverage`     | Toggle code coverage marks on the side bar |
+| `XcodebuildShowCodeCoverageReport` | Open HTML code coverage report             |
+| `XcodebuildJumpToNextCoverage`     | Jump to next code coverage mark            |
+| `XcodebuildJumpToPrevCoverage`     | Jump to previous code coverage mark        |
+
+### Test Explorer
+
+| Command                                  | Description                    |
+| ---------------------------------------- | ------------------------------ |
+| `XcodebuildTestExplorerShow`             | Show Test Explorer             |
+| `XcodebuildTestExplorerHide`             | Hide Test Explorer             |
+| `XcodebuildTestExplorerToggle`           | Toggle Test Explorer           |
+| `XcodebuildTestExplorerRunSelectedTests` | Run Selected Tests             |
+| `XcodebuildTestExplorerRerunTests`       | Re-run recently selected tests |
+
+### Configuration
+
+| Command                    | Description                         |
+| -------------------------- | ----------------------------------- |
+| `XcodebuildSelectProject`  | Show project file picker            |
+| `XcodebuildSelectScheme`   | Show scheme picker                  |
+| `XcodebuildSelectConfig`   | Show build configuration picker     |
+| `XcodebuildSelectDevice`   | Show device picker                  |
+| `XcodebuildSelectTestPlan` | Show test plan picker               |
+| `XcodebuildShowConfig`     | Print current project configuration |
+| `XcodebuildBootSimulator`  | Boot selected simulator             |
+| `XcodebuildUninstall`      | Uninstall mobile app                |
+
+</details>
+
+### ⌘ Sample Key Bindings
+
+```lua
+vim.keymap.set("n", "<leader>X", "<cmd>XcodebuildPicker<cr>", { desc = "Show Xcodebuild Actions" })
+vim.keymap.set("n", "<leader>xf", "<cmd>XcodebuildProjectManager<cr>", { desc = "Show Project Manager Actions" })
+
+vim.keymap.set("n", "<leader>xb", "<cmd>XcodebuildBuild<cr>", { desc = "Build Project" })
+vim.keymap.set("n", "<leader>xB", "<cmd>XcodebuildBuildForTesting<cr>", { desc = "Build For Testing" })
+vim.keymap.set("n", "<leader>xr", "<cmd>XcodebuildBuildRun<cr>", { desc = "Build & Run Project" })
+
+vim.keymap.set("n", "<leader>xt", "<cmd>XcodebuildTest<cr>", { desc = "Run Tests" })
+vim.keymap.set("v", "<leader>xt", "<cmd>XcodebuildTestSelected<cr>", { desc = "Run Selected Tests" })
+vim.keymap.set("n", "<leader>xT", "<cmd>XcodebuildTestClass<cr>", { desc = "Run This Test Class" })
+
+vim.keymap.set("n", "<leader>xl", "<cmd>XcodebuildToggleLogs<cr>", { desc = "Toggle Xcodebuild Logs" })
+vim.keymap.set("n", "<leader>xc", "<cmd>XcodebuildToggleCodeCoverage<cr>", { desc = "Toggle Code Coverage" })
+vim.keymap.set("n", "<leader>xC", "<cmd>XcodebuildShowCodeCoverageReport<cr>", { desc = "Show Code Coverage Report" })
+vim.keymap.set("n", "<leader>xe", "<cmd>XcodebuildTestExplorerToggle<cr>", { desc = "Toggle Test Explorer" })
+vim.keymap.set("n", "<leader>xs", "<cmd>XcodebuildFailingSnapshots<cr>", { desc = "Show Failing Snapshots" })
+
+vim.keymap.set("n", "<leader>xd", "<cmd>XcodebuildSelectDevice<cr>", { desc = "Select Device" })
+vim.keymap.set("n", "<leader>xp", "<cmd>XcodebuildSelectTestPlan<cr>", { desc = "Select Test Plan" })
+vim.keymap.set("n", "<leader>xq", "<cmd>Telescope quickfix<cr>", { desc = "Show QuickFix List" })
+```
+
+> [!TIP]
+> Press `<leader>X` to access the picker with all commands.
+>
+> Press `<leader>xf` to access the picker with all Project Manager commands.
+
+
+### 📋 Logs Panel
+
+- Press `o` on a failed test in the summary section to jump to the failing location
+- Press `q` to close the panel
+
+### 🧪 Test Explorer
+
+- Press `o` to jump to the test implementation
+- Press `t` to run selected tests
+- Press `T` to re-run recently selected tests
+- Press `R` to reload test list
+- Press `[` to jump to the previous failed test
+- Press `]` to jump to the next failed test
+- Press `<cr>` to expand or collapse the current node
+- Press `<tab>` to expand or collapse all classes
+- Press `q` to close the Test Explorer
+
 ## ⚙️ Configuration
+
+### 🔥 Customize Xcodebuild.nvim
 
 <details>
   <summary>See default Xcodebuild.nvim config</summary>
@@ -317,18 +468,11 @@ In order to support multiple cases, the plugin allows you to choose the search m
 
 </details>
 
-### 📱 Setup Your Neovim For iOS Development
-
-> [!IMPORTANT]
-> I wrote an article that sums up all steps to set up your Neovim from scratch to develop iOS and macOS apps:
->
-> [The Complete Guide To iOS & macOS Development In Neovim](https://wojciechkulik.pl/ios/the-complete-guide-to-ios-macos-development-in-neovim)
->
-> You can also check out a sample Neovim configuration that I prepared for iOS development: [ios-dev-starter-nvim](https://github.com/wojciech-kulik/ios-dev-starter-nvim)
-
 ### 📦 Swift Packages Development
 
 This plugin supports only iOS and macOS applications. However, if you develop Swift Package for one of those platforms, you can easily use this plugin by creating a sample iOS/macOS project in your root directory and by adding your package as a dependency.
+
+## 🦾 Extra Features
 
 ### 🔬 DAP Integration
 
@@ -410,9 +554,6 @@ return {
 
 If you installed [nvim-dap](https://github.com/mfussenegger/nvim-dap) and [nvim-dap-ui](https://github.com/rcarriga/nvim-dap-ui), you can easily track your app logs. The plugin automatically sends simulator logs to the `console` window provided by [nvim-dap-ui](https://github.com/rcarriga/nvim-dap-ui).
 
-> [!TIP]
-> Config options allow you to filter and format each line.
-
 To see logs you don't need to run the debugger. You can just show the `console` and run the app (remember that the app must be launched by xcodebuild.nvim).
 
 ```
@@ -437,146 +578,6 @@ tail -f .nvim/xcodebuild/simulator_logs.log
 ```
 
 This approach works especially well if you are using tmux.
-
-## 🚀 Usage
-
-> [!IMPORTANT]
-> Make sure to open your project's root directory in Neovim and run `XcodebuildSetup` to configure the project. The plugin needs several information like project file, scheme, config, device, and test plan to be able to run commands.
-
-### 🔧 Commands
-
-<details>
-  <summary>👉 See all user commands</summary>
-
-Xcodebuild.nvim comes with the following commands:
-
-### General
-
-| Command                      | Description                                              |
-| ---------------------------- | -------------------------------------------------------- |
-| `XcodebuildSetup`            | Run configuration wizard to select project configuration |
-| `XcodebuildPicker`           | Show picker with all available actions                   |
-| `XcodebuildBuild`            | Build project                                            |
-| `XcodebuildCleanBuild`       | Build project (clean build)                              |
-| `XcodebuildBuildRun`         | Build & run app                                          |
-| `XcodebuildBuildForTesting`  | Build for testing                                        |
-| `XcodebuildRun`              | Run app without building                                 |
-| `XcodebuildCancel`           | Cancel currently running action                          |
-| `XcodebuildCleanDerivedData` | Deletes project's DerivedData                            |
-| `XcodebuildToggleLogs`       | Toggle logs panel                                        |
-| `XcodebuildOpenLogs`         | Open logs panel                                          |
-| `XcodebuildCloseLogs`        | Close logs panel                                         |
-
-### Project Manager
-
-| Command                              | Description                                                |
-| ------------------------------------ | ---------------------------------------------------------- |
-| `XcodebuildProjectManager`           | Show picker with all Project Manager actions               |
-| `XcodebuildCreateNewFile`            | Create a new file and add it to target(s)                  |
-| `XcodebuildAddCurrentFile`           | Add the active file to target(s)                           |
-| `XcodebuildRenameCurrentFile`        | Rename the current file                                    |
-| `XcodebuildDeleteCurrentFile`        | Delete the current file                                    |
-| `XcodebuildCreateNewGroup`           | Create a new directory and add it to the project           |
-| `XcodebuildAddCurrentGroup`          | Add the parent directory of the active file to the project |
-| `XcodebuildRenameCurrentGroup`       | Rename the current directory                               |
-| `XcodebuildDeleteCurrentGroup`       | Delete the current directory including all files inside    |
-| `XcodebuildUpdateCurrentFileTargets` | Update target membership of the active file                |
-| `XcodebuildShowCurrentFileTargets`   | Show target membership of the active file                  |
-
-👉 To add a file to multiple targets use multi-select feature (by default `tab`).
-
-### Testing
-
-| Command                      | Description                               |
-| ---------------------------- | ----------------------------------------- |
-| `XcodebuildTest`             | Run tests (whole test plan)               |
-| `XcodebuildTestTarget`       | Run test target (where the cursor is)     |
-| `XcodebuildTestClass`        | Run test class (where the cursor is)      |
-| `XcodebuildTestFunc`         | Run test (where the cursor is)            |
-| `XcodebuildTestSelected`     | Run selected tests (using visual mode)    |
-| `XcodebuildTestFailing`      | Rerun previously failed tests             |
-| `XcodebuildFailingSnapshots` | Show a picker with failing snapshot tests |
-
-### Code Coverage
-
-| Command                            | Description                                |
-| ---------------------------------- | ------------------------------------------ |
-| `XcodebuildToggleCodeCoverage`     | Toggle code coverage marks on the side bar |
-| `XcodebuildShowCodeCoverageReport` | Open HTML code coverage report             |
-| `XcodebuildJumpToNextCoverage`     | Jump to next code coverage mark            |
-| `XcodebuildJumpToPrevCoverage`     | Jump to previous code coverage mark        |
-
-### Test Explorer
-
-| Command                                  | Description                    |
-| ---------------------------------------- | ------------------------------ |
-| `XcodebuildTestExplorerShow`             | Show Test Explorer             |
-| `XcodebuildTestExplorerHide`             | Hide Test Explorer             |
-| `XcodebuildTestExplorerToggle`           | Toggle Test Explorer           |
-| `XcodebuildTestExplorerRunSelectedTests` | Run Selected Tests             |
-| `XcodebuildTestExplorerRerunTests`       | Re-run recently selected tests |
-
-### Configuration
-
-| Command                    | Description                         |
-| -------------------------- | ----------------------------------- |
-| `XcodebuildSelectProject`  | Show project file picker            |
-| `XcodebuildSelectScheme`   | Show scheme picker                  |
-| `XcodebuildSelectConfig`   | Show build configuration picker     |
-| `XcodebuildSelectDevice`   | Show device picker                  |
-| `XcodebuildSelectTestPlan` | Show test plan picker               |
-| `XcodebuildShowConfig`     | Print current project configuration |
-| `XcodebuildBootSimulator`  | Boot selected simulator             |
-| `XcodebuildUninstall`      | Uninstall mobile app                |
-
-</details>
-
-### ⌘ Sample Key Bindings
-
-```lua
-vim.keymap.set("n", "<leader>X", "<cmd>XcodebuildPicker<cr>", { desc = "Show Xcodebuild Actions" })
-vim.keymap.set("n", "<leader>xf", "<cmd>XcodebuildProjectManager<cr>", { desc = "Show Project Manager Actions" })
-
-vim.keymap.set("n", "<leader>xb", "<cmd>XcodebuildBuild<cr>", { desc = "Build Project" })
-vim.keymap.set("n", "<leader>xB", "<cmd>XcodebuildBuildForTesting<cr>", { desc = "Build For Testing" })
-vim.keymap.set("n", "<leader>xr", "<cmd>XcodebuildBuildRun<cr>", { desc = "Build & Run Project" })
-
-vim.keymap.set("n", "<leader>xt", "<cmd>XcodebuildTest<cr>", { desc = "Run Tests" })
-vim.keymap.set("v", "<leader>xt", "<cmd>XcodebuildTestSelected<cr>", { desc = "Run Selected Tests" })
-vim.keymap.set("n", "<leader>xT", "<cmd>XcodebuildTestClass<cr>", { desc = "Run This Test Class" })
-
-vim.keymap.set("n", "<leader>xl", "<cmd>XcodebuildToggleLogs<cr>", { desc = "Toggle Xcodebuild Logs" })
-vim.keymap.set("n", "<leader>xc", "<cmd>XcodebuildToggleCodeCoverage<cr>", { desc = "Toggle Code Coverage" })
-vim.keymap.set("n", "<leader>xC", "<cmd>XcodebuildShowCodeCoverageReport<cr>", { desc = "Show Code Coverage Report" })
-vim.keymap.set("n", "<leader>xe", "<cmd>XcodebuildTestExplorerToggle<cr>", { desc = "Toggle Test Explorer" })
-vim.keymap.set("n", "<leader>xs", "<cmd>XcodebuildFailingSnapshots<cr>", { desc = "Show Failing Snapshots" })
-
-vim.keymap.set("n", "<leader>xd", "<cmd>XcodebuildSelectDevice<cr>", { desc = "Select Device" })
-vim.keymap.set("n", "<leader>xp", "<cmd>XcodebuildSelectTestPlan<cr>", { desc = "Select Test Plan" })
-vim.keymap.set("n", "<leader>xq", "<cmd>Telescope quickfix<cr>", { desc = "Show QuickFix List" })
-```
-
-> [!TIP]
-> Press `<leader>X` to access the picker with all commands.
->
-> Press `<leader>xf` to access the picker with all Project Manager commands.
-
-### 📋 Logs Panel
-
-- Press `o` on a failed test in the summary section to jump to the failing location
-- Press `q` to close the panel
-
-### 🧪 Test Explorer
-
-- Press `o` to jump to the test implementation
-- Press `t` to run selected tests
-- Press `T` to re-run recently selected tests
-- Press `R` to reload test list
-- Press `[` to jump to the previous failed test
-- Press `]` to jump to the next failed test
-- Press `<cr>` to expand or collapse the current node
-- Press `<tab>` to expand or collapse all classes
-- Press `q` to close the Test Explorer
 
 ### 🚥 Lualine Integration
 
