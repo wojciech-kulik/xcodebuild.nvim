@@ -79,7 +79,7 @@ gem install xcodeproj
 > [!TIP]
 > Make sure to check out [Tips & Tricks](https://github.com/wojciech-kulik/xcodebuild.nvim/discussions/categories/tips-tricks)!
 > 
-> You will find there are collection of useful things and code snippets for iOS/macOS development.
+> You will find there a collection of useful code snippets and tips for iOS/macOS development in Neovim.
 
 ## ⚙️ Configuration
 
