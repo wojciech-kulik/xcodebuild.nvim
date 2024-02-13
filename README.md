@@ -47,13 +47,6 @@ https://github.com/wojciech-kulik/xcodebuild.nvim/assets/3128467/ed7d2d2e-eaa4-4
 - This plugin requires the project to be built using Swift. It was tested only with Xcode 15.
 - Make sure to configure LSP properly. You can read how to do that in my post: [The Complete Guide To iOS & macOS Development In Neovim](https://wojciechkulik.pl/ios/the-complete-guide-to-ios-macos-development-in-neovim).
 
-Install tools:
-
-```shell
-brew install xcbeautify
-gem install xcodeproj
-```
-
 ## 📦 Installation
 
 Install the plugin using your preferred package manager.
@@ -75,6 +68,18 @@ return {
   end,
 }
 ```
+
+Install external tools:
+
+```shell
+brew install xcbeautify
+gem install xcodeproj
+```
+
+> [!TIP]
+> Make sure to check out [Tips & Tricks](https://github.com/wojciech-kulik/xcodebuild.nvim/discussions/categories/tips-tricks)!
+> 
+> You will find there are collection of useful things and code snippets for iOS/macOS development.
 
 ## ⚙️ Configuration
 
