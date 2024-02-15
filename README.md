@@ -78,7 +78,7 @@ gem install xcodeproj
 
 > [!TIP]
 > Make sure to check out [Tips & Tricks](https://github.com/wojciech-kulik/xcodebuild.nvim/discussions/categories/tips-tricks)!
-> 
+>
 > You will find there a collection of useful code snippets and tips for iOS/macOS development in Neovim.
 
 ## 📱 Setup Your Neovim For iOS Development
@@ -211,7 +211,6 @@ vim.keymap.set("n", "<leader>xq", "<cmd>Telescope quickfix<cr>", { desc = "Show 
 > Press `<leader>X` to access the picker with all commands.
 >
 > Press `<leader>xf` to access the picker with all Project Manager commands.
-
 
 ### 📋 Logs Panel
 
@@ -601,14 +600,15 @@ lualine_x = {
 
 Global variables that you can use:
 
-| Variable                       | Description                                 |
-| ------------------------------ | ------------------------------------------- |
-| `vim.g.xcodebuild_device_name` | Device name (ex. iPhone 15 Pro)             |
-| `vim.g.xcodebuild_os`          | OS version (ex. 16.4)                       |
-| `vim.g.xcodebuild_platform`    | Device platform (macOS or iPhone Simulator) |
-| `vim.g.xcodebuild_config`      | Selected build config (ex. Debug)           |
-| `vim.g.xcodebuild_scheme`      | Selected project scheme (ex. MyApp)         |
-| `vim.g.xcodebuild_test_plan`   | Selected Test Plan (ex. MyAppTests)         |
+| Variable                       | Description                                        |
+| ------------------------------ | -------------------------------------------------- |
+| `vim.g.xcodebuild_device_name` | Device name (ex. iPhone 15 Pro)                    |
+| `vim.g.xcodebuild_os`          | OS version (ex. 16.4)                              |
+| `vim.g.xcodebuild_platform`    | Device platform (macOS or iPhone Simulator)        |
+| `vim.g.xcodebuild_config`      | Selected build config (ex. Debug)                  |
+| `vim.g.xcodebuild_scheme`      | Selected project scheme (ex. MyApp)                |
+| `vim.g.xcodebuild_test_plan`   | Selected Test Plan (ex. MyAppTests)                |
+| `vim.g.xcodebuild_last_status` | Last build/test status (ex. Build Succeeded [15s]) |
 
 </details>
 

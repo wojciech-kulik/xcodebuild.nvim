@@ -1,5 +1,7 @@
 local M = {}
 
+local lastDuration = 0
+
 -- Build
 
 function M.build_started(forTesting)
@@ -7,6 +9,8 @@ function M.build_started(forTesting)
     pattern = "XcodebuildBuildStarted",
     data = { forTesting = forTesting },
   })
+
+  vim.g.xcodebuild_last_status = nil
 end
 
 function M.build_status(forTesting, progress, duration)
@@ -14,6 +18,7 @@ function M.build_status(forTesting, progress, duration)
     pattern = "XcodebuildBuildStatus",
     data = { forTesting = forTesting, progress = progress, duration = duration },
   })
+  lastDuration = duration
 end
 
 function M.build_finished(forTesting, success, cancelled, errors)
@@ -21,6 +26,14 @@ function M.build_finished(forTesting, success, cancelled, errors)
     pattern = "XcodebuildBuildFinished",
     data = { forTesting = forTesting, success = success, cancelled = cancelled, errors = errors },
   })
+
+  if cancelled then
+    vim.g.xcodebuild_last_status = "Build Cancelled"
+  elseif success then
+    vim.g.xcodebuild_last_status = "Build Succeeded [" .. lastDuration .. "s]"
+  else
+    vim.g.xcodebuild_last_status = "Build Failed with " .. #errors .. " error(s)"
+  end
 end
 
 -- Tests
@@ -29,6 +42,8 @@ function M.tests_started()
   vim.api.nvim_exec_autocmds("User", {
     pattern = "XcodebuildTestsStarted",
   })
+
+  vim.g.xcodebuild_last_status = nil
 end
 
 function M.tests_status(passedCount, failedCount)
@@ -43,6 +58,20 @@ function M.tests_finished(passedCount, failedCount, cancelled)
     pattern = "XcodebuildTestsFinished",
     data = { passedCount = passedCount, failedCount = failedCount, cancelled = cancelled },
   })
+
+  local success = failedCount == 0
+
+  if cancelled then
+    vim.g.xcodebuild_last_status = "Tests Cancelled"
+  elseif success then
+    vim.g.xcodebuild_last_status = "Tests Passed [Executed: " .. passedCount .. "]"
+  else
+    vim.g.xcodebuild_last_status = "Tests Failed [Passed: "
+      .. passedCount
+      .. " Failed: "
+      .. failedCount
+      .. "]"
+  end
 end
 
 -- Other
