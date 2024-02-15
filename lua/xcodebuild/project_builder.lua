@@ -22,7 +22,6 @@ function M.build_and_run_app(waitForDebugger, callback)
   M.build_project({}, function(report)
     if util.is_not_empty(report.buildErrors) then
       notifications.send_error("Build Failed")
-      logs.open_logs(true)
       return
     end
 
