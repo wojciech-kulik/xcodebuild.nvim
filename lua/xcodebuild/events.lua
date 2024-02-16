@@ -19,6 +19,7 @@ function M.build_status(forTesting, progress, duration)
     data = { forTesting = forTesting, progress = progress, duration = duration },
   })
   lastDuration = duration
+  vim.g.xcodebuild_last_status = "Building" .. (forTesting and " For Testing..." or "...")
 end
 
 function M.build_finished(forTesting, success, cancelled, errors)
@@ -32,7 +33,7 @@ function M.build_finished(forTesting, success, cancelled, errors)
   elseif success then
     vim.g.xcodebuild_last_status = "Build Succeeded [" .. lastDuration .. "s]"
   else
-    vim.g.xcodebuild_last_status = "Build Failed with " .. #errors .. " error(s)"
+    vim.g.xcodebuild_last_status = "Build Failed With " .. #errors .. " Error(s)"
   end
 end
 
@@ -51,6 +52,7 @@ function M.tests_status(passedCount, failedCount)
     pattern = "XcodebuildTestsStatus",
     data = { passedCount = passedCount, failedCount = failedCount },
   })
+  vim.g.xcodebuild_last_status = "Running Tests..."
 end
 
 function M.tests_finished(passedCount, failedCount, cancelled)

@@ -32,7 +32,7 @@ local progressFrames = {
 math.randomseed(tonumber(tostring(os.time()):reverse():sub(1, 9)))
 
 function M.start_action_timer(buildForTesting, expectedDuration)
-  local actionTitle = buildForTesting and "Building for Testing" or "Building"
+  local actionTitle = buildForTesting and "Building For Testing" or "Building"
   local startTime = os.time()
   local shouldShowProgressBar = require("xcodebuild.config").options.show_build_progress_bar
 
