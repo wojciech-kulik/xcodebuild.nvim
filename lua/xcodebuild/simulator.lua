@@ -27,6 +27,7 @@ function M.run_app(waitForDebugger, callback)
     local path = settings.appPath .. "/Contents/MacOS/" .. settings.productName
 
     M.currentJobId = vim.fn.jobstart(path, { detach = true })
+    events.application_launched()
     notifications.send("Application has been launched")
     util.call(callback)
   else
@@ -35,12 +36,18 @@ function M.run_app(waitForDebugger, callback)
     end
 
     notifications.send("Installing application...")
-    M.currentJobId = xcode.install_app(settings.destination, settings.appPath, function()
-      M.currentJobId = xcode.launch_app(settings.destination, settings.bundleId, waitForDebugger, function()
-        notifications.send("Application has been launched")
-        events.application_launched()
-        util.call(callback)
-      end)
+    M.currentJobId = xcode.install_app(settings.platform, settings.destination, settings.appPath, function()
+      M.currentJobId = xcode.launch_app(
+        settings.platform,
+        settings.destination,
+        settings.bundleId,
+        waitForDebugger,
+        function()
+          notifications.send("Application has been launched")
+          events.application_launched()
+          util.call(callback)
+        end
+      )
     end)
   end
 end
@@ -52,6 +59,11 @@ function M.boot_simulator(callback)
 
   if projectConfig.settings.platform == "macOS" then
     notifications.send_error("Your selected device is macOS.")
+    return
+  end
+
+  if projectConfig.settings.platform == "iOS" then
+    notifications.send_error("Selected device cannot be booted. Please select a simulator.")
     return
   end
 
@@ -74,7 +86,7 @@ function M.uninstall_app(callback)
   end
 
   notifications.send("Uninstalling application...")
-  M.currentJobId = xcode.uninstall_app(settings.destination, settings.bundleId, function()
+  M.currentJobId = xcode.uninstall_app(settings.platform, settings.destination, settings.bundleId, function()
     notifications.send("Application has been uninstalled")
     util.call(callback)
   end)

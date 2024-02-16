@@ -4,6 +4,22 @@ local notifications = require("xcodebuild.notifications")
 local M = {}
 local CANCELLED_CODE = 143
 
+local function show_stderr_output(_, output)
+  if output and (#output > 1 or output[1] ~= "") then
+    notifications.send_error(table.concat(output, "\n"))
+  end
+end
+
+local function callback_or_error(action, callback)
+  return function(_, code, _)
+    if code ~= 0 then
+      notifications.send_error("Could not " .. action .. " app (code: " .. code .. ")")
+    else
+      util.call(callback)
+    end
+  end
+end
+
 local function get_coverage_item_id(xcresultPath, callback)
   local command = "xcrun xcresulttool get --format json --path '" .. xcresultPath .. "'"
 
@@ -230,6 +246,13 @@ function M.build_project(opts)
 end
 
 function M.get_build_settings(platform, projectCommand, scheme, config, callback)
+  local sdk = "iphonesimulator"
+  if platform == "macOS" then
+    sdk = "macosx"
+  elseif platform == "iOS" then
+    sdk = "iphoneos"
+  end
+
   local command = "xcodebuild "
     .. projectCommand
     .. " -scheme '"
@@ -238,7 +261,7 @@ function M.get_build_settings(platform, projectCommand, scheme, config, callback
     .. config
     .. "' -showBuildSettings"
     .. " -sdk "
-    .. (platform == "macOS" and "macosx" or "iphonesimulator")
+    .. sdk
 
   local find_setting = function(source, key)
     return string.match(source, "%s+" .. key .. " = (.*)%s*")
@@ -272,14 +295,30 @@ function M.get_build_settings(platform, projectCommand, scheme, config, callback
         bundleId = bundleId,
       }
 
-      if callback then
-        callback(result)
-      end
+      util.call(callback, result)
     end,
   })
 end
 
-function M.install_app(destination, appPath, callback)
+function M.install_app(platform, destination, appPath, callback)
+  if platform == "iOS" then
+    M.install_app_on_device(destination, appPath, callback)
+  else
+    M.install_app_on_simulator(destination, appPath, callback)
+  end
+end
+
+function M.install_app_on_device(destination, appPath, callback)
+  local command = "xcrun devicectl device install app -d '" .. destination .. "' '" .. appPath .. "'"
+
+  return vim.fn.jobstart(command, {
+    stderr_buffered = true,
+    on_stderr = show_stderr_output,
+    on_exit = callback_or_error("installl", callback),
+  })
+end
+
+function M.install_app_on_simulator(destination, appPath, callback)
   local command = "xcrun simctl install '" .. destination .. "' '" .. appPath .. "'"
 
   return vim.fn.jobstart(command, {
@@ -297,7 +336,20 @@ function M.install_app(destination, appPath, callback)
   })
 end
 
-function M.launch_app(destination, bundleId, waitForDebugger, callback)
+function M.launch_app_on_device(destination, bundleId, callback)
+  local command = "xcrun devicectl device process launch --terminate-existing -d '"
+    .. destination
+    .. "' "
+    .. bundleId
+
+  return vim.fn.jobstart(command, {
+    stderr_buffered = true,
+    on_stderr = show_stderr_output,
+    on_exit = callback_or_error("launch", callback),
+  })
+end
+
+function M.launch_app_on_simulator(destination, bundleId, waitForDebugger, callback)
   local command = "xcrun simctl launch --terminate-running-process --console-pty '"
     .. destination
     .. "' "
@@ -357,6 +409,14 @@ function M.launch_app(destination, bundleId, waitForDebugger, callback)
   })
 end
 
+function M.launch_app(platform, destination, bundleId, waitForDebugger, callback)
+  if platform == "iOS" then
+    M.launch_app_on_device(destination, bundleId, callback)
+  else
+    M.launch_app_on_simulator(destination, bundleId, waitForDebugger, callback)
+  end
+end
+
 function M.boot_simulator(destination, callback)
   local command = "xcrun simctl boot '" .. destination .. "' "
 
@@ -380,19 +440,31 @@ function M.boot_simulator(destination, callback)
   })
 end
 
-function M.uninstall_app(destination, bundleId, callback)
+function M.uninstall_app_from_simulator(destination, bundleId, callback)
   local command = "xcrun simctl uninstall '" .. destination .. "' " .. bundleId
 
   return vim.fn.jobstart(command, {
     stdout_buffered = true,
-    on_exit = function(_, code, _)
-      if code ~= 0 then
-        notifications.send_error("Could not uninstall app (code: " .. code .. ")")
-      else
-        callback()
-      end
-    end,
+    on_exit = callback_or_error("uninstalll", callback),
   })
+end
+
+function M.uninstall_app_from_device(destination, bundleId, callback)
+  local command = "xcrun devicectl device uninstall app -d  '" .. destination .. "' " .. bundleId
+
+  return vim.fn.jobstart(command, {
+    stderr_buffered = true,
+    on_stderr = show_stderr_output,
+    on_exit = callback_or_error("uninstalll", callback),
+  })
+end
+
+function M.uninstall_app(platform, destination, bundleId, callback)
+  if platform == "iOS" then
+    M.uninstall_app_from_device(destination, bundleId, callback)
+  else
+    M.uninstall_app_from_simulator(destination, bundleId, callback)
+  end
 end
 
 function M.get_app_pid(productName)
@@ -427,9 +499,7 @@ function M.export_code_coverage(xcresultPath, outputPath, callback)
       notifications.send(
         "Could not export code coverage. Make sure that code coverage is enabled for your test plan"
       )
-      if callback then
-        callback()
-      end
+      util.call(callback)
       return
     end
 
@@ -448,10 +518,7 @@ function M.export_code_coverage(xcresultPath, outputPath, callback)
         if code ~= 0 then
           notifications.send_error("Could not export code coverage (code: " .. code .. ")")
         end
-
-        if callback then
-          callback()
-        end
+        util.call(callback)
       end,
     })
   end)
@@ -505,9 +572,7 @@ function M.export_code_coverage_report(xcresultPath, outputPath, callback)
   vim.fn.jobstart(command, {
     stdout_buffered = true,
     on_exit = function()
-      if callback then
-        callback()
-      end
+      util.call(callback)
     end,
   })
 end

@@ -13,7 +13,8 @@ A plugin designed to let you migrate your iOS, iPadOS, and macOS app development
 - [x] Project Manager to deal with project files without using Xcode.
 - [x] Test Explorer to visually present a tree with all tests and results.
 - [x] Built using official command line tools like `xcodebuild` and `xcrun simctl`.
-- [x] Actions to build, run, debug, and test apps.
+- [x] Actions to build, run, debug, and test apps on simulators.
+- [x] Actions to run and test apps on physical devices.
 - [x] App deployment to selected iOS simulator.
 - [x] Buffer integration with test results (code coverage, success & failure marks, duration, extra diagnostics).
 - [x] Code coverage report with customizable levels.
@@ -211,6 +212,8 @@ vim.keymap.set("n", "<leader>xq", "<cmd>Telescope quickfix<cr>", { desc = "Show 
 > Press `<leader>X` to access the picker with all commands.
 >
 > Press `<leader>xf` to access the picker with all Project Manager commands.
+>
+> Press `<C-r>` when the picker with devices is presented to refresh the list.
 
 ### 📋 Logs Panel
 
