@@ -8,6 +8,20 @@ local actions = require("xcodebuild.actions")
 
 local M = {}
 
+local function validate_project()
+  if not projectConfig.is_project_configured() then
+    notifications.send_error("The project is missing some details. Please run XcodebuildSetup first.")
+    return false
+  end
+
+  if projectConfig.settings.platform == "iOS" then
+    notifications.send_error("Debugging on physical devices is not supported. Please use the simulator.")
+    return false
+  end
+
+  return true
+end
+
 function M.start_dap_in_swift_buffer()
   local loadedDap, dap = pcall(require, "dap")
   if not loadedDap then
@@ -41,6 +55,10 @@ function M.build_and_debug(callback)
     return
   end
 
+  if not validate_project() then
+    return
+  end
+
   xcode.kill_app(projectConfig.settings.productName)
   M.start_dap_in_swift_buffer()
 
@@ -61,6 +79,10 @@ function M.build_and_debug(callback)
 end
 
 function M.debug_without_build(callback)
+  if not validate_project() then
+    return
+  end
+
   xcode.kill_app(projectConfig.settings.productName)
   M.start_dap_in_swift_buffer()
   simulator.run_app(false, callback)
@@ -70,6 +92,10 @@ function M.attach_debugger_for_tests()
   local loadedDap, dap = pcall(require, "dap")
   if not loadedDap then
     notifications.send_error("Could not load nvim-dap plugin")
+    return
+  end
+
+  if not validate_project() then
     return
   end
 
