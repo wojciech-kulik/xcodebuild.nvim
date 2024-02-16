@@ -87,6 +87,13 @@ function M.show(title, items, callback, opts)
     sorter = telescopeConfig.generic_sorter(),
     file_ignore_patterns = {},
     attach_mappings = function(prompt_bufnr, _)
+      if opts.on_refresh ~= nil then
+        vim.keymap.set({ "n", "i" }, "<C-r>", function()
+          start_telescope_spinner()
+          opts.on_refresh()
+        end, { silent = true, buffer = prompt_bufnr })
+      end
+
       telescopeActions.select_default:replace(function()
         local selection = telescopeState.get_selected_entry()
 
@@ -298,15 +305,67 @@ function M.select_testplan(callback, opts)
 end
 
 function M.select_destination(callback, opts)
+  opts = opts or {}
+
   local projectCommand = projectConfig.settings.projectCommand
   local scheme = projectConfig.settings.scheme
   local results = cachedDestinations or {}
   local useCache = require("xcodebuild.config").options.commands.cache_devices
   local hasCachedDevices = useCache and util.is_not_empty(results) and util.is_not_empty(cachedDeviceNames)
 
+  local refreshDevices = function()
+    currentJobId = xcode.get_destinations(projectCommand, scheme, function(destinations)
+      local alreadyAdded = {}
+      local filtered = util.filter(destinations, function(table)
+        if table.id and not alreadyAdded[table.id] then
+          alreadyAdded[table.id] = true
+
+          return (not table.name or not string.find(table.name, "^Any")) and not table.error
+        end
+      end)
+
+      local destinationNames = util.select(filtered, function(table)
+        local name = table.name or ""
+
+        if table.platform and table.platform == "iOS" then
+          return util.trim(name)
+        end
+
+        if table.platform and table.platform ~= "iOS Simulator" then
+          name = util.trim(name .. " " .. table.platform)
+        end
+        if table.platform == "macOS" and table.arch then
+          name = name .. " (" .. table.arch .. ")"
+        end
+        if table.os then
+          name = name .. " (" .. table.os .. ")"
+        end
+        if table.variant then
+          name = name .. " (" .. table.variant .. ")"
+        end
+        if table.error then
+          name = name .. " [error]"
+        end
+        return name
+      end)
+
+      if useCache then
+        cachedDeviceNames = destinationNames
+        cachedDestinations = filtered
+      end
+
+      results = filtered
+      update_results(destinationNames)
+    end)
+
+    return currentJobId
+  end
+
   if not hasCachedDevices then
     start_telescope_spinner()
   end
+
+  opts.on_refresh = refreshDevices
 
   M.show("Select Device", cachedDeviceNames or {}, function(_, index)
     projectConfig.settings.destination = results[index].id
@@ -320,47 +379,9 @@ function M.select_destination(callback, opts)
     end
   end, opts)
 
-  if hasCachedDevices then
-    return nil
+  if not hasCachedDevices then
+    return refreshDevices()
   end
-
-  currentJobId = xcode.get_destinations(projectCommand, scheme, function(destinations)
-    local filtered = util.filter(destinations, function(table)
-      return table.id ~= nil
-        and table.platform ~= "iOS"
-        and (not table.name or not string.find(table.name, "^Any"))
-    end)
-
-    local destinationNames = util.select(filtered, function(table)
-      local name = table.name or ""
-      if table.platform and table.platform ~= "iOS Simulator" then
-        name = util.trim(name .. " " .. table.platform)
-      end
-      if table.platform == "macOS" and table.arch then
-        name = name .. " (" .. table.arch .. ")"
-      end
-      if table.os then
-        name = name .. " (" .. table.os .. ")"
-      end
-      if table.variant then
-        name = name .. " (" .. table.variant .. ")"
-      end
-      if table.error then
-        name = name .. " [error]"
-      end
-      return name
-    end)
-
-    if useCache then
-      cachedDeviceNames = destinationNames
-      cachedDestinations = filtered
-    end
-
-    results = filtered
-    update_results(destinationNames)
-  end)
-
-  return currentJobId
 end
 
 function M.select_failing_snapshot_test()
