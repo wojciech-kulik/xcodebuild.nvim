@@ -35,6 +35,11 @@ local function run(action, params)
     table.remove(output, #output)
   end
 
+  if output[1] and vim.startswith(output[1], "WARN:") then
+    vim.notify(table.concat(output, "\n"):sub(7), vim.log.levels.WARN)
+    return {}
+  end
+
   local stderr_file = io.open(errorFile, "r")
   if stderr_file then
     if stderr_file:read("*all") ~= "" then

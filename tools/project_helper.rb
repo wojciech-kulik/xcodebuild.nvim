@@ -3,41 +3,61 @@ require 'xcodeproj'
 action = ARGV[0]
 project = Xcodeproj::Project.open(ARGV[1])
 
-def find_group_by_absolute_file_path(project, path)
+def find_group_by_absolute_file_path(project, path, exit_on_not_found = true)
   groups = project.groups.lazy.filter_map do |group|
     relative_path = path.sub(group.real_path.to_s + "/", "")
     relative_dir = File.dirname(relative_path)
 
-    if group.real_path.to_s == File.dirname(path) then
+    if group.real_path.to_s == File.dirname(path)
       return group
     end
 
     group.find_subpath(relative_dir)
   end
 
+  if groups.first.nil? && exit_on_not_found
+    group_name = File.dirname(path)
+    puts "WARN: Could not find \"#{group_name}\" group in the project."
+    exit
+  end
+
   groups.first
 end
 
-def find_group_by_absolute_dir_path(project, path)
+def find_group_by_absolute_dir_path(project, path, exit_on_not_found = true)
   groups = project.groups.lazy.filter_map do |group|
     relative_dir = path.sub(group.real_path.to_s + "/", "")
 
-    if group.real_path.to_s == path then
+    if group.real_path.to_s == path
       return group
     end
 
     group.find_subpath(relative_dir)
   end
 
+  if groups.first.nil? && exit_on_not_found
+    group_name = File.basename(path)
+    puts "WARN: Could not find \"#{group_name}\" group in the project."
+    exit
+  end
+
   groups.first
 end
 
-def find_file(project, file_path)
-  project.files.find { |file| file.real_path.to_s == file_path }
+def find_file(project, file_path, exit_on_not_found = true)
+  file_ref = project.files.find { |file| file.real_path.to_s == file_path }
+
+  if file_ref.nil? && exit_on_not_found
+    file_name = File.basename(file_path)
+    puts "WARN: Could not find \"#{file_name}\" in the project."
+    exit
+  end
+
+  file_ref
 end
 
 def add_file_to_targets(project, targets, file_path)
-  file_ref = find_file(project, file_path)
+  file_ref = find_file(project, file_path, false)
 
   if file_ref.nil?
     group = find_group_by_absolute_file_path(project, file_path)
@@ -79,8 +99,8 @@ def add_group(project, group_path)
   for i in 1..(splitted_path.length - 2)
     current_path = splitted_path[0..i].join("/")
     new_group_path = current_path + "/" + splitted_path[i + 1]
-    parent_group = find_group_by_absolute_dir_path(project, current_path)
-    current_group = find_group_by_absolute_dir_path(project, new_group_path)
+    parent_group = find_group_by_absolute_dir_path(project, current_path, false)
+    current_group = find_group_by_absolute_dir_path(project, new_group_path, false)
 
     if current_group.nil?
       parent_group.new_group(splitted_path[i + 1], new_group_path) unless parent_group.nil?
