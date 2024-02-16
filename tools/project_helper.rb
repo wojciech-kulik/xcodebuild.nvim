@@ -17,7 +17,7 @@ def find_group_by_absolute_file_path(project, path, exit_on_not_found = true)
 
   if groups.first.nil? && exit_on_not_found
     group_name = File.dirname(path)
-    puts "WARN: Could not find \"#{group_name}\" group in the project."
+    puts "WARN: xcodebuild.nvim: Could not find \"#{group_name}\" group in the project."
     exit
   end
 
@@ -37,7 +37,7 @@ def find_group_by_absolute_dir_path(project, path, exit_on_not_found = true)
 
   if groups.first.nil? && exit_on_not_found
     group_name = File.basename(path)
-    puts "WARN: Could not find \"#{group_name}\" group in the project."
+    puts "WARN: xcodebuild.nvim: Could not find \"#{group_name}\" group in the project."
     exit
   end
 
@@ -49,7 +49,7 @@ def find_file(project, file_path, exit_on_not_found = true)
 
   if file_ref.nil? && exit_on_not_found
     file_name = File.basename(file_path)
-    puts "WARN: Could not find \"#{file_name}\" in the project."
+    puts "WARN: xcodebuild.nvim: Could not find \"#{file_name}\" in the project."
     exit
   end
 
