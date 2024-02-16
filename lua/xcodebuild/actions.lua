@@ -31,6 +31,12 @@ local function update_settings(callback)
   end)
 end
 
+function M.open_in_xcode()
+  if helpers.validate_project() then
+    vim.fn.system({ "open", projectConfig.settings.projectFile })
+  end
+end
+
 function M.open_logs()
   logs.open_logs(false)
 end

@@ -429,6 +429,7 @@ function M.show_all_actions()
     "Boot Selected Simulator",
     "Clean DerivedData",
     "Uninstall Application",
+    "Open Project in Xcode",
   }
   local actionsPointers = {
     actions.build,
@@ -458,6 +459,7 @@ function M.show_all_actions()
     actions.boot_simulator,
     actions.clean_derived_data,
     actions.uninstall,
+    actions.open_in_xcode,
   }
 
   if not projectConfig.is_project_configured() then

@@ -118,6 +118,7 @@ Xcodebuild.nvim comes with the following commands:
 | `XcodebuildToggleLogs`       | Toggle logs panel                                        |
 | `XcodebuildOpenLogs`         | Open logs panel                                          |
 | `XcodebuildCloseLogs`        | Close logs panel                                         |
+| `XcodebuildOpenInXcode`      | Open project in Xcode                                    |
 
 ### Project Manager
 
