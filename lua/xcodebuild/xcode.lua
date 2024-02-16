@@ -253,7 +253,7 @@ function M.get_build_settings(platform, projectCommand, scheme, config, callback
 
       for _, line in ipairs(output) do
         bundleId = bundleId or find_setting(line, "PRODUCT_BUNDLE_IDENTIFIER")
-        productName = productName or find_setting(line, "PRODUCT_NAME")
+        productName = productName or find_setting(line, "PRODUCT_MODULE_NAME")
         buildDir = buildDir or find_setting(line, "TARGET_BUILD_DIR")
 
         if bundleId and productName and buildDir then
