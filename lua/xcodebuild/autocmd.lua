@@ -32,7 +32,9 @@ function M.setup()
       group = autogroup,
       pattern = config.marks.file_pattern,
       callback = function(ev)
-        diagnostics.refresh_test_buffer(ev.buf, appdata.report)
+        if projectConfig.is_project_configured() then
+          diagnostics.refresh_test_buffer(ev.buf, appdata.report)
+        end
       end,
     })
   end
