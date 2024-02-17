@@ -272,21 +272,31 @@ function M.get_build_settings(platform, projectCommand, scheme, config, callback
     on_stdout = function(_, output)
       local bundleId = nil
       local productName = nil
+      local wrapperName = nil
       local buildDir = nil
 
       for _, line in ipairs(output) do
         bundleId = bundleId or find_setting(line, "PRODUCT_BUNDLE_IDENTIFIER")
         productName = productName or find_setting(line, "PRODUCT_NAME")
+        wrapperName = wrapperName or find_setting(line, "WRAPPER_NAME")
         buildDir = buildDir or find_setting(line, "TARGET_BUILD_DIR")
 
-        if bundleId and productName and buildDir then
+        if bundleId and productName and buildDir and wrapperName then
           break
         end
       end
 
-      if not bundleId or not productName or not buildDir then
+      if not bundleId or (not productName and not wrapperName) or not buildDir then
         notifications.send_error("Could not get build settings")
         return
+      end
+
+      if wrapperName then
+        wrapperName = wrapperName:gsub("%.app$", "")
+
+        if vim.trim(wrapperName) ~= "" then
+          productName = wrapperName
+        end
       end
 
       local result = {
