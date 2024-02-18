@@ -360,17 +360,15 @@ function M.launch_app_on_device(destination, bundleId, callback)
 end
 
 function M.launch_app_on_simulator(destination, bundleId, waitForDebugger, callback)
-  local command = "xcrun simctl launch --terminate-running-process --console-pty '"
+  local command = "xcrun simctl launch --terminate-running-process --console-pty"
+    .. (waitForDebugger and " --wait-for-debugger" or "")
+    .. " '"
     .. destination
     .. "' "
     .. bundleId
   local logFile = require("xcodebuild.appdata").simulator_logs_filepath
-
-  if waitForDebugger then
-    command = command .. " --wait-for-debugger"
-  end
-
   local config = require("xcodebuild.config").options.console_logs
+
   local write_logs = function(_, output)
     if output[#output] == "" then
       table.remove(output, #output)
