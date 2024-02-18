@@ -428,6 +428,7 @@ function M.show_all_actions()
     "Show Configuration Wizard",
     "Boot Selected Simulator",
     "Clean DerivedData",
+    "Install Application",
     "Uninstall Application",
     "Open Project in Xcode",
   }
@@ -458,7 +459,8 @@ function M.show_all_actions()
     actions.configure_project,
     actions.boot_simulator,
     actions.clean_derived_data,
-    actions.uninstall,
+    actions.install_app,
+    actions.uninstall_app,
     actions.open_in_xcode,
   }
 

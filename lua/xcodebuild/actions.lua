@@ -181,9 +181,18 @@ function M.show_current_config()
   end, 100)
 end
 
-function M.uninstall(callback)
+function M.install_app(callback)
+  helpers.cancel_actions()
+  simulator.install_app(callback)
+end
+
+function M.uninstall_app(callback)
   helpers.cancel_actions()
   simulator.uninstall_app(callback)
+end
+
+function M.uninstall(callback) -- backward compatibility
+  M.uninstall_app(callback)
 end
 
 function M.boot_simulator(callback)

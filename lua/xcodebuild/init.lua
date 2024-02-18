@@ -125,8 +125,12 @@ function M.setup(options)
   vim.api.nvim_create_user_command("XcodebuildShowConfig", call(actions.show_current_config), { nargs = 0 })
   vim.api.nvim_create_user_command("XcodebuildBootSimulator", call(actions.boot_simulator), { nargs = 0 })
   vim.api.nvim_create_user_command("XcodebuildCleanDerivedData", call(actions.clean_derived_data), { nargs = 0 })
-  vim.api.nvim_create_user_command("XcodebuildUninstall", call(actions.uninstall), { nargs = 0 })
+  vim.api.nvim_create_user_command("XcodebuildInstallApp", call(actions.install_app), { nargs = 0 })
+  vim.api.nvim_create_user_command("XcodebuildUninstallApp", call(actions.uninstall_app), { nargs = 0 })
   vim.api.nvim_create_user_command("XcodebuildOpenInXcode", call(actions.open_in_xcode), { nargs = 0 })
+
+  -- Backward compatibility
+  vim.api.nvim_create_user_command("XcodebuildUninstall", call(actions.uninstall), { nargs = 0 })
 end
 
 return M

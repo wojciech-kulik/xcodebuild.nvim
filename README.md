@@ -180,7 +180,8 @@ Xcodebuild.nvim comes with the following commands:
 | `XcodebuildSelectTestPlan` | Show test plan picker               |
 | `XcodebuildShowConfig`     | Print current project configuration |
 | `XcodebuildBootSimulator`  | Boot selected simulator             |
-| `XcodebuildUninstall`      | Uninstall mobile app                |
+| `XcodebuildInstallApp`     | Install mobile app                  |
+| `XcodebuildUninstallApp`   | Uninstall mobile app                |
 
 </details>
 

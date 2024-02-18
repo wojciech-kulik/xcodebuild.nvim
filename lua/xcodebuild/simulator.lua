@@ -11,6 +11,24 @@ local M = {
   currentJobId = nil,
 }
 
+function M.install_app(callback)
+  if not helpers.validate_project() then
+    return
+  end
+
+  local settings = projectConfig.settings
+  if settings.platform == "macOS" then
+    notifications.send_error("macOS apps cannot be installed")
+    return
+  end
+
+  notifications.send("Installing application...")
+  xcode.install_app(settings.platform, settings.destination, settings.appPath, function()
+    notifications.send("Application has been installed")
+    util.call(callback)
+  end)
+end
+
 function M.run_app(waitForDebugger, callback)
   if not helpers.validate_project() then
     return

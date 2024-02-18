@@ -1,6 +1,7 @@
 {
   "workspace.library": ["${3rd}/luassert/library"],
   "diagnostics.globals": ["vim", "require", "describe", "it", "P"],
-  "diagnostics.disable": ["luadoc-miss-module-name", "luadoc-miss-type-name"]
+  "diagnostics.disable": ["luadoc-miss-module-name", "luadoc-miss-type-name",
+        "different-requires"]
 }
 
