@@ -43,6 +43,7 @@ https://github.com/wojciech-kulik/xcodebuild.nvim/assets/3128467/ed7d2d2e-eaa4-4
 - [xcbeautify](https://github.com/tuist/xcbeautify) - Xcode logs formatter (optional - you can set a different tool or disable formatting in the config).
 - [Xcodeproj](https://github.com/CocoaPods/Xcodeproj) - required by Project Manager to manage project files.
 - [nvim-tree](https://github.com/nvim-tree/nvim-tree.lua) required if you want to visually manage your project files.
+- [pymobiledevice3](https://github.com/doronz88/pymobiledevice3) required if you want to debug apps on physical devices.
 - Xcode (make sure that `xcodebuild` and `xcrun simctl` work correctly).
 - To get the best experience, you should install and configure [nvim-dap](https://github.com/mfussenegger/nvim-dap) and [nvim-dap-ui](https://github.com/rcarriga/nvim-dap-ui) to be able to debug.
 - This plugin requires the project to be built using Swift. It was tested only with Xcode 15.
@@ -75,6 +76,13 @@ Install external tools:
 ```shell
 brew install xcbeautify
 gem install xcodeproj
+```
+
+To debug apps on physical devices you will also need:
+
+```shell
+brew install jq
+python3 -m pip install -U pymobiledevice3
 ```
 
 > [!TIP]
@@ -258,6 +266,7 @@ vim.keymap.set("n", "<leader>xq", "<cmd>Telescope quickfix<cr>", { desc = "Show 
     extra_build_args = "-parallelizeTargets", -- extra arguments for `xcodebuild build`
     extra_test_args = "-parallelizeTargets", -- extra arguments for `xcodebuild test`
     project_search_max_depth = 3, -- maxdepth of xcodeproj/xcworkspace search while using configuration wizard
+    remote_debugger = nil, -- optional path to local copy of remote_debugger (check out README for details)
   },
   logs = { -- build & test logs
     auto_open_on_success_tests = false, -- open logs when tests succeeded
@@ -478,7 +487,7 @@ This plugin supports only iOS and macOS applications. However, if you develop Sw
 
 ## 🦾 Extra Features
 
-### 🔬 DAP Integration
+### 🔬 Debugger Configuration
 
 [nvim-dap](https://github.com/mfussenegger/nvim-dap) plugin lets you debug applications like in any other IDE. On top of that [nvim-dap-ui](https://github.com/rcarriga/nvim-dap-ui) extension will present for you all panels with stack, breakpoints, variables, logs, etc.
 
@@ -554,11 +563,56 @@ return {
 
 </details>
 
-### 🐛 Simulator Logs
+### 📲 Debugging On Physical Device
 
-If you installed [nvim-dap](https://github.com/mfussenegger/nvim-dap) and [nvim-dap-ui](https://github.com/rcarriga/nvim-dap-ui), you can easily track your app logs. The plugin automatically sends simulator logs to the `console` window provided by [nvim-dap-ui](https://github.com/rcarriga/nvim-dap-ui).
+This plugin allows you to debug your applications on physical devices. However, there are required some extra steps to configure it.
 
-To see logs you don't need to run the debugger. You can just show the `console` and run the app (remember that the app must be launched by xcodebuild.nvim).
+1. Make sure that you already configured [nvim-dap](https://github.com/mfussenegger/nvim-dap) and that it works with the simulator.
+1. Install required dependencies ([jq](https://jqlang.github.io/jq/) and [pymobiledevice3](https://github.com/doronz88/pymobiledevice3)):
+   ```shell
+   brew install jq
+   python3 -m pip install -U pymobiledevice3
+   ```
+1. [pymobiledevice3](https://github.com/doronz88/pymobiledevice3) requires `sudo` to [establish a secure connection](https://github.com/doronz88/pymobiledevice3?tab=readme-ov-file#working-with-developer-tools-ios--170) between Mac and remote device.
+   To make it work with xcodebuild.nvim, you must configure a passwordless access to the included small wrapper script: [remote_debugger](./tools/remote_debugger).
+
+   This script is responsible for just 2 simple actions which require `sudo`: starting a secure connection by using `pymobiledevice3` and killing it.
+
+> [!IMPORTANT]
+> This feature was tested on a device with iOS 17. It may not work with other versions.
+>
+> If you tested the plugin with older releases, please let me know.
+>
+> Devices with iOS 14 are no longer discoverable by Xcode tools. Although, Xcode itself still provides some backward compatibility.
+
+#### Passwordless access to `remote_debugger`
+
+You can disable password requirement by updating `/etc/sudoers` file. Make sure to use the command below, otherwise you may break your `sudo` command:
+
+```shell
+sudo visudo -f /etc/sudoers
+```
+
+Append this line, but first update the path and username:
+
+```
+YOUR_USERNAME ALL = (ALL) NOPASSWD: /Users/YOUR_USERNAME/.local/share/nvim/lazy/xcodebuild.nvim/tools/remote_debugger
+```
+
+The path above may differ on your computer, so make sure it's correct.
+
+#### Creating a local copy of `remote_debugger`
+
+If you don't want to set passwordless permission to the file that can be changed in the future. You can make a local copy of this script,
+set your local path in the config `commands.remote_debugger`, and update `/etc/sudoers` accordingly.
+
+**Please remember that you will need to update this file manually in the future.**
+
+### 🐛 Application Logs
+
+If you installed [nvim-dap](https://github.com/mfussenegger/nvim-dap) and [nvim-dap-ui](https://github.com/rcarriga/nvim-dap-ui), you can easily track your app logs. The plugin automatically sends logs to the `console` window provided by [nvim-dap-ui](https://github.com/rcarriga/nvim-dap-ui).
+
+To see **SIMULATOR** logs you don't need to run the debugger. You can just show the `console` and run the app (remember that the app must be launched by xcodebuild.nvim).
 
 ```
 :lua require("dapui").toggle()
@@ -578,7 +632,7 @@ Use this command to clear the console:
 If you don't want to use [nvim-dap](https://github.com/mfussenegger/nvim-dap) you can always print logs directly to your terminal by calling (from your project root directory):
 
 ```bash
-tail -f .nvim/xcodebuild/simulator_logs.log
+tail -f .nvim/xcodebuild/app_logs.log
 ```
 
 This approach works especially well if you are using tmux.

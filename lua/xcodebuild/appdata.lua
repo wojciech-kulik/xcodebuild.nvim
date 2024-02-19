@@ -4,8 +4,8 @@ local M = {}
 
 M.report = {}
 M.appdir = vim.fn.getcwd() .. "/.nvim/xcodebuild"
-M.simulator_logs_filename = "simulator_logs.log"
-M.simulator_logs_filepath = M.appdir .. "/" .. M.simulator_logs_filename
+M.app_logs_filename = "app_logs.log"
+M.app_logs_filepath = M.appdir .. "/" .. M.app_logs_filename
 M.original_logs_filename = "original_logs.log"
 M.original_logs_filepath = M.appdir .. "/" .. M.original_logs_filename
 M.build_logs_filename = "xcodebuild.log"
@@ -20,6 +20,7 @@ M.coverage_report_filepath = M.appdir .. "/coverage.json"
 
 GETSNAPSHOTS_TOOL = "getsnapshots"
 PROJECT_HELPER_TOOL = "project_helper.rb"
+REMOTE_DEBUGGER_TOOL = "remote_debugger"
 
 function M.tool_path(name)
   local pathComponents = vim.split(debug.getinfo(1).source:sub(2), "/", { plain = true })
@@ -77,6 +78,38 @@ function M.load_last_report()
       quickfix.set(M.report)
       diagnostics.refresh_all_test_buffers(M.report)
     end, vim.startswith(config.test_search.file_matching, "lsp") and 1000 or 500)
+  end
+end
+
+function M.clear_app_logs()
+  local config = require("xcodebuild.config").options.console_logs
+
+  if config.enabled then
+    require("xcodebuild.dap").clear_console()
+  end
+
+  vim.fn.writefile({}, M.app_logs_filepath)
+end
+
+function M.append_app_logs(output)
+  local logFile = M.app_logs_filepath
+  local config = require("xcodebuild.config").options.console_logs
+
+  for index, line in ipairs(output) do
+    output[index] = line:gsub("\r", "")
+  end
+
+  vim.fn.writefile(output, logFile, "a")
+
+  if config.enabled then
+    local log_lines = {}
+    for _, line in ipairs(output) do
+      if config.filter_line(line) then
+        table.insert(log_lines, config.format_line(line))
+      end
+    end
+
+    require("xcodebuild.dap").update_console(log_lines)
   end
 end
 

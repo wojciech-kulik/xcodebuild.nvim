@@ -19,6 +19,7 @@ local defaults = {
     extra_build_args = "-parallelizeTargets", -- extra arguments for `xcodebuild build`
     extra_test_args = "-parallelizeTargets", -- extra arguments for `xcodebuild test`
     project_search_max_depth = 3, -- maxdepth of xcodeproj/xcworkspace search while using configuration wizard
+    remote_debugger = nil, -- optional path to local copy of remote_debugger (check out README for details)
   },
   logs = { -- build & test logs
     auto_open_on_success_tests = false, -- open logs when tests succeeded

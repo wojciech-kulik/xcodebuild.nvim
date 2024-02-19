@@ -5,6 +5,7 @@ local xcode = require("xcodebuild.xcode")
 local projectBuilder = require("xcodebuild.project_builder")
 local simulator = require("xcodebuild.simulator")
 local actions = require("xcodebuild.actions")
+local remoteDebugger = require("xcodebuild.remote_debugger")
 
 local M = {}
 
@@ -14,18 +15,13 @@ local function validate_project()
     return false
   end
 
-  if projectConfig.settings.platform == "iOS" then
-    notifications.send_error("Debugging on physical devices is not supported. Please use the simulator.")
-    return false
-  end
-
   return true
 end
 
-function M.start_dap_in_swift_buffer()
+function M.start_dap_in_swift_buffer(remote)
   local loadedDap, dap = pcall(require, "dap")
   if not loadedDap then
-    error("Could not load nvim-dap plugin")
+    error("xcodebuild.nvim: Could not load nvim-dap plugin")
     return
   end
 
@@ -38,14 +34,18 @@ function M.start_dap_in_swift_buffer()
 
     if extension and extension:lower() == "swift" then
       vim.api.nvim_win_call(winid, function()
-        dap.continue()
+        if remote then
+          remoteDebugger.start_dap()
+        else
+          dap.continue()
+        end
       end)
 
       return
     end
   end
 
-  error("Could not find a Swift buffer to start the debugger")
+  error("xcodebuild.nvim: Could not find a Swift buffer to start the debugger")
 end
 
 function M.build_and_debug(callback)
@@ -59,21 +59,31 @@ function M.build_and_debug(callback)
     return
   end
 
-  xcode.kill_app(projectConfig.settings.productName)
-  M.start_dap_in_swift_buffer()
+  local remote = projectConfig.settings.platform == "iOS"
+
+  if not remote then
+    xcode.kill_app(projectConfig.settings.productName)
+    M.start_dap_in_swift_buffer()
+  end
 
   projectBuilder.build_project({}, function(report)
     local success = util.is_empty(report.buildErrors)
-
-    if success then
-      simulator.run_app(false, callback)
-    else
+    if not success then
       dap.terminate()
 
       local loadedDapui, dapui = pcall(require, "dapui")
       if loadedDapui then
         dapui.close()
       end
+      return
+    end
+
+    if remote then
+      simulator.install_app(function()
+        remoteDebugger.start_remote_debugger(callback)
+      end)
+    else
+      simulator.run_app(false, callback)
     end
   end)
 end
@@ -83,15 +93,30 @@ function M.debug_without_build(callback)
     return
   end
 
-  xcode.kill_app(projectConfig.settings.productName)
-  M.start_dap_in_swift_buffer()
-  simulator.run_app(false, callback)
+  local remote = projectConfig.settings.platform == "iOS"
+
+  if remote then
+    simulator.install_app(function()
+      remoteDebugger.start_remote_debugger(callback)
+    end)
+  else
+    xcode.kill_app(projectConfig.settings.productName)
+    M.start_dap_in_swift_buffer()
+    simulator.run_app(true, callback)
+  end
 end
 
 function M.attach_debugger_for_tests()
   local loadedDap, dap = pcall(require, "dap")
   if not loadedDap then
     notifications.send_error("Could not load nvim-dap plugin")
+    return
+  end
+
+  if projectConfig.settings.platform == "iOS" then
+    notifications.send_error(
+      "Debugging tests on physical devices is not supported. Please use the simulator."
+    )
     return
   end
 
@@ -224,7 +249,7 @@ function M.clear_console()
   vim.bo[bufnr].modifiable = false
 end
 
-function M.update_console(output)
+function M.update_console(output, append)
   local success, dapui = pcall(require, "dapui")
   if not success then
     return
@@ -250,7 +275,13 @@ function M.update_console(output)
     autoscroll = currentWinnr ~= winnr or currentLine == lastLine
   end
 
-  vim.api.nvim_buf_set_lines(bufnr, -1, -1, false, output)
+  if append then
+    local lastLine = vim.api.nvim_buf_get_lines(bufnr, -2, -1, false)[1]
+    output[1] = lastLine .. output[1]
+    vim.api.nvim_buf_set_lines(bufnr, -2, -1, false, output)
+  else
+    vim.api.nvim_buf_set_lines(bufnr, -1, -1, false, output)
+  end
 
   if autoscroll then
     vim.api.nvim_win_call(winnr, function()

@@ -319,6 +319,9 @@ function M.install_app(platform, destination, appPath, callback)
 end
 
 function M.install_app_on_device(destination, appPath, callback)
+  local appdata = require("xcodebuild.appdata")
+  appdata.clear_app_logs()
+
   local command = "xcrun devicectl device install app -d '" .. destination .. "' '" .. appPath .. "'"
 
   return vim.fn.jobstart(command, {
@@ -366,37 +369,17 @@ function M.launch_app_on_simulator(destination, bundleId, waitForDebugger, callb
     .. destination
     .. "' "
     .. bundleId
-  local logFile = require("xcodebuild.appdata").simulator_logs_filepath
-  local config = require("xcodebuild.config").options.console_logs
+
+  local appdata = require("xcodebuild.appdata")
 
   local write_logs = function(_, output)
     if output[#output] == "" then
       table.remove(output, #output)
     end
-
-    for index, line in ipairs(output) do
-      output[index] = line:gsub("\r", "")
-    end
-
-    vim.fn.writefile(output, logFile, "a")
-
-    if config.enabled then
-      local log_lines = {}
-      for _, line in ipairs(output) do
-        if config.filter_line(line) then
-          table.insert(log_lines, config.format_line(line))
-        end
-      end
-
-      require("xcodebuild.dap").update_console(log_lines)
-    end
+    appdata.append_app_logs(output)
   end
 
-  -- clear log file
-  if config.enabled then
-    require("xcodebuild.dap").clear_console()
-  end
-  vim.fn.writefile({}, logFile)
+  appdata.clear_app_logs()
 
   util.call(callback)
 
