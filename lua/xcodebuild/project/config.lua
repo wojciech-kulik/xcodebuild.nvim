@@ -1,4 +1,4 @@
-local xcode = require("xcodebuild.xcode")
+local xcode = require("xcodebuild.core.xcode")
 
 local M = {
   settings = {},
@@ -64,12 +64,12 @@ function M.update_settings(callback)
 end
 
 function M.configure_project()
-  local appdata = require("xcodebuild.appdata")
-  local notifications = require("xcodebuild.notifications")
+  local appdata = require("xcodebuild.project.appdata")
+  local notifications = require("xcodebuild.broadcasting.notifications")
 
   appdata.create_app_dir()
 
-  local pickers = require("xcodebuild.pickers")
+  local pickers = require("xcodebuild.ui.pickers")
   local defer_print = function(text)
     vim.defer_fn(function()
       notifications.send(text)

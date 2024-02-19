@@ -1,8 +1,8 @@
 local util = require("xcodebuild.util")
-local config = require("xcodebuild.config").options.test_explorer
-local notifications = require("xcodebuild.notifications")
-local testSearch = require("xcodebuild.test_search")
-local events = require("xcodebuild.events")
+local config = require("xcodebuild.core.config").options.test_explorer
+local notifications = require("xcodebuild.broadcasting.notifications")
+local testSearch = require("xcodebuild.tests.search")
+local events = require("xcodebuild.broadcasting.events")
 
 local M = {}
 
@@ -312,7 +312,7 @@ local function setup_buffer()
   vim.api.nvim_buf_set_keymap(M.bufnr, "n", "<tab>", "", { callback = M.toggle_all_classes, nowait = true })
   vim.api.nvim_buf_set_keymap(M.bufnr, "n", "R", "", {
     callback = function()
-      require("xcodebuild.test_runner").show_test_explorer(function()
+      require("xcodebuild.tests.runner").show_test_explorer(function()
         notifications.send("")
       end)
     end,
@@ -540,7 +540,7 @@ function M.repeat_last_run()
   end
 
   require("xcodebuild.helpers").cancel_actions()
-  require("xcodebuild.test_runner").run_tests(last_run_tests, { skipEnumeration = true })
+  require("xcodebuild.tests.runner").run_tests(last_run_tests, { skipEnumeration = true })
 end
 
 function M.run_selected_tests()
@@ -582,7 +582,7 @@ function M.run_selected_tests()
 
   if #selectedTests > 0 then
     require("xcodebuild.helpers").cancel_actions()
-    require("xcodebuild.test_runner").run_tests(selectedTests, { skipEnumeration = true })
+    require("xcodebuild.tests.runner").run_tests(selectedTests, { skipEnumeration = true })
   else
     notifications.send_error("Tests not found")
   end
@@ -618,7 +618,7 @@ function M.show()
   end
 
   if not M.report then
-    require("xcodebuild.test_runner").show_test_explorer(function()
+    require("xcodebuild.tests.runner").show_test_explorer(function()
       notifications.send("")
     end)
 

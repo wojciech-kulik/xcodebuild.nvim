@@ -1,6 +1,6 @@
 local util = require("xcodebuild.util")
-local config = require("xcodebuild.config").options.marks
-local testSearch = require("xcodebuild.test_search")
+local config = require("xcodebuild.core.config").options.marks
+local testSearch = require("xcodebuild.tests.search")
 
 local M = {}
 

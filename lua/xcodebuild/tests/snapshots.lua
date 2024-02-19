@@ -1,6 +1,6 @@
 local util = require("xcodebuild.util")
-local notifications = require("xcodebuild.notifications")
-local appdata = require("xcodebuild.appdata")
+local notifications = require("xcodebuild.broadcasting.notifications")
+local appdata = require("xcodebuild.project.appdata")
 
 local M = {}
 

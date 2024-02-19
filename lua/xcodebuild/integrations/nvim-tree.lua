@@ -1,7 +1,7 @@
 local M = {}
 
 function M.setup()
-  local config = require("xcodebuild.config").options.integrations.nvim_tree
+  local config = require("xcodebuild.core.config").options.integrations.nvim_tree
   if not config.enabled then
     return
   end
@@ -11,8 +11,8 @@ function M.setup()
     return
   end
 
-  local projectManager = require("xcodebuild.project_manager")
-  local projectConfig = require("xcodebuild.project_config")
+  local projectManager = require("xcodebuild.project.manager")
+  local projectConfig = require("xcodebuild.project.config")
   local Event = api.events.Event
   local cwd = vim.fn.getcwd()
 

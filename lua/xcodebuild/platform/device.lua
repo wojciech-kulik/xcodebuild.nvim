@@ -1,9 +1,9 @@
-local notifications = require("xcodebuild.notifications")
-local projectConfig = require("xcodebuild.project_config")
-local xcode = require("xcodebuild.xcode")
-local logs = require("xcodebuild.logs")
-local config = require("xcodebuild.config").options
-local events = require("xcodebuild.events")
+local notifications = require("xcodebuild.broadcasting.notifications")
+local projectConfig = require("xcodebuild.project.config")
+local xcode = require("xcodebuild.core.xcode")
+local logsPanel = require("xcodebuild.xcode_logs.panel")
+local config = require("xcodebuild.core.config").options
+local events = require("xcodebuild.broadcasting.events")
 local helpers = require("xcodebuild.helpers")
 local util = require("xcodebuild.util")
 
@@ -35,7 +35,7 @@ function M.run_app(waitForDebugger, callback)
   end
 
   if config.logs.auto_close_on_app_launch then
-    logs.close_logs()
+    logsPanel.close_logs()
   end
 
   local settings = projectConfig.settings

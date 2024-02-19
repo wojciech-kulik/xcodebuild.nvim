@@ -1,8 +1,8 @@
-local appdata = require("xcodebuild.appdata")
-local projectConfig = require("xcodebuild.project_config")
+local appdata = require("xcodebuild.project.appdata")
+local projectConfig = require("xcodebuild.project.config")
 local util = require("xcodebuild.util")
-local pickers = require("xcodebuild.pickers")
-local notifications = require("xcodebuild.notifications")
+local pickers = require("xcodebuild.ui.pickers")
+local notifications = require("xcodebuild.broadcasting.notifications")
 local helpers = require("xcodebuild.helpers")
 
 local M = {}

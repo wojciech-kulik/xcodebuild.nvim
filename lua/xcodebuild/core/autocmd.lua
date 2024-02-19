@@ -1,20 +1,20 @@
 local M = {}
 
 function M.setup()
-  local appdata = require("xcodebuild.appdata")
-  local config = require("xcodebuild.config").options
-  local projectConfig = require("xcodebuild.project_config")
-  local diagnostics = require("xcodebuild.diagnostics")
-  local logs = require("xcodebuild.logs")
-  local coverage = require("xcodebuild.coverage")
-  local events = require("xcodebuild.events")
+  local appdata = require("xcodebuild.project.appdata")
+  local config = require("xcodebuild.core.config").options
+  local projectConfig = require("xcodebuild.project.config")
+  local diagnostics = require("xcodebuild.core.diagnostics")
+  local logsPanel = require("xcodebuild.xcode_logs.panel")
+  local coverage = require("xcodebuild.code_coverage.coverage")
+  local events = require("xcodebuild.broadcasting.events")
   local autogroup = vim.api.nvim_create_augroup("xcodebuild.nvim", { clear = true })
 
   vim.api.nvim_create_autocmd({ "BufReadPost" }, {
     group = autogroup,
     pattern = "*" .. appdata.build_logs_filename,
     callback = function(ev)
-      logs.setup_buffer(ev.buf)
+      logsPanel.setup_buffer(ev.buf)
     end,
   })
 

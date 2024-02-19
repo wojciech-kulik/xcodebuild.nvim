@@ -4,10 +4,10 @@ local Text = require("nui.text")
 local Tree = require("nui.tree")
 local event = require("nui.utils.autocmd").event
 
-local config = require("xcodebuild.config").options.code_coverage_report
-local appdata = require("xcodebuild.appdata")
+local config = require("xcodebuild.core.config").options.code_coverage_report
+local appdata = require("xcodebuild.project.appdata")
 local util = require("xcodebuild.util")
-local events = require("xcodebuild.events")
+local events = require("xcodebuild.broadcasting.events")
 
 local M = {}
 

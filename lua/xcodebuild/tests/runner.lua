@@ -1,21 +1,21 @@
-local notifications = require("xcodebuild.notifications")
-local parser = require("xcodebuild.parser")
+local notifications = require("xcodebuild.broadcasting.notifications")
+local logsParser = require("xcodebuild.xcode_logs.parser")
 local util = require("xcodebuild.util")
-local appdata = require("xcodebuild.appdata")
-local quickfix = require("xcodebuild.quickfix")
-local projectConfig = require("xcodebuild.project_config")
-local xcode = require("xcodebuild.xcode")
-local logs = require("xcodebuild.logs")
-local diagnostics = require("xcodebuild.diagnostics")
-local config = require("xcodebuild.config").options
-local snapshots = require("xcodebuild.snapshots")
-local testSearch = require("xcodebuild.test_search")
-local coverage = require("xcodebuild.coverage")
-local testExplorer = require("xcodebuild.test_explorer")
-local events = require("xcodebuild.events")
-local projectBuilder = require("xcodebuild.project_builder")
-local testProvider = require("xcodebuild.test_provider")
+local appdata = require("xcodebuild.project.appdata")
+local quickfix = require("xcodebuild.core.quickfix")
+local projectConfig = require("xcodebuild.project.config")
+local xcode = require("xcodebuild.core.xcode")
+local logsPanel = require("xcodebuild.xcode_logs.panel")
+local diagnostics = require("xcodebuild.core.diagnostics")
+local config = require("xcodebuild.core.config").options
+local snapshots = require("xcodebuild.tests.snapshots")
+local coverage = require("xcodebuild.code_coverage.coverage")
+local events = require("xcodebuild.broadcasting.events")
+local projectBuilder = require("xcodebuild.project.builder")
 local helpers = require("xcodebuild.helpers")
+local testSearch = require("xcodebuild.tests.search")
+local testExplorer = require("xcodebuild.tests.explorer")
+local testProvider = require("xcodebuild.tests.provider")
 
 local M = {}
 local CANCELLED_CODE = 143
@@ -126,7 +126,7 @@ function M.run_tests(testsToRun, opts)
   end
 
   local on_stdout = function(_, output)
-    appdata.report = parser.parse_logs(output)
+    appdata.report = logsParser.parse_logs(output)
     notifications.show_tests_progress(appdata.report)
     diagnostics.refresh_all_test_buffers(appdata.report)
     events.tests_status(
@@ -157,7 +157,7 @@ function M.run_tests(testsToRun, opts)
     diagnostics.refresh_all_test_buffers(appdata.report)
 
     notifications.send_progress("Processing logs...")
-    logs.set_logs(appdata.report, true, process_coverage)
+    logsPanel.set_logs(appdata.report, true, process_coverage)
 
     events.tests_finished(
       appdata.report.testsCount - appdata.report.failedTestsCount,
@@ -266,7 +266,7 @@ function M.show_failing_snapshot_tests()
     return
   end
 
-  local pickers = require("xcodebuild.pickers")
+  local pickers = require("xcodebuild.ui.pickers")
   pickers.select_failing_snapshot_test()
 end
 

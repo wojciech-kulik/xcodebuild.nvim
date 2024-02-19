@@ -7,7 +7,7 @@ local function call(action, args)
 end
 
 local function setupHighlights()
-  local highlights = require("xcodebuild.config").options.highlights or {}
+  local highlights = require("xcodebuild.core.config").options.highlights or {}
 
   for hl, color in pairs(highlights) do
     if type(color) == "table" then
@@ -21,7 +21,7 @@ local function setupHighlights()
 end
 
 local function warnAboutOldConfig()
-  local config = require("xcodebuild.config").options
+  local config = require("xcodebuild.core.config").options
 
   if
     config.code_coverage.covered
@@ -43,15 +43,15 @@ end
 
 -- stylua: ignore start
 function M.setup(options)
-  require("xcodebuild.config").setup(options)
+  require("xcodebuild.core.config").setup(options)
 
-  local autocmd = require("xcodebuild.autocmd")
+  local autocmd = require("xcodebuild.core.autocmd")
   local actions = require("xcodebuild.actions")
-  local projectConfig = require("xcodebuild.project_config")
-  local coverage = require("xcodebuild.coverage")
-  local coverageReport = require("xcodebuild.coverage_report")
-  local testExplorer = require("xcodebuild.test_explorer")
-  local diagnostics = require("xcodebuild.diagnostics")
+  local projectConfig = require("xcodebuild.project.config")
+  local coverage = require("xcodebuild.code_coverage.coverage")
+  local coverageReport = require("xcodebuild.code_coverage.coverage_report")
+  local testExplorer = require("xcodebuild.tests.explorer")
+  local diagnostics = require("xcodebuild.core.diagnostics")
   local nvimTree = require("xcodebuild.integrations.nvim-tree")
 
   autocmd.setup()

@@ -63,13 +63,13 @@ function M.write_build_logs(data)
 end
 
 function M.load_last_report()
-  local parser = require("xcodebuild.parser")
-  local quickfix = require("xcodebuild.quickfix")
-  local diagnostics = require("xcodebuild.diagnostics")
-  local config = require("xcodebuild.config").options
-  local testSearch = require("xcodebuild.test_search")
+  local logsParser = require("xcodebuild.xcode_logs.parser")
+  local quickfix = require("xcodebuild.core.quickfix")
+  local diagnostics = require("xcodebuild.core.diagnostics")
+  local config = require("xcodebuild.core.config").options
+  local testSearch = require("xcodebuild.tests.search")
 
-  parser.clear()
+  logsParser.clear()
   M.report = M.read_report() or {}
 
   if util.is_not_empty(M.report) then
@@ -82,7 +82,7 @@ function M.load_last_report()
 end
 
 function M.clear_app_logs()
-  local config = require("xcodebuild.config").options.console_logs
+  local config = require("xcodebuild.core.config").options.console_logs
 
   if config.enabled then
     require("xcodebuild.dap").clear_console()
@@ -93,7 +93,7 @@ end
 
 function M.append_app_logs(output)
   local logFile = M.app_logs_filepath
-  local config = require("xcodebuild.config").options.console_logs
+  local config = require("xcodebuild.core.config").options.console_logs
 
   for index, line in ipairs(output) do
     output[index] = line:gsub("\r", "")

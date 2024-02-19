@@ -1,8 +1,8 @@
 local util = require("xcodebuild.util")
-local appdata = require("xcodebuild.appdata")
-local config = require("xcodebuild.config").options.logs
-local testSearch = require("xcodebuild.test_search")
-local events = require("xcodebuild.events")
+local appdata = require("xcodebuild.project.appdata")
+local config = require("xcodebuild.core.config").options.logs
+local testSearch = require("xcodebuild.tests.search")
+local events = require("xcodebuild.broadcasting.events")
 
 local M = {}
 

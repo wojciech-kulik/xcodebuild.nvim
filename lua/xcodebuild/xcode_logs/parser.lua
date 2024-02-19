@@ -1,7 +1,7 @@
 local M = {}
 
 local util = require("xcodebuild.util")
-local testSearch = require("xcodebuild.test_search")
+local testSearch = require("xcodebuild.tests.search")
 
 -- state machine
 local BEGIN = "BEGIN"
@@ -41,7 +41,7 @@ local function flush_test(message)
     table.insert(tests[key], lineData)
   end
 
-  require("xcodebuild.test_explorer").update_test_status(
+  require("xcodebuild.tests.explorer").update_test_status(
     lineData.target .. "/" .. lineData.class .. "/" .. lineData.name,
     lineData.success and "passed" or "failed"
   )

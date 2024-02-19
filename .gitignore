@@ -40,8 +40,8 @@ luac.out
 *.hex
 
 .DS_Store
-lua/xcodebuild/tests/test_data/*.vim
 tools/src/getsnapshots.xcodeproj/project.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist
 xcuserdata
 tools/src/getsnapshots.xcodeproj/xcuserdata
 tools/src/getsnapshots.xcodeproj/xcshareddata/xcschemes/getsnapshots.xcscheme
+lua/xcodebuild/_tests/test_data/*.vim

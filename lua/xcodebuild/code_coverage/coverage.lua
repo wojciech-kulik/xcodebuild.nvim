@@ -1,10 +1,10 @@
-local appdata = require("xcodebuild.appdata")
+local appdata = require("xcodebuild.project.appdata")
 local util = require("xcodebuild.util")
-local xcode = require("xcodebuild.xcode")
-local projectConfig = require("xcodebuild.project_config")
-local notifications = require("xcodebuild.notifications")
-local config = require("xcodebuild.config").options.code_coverage
-local events = require("xcodebuild.events")
+local xcode = require("xcodebuild.core.xcode")
+local projectConfig = require("xcodebuild.project.config")
+local notifications = require("xcodebuild.broadcasting.notifications")
+local config = require("xcodebuild.core.config").options.code_coverage
+local events = require("xcodebuild.broadcasting.events")
 local helpers = require("xcodebuild.helpers")
 
 local M = {}
@@ -120,7 +120,7 @@ function M.show_report()
     return
   end
 
-  local coverageReport = require("xcodebuild.coverage_report")
+  local coverageReport = require("xcodebuild.code_coverage.coverage_report")
 
   if not coverageReport.is_report_available() then
     notifications.send_error(

@@ -1,5 +1,5 @@
 local util = require("xcodebuild.util")
-local notifications = require("xcodebuild.notifications")
+local notifications = require("xcodebuild.broadcasting.notifications")
 
 local M = {}
 local CANCELLED_CODE = 143
@@ -319,7 +319,7 @@ function M.install_app(platform, destination, appPath, callback)
 end
 
 function M.install_app_on_device(destination, appPath, callback)
-  local appdata = require("xcodebuild.appdata")
+  local appdata = require("xcodebuild.project.appdata")
   appdata.clear_app_logs()
 
   local command = "xcrun devicectl device install app -d '" .. destination .. "' '" .. appPath .. "'"
@@ -370,7 +370,7 @@ function M.launch_app_on_simulator(destination, bundleId, waitForDebugger, callb
     .. "' "
     .. bundleId
 
-  local appdata = require("xcodebuild.appdata")
+  local appdata = require("xcodebuild.project.appdata")
 
   local write_logs = function(_, output)
     if output[#output] == "" then
@@ -516,7 +516,7 @@ function M.export_code_coverage(xcresultPath, outputPath, callback)
 end
 
 function M.enumerate_tests(opts, callback)
-  local appdata = require("xcodebuild.appdata")
+  local appdata = require("xcodebuild.project.appdata")
   local outputPath = appdata.tests_filepath
   util.shell("rm -rf '" .. outputPath .. "'")
 
@@ -551,7 +551,7 @@ function M.enumerate_tests(opts, callback)
         return
       end
 
-      local tests = require("xcodebuild.test_enumeration_parser").parse(outputPath)
+      local tests = require("xcodebuild.tests.enumeration_parser").parse(outputPath)
       util.call(callback, tests)
     end,
   })

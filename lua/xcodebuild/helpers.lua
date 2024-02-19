@@ -3,7 +3,7 @@ local M = {}
 local function cancel(source)
   if source.currentJobId then
     if vim.fn.jobstop(source.currentJobId) == 1 then
-      require("xcodebuild.events").action_cancelled()
+      require("xcodebuild.broadcasting.events").action_cancelled()
     end
 
     source.currentJobId = nil
@@ -11,14 +11,14 @@ local function cancel(source)
 end
 
 function M.cancel_actions()
-  cancel(require("xcodebuild.simulator"))
-  cancel(require("xcodebuild.project_builder"))
-  cancel(require("xcodebuild.test_runner"))
+  cancel(require("xcodebuild.platform.device"))
+  cancel(require("xcodebuild.project.builder"))
+  cancel(require("xcodebuild.tests.runner"))
 end
 
 function M.validate_project()
-  local projectConfig = require("xcodebuild.project_config")
-  local notifications = require("xcodebuild.notifications")
+  local projectConfig = require("xcodebuild.project.config")
+  local notifications = require("xcodebuild.broadcasting.notifications")
 
   if not projectConfig.is_project_configured() then
     notifications.send_error("The project is missing some details. Please run XcodebuildSetup first.")
@@ -29,17 +29,17 @@ function M.validate_project()
 end
 
 function M.before_new_run()
-  local snapshots = require("xcodebuild.snapshots")
-  local testSearch = require("xcodebuild.test_search")
-  local parser = require("xcodebuild.parser")
-  local config = require("xcodebuild.config").options
+  local snapshots = require("xcodebuild.tests.snapshots")
+  local testSearch = require("xcodebuild.tests.search")
+  local logsParser = require("xcodebuild.xcode_logs.parser")
+  local config = require("xcodebuild.core.config").options
 
   if config.auto_save then
     vim.cmd("silent wa!")
   end
 
   snapshots.delete_snapshots()
-  parser.clear()
+  logsParser.clear()
   testSearch.clear()
 end
 

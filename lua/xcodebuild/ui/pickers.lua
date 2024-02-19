@@ -1,10 +1,10 @@
-local xcode = require("xcodebuild.xcode")
-local projectConfig = require("xcodebuild.project_config")
+local xcode = require("xcodebuild.core.xcode")
+local projectConfig = require("xcodebuild.project.config")
 local util = require("xcodebuild.util")
-local notifications = require("xcodebuild.notifications")
-local snapshots = require("xcodebuild.snapshots")
-local events = require("xcodebuild.events")
-local remoteDevices = require("xcodebuild.devices.remote_devices")
+local notifications = require("xcodebuild.broadcasting.notifications")
+local snapshots = require("xcodebuild.tests.snapshots")
+local events = require("xcodebuild.broadcasting.events")
+local usb = require("xcodebuild.platform.usb")
 
 local telescopePickers = require("telescope.pickers")
 local telescopeFinders = require("telescope.finders")
@@ -152,7 +152,7 @@ function M.select_xcodeproj_if_needed(callback, opts)
 end
 
 function M.select_xcodeproj(callback, opts)
-  local maxdepth = require("xcodebuild.config").options.commands.project_search_max_depth
+  local maxdepth = require("xcodebuild.core.config").options.commands.project_search_max_depth
   local sanitizedFiles = {}
   local filenames = {}
   local files = util.shell(
@@ -185,7 +185,7 @@ function M.select_xcodeproj(callback, opts)
 end
 
 function M.select_project(callback, opts)
-  local maxdepth = require("xcodebuild.config").options.commands.project_search_max_depth
+  local maxdepth = require("xcodebuild.core.config").options.commands.project_search_max_depth
   local sanitizedFiles = {}
   local filenames = {}
   local files = util.shell(
@@ -311,7 +311,7 @@ function M.select_destination(callback, opts)
   local projectCommand = projectConfig.settings.projectCommand
   local scheme = projectConfig.settings.scheme
   local results = cachedDestinations or {}
-  local useCache = require("xcodebuild.config").options.commands.cache_devices
+  local useCache = require("xcodebuild.core.config").options.commands.cache_devices
   local hasCachedDevices = useCache and util.is_not_empty(results) and util.is_not_empty(cachedDeviceNames)
 
   local refreshDevices = function(connectedDevices)
@@ -367,7 +367,7 @@ function M.select_destination(callback, opts)
   end
 
   local function getConnectedDevices()
-    return remoteDevices.get_connected_devices(refreshDevices)
+    return usb.get_connected_devices(refreshDevices)
   end
 
   if not hasCachedDevices then
@@ -399,7 +399,7 @@ function M.select_failing_snapshot_test()
     return util.get_filename(item)
   end)
 
-  require("xcodebuild.pickers").show("Failing Snapshot Tests", filenames, function(_, index)
+  require("xcodebuild.ui.pickers").show("Failing Snapshot Tests", filenames, function(_, index)
     local selectedFile = failingSnapshots[index]
     vim.fn.jobstart("qlmanage -p '" .. selectedFile .. "'", {
       detach = true,
@@ -478,7 +478,7 @@ function M.show_all_actions()
     actionsPointers = { actions.configure_project }
   end
 
-  local config = require("xcodebuild.config").options
+  local config = require("xcodebuild.core.config").options
 
   if config.prepare_snapshot_test_previews then
     if util.is_not_empty(snapshots.get_failing_snapshots()) then
@@ -491,7 +491,7 @@ function M.show_all_actions()
     table.insert(actionsNames, 13, "Toggle Code Coverage")
     table.insert(actionsPointers, 13, actions.toggle_code_coverage)
 
-    if require("xcodebuild.coverage_report").is_report_available() then
+    if require("xcodebuild.code_coverage.coverage_report").is_report_available() then
       table.insert(actionsNames, 14, "Show Code Coverage Report")
       table.insert(actionsPointers, 14, actions.show_code_coverage_report)
     end

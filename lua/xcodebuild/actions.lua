@@ -1,15 +1,15 @@
-local notifications = require("xcodebuild.notifications")
-local pickers = require("xcodebuild.pickers")
-local logs = require("xcodebuild.logs")
-local coverage = require("xcodebuild.coverage")
-local testExplorer = require("xcodebuild.test_explorer")
-local events = require("xcodebuild.events")
-local simulator = require("xcodebuild.simulator")
-local projectBuilder = require("xcodebuild.project_builder")
-local testRunner = require("xcodebuild.test_runner")
-local projectConfig = require("xcodebuild.project_config")
+local notifications = require("xcodebuild.broadcasting.notifications")
+local pickers = require("xcodebuild.ui.pickers")
+local logsPanel = require("xcodebuild.xcode_logs.panel")
+local coverage = require("xcodebuild.code_coverage.coverage")
+local testExplorer = require("xcodebuild.tests.explorer")
+local events = require("xcodebuild.broadcasting.events")
+local device = require("xcodebuild.platform.device")
+local projectBuilder = require("xcodebuild.project.builder")
+local testRunner = require("xcodebuild.tests.runner")
+local projectConfig = require("xcodebuild.project.config")
 local helpers = require("xcodebuild.helpers")
-local projectManager = require("xcodebuild.project_manager")
+local projectManager = require("xcodebuild.project.manager")
 
 local M = {}
 
@@ -23,7 +23,7 @@ local function update_settings(callback)
   defer_send("Updating project settings...")
   projectConfig.update_settings(function()
     notifications.send("Project settings updated")
-    events.project_settings_updated(require("xcodebuild.project_config").settings)
+    events.project_settings_updated(require("xcodebuild.project.config").settings)
 
     if callback then
       callback()
@@ -38,15 +38,15 @@ function M.open_in_xcode()
 end
 
 function M.open_logs()
-  logs.open_logs(false)
+  logsPanel.open_logs(false)
 end
 
 function M.close_logs()
-  logs.close_logs()
+  logsPanel.close_logs()
 end
 
 function M.toggle_logs()
-  logs.toggle_logs()
+  logsPanel.toggle_logs()
 end
 
 function M.show_picker()
@@ -89,7 +89,7 @@ end
 
 function M.run(callback)
   helpers.cancel_actions()
-  simulator.run_app(false, callback)
+  device.run_app(false, callback)
 end
 
 function M.run_tests()
@@ -183,12 +183,12 @@ end
 
 function M.install_app(callback)
   helpers.cancel_actions()
-  simulator.install_app(callback)
+  device.install_app(callback)
 end
 
 function M.uninstall_app(callback)
   helpers.cancel_actions()
-  simulator.uninstall_app(callback)
+  device.uninstall_app(callback)
 end
 
 function M.uninstall(callback) -- backward compatibility
@@ -196,7 +196,7 @@ function M.uninstall(callback) -- backward compatibility
 end
 
 function M.boot_simulator(callback)
-  simulator.boot_simulator(callback)
+  device.boot_simulator(callback)
 end
 
 -- Code Coverage

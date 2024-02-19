@@ -1,7 +1,7 @@
-local config = require("xcodebuild.config").options.test_search
+local config = require("xcodebuild.core.config").options.test_search
 local util = require("xcodebuild.util")
-local xcode = require("xcodebuild.xcode")
-local projectConfig = require("xcodebuild.project_config")
+local xcode = require("xcodebuild.core.xcode")
+local projectConfig = require("xcodebuild.project.config")
 local helpers = require("xcodebuild.helpers")
 
 local M = {

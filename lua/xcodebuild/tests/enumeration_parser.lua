@@ -1,4 +1,4 @@
-local notifications = require("xcodebuild.notifications")
+local notifications = require("xcodebuild.broadcasting.notifications")
 
 local M = {}
 

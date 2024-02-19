@@ -1,14 +1,14 @@
-local notifications = require("xcodebuild.notifications")
-local parser = require("xcodebuild.parser")
+local notifications = require("xcodebuild.broadcasting.notifications")
+local logsParser = require("xcodebuild.xcode_logs.parser")
 local util = require("xcodebuild.util")
-local appdata = require("xcodebuild.appdata")
-local quickfix = require("xcodebuild.quickfix")
-local projectConfig = require("xcodebuild.project_config")
-local xcode = require("xcodebuild.xcode")
-local logs = require("xcodebuild.logs")
-local config = require("xcodebuild.config").options
-local events = require("xcodebuild.events")
-local simulator = require("xcodebuild.simulator")
+local appdata = require("xcodebuild.project.appdata")
+local quickfix = require("xcodebuild.core.quickfix")
+local projectConfig = require("xcodebuild.project.config")
+local xcode = require("xcodebuild.core.xcode")
+local logsPanel = require("xcodebuild.xcode_logs.panel")
+local config = require("xcodebuild.core.config").options
+local events = require("xcodebuild.broadcasting.events")
+local device = require("xcodebuild.platform.device")
 local helpers = require("xcodebuild.helpers")
 
 local M = {}
@@ -25,7 +25,7 @@ function M.build_and_run_app(waitForDebugger, callback)
       return
     end
 
-    simulator.run_app(waitForDebugger, callback)
+    device.run_app(waitForDebugger, callback)
   end)
 end
 
@@ -40,7 +40,7 @@ function M.build_project(opts, callback)
   helpers.before_new_run()
 
   local on_stdout = function(_, output)
-    appdata.report = parser.parse_logs(output)
+    appdata.report = logsParser.parse_logs(output)
   end
 
   local on_exit = function(_, code, _)
@@ -58,7 +58,7 @@ function M.build_project(opts, callback)
 
     notifications.stop_build_timer()
     notifications.send_progress("Processing logs...")
-    logs.set_logs(appdata.report, false, function()
+    logsPanel.set_logs(appdata.report, false, function()
       notifications.send_build_finished(
         appdata.report,
         buildId,

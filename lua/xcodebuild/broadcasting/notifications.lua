@@ -1,4 +1,4 @@
-local config = require("xcodebuild.config").options.logs
+local config = require("xcodebuild.core.config").options.logs
 local util = require("xcodebuild.util")
 
 local M = {}
@@ -34,7 +34,7 @@ math.randomseed(tonumber(tostring(os.time()):reverse():sub(1, 9)))
 function M.start_action_timer(buildForTesting, expectedDuration)
   local actionTitle = buildForTesting and "Building For Testing" or "Building"
   local startTime = os.time()
-  local shouldShowProgressBar = require("xcodebuild.config").options.show_build_progress_bar
+  local shouldShowProgressBar = require("xcodebuild.core.config").options.show_build_progress_bar
 
   local timer = vim.fn.timer_start(80, function()
     local duration = os.difftime(os.time(), startTime)
@@ -43,7 +43,7 @@ function M.start_action_timer(buildForTesting, expectedDuration)
       local progress
       local numberOfDots = math.floor(duration / expectedDuration * 10.0)
       local progressPercentage = math.min(100, math.floor(duration / expectedDuration * 100.0))
-      require("xcodebuild.events").build_status(buildForTesting, progressPercentage, duration)
+      require("xcodebuild.broadcasting.events").build_status(buildForTesting, progressPercentage, duration)
 
       if numberOfDots <= 10 then
         progress = string.rep(".", numberOfDots) .. string.rep(" ", 10 - numberOfDots)
@@ -55,7 +55,7 @@ function M.start_action_timer(buildForTesting, expectedDuration)
       M.send_progress(string.format("[ %s ] %s (%d seconds)", progress, actionTitle, duration))
     else
       M.send_progress(string.format("%s [%d seconds]", actionTitle, duration))
-      require("xcodebuild.events").build_status(buildForTesting, nil, duration)
+      require("xcodebuild.broadcasting.events").build_status(buildForTesting, nil, duration)
     end
   end, { ["repeat"] = -1 })
 
@@ -75,7 +75,7 @@ function M.send_build_started(buildForTesting)
     vim.fn.timer_stop(buildState.timer)
   end
 
-  local projectConfig = require("xcodebuild.project_config")
+  local projectConfig = require("xcodebuild.project.config")
   local lastBuildTime = projectConfig.settings.lastBuildTime
 
   buildState.id = math.random(10000000)
@@ -100,7 +100,7 @@ function M.send_build_finished(report, id, isCancelled, opts)
     M.send_warning("Build cancelled")
   elseif util.is_empty(report.buildErrors) then
     local duration = buildState.buildDuration
-    local projectConfig = require("xcodebuild.project_config")
+    local projectConfig = require("xcodebuild.project.config")
     projectConfig.settings.lastBuildTime = duration
     projectConfig.save_settings()
 

@@ -1,7 +1,7 @@
 local M = {}
 
 function M.find_tests(opts)
-  local appdata = require("xcodebuild.appdata")
+  local appdata = require("xcodebuild.project.appdata")
   local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
   local selectedClass = nil
   local selectedTests = {}
