@@ -52,7 +52,7 @@ function M.kill_app(callback)
 
   local settings = projectConfig.settings
   if settings.platform == "macOS" then
-    notifications.send_error("macOS app can't be uninstalled")
+    -- TODO: kill macOS process?
     return
   end
 
@@ -72,9 +72,13 @@ function M.run_app(waitForDebugger, callback)
     logsPanel.close_logs()
   end
 
-  M.currentJobId = M.install_app(function()
+  if projectConfig.settings.platform == "macOS" then
     M.currentJobId = launch_app(waitForDebugger, callback)
-  end)
+  else
+    M.currentJobId = M.install_app(function()
+      M.currentJobId = launch_app(waitForDebugger, callback)
+    end)
+  end
 end
 
 function M.boot_simulator(callback)
