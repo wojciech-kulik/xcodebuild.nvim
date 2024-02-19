@@ -6,6 +6,7 @@ local xcode = require("xcodebuild.core.xcode")
 local projectBuilder = require("xcodebuild.project.builder")
 local device = require("xcodebuild.platform.device")
 local actions = require("xcodebuild.actions")
+local remoteDebugger = require("xcodebuild.integrations.remote_debugger")
 
 local M = {}
 
@@ -18,27 +19,13 @@ local function validate_project()
   return true
 end
 
-local function remote_debugger_start_dap()
-  local remoteDebuggerLegacy = require("xcodebuild.integrations.remote_debugger_legacy")
-  local remoteDebugger = require("xcodebuild.integrations.remote_debugger")
+local function set_remote_debugger_mode()
   local majorVersion = helpers.get_major_os_version()
 
   if majorVersion and majorVersion < 17 then
-    remoteDebuggerLegacy.start_dap()
+    remoteDebugger.set_mode(remoteDebugger.LEGACY_MODE)
   else
-    remoteDebugger.start_dap()
-  end
-end
-
-local function remote_debugger_start(callback)
-  local remoteDebuggerLegacy = require("xcodebuild.integrations.remote_debugger_legacy")
-  local remoteDebugger = require("xcodebuild.integrations.remote_debugger")
-  local majorVersion = helpers.get_major_os_version()
-
-  if majorVersion and majorVersion < 17 then
-    remoteDebuggerLegacy.start_remote_debugger(callback)
-  else
-    remoteDebugger.start_remote_debugger(callback)
+    remoteDebugger.set_mode(remoteDebugger.SECURED_MODE)
   end
 end
 
@@ -59,7 +46,8 @@ function M.start_dap_in_swift_buffer(remote)
     if extension and extension:lower() == "swift" then
       vim.api.nvim_win_call(winid, function()
         if remote then
-          remote_debugger_start_dap()
+          set_remote_debugger_mode()
+          remoteDebugger.start_dap()
         else
           dap.continue()
         end
@@ -106,7 +94,8 @@ function M.build_and_debug(callback)
 
     if remote then
       device.install_app(function()
-        remote_debugger_start(callback)
+        set_remote_debugger_mode()
+        remoteDebugger.start_remote_debugger(callback)
       end)
     else
       device.run_app(false, callback)
@@ -123,7 +112,8 @@ function M.debug_without_build(callback)
 
   if remote then
     device.install_app(function()
-      remote_debugger_start(callback)
+      set_remote_debugger_mode()
+      remoteDebugger.start_remote_debugger(callback)
     end)
   else
     device.kill_app()

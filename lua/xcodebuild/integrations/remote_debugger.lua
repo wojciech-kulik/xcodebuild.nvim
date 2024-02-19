@@ -2,17 +2,23 @@ local notifications = require("xcodebuild.broadcasting.notifications")
 local util = require("xcodebuild.util")
 local projectConfig = require("xcodebuild.project.config")
 local appdata = require("xcodebuild.project.appdata")
+local config = require("xcodebuild.core.config")
 local deviceProxy = require("xcodebuild.platform.device_proxy")
 
 local M = {}
+
+M.LEGACY_MODE = 1
+M.SECURED_MODE = 2
+
+M.mode = M.SECURED_MODE
 
 local function remove_listeners()
   local listeners = require("dap").listeners.after
 
   listeners.event_terminated["xcodebuild"] = nil
-  listeners.disconnect["xcodebuild"] = nil
   listeners.event_continued["xcodebuild"] = nil
   listeners.event_output["xcodebuild"] = nil
+  listeners.disconnect["xcodebuild"] = nil
 end
 
 local function setup_terminate_listeners()
@@ -56,6 +62,10 @@ local function setup_connection_listeners()
       appdata.append_app_logs(splitted)
     end
   end
+end
+
+function M.set_mode(mode)
+  M.mode = mode
 end
 
 function M.start_dap()
@@ -103,11 +113,50 @@ function M.start_dap()
       end,
 
       function()
-        return deviceProxy.start_secure_server(projectConfig.settings.destination, M.rsd_param)
+        if M.mode == M.LEGACY_MODE then
+          return M.connection_string
+        else
+          return deviceProxy.start_secure_server(projectConfig.settings.destination, M.rsd_param)
+        end
       end,
+
       "process launch",
     },
   })
+end
+
+local function start_legacy_server(callback)
+  local xcodebuildDap = require("xcodebuild.dap")
+
+  M.debug_server_job = deviceProxy.start_server(
+    projectConfig.settings.destination,
+    config.options.commands.remote_debugger_port,
+    function(connection_string)
+      M.connection_string = connection_string
+
+      xcodebuildDap.update_console({
+        "Connecting to " .. connection_string:gsub("process connect connect://", ""),
+      })
+      setup_terminate_listeners()
+      xcodebuildDap.start_dap_in_swift_buffer(true)
+
+      util.call(callback)
+    end
+  )
+end
+
+local function start_secured_tunnel(callback)
+  local xcodebuildDap = require("xcodebuild.dap")
+
+  M.debug_server_job = deviceProxy.create_secure_tunnel(projectConfig.settings.destination, function(rsdParam)
+    M.rsd_param = rsdParam
+
+    xcodebuildDap.update_console({ "Connecting to " .. rsdParam:gsub("%-%-rsd ", "") })
+    setup_terminate_listeners()
+    xcodebuildDap.start_dap_in_swift_buffer(true)
+
+    util.call(callback)
+  end)
 end
 
 function M.start_remote_debugger(callback)
@@ -121,27 +170,31 @@ function M.start_remote_debugger(callback)
   notifications.send("Starting remote debugger...")
   xcodebuildDap.clear_console()
 
-  M.debug_server_job = deviceProxy.create_secure_tunnel(projectConfig.settings.destination, function(rsdParam)
-    M.rsd_param = rsdParam
-
-    xcodebuildDap.update_console({ "Connecting to " .. rsdParam:gsub("%-%-rsd ", "") })
-    setup_terminate_listeners()
-    xcodebuildDap.start_dap_in_swift_buffer(true)
-
-    util.call(callback)
-  end)
+  if M.mode == M.LEGACY_MODE then
+    start_legacy_server(callback)
+  else
+    start_secured_tunnel(callback)
+  end
 end
 
 function M.stop_remote_debugger()
   if not M.debug_server_job then
-    deviceProxy.close_secure_tunnel()
+    if M.mode == M.SECURED_MODE then
+      deviceProxy.close_secure_tunnel()
+    end
     return
   end
 
-  M.rsd_param = nil
-  M.debug_server_job = nil
+  if M.mode == M.LEGACY_MODE then
+    vim.fn.jobstop(M.debug_server_job)
+  else
+    deviceProxy.close_secure_tunnel()
+  end
 
-  deviceProxy.close_secure_tunnel()
+  M.debug_server_job = nil
+  M.rsd_param = nil
+  M.connection_string = nil
+
   notifications.send("Remote debugger stopped")
 end
 
