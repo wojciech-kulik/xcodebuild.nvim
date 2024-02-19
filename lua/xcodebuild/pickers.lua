@@ -4,6 +4,7 @@ local util = require("xcodebuild.util")
 local notifications = require("xcodebuild.notifications")
 local snapshots = require("xcodebuild.snapshots")
 local events = require("xcodebuild.events")
+local remoteDevices = require("xcodebuild.devices.remote_devices")
 
 local telescopePickers = require("telescope.pickers")
 local telescopeFinders = require("telescope.finders")
@@ -313,8 +314,12 @@ function M.select_destination(callback, opts)
   local useCache = require("xcodebuild.config").options.commands.cache_devices
   local hasCachedDevices = useCache and util.is_not_empty(results) and util.is_not_empty(cachedDeviceNames)
 
-  local refreshDevices = function()
+  local refreshDevices = function(connectedDevices)
     currentJobId = xcode.get_destinations(projectCommand, scheme, function(destinations)
+      for _, device in ipairs(connectedDevices) do
+        table.insert(destinations, 1, device)
+      end
+
       local alreadyAdded = {}
       local filtered = util.filter(destinations, function(table)
         if table.id and not alreadyAdded[table.id] then
@@ -328,7 +333,7 @@ function M.select_destination(callback, opts)
         local name = table.name or ""
 
         if table.platform and table.platform == "iOS" then
-          return util.trim(name)
+          return util.trim(name) .. (table.os and " (" .. table.os .. ")" or "")
         end
 
         if table.platform and table.platform ~= "iOS Simulator" then
@@ -361,11 +366,15 @@ function M.select_destination(callback, opts)
     return currentJobId
   end
 
+  local function getConnectedDevices()
+    return remoteDevices.get_connected_devices(refreshDevices)
+  end
+
   if not hasCachedDevices then
     start_telescope_spinner()
   end
 
-  opts.on_refresh = refreshDevices
+  opts.on_refresh = getConnectedDevices
 
   M.show("Select Device", cachedDeviceNames or {}, function(_, index)
     projectConfig.settings.destination = results[index].id
@@ -380,7 +389,7 @@ function M.select_destination(callback, opts)
   end, opts)
 
   if not hasCachedDevices then
-    return refreshDevices()
+    return getConnectedDevices()
   end
 end
 
