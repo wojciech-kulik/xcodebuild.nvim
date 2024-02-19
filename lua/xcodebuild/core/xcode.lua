@@ -312,9 +312,9 @@ end
 
 function M.install_app(platform, destination, appPath, callback)
   if platform == "iOS" then
-    M.install_app_on_device(destination, appPath, callback)
+    return M.install_app_on_device(destination, appPath, callback)
   else
-    M.install_app_on_simulator(destination, appPath, callback)
+    return M.install_app_on_simulator(destination, appPath, callback)
   end
 end
 
@@ -452,9 +452,9 @@ end
 
 function M.uninstall_app(platform, destination, bundleId, callback)
   if platform == "iOS" then
-    M.uninstall_app_from_device(destination, bundleId, callback)
+    return M.uninstall_app_from_device(destination, bundleId, callback)
   else
-    M.uninstall_app_from_simulator(destination, bundleId, callback)
+    return M.uninstall_app_from_simulator(destination, bundleId, callback)
   end
 end
 
@@ -464,12 +464,15 @@ function M.get_app_pid(productName)
   return tonumber(pid and pid[1] or nil)
 end
 
-function M.kill_app(productName)
+function M.kill_app(productName, callback)
+  -- TODO: kill on device with iOS 17
   local pid = M.get_app_pid(productName)
 
   if pid then
     util.shell("kill -9 " .. pid)
   end
+
+  util.call(callback)
 end
 
 function M.get_code_coverage(archive, filepath, callback)

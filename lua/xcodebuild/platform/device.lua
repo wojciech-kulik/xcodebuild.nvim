@@ -5,28 +5,62 @@ local logsPanel = require("xcodebuild.xcode_logs.panel")
 local config = require("xcodebuild.core.config").options
 local events = require("xcodebuild.broadcasting.events")
 local helpers = require("xcodebuild.helpers")
+local deviceProxy = require("xcodebuild.platform.device_proxy")
 local util = require("xcodebuild.util")
 
 local M = {
   currentJobId = nil,
 }
 
-function M.install_app(callback)
+local function launch_app(waitForDebugger, callback)
+  local settings = projectConfig.settings
+  local function finished()
+    notifications.send("Application has been launched")
+    events.application_launched()
+    util.call(callback)
+  end
+
+  notifications.send("Launching application...")
+
+  if settings.platform == "macOS" then
+    local path = settings.appPath .. "/Contents/MacOS/" .. settings.productName
+    finished()
+    return vim.fn.jobstart(path, { detach = true })
+  end
+
+  if settings.productName then
+    M.kill_app()
+  end
+
+  if deviceProxy.should_use() then
+    return deviceProxy.launch_app(settings.destination, settings.bundleId, finished)
+  else
+    return xcode.launch_app(
+      settings.platform,
+      settings.destination,
+      settings.bundleId,
+      waitForDebugger,
+      finished
+    )
+  end
+end
+
+function M.kill_app(callback)
   if not helpers.validate_project() then
     return
   end
 
   local settings = projectConfig.settings
   if settings.platform == "macOS" then
-    notifications.send_error("macOS apps cannot be installed")
+    notifications.send_error("macOS app can't be uninstalled")
     return
   end
 
-  notifications.send("Installing application...")
-  xcode.install_app(settings.platform, settings.destination, settings.appPath, function()
-    notifications.send("Application has been installed")
-    util.call(callback)
-  end)
+  if deviceProxy.is_installed() and settings.platform == "iOS" then
+    M.currentJobId = deviceProxy.kill_app(settings.productName, callback)
+  else
+    M.currentJobId = xcode.kill_app(settings.productName, callback)
+  end
 end
 
 function M.run_app(waitForDebugger, callback)
@@ -38,36 +72,9 @@ function M.run_app(waitForDebugger, callback)
     logsPanel.close_logs()
   end
 
-  local settings = projectConfig.settings
-
-  if settings.platform == "macOS" then
-    notifications.send("Launching application...")
-    local path = settings.appPath .. "/Contents/MacOS/" .. settings.productName
-
-    M.currentJobId = vim.fn.jobstart(path, { detach = true })
-    events.application_launched()
-    notifications.send("Application has been launched")
-    util.call(callback)
-  else
-    if settings.productName then
-      xcode.kill_app(settings.productName)
-    end
-
-    notifications.send("Installing application...")
-    M.currentJobId = xcode.install_app(settings.platform, settings.destination, settings.appPath, function()
-      M.currentJobId = xcode.launch_app(
-        settings.platform,
-        settings.destination,
-        settings.bundleId,
-        waitForDebugger,
-        function()
-          notifications.send("Application has been launched")
-          events.application_launched()
-          util.call(callback)
-        end
-      )
-    end)
-  end
+  M.currentJobId = M.install_app(function()
+    M.currentJobId = launch_app(waitForDebugger, callback)
+  end)
 end
 
 function M.boot_simulator(callback)
@@ -92,6 +99,31 @@ function M.boot_simulator(callback)
   end)
 end
 
+function M.install_app(callback)
+  if not helpers.validate_project() then
+    return
+  end
+
+  local settings = projectConfig.settings
+  if settings.platform == "macOS" then
+    notifications.send_error("macOS apps cannot be installed")
+    return
+  end
+
+  local function finished()
+    notifications.send("Application has been installed")
+    util.call(callback)
+  end
+
+  notifications.send("Installing application...")
+
+  if deviceProxy.should_use() then
+    return deviceProxy.install_app(settings.destination, settings.appPath, finished)
+  else
+    return xcode.install_app(settings.platform, settings.destination, settings.appPath, finished)
+  end
+end
+
 function M.uninstall_app(callback)
   if not helpers.validate_project() then
     return
@@ -103,11 +135,18 @@ function M.uninstall_app(callback)
     return
   end
 
-  notifications.send("Uninstalling application...")
-  M.currentJobId = xcode.uninstall_app(settings.platform, settings.destination, settings.bundleId, function()
+  local function finished()
     notifications.send("Application has been uninstalled")
     util.call(callback)
-  end)
+  end
+
+  notifications.send("Uninstalling application...")
+
+  if deviceProxy.should_use() then
+    M.currentJobId = deviceProxy.uninstall_app(settings.destination, settings.bundleId, finished)
+  else
+    M.currentJobId = xcode.uninstall_app(settings.platform, settings.destination, settings.bundleId, finished)
+  end
 end
 
 return M

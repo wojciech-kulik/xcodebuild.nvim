@@ -2,6 +2,7 @@ local notifications = require("xcodebuild.broadcasting.notifications")
 local util = require("xcodebuild.util")
 local projectConfig = require("xcodebuild.project.config")
 local appdata = require("xcodebuild.project.appdata")
+local config = require("xcodebuild.core.config")
 local deviceProxy = require("xcodebuild.platform.device_proxy")
 
 local M = {}
@@ -9,21 +10,21 @@ local M = {}
 local function remove_listeners()
   local listeners = require("dap").listeners.after
 
-  listeners.event_terminated["xcodebuild"] = nil
-  listeners.disconnect["xcodebuild"] = nil
-  listeners.event_continued["xcodebuild"] = nil
-  listeners.event_output["xcodebuild"] = nil
+  listeners.event_terminated["xcodebuild-legacy"] = nil
+  listeners.event_continued["xcodebuild-legacy"] = nil
+  listeners.event_output["xcodebuild-legacy"] = nil
+  require("dap").listeners.before.disconnect["xcodebuild-legacy"] = nil
 end
 
 local function setup_terminate_listeners()
   local listeners = require("dap").listeners.after
 
-  listeners.event_terminated["xcodebuild"] = function()
+  listeners.event_terminated["xcodebuild-legacy"] = function()
     remove_listeners()
     M.stop_remote_debugger()
   end
 
-  listeners.disconnect["xcodebuild"] = function()
+  require("dap").listeners.before.disconnect["xcodebuild-legacy"] = function()
     remove_listeners()
     M.stop_remote_debugger()
   end
@@ -34,12 +35,12 @@ local function setup_connection_listeners()
   local processLaunched = false
   local buffer = ""
 
-  listeners.event_continued["xcodebuild"] = function()
-    listeners.event_continued["xcodebuild"] = nil
+  listeners.event_continued["xcodebuild-legacy"] = function()
+    listeners.event_continued["xcodebuild-legacy"] = nil
     notifications.send("Remote debugger connected")
   end
 
-  listeners.event_output["xcodebuild"] = function(_, body)
+  listeners.event_output["xcodebuild-legacy"] = function(_, body)
     if not processLaunched and string.find(body.output, "Launched process") then
       processLaunched = true
       return
@@ -102,9 +103,8 @@ function M.start_dap()
         return "script lldb.target.module[0].SetPlatformFileSpec(lldb.SBFileSpec('" .. appPath .. "'))"
       end,
 
-      function()
-        return deviceProxy.start_secure_server(projectConfig.settings.destination, M.rsd_param)
-      end,
+      M.connection_string,
+
       "process launch",
     },
   })
@@ -121,28 +121,33 @@ function M.start_remote_debugger(callback)
   notifications.send("Starting remote debugger...")
   xcodebuildDap.clear_console()
 
-  M.debug_server_job = deviceProxy.create_secure_tunnel(projectConfig.settings.destination, function(rsdParam)
-    M.rsd_param = rsdParam
+  M.debug_server_job = deviceProxy.start_server(
+    projectConfig.settings.destination,
+    config.options.commands.remote_debugger_port,
+    function(connection_string)
+      M.connection_string = connection_string
 
-    xcodebuildDap.update_console({ "Connecting to " .. rsdParam:gsub("%-%-rsd ", "") })
-    setup_terminate_listeners()
-    xcodebuildDap.start_dap_in_swift_buffer(true)
+      xcodebuildDap.update_console({
+        "Connecting to " .. connection_string:gsub("process connect connect://", ""),
+      })
+      setup_terminate_listeners()
+      xcodebuildDap.start_dap_in_swift_buffer(true)
 
-    util.call(callback)
-  end)
+      util.call(callback)
+    end
+  )
 end
 
 function M.stop_remote_debugger()
   if not M.debug_server_job then
-    deviceProxy.close_secure_tunnel()
     return
   end
 
-  M.rsd_param = nil
-  M.debug_server_job = nil
-
-  deviceProxy.close_secure_tunnel()
+  vim.fn.jobstop(M.debug_server_job)
   notifications.send("Remote debugger stopped")
+
+  M.debug_server_job = nil
+  M.connection_string = nil
 end
 
 return M

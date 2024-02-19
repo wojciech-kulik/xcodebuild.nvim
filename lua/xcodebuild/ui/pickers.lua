@@ -4,7 +4,7 @@ local util = require("xcodebuild.util")
 local notifications = require("xcodebuild.broadcasting.notifications")
 local snapshots = require("xcodebuild.tests.snapshots")
 local events = require("xcodebuild.broadcasting.events")
-local usb = require("xcodebuild.platform.usb")
+local deviceProxy = require("xcodebuild.platform.device_proxy")
 
 local telescopePickers = require("telescope.pickers")
 local telescopeFinders = require("telescope.finders")
@@ -367,7 +367,11 @@ function M.select_destination(callback, opts)
   end
 
   local function getConnectedDevices()
-    return usb.get_connected_devices(refreshDevices)
+    if not deviceProxy.is_installed() then
+      return refreshDevices({})
+    end
+
+    return deviceProxy.get_connected_devices(refreshDevices)
   end
 
   if not hasCachedDevices then

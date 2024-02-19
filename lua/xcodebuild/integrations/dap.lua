@@ -1,11 +1,11 @@
 local notifications = require("xcodebuild.broadcasting.notifications")
+local helpers = require("xcodebuild.helpers")
 local util = require("xcodebuild.util")
 local projectConfig = require("xcodebuild.project.config")
 local xcode = require("xcodebuild.core.xcode")
 local projectBuilder = require("xcodebuild.project.builder")
 local device = require("xcodebuild.platform.device")
 local actions = require("xcodebuild.actions")
-local remoteDebugger = require("xcodebuild.integrations.remote_debugger")
 
 local M = {}
 
@@ -16,6 +16,30 @@ local function validate_project()
   end
 
   return true
+end
+
+local function remote_debugger_start_dap()
+  local remoteDebuggerLegacy = require("xcodebuild.integrations.remote_debugger_legacy")
+  local remoteDebugger = require("xcodebuild.integrations.remote_debugger")
+  local majorVersion = helpers.get_major_os_version()
+
+  if majorVersion and majorVersion < 17 then
+    remoteDebuggerLegacy.start_dap()
+  else
+    remoteDebugger.start_dap()
+  end
+end
+
+local function remote_debugger_start(callback)
+  local remoteDebuggerLegacy = require("xcodebuild.integrations.remote_debugger_legacy")
+  local remoteDebugger = require("xcodebuild.integrations.remote_debugger")
+  local majorVersion = helpers.get_major_os_version()
+
+  if majorVersion and majorVersion < 17 then
+    remoteDebuggerLegacy.start_remote_debugger(callback)
+  else
+    remoteDebugger.start_remote_debugger(callback)
+  end
 end
 
 function M.start_dap_in_swift_buffer(remote)
@@ -35,7 +59,7 @@ function M.start_dap_in_swift_buffer(remote)
     if extension and extension:lower() == "swift" then
       vim.api.nvim_win_call(winid, function()
         if remote then
-          remoteDebugger.start_dap()
+          remote_debugger_start_dap()
         else
           dap.continue()
         end
@@ -62,14 +86,16 @@ function M.build_and_debug(callback)
   local remote = projectConfig.settings.platform == "iOS"
 
   if not remote then
-    xcode.kill_app(projectConfig.settings.productName)
+    device.kill_app()
     M.start_dap_in_swift_buffer()
   end
 
   projectBuilder.build_project({}, function(report)
     local success = util.is_empty(report.buildErrors)
     if not success then
-      dap.terminate()
+      if dap.session() then
+        dap.terminate()
+      end
 
       local loadedDapui, dapui = pcall(require, "dapui")
       if loadedDapui then
@@ -80,7 +106,7 @@ function M.build_and_debug(callback)
 
     if remote then
       device.install_app(function()
-        remoteDebugger.start_remote_debugger(callback)
+        remote_debugger_start(callback)
       end)
     else
       device.run_app(false, callback)
@@ -97,10 +123,10 @@ function M.debug_without_build(callback)
 
   if remote then
     device.install_app(function()
-      remoteDebugger.start_remote_debugger(callback)
+      remote_debugger_start(callback)
     end)
   else
-    xcode.kill_app(projectConfig.settings.productName)
+    device.kill_app()
     M.start_dap_in_swift_buffer()
     device.run_app(true, callback)
   end

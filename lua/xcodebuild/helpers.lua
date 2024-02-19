@@ -60,4 +60,9 @@ function M.find_all_swift_files()
   return map
 end
 
+function M.get_major_os_version()
+  local settings = require("xcodebuild.project.config").settings
+  return settings.os and tonumber(vim.split(settings.os, ".", { plain = true })[1]) or nil
+end
+
 return M

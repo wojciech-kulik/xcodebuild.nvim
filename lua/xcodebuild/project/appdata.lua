@@ -24,7 +24,7 @@ REMOTE_DEBUGGER_TOOL = "remote_debugger"
 
 function M.tool_path(name)
   local pathComponents = vim.split(debug.getinfo(1).source:sub(2), "/", { plain = true })
-  return table.concat(pathComponents, "/", 1, #pathComponents - 3) .. "/tools/" .. name
+  return table.concat(pathComponents, "/", 1, #pathComponents - 4) .. "/tools/" .. name
 end
 
 function M.create_app_dir()
