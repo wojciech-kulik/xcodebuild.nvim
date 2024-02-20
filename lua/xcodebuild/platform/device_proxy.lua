@@ -151,7 +151,7 @@ function M.should_use()
   end
 
   local majorVersion = helpers.get_major_os_version()
-  local result = settings.platform == "iOS" and (not majorVersion or majorVersion < 17)
+  local result = settings.platform == "iOS" and majorVersion and majorVersion < 17
 
   return result
 end
