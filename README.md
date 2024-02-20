@@ -555,13 +555,17 @@ return {
 
 </details>
 
-### 📲 Debugging On Physical Device With iOS 17+
+### 📲 Debugging On iOS 17+ Device
 
-**On iOS 17+**, to establish a connection, [pymobiledevice3](https://github.com/doronz88/pymobiledevice3) needs to create a
-[secure tunnel](https://github.com/doronz88/pymobiledevice3?tab=readme-ov-file#working-with-developer-tools-ios--170), which must be called with `sudo`.
+Since iOS 17, a new secure connection between Mac and mobile devices is required. Xcodebuild.nvim uses [pymobiledevice3](https://github.com/doronz88/pymobiledevice3)
+to establish a special trusted tunnel that is later used for debugging. However, this operation requires `sudo`
+([more details](https://github.com/doronz88/pymobiledevice3/blob/master/misc/RemoteXPC.md#trusted-tunnel)).
 
-To make it work with xcodebuild.nvim, you must configure a passwordless access for the included small script: [remote_debugger](./tools/remote_debugger).
-This script is responsible for just 2 simple actions: creating a secure tunnel and killing it.
+Showing a pop-up to enter a password every time you run a debugger would be quite annoying. That's why the plugin provides a small script ([tools/remote_debugger](./tools/remote_debugger))
+that wraps the only two operations requiring `sudo` (starting a secure tunnel and closing it).
+
+This allows you to configure passwordless access just for this single file and make it work with xcodebuild.nvim. You can even make a local copy if you are worried that the content of
+this file could be changed in the future.
 
 #### Passwordless access to `remote_debugger`
 
