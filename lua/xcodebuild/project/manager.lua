@@ -57,8 +57,12 @@ local function run(action, params)
   return output
 end
 
+local function run_list_targets()
+  return run("list_targets")
+end
+
 local function run_select_targets(callback)
-  local targets = run("list_targets")
+  local targets = run_list_targets()
   pickers.show("Select Target(s)", targets, callback, { close_on_select = true, multiselect = true })
 end
 
@@ -126,6 +130,22 @@ function M.create_new_file()
   vim.cmd("e " .. fullPath)
 
   M.add_current_file()
+end
+
+function M.add_file_to_targets(filepath, targets)
+  if not helpers.validate_project() or not validate_xcodeproj_tool() then
+    return
+  end
+
+  run_add_file_to_targets(filepath, targets)
+end
+
+function M.get_project_targets()
+  if not helpers.validate_project() or not validate_xcodeproj_tool() then
+    return
+  end
+
+  return run_list_targets()
 end
 
 function M.add_file(filepath)

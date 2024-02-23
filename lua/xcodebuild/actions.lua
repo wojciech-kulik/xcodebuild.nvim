@@ -241,6 +241,14 @@ end
 
 -- Project Management
 
+function M.get_project_targets()
+  return projectManager.get_project_targets()
+end
+
+function M.add_file_to_targets(filepath, targets)
+  projectManager.add_file_to_targets(filepath, targets)
+end
+
 function M.create_new_file()
   projectManager.create_new_file()
 end
