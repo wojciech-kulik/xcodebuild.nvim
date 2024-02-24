@@ -128,6 +128,8 @@ function M.setup(options)
   vim.api.nvim_create_user_command("XcodebuildInstallApp", call(actions.install_app), { nargs = 0 })
   vim.api.nvim_create_user_command("XcodebuildUninstallApp", call(actions.uninstall_app), { nargs = 0 })
   vim.api.nvim_create_user_command("XcodebuildOpenInXcode", call(actions.open_in_xcode), { nargs = 0 })
+  vim.api.nvim_create_user_command("XcodebuildQuickfixLine", call(actions.quickfix_line), { nargs = 0 })
+  vim.api.nvim_create_user_command("XcodebuildCodeActions", call(actions.show_code_actions), { nargs = 0 })
 
   -- Backward compatibility
   vim.api.nvim_create_user_command("XcodebuildUninstall", call(actions.uninstall), { nargs = 0 })

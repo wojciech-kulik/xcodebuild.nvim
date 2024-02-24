@@ -10,6 +10,7 @@ local testRunner = require("xcodebuild.tests.runner")
 local projectConfig = require("xcodebuild.project.config")
 local helpers = require("xcodebuild.helpers")
 local projectManager = require("xcodebuild.project.manager")
+local lsp = require("xcodebuild.integrations.lsp")
 
 local M = {}
 
@@ -283,6 +284,16 @@ end
 
 function M.show_project_manager_actions()
   projectManager.show_action_picker()
+end
+
+-- LSP
+
+function M.quickfix_line()
+  lsp.quickfix_line()
+end
+
+function M.show_code_actions()
+  lsp.code_actions()
 end
 
 return M
