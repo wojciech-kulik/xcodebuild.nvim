@@ -12,11 +12,11 @@
       lineNumber = 51,
       message = { "'WindowController' is only available in iOS 15 or newer", "extension WindowController: DebugMenuDelegate {", "          ^" }
     } },
-  diagnostics = {},
+  buildWarnings = {},
   failedTestsCount = 0,
   output = {},
+  testErrors = {},
   tests = {},
   testsCount = 0,
-  warnings = {},
   xcresultFilepath = "/Users/john/Library/Developer/Xcode/DerivedData/CalendarAppDemo-gpxsuartkqsliqafuudvbkhotrhj/Logs/Test/Test-CalendarAppDemo-2023.10.31_18-49-34-+0100.xcresult"
 }

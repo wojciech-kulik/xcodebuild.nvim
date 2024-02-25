@@ -6,11 +6,11 @@
       lineNumber = 73,
       message = { "type 'AsyncStatus<()>' has no member 'inProgresss'", "        status = .inProgresss", "                 ~^~~~~~~~~~~" }
     } },
-  diagnostics = {},
+  buildWarnings = {},
   failedTestsCount = 0,
   output = {},
+  testErrors = {},
   tests = {},
   testsCount = 0,
-  warnings = {},
   xcresultFilepath = "/Users/john/Library/Developer/Xcode/DerivedData/CalendarAppDemo-gpxsuartkqsliqafuudvbkhotrhj/Logs/Test/Test-CalendarAppDemo-2023.10.31_17-55-22-+0100.xcresult"
 }

@@ -45,3 +45,4 @@ xcuserdata
 tools/src/getsnapshots.xcodeproj/xcuserdata
 tools/src/getsnapshots.xcodeproj/xcshareddata/xcschemes/getsnapshots.xcscheme
 lua/xcodebuild/_tests/test_data/*.vim
+doc/tags

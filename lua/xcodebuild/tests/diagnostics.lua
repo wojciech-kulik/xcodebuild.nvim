@@ -1,9 +1,19 @@
+---@mod xcodebuild.tests.diagnostics Test Diagnostics
+---@brief [[
+---This module is responsible for handling diagnostics and marks for test files.
+---@brief ]]
+
 local util = require("xcodebuild.util")
 local config = require("xcodebuild.core.config").options.marks
 local testSearch = require("xcodebuild.tests.search")
 
 local M = {}
 
+---Returns the test class key for the given buffer.
+---@param bufnr number
+---@param report ParsedReport
+---@return string|nil
+---@see xcodebuild.tests.search.get_test_key_for_file
 local function find_test_class(bufnr, report)
   local filepath = vim.api.nvim_buf_get_name(bufnr)
 
@@ -26,6 +36,10 @@ local function find_test_class(bufnr, report)
   return nil
 end
 
+---Refreshes the diagnostics for the given buffer.
+---@param bufnr number
+---@param testClass string
+---@param report ParsedReport
 local function refresh_buf_diagnostics(bufnr, testClass, report)
   if not report.tests or not config.show_diagnostics then
     return
@@ -59,6 +73,10 @@ local function refresh_buf_diagnostics(bufnr, testClass, report)
   vim.diagnostic.set(ns, bufnr, diagnostics, {})
 end
 
+---Refreshes the marks for the given buffer.
+---@param bufnr number
+---@param testClass string
+---@param tests ParsedTest[]
 local function refresh_buf_marks(bufnr, testClass, tests)
   if not tests or not (config.show_test_duration or config.show_signs) then
     return
@@ -110,6 +128,7 @@ local function refresh_buf_marks(bufnr, testClass, tests)
   end
 end
 
+---Set up highlights for tests.
 function M.setup()
   -- stylua: ignore start
   vim.api.nvim_set_hl(0, "XcodebuildTestSuccessSign", { link = "DiagnosticSignOk", default = true })
@@ -119,12 +138,21 @@ function M.setup()
   -- stylua: ignore end
 end
 
+---Refreshes the diagnostics and marks for the given buffer.
+---@param bufnr number
+---@param report ParsedReport
+---@see xcodebuild.xcode_logs.parser.ParsedReport
 function M.refresh_test_buffer(bufnr, report)
   local testClass = find_test_class(bufnr, report)
-  refresh_buf_diagnostics(bufnr, testClass, report)
-  refresh_buf_marks(bufnr, testClass, report.tests)
+  if testClass then
+    refresh_buf_diagnostics(bufnr, testClass, report)
+    refresh_buf_marks(bufnr, testClass, report.tests)
+  end
 end
 
+---Refreshes the diagnostics and marks for all test buffers.
+---@param report ParsedReport
+---@see xcodebuild.xcode_logs.parser.ParsedReport
 function M.refresh_all_test_buffers(report)
   if util.is_not_empty(report.buildErrors) then
     return
@@ -137,8 +165,10 @@ function M.refresh_all_test_buffers(report)
 
   for _, buffer in ipairs(testBuffers or {}) do
     local testClass = find_test_class(buffer.bufnr, report)
-    refresh_buf_diagnostics(buffer.bufnr, testClass, report)
-    refresh_buf_marks(buffer.bufnr, testClass, report.tests)
+    if testClass then
+      refresh_buf_diagnostics(buffer.bufnr, testClass, report)
+      refresh_buf_marks(buffer.bufnr, testClass, report.tests)
+    end
   end
 end
 

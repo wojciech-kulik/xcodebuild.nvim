@@ -1,10 +1,68 @@
+---@mod xcodebuild.tests.explorer Test Explorer
+---@tag xcodebuild.test-explorer
+---@brief [[
+---This module contains the Test Explorer functionality.
+---
+---The Test Explorer is a UI that shows the status of tests
+---and allows the user to run, repeat, and open the tests.
+---
+---Tests are presented as a tree structure with targets,
+---classes, and tests.
+---
+---Key bindings:
+--- - Press `o` to jump to the test implementation
+--- - Press `t` to run selected tests
+--- - Press `T` to re-run recently selected tests
+--- - Press `R` to reload test list
+--- - Press `[` to jump to the previous failed test
+--- - Press `]` to jump to the next failed test
+--- - Press `<cr>` to expand or collapse the current node
+--- - Press `<tab>` to expand or collapse all classes
+--- - Press `q` to close the Test Explorer
+---
+---@brief ]]
+
+---Report node type.
+---@alias TestExplorerNodeStatus
+---| 'not_executed'
+---| 'partial_execution'
+---| 'passed'
+---| 'running'
+---| 'passed'
+---| 'failed'
+---| 'disabled'
+
+---Report node status.
+---@alias TestExplorerNodeKind
+---| 'target'
+---| 'class'
+---| 'test'
+
+---@class TestExplorerNode
+---@field id string
+---@field kind TestExplorerNodeKind
+---@field status TestExplorerNodeStatus
+---@field name string
+---@field hidden boolean
+---@field filepath string|nil
+---@field classes TestExplorerNode[]|nil
+---@field tests TestExplorerNode[]|nil
+
 local util = require("xcodebuild.util")
 local config = require("xcodebuild.core.config").options.test_explorer
 local notifications = require("xcodebuild.broadcasting.notifications")
-local testSearch = require("xcodebuild.tests.search")
 local events = require("xcodebuild.broadcasting.events")
 
 local M = {}
+
+---Tree structure with tests report.
+---
+---It's a list of targets, each target has a list of classes,
+---and each class has a list of tests.
+---
+
+---@type TestExplorerNode[]|nil
+M.report = nil
 
 local STATUS_NOT_EXECUTED = "not_executed"
 local STATUS_PARTIAL_EXECUTION = "partial_execution"
@@ -25,6 +83,10 @@ local last_run_tests = {}
 local collapsed_ids = {}
 local ns = vim.api.nvim_create_namespace("xcodebuild-test-explorer")
 
+---Generates the report for provided tests.
+---Sets the `M.report` variable.
+---@param tests XcodeTest[]
+---@see TestExplorerReport
 local function generate_report(tests)
   local targets = {}
   local current_target = {
@@ -41,6 +103,7 @@ local function generate_report(tests)
       goto continue
     end
 
+    local testSearch = require("xcodebuild.tests.search")
     local filepath = testSearch.find_filepath(test.target, test.class)
 
     if not config.open_expanded and util.is_empty(M.report) then
@@ -87,6 +150,9 @@ local function generate_report(tests)
   M.report = targets
 end
 
+---Gets the highlight group for the provided status.
+---@param status TestExplorerNodeStatus
+---@return string
 local function get_hl_for_status(status)
   if status == STATUS_NOT_EXECUTED then
     return "XcodebuildTestExplorerTestNotExecuted"
@@ -105,6 +171,9 @@ local function get_hl_for_status(status)
   end
 end
 
+---Gets the icon for the provided status.
+---@param status TestExplorerNodeStatus
+---@return string
 local function get_icon_for_status(status)
   if status == STATUS_NOT_EXECUTED then
     return config.not_executed_sign
@@ -123,6 +192,10 @@ local function get_icon_for_status(status)
   end
 end
 
+---Gets the highlight group for the provided kind and status.
+---@param kind TestExplorerNodeKind
+---@param status TestExplorerNodeStatus
+---@return string
 local function get_text_hl_for_kind(kind, status)
   if status == STATUS_DISABLED then
     return "XcodebuildTestExplorerTestDisabled"
@@ -132,9 +205,16 @@ local function get_text_hl_for_kind(kind, status)
     return "XcodebuildTestExplorerClass"
   elseif kind == KIND_TARGET then
     return "XcodebuildTestExplorerTarget"
+  else
+    return "XcodebuildTestExplorerTest"
   end
 end
 
+---Formats the line for the provided report line.
+---@param line TestExplorerNode
+---@param row number
+---@return string
+---@return table
 local function format_line(line, row)
   local status = line.status
   local kind = line.kind
@@ -166,11 +246,14 @@ local function format_line(line, row)
     return string.format("    [%s] %s", icon, name), get_highlights(4)
   elseif kind == KIND_CLASS then
     return string.format("  [%s] %s", icon, name), get_highlights(2)
-  elseif kind == KIND_TARGET then
+  else
     return string.format("[%s] %s", icon, name), get_highlights(0)
   end
 end
 
+---Gets the aggregated status for the provided children.
+---@param children TestExplorerNode[]
+---@return TestExplorerNodeStatus
 local function get_aggregated_status(children)
   local passed = false
   local failed = false
@@ -211,6 +294,9 @@ local function get_aggregated_status(children)
   end
 end
 
+---Refreshes the test explorer buffer.
+---It also moves the cursor to the last updated test
+---if `config.cursor_follows_tests` is enabled.
 local function refresh_explorer()
   if not M.bufnr then
     return
@@ -281,6 +367,8 @@ local function refresh_explorer()
   end
 end
 
+---Animates the test status.
+---Sets the `M.timer` variable.
 local function animate_status()
   M.timer = vim.fn.timer_start(100, function()
     refresh_explorer()
@@ -288,6 +376,8 @@ local function animate_status()
   end, { ["repeat"] = -1 })
 end
 
+---Sets up the buffer for the test explorer.
+---It also sets up the keymaps and the window options.
 local function setup_buffer()
   vim.api.nvim_buf_set_option(M.bufnr, "modifiable", true)
 
@@ -332,6 +422,7 @@ local function setup_buffer()
   })
 end
 
+---Collapses or expands all classes.
 function M.toggle_all_classes()
   local newState = nil
 
@@ -352,6 +443,7 @@ function M.toggle_all_classes()
   refresh_explorer()
 end
 
+---Expands or collapses the current node.
 function M.toggle_current_node()
   local currentRow = vim.api.nvim_win_get_cursor(0)[1]
   local line = line_to_test[currentRow]
@@ -399,6 +491,9 @@ function M.toggle_current_node()
   refresh_explorer()
 end
 
+---Opens the selected test or class under the cursor.
+---It navigates to the previous window to avoid
+---navigation in Test Explorer window.
 function M.open_selected_test()
   local currentRow = vim.api.nvim_win_get_cursor(0)[1]
   if not line_to_test[currentRow] then
@@ -420,6 +515,10 @@ function M.open_selected_test()
   end
 end
 
+---Changes status to `running` for all test ids from
+---{selectedTests}. If {selectedTests} is nil, then
+---all enabled tests will be marked as `running`.
+---@param selectedTests string[]|nil test ids
 function M.start_tests(selectedTests)
   if not M.report then
     return
@@ -453,6 +552,8 @@ function M.start_tests(selectedTests)
   end
 end
 
+---Stops the animation and changes the status of `running`
+---tests to `not_executed`.
 function M.finish_tests()
   if M.timer then
     vim.fn.timer_stop(M.timer)
@@ -484,6 +585,10 @@ function M.finish_tests()
   refresh_explorer()
 end
 
+---Updates the status of the test with the provided {testId}.
+---It also updates parent nodes.
+---@param testId string
+---@param status TestExplorerNodeStatus
 function M.update_test_status(testId, status)
   if not M.report then
     return
@@ -516,6 +621,8 @@ function M.update_test_status(testId, status)
   end
 end
 
+---Jumps to the next or previous failed test on the list.
+---@param next boolean
 function M.jump_to_failed_test(next)
   if not M.report then
     return
@@ -529,6 +636,7 @@ function M.jump_to_failed_test(next)
   vim.fn.search("\\[" .. config.failure_sign .. "\\]", next and "W" or "bW")
 end
 
+---Repeats the last executed tests.
 function M.repeat_last_run()
   if not M.report then
     return
@@ -543,6 +651,7 @@ function M.repeat_last_run()
   require("xcodebuild.tests.runner").run_tests(last_run_tests, { skipEnumeration = true })
 end
 
+---Runs the selected tests (in visual-mode).
 function M.run_selected_tests()
   if not M.report then
     return
@@ -588,6 +697,7 @@ function M.run_selected_tests()
   end
 end
 
+---Toggles the Test Explorer window.
 function M.toggle()
   if not M.bufnr then
     M.show()
@@ -602,6 +712,7 @@ function M.toggle()
   end
 end
 
+---Hides the Test Explorer window.
 function M.hide()
   if M.bufnr then
     local winnr = vim.fn.win_findbuf(M.bufnr)
@@ -612,6 +723,7 @@ function M.hide()
   end
 end
 
+---Shows the Test Explorer window.
 function M.show()
   if not config.enabled then
     return
@@ -639,6 +751,8 @@ function M.show()
   refresh_explorer()
 end
 
+---Loads the tests and generates the report.
+---@param tests XcodeTest[]
 function M.load_tests(tests)
   if not config.enabled then
     return
@@ -648,6 +762,7 @@ function M.load_tests(tests)
   generate_report(tests)
 end
 
+---Sets up the Test Explorer.
 function M.setup()
   -- stylua: ignore start
   vim.api.nvim_set_hl(0, "XcodebuildTestExplorerTest", { link = "Function", default = true })

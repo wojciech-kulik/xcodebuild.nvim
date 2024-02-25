@@ -45,6 +45,13 @@ local function get_coverage_item_id(xcresultPath, callback)
   })
 end
 
+---Hash map of targets to list of file paths.
+---@alias TargetMap table<string, string[]>
+
+---Returns a map of targets to list of file paths based on
+---the `SwiftFileList` files in the build directory.
+---@param appPath string
+---@return TargetMap
 function M.get_targets_filemap(appPath)
   if not appPath then
     notifications.send_error("Could not locate build dir. Please run Build.")

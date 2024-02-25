@@ -1,7 +1,26 @@
+---@mod xcodebuild.tests.enumeration_parser Test Enumeration Parser
+---@brief [[
+---This module contains the parser for the:
+---`xcodebuild enumerate-tests` command results.
+---
+---See |xcodebuild.core.xcode.enumerate_tests| for more details.
+---@brief ]]
+
+---@class XcodeTest
+---@field id string
+---@field target string
+---@field class string
+---@field name string
+---@field enabled boolean
+
 local notifications = require("xcodebuild.broadcasting.notifications")
 
 local M = {}
 
+---Parses the test enumeration results from `xcodebuild` command.
+---@param filepath string
+---@return XcodeTest[]
+---@see xcodebuild.core.xcode.enumerate_tests
 function M.parse(filepath)
   local readResult, jsonContent = pcall(vim.fn.readfile, filepath)
   if not readResult then

@@ -1,0 +1,54 @@
+---@mod xcodebuild.bindings Key Bindings
+---@tag xcodebuild.keybindings
+---@tag xcodebuild.keys
+---@tag xcodebuild.keymaps
+---@brief [[
+---Sample key bindings for the plugin.
+--->lua
+---    vim.keymap.set("n", "<leader>X", "<cmd>XcodebuildPicker<cr>", { desc = "Show Xcodebuild Actions" })
+---    vim.keymap.set("n", "<leader>xf", "<cmd>XcodebuildProjectManager<cr>", { desc = "Show Project Manager Actions" })
+---
+---    vim.keymap.set("n", "<leader>xb", "<cmd>XcodebuildBuild<cr>", { desc = "Build Project" })
+---    vim.keymap.set("n", "<leader>xB", "<cmd>XcodebuildBuildForTesting<cr>", { desc = "Build For Testing" })
+---    vim.keymap.set("n", "<leader>xr", "<cmd>XcodebuildBuildRun<cr>", { desc = "Build & Run Project" })
+---
+---    vim.keymap.set("n", "<leader>xt", "<cmd>XcodebuildTest<cr>", { desc = "Run Tests" })
+---    vim.keymap.set("v", "<leader>xt", "<cmd>XcodebuildTestSelected<cr>", { desc = "Run Selected Tests" })
+---    vim.keymap.set("n", "<leader>xT", "<cmd>XcodebuildTestClass<cr>", { desc = "Run This Test Class" })
+---
+---    vim.keymap.set("n", "<leader>xl", "<cmd>XcodebuildToggleLogs<cr>", { desc = "Toggle Xcodebuild Logs" })
+---    vim.keymap.set("n", "<leader>xc", "<cmd>XcodebuildToggleCodeCoverage<cr>", { desc = "Toggle Code Coverage" })
+---    vim.keymap.set("n", "<leader>xC", "<cmd>XcodebuildShowCodeCoverageReport<cr>", { desc = "Show Code Coverage Report" })
+---    vim.keymap.set("n", "<leader>xe", "<cmd>XcodebuildTestExplorerToggle<cr>", { desc = "Toggle Test Explorer" })
+---    vim.keymap.set("n", "<leader>xs", "<cmd>XcodebuildFailingSnapshots<cr>", { desc = "Show Failing Snapshots" })
+---
+---    vim.keymap.set("n", "<leader>xd", "<cmd>XcodebuildSelectDevice<cr>", { desc = "Select Device" })
+---    vim.keymap.set("n", "<leader>xp", "<cmd>XcodebuildSelectTestPlan<cr>", { desc = "Select Test Plan" })
+---    vim.keymap.set("n", "<leader>xq", "<cmd>Telescope quickfix<cr>", { desc = "Show QuickFix List" })
+---
+---    vim.keymap.set("n", "<leader>xx", "<cmd>XcodebuildQuickfixLine<cr>", { desc = "Quickfix Line" })
+---    vim.keymap.set("n", "<leader>xa", "<cmd>XcodebuildCodeActions<cr>", { desc = "Show Code Actions" })
+---<
+---Test Explorer
+--- - Press `o` to jump to the test implementation
+--- - Press `t` to run selected tests
+--- - Press `T` to re-run recently selected tests
+--- - Press `R` to reload test list
+--- - Press `[` to jump to the previous failed test
+--- - Press `]` to jump to the next failed test
+--- - Press `<cr>` to expand or collapse the current node
+--- - Press `<tab>` to expand or collapse all classes
+--- - Press `q` to close the Test Explorer
+---
+---Logs Panel
+--- - Press `o` on a failed test in the summary section to jump to the failing location
+--- - Press `q` to close the panel
+---
+---Code Coverage Report
+--- - `enter` or `tab` - expand or collapse the current node
+--- - `o` - open source file
+---
+---@brief ]]
+
+local M = {}
+return M

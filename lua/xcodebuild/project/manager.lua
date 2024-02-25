@@ -140,6 +140,8 @@ function M.add_file_to_targets(filepath, targets)
   run_add_file_to_targets(filepath, targets)
 end
 
+---Returns the project targets.
+---@return string[]|nil
 function M.get_project_targets()
   if not helpers.validate_project() or not validate_xcodeproj_tool() then
     return

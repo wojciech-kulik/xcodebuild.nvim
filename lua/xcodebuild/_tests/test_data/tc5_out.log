@@ -1,8 +1,9 @@
 {
   buildErrors = {},
-  diagnostics = {},
+  buildWarnings = {},
   failedTestsCount = 0,
   output = {},
+  testErrors = {},
   tests = {
     CalendarNetworkProviderTests = { {
         class = "CalendarNetworkProviderTests",
@@ -3472,6 +3473,5 @@
       } }
   },
   testsCount = 377,
-  warnings = {},
   xcresultFilepath = "/Users/john/Library/Developer/Xcode/DerivedData/CalendarEventDemo-gpxsuartkqsliqafuudvbkhotrhj/Logs/Test/Test-CalendarEventDemo-2023.11.02_03-23-49-+0100.xcresult"
 }

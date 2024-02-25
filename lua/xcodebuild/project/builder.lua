@@ -1,19 +1,29 @@
-local notifications = require("xcodebuild.broadcasting.notifications")
-local logsParser = require("xcodebuild.xcode_logs.parser")
+---@mod xcodebuild.project.builder Project Builder
+---@brief [[
+---This module contains the functionality to build the project.
+---
+---It interacts with multiple modules to build the project
+---and present the results.
+---
+---It also sends notifications and events to the user.
+---@brief ]]
+
 local util = require("xcodebuild.util")
-local appdata = require("xcodebuild.project.appdata")
-local quickfix = require("xcodebuild.core.quickfix")
-local projectConfig = require("xcodebuild.project.config")
-local xcode = require("xcodebuild.core.xcode")
-local logsPanel = require("xcodebuild.xcode_logs.panel")
-local config = require("xcodebuild.core.config").options
-local events = require("xcodebuild.broadcasting.events")
-local device = require("xcodebuild.platform.device")
 local helpers = require("xcodebuild.helpers")
+local notifications = require("xcodebuild.broadcasting.notifications")
+local events = require("xcodebuild.broadcasting.events")
+local appdata = require("xcodebuild.project.appdata")
+local projectConfig = require("xcodebuild.project.config")
+local config = require("xcodebuild.core.config").options
 
 local M = {}
 local CANCELLED_CODE = 143
 
+---Builds and runs the app on device or simulator.
+---@param waitForDebugger boolean
+---@param callback function|nil
+---@see xcodebuild.platform.device.run_app
+---@see xcodebuild.project.builder.build_project
 function M.build_and_run_app(waitForDebugger, callback)
   if not helpers.validate_project() then
     return
@@ -25,10 +35,21 @@ function M.build_and_run_app(waitForDebugger, callback)
       return
     end
 
+    local device = require("xcodebuild.platform.device")
     device.run_app(waitForDebugger, callback)
   end)
 end
 
+---Builds the project.
+---Sets quickfix list, logs, and sends notifications.
+---@param opts table|nil
+---
+---* {buildForTesting} (boolean|nil)
+---* {doNotShowSuccess} (boolean|nil)
+---  if should send the notification
+---* {clean} (boolean|nil) runs clean build
+---@param callback function|nil
+---@see xcodebuild.core.xcode.build_project
 function M.build_project(opts, callback)
   opts = opts or {}
 
@@ -36,8 +57,13 @@ function M.build_project(opts, callback)
     return
   end
 
-  local buildId = notifications.send_build_started(opts.buildForTesting)
-  helpers.before_new_run()
+  local quickfix = require("xcodebuild.core.quickfix")
+  local logsParser = require("xcodebuild.xcode_logs.parser")
+  local xcode = require("xcodebuild.core.xcode")
+  local logsPanel = require("xcodebuild.xcode_logs.panel")
+
+  local buildId = notifications.start_build_timer(opts.buildForTesting)
+  helpers.clear_state()
 
   local on_stdout = function(_, output)
     appdata.report = logsParser.parse_logs(output)
@@ -95,6 +121,8 @@ function M.build_project(opts, callback)
   })
 end
 
+---Cleans the `DerivedData` folder.
+---It will ask for confirmation before deleting it.
 function M.clean_derived_data()
   local appPath = projectConfig.settings.appPath
   if not appPath then
@@ -115,6 +143,7 @@ function M.clean_derived_data()
     if input == "y" then
       notifications.send("Deleting: " .. derivedDataPath .. "...")
 
+      -- TODO: should clean targets map?
       vim.fn.jobstart("rm -rf '" .. derivedDataPath .. "'", {
         on_exit = function(_, code)
           if code == 0 then

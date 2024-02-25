@@ -1,8 +1,9 @@
 {
   buildErrors = {},
-  diagnostics = {},
+  buildWarnings = {},
   failedTestsCount = 0,
   output = {},
+  testErrors = {},
   tests = {
     ShortcutRecorderCrashTests = { {
         class = "ShortcutRecorderCrashTests",
@@ -25,6 +26,5 @@
       } }
   },
   testsCount = 2,
-  warnings = {},
   xcresultFilepath = "/Users/wkulik/Library/Developer/Xcode/DerivedData/ShortcutRecorderCrash-godwnktrdenglibwmfrosntqktad/Logs/Test/Test-ShortcutRecorderCrash-2023.11.02_00-32-53-+0100.xcresult"
 }

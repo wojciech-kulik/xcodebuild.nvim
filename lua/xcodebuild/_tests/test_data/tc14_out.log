@@ -1,11 +1,6 @@
 {
   buildErrors = {},
-  diagnostics = {},
-  failedTestsCount = 0,
-  output = {},
-  tests = {},
-  testsCount = 0,
-  warnings = { {
+  buildWarnings = { {
       columnNumber = 13,
       filename = "MainViewModel",
       filepath = "/Users/john/repositories/calendar-app-ios/DemoApp/CalendarEventDemo/Modules/Main/MainViewModel.swift",
@@ -17,5 +12,10 @@
       filepath = "/Users/john/repositories/calendar-app-ios/DemoApp/CalendarEventDemo/Modules/Main/MainViewModel.swift",
       lineNumber = 57,
       message = { "string interpolation produces a debug description for an optional value; did you mean to make this explicit?", '        print("aa \\(b)")', "                    ^" }
-    } }
+    } },
+  failedTestsCount = 0,
+  output = {},
+  testErrors = {},
+  tests = {},
+  testsCount = 0
 }

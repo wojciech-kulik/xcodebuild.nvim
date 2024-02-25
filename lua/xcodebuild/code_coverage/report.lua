@@ -1,16 +1,55 @@
+---@mod xcodebuild.code_coverage.report Code Coverage Report
+---@tag xcodebuild.code-coverage-report
+---@brief [[
+---This module is responsible for showing the code coverage report in a floating window.
+---It relies on `nui.nvim` plugin to create the floating window.
+---
+---`nui.nvim` source code: https://github.com/MunifTanjim/nui.nvim
+---
+---Key bindings:
+--- - `enter` or `tab` - expand or collapse the current node
+--- - `o` - open source file
+---
+---@brief ]]
+
+---@private
+---@class CoverageReportFile
+---@field id string|nil injected test id
+---@field name string
+---@field path string
+---@field executableLines number
+---@field coveredLines number
+---@field lineCoverage number percentage (0.0-1.0)
+
+---@private
+---@class CoverageReportTarget
+---@field name string
+---@field executableLines number
+---@field coveredLines number
+---@field lineCoverage number percentage (0.0-1.0)
+---@field files CoverageReportFile[]
+
+---@private
+---@class CoverageReport
+---@field coveredLines number percentage (0.0-1.0)
+---@field executableLines number
+---@field targets CoverageReportTarget[]
+
 local Popup = require("nui.popup")
 local Line = require("nui.line")
 local Text = require("nui.text")
 local Tree = require("nui.tree")
 local event = require("nui.utils.autocmd").event
 
+local util = require("xcodebuild.util")
 local config = require("xcodebuild.core.config").options.code_coverage_report
 local appdata = require("xcodebuild.project.appdata")
-local util = require("xcodebuild.util")
 local events = require("xcodebuild.broadcasting.events")
 
 local M = {}
 
+---Reads the coverage report file and parses it.
+---@return CoverageReport
 local function parse_coverage()
   local lines = vim.fn.readfile(appdata.coverage_report_filepath)
   local coverage = vim.fn.json_decode(lines)
@@ -28,6 +67,9 @@ local function parse_coverage()
   return coverage
 end
 
+---Creates a tree of nodes from the coverage report.
+---@param coverage CoverageReport
+---@return any
 local function get_nodes(coverage)
   local nodes = {}
 
@@ -43,26 +85,35 @@ local function get_nodes(coverage)
   return nodes
 end
 
+---Gets the highlight group based on the coverage percentage.
+---@param coverage number percentage (0-100)
 local function get_hl_group(coverage)
   return coverage < config.error_coverage_level and "XcodebuildCoverageReportError"
     or coverage < config.warning_coverage_level and "XcodebuildCoverageReportWarning"
     or "XcodebuildCoverageReportOk"
 end
 
+---Expands all nodes in the tree.
+---@param tree any
 local function expand_all_nodes(tree)
   for _, node in pairs(tree:get_nodes()) do
     node:expand()
   end
 end
 
+---Converts a number to a percentage (0-100).
+---@param value number (0.0-1.0)
 local function to_percent(value)
   return vim.fn.round(tonumber(value) * 100)
 end
 
+---Checks if the coverage report file exists.
+---@return boolean
 function M.is_report_available()
   return util.file_exists(appdata.coverage_report_filepath)
 end
 
+---Opens the code coverage report in a floating window.
 function M.open()
   local coverage = parse_coverage()
 
@@ -172,6 +223,7 @@ function M.open()
   tree:render()
 end
 
+---Sets up the highlight groups for the code coverage report.
 function M.setup()
   vim.api.nvim_set_hl(0, "XcodebuildCoverageReportWarning", { link = "DiagnosticWarn", default = true })
   vim.api.nvim_set_hl(0, "XcodebuildCoverageReportError", { link = "DiagnosticError", default = true })

@@ -1,3 +1,14 @@
+---@mod xcodebuild.xcode_logs.panel Logs Panel
+---@tag xcodebuild.logs
+---@brief [[
+---This module contains the logs panel related functions.
+---
+---Key bindings:
+--- - Press `o` on a failed test in the summary section to jump to the failing location
+--- - Press `q` to close the panel
+---
+---@brief ]]
+
 local util = require("xcodebuild.util")
 local appdata = require("xcodebuild.project.appdata")
 local config = require("xcodebuild.core.config").options.logs
@@ -6,6 +17,8 @@ local events = require("xcodebuild.broadcasting.events")
 
 local M = {}
 
+---Inserts summary header into the {output}.
+---@param output string[]
 local function insert_summary_header(output)
   table.insert(output, "-----------------------------")
   table.insert(output, "-- xcodebuild.nvim summary --")
@@ -13,11 +26,16 @@ local function insert_summary_header(output)
   table.insert(output, "")
 end
 
+---Uses `config.open_command` to show {filepath}.
+---@param filepath string
+---@see xcodebuild.config
 local function split(filepath)
   local command = string.gsub(config.open_command, "{path}", filepath)
   vim.cmd(command)
 end
 
+---Returns buffer and window number of the logs buffer.
+---@return number|nil, number|nil
 local function get_buf_and_win_of_logs()
   local bufnr = util.get_buf_by_name(appdata.build_logs_filename, { returnNotLoaded = true })
 
@@ -31,6 +49,10 @@ local function get_buf_and_win_of_logs()
   return bufnr, nil
 end
 
+---Formats Xcode logs ({lines}) using `config.logs_formatter`.
+-- Calls {callback} with the result.
+---@param lines string[]
+---@param callback fun(prettyOutput: string[])
 local function format_logs(lines, callback)
   if config.only_summary then
     callback({})
@@ -49,6 +71,7 @@ local function format_logs(lines, callback)
   end
 end
 
+---Refreshes logs content.
 local function refresh_logs_content()
   local bufnr, winnr = get_buf_and_win_of_logs()
   if not bufnr or not winnr then
@@ -72,6 +95,9 @@ local function refresh_logs_content()
   vim.api.nvim_buf_set_option(bufnr, "readonly", true)
 end
 
+---Inserts test results into the {prettyOutput}.
+---@param report ParsedReport
+---@param prettyOutput string[]
 local function insert_test_results(report, prettyOutput)
   if report.failedTestsCount > 0 then
     table.insert(prettyOutput, "Failing Tests:")
@@ -99,6 +125,9 @@ local function insert_test_results(report, prettyOutput)
   end
 end
 
+---Inserts warnings into the {prettyOutput}.
+---@param prettyOutput string[]
+---@param warnings ParsedBuildWarning[]
 local function insert_warnings(prettyOutput, warnings)
   if util.is_empty(warnings) then
     return
@@ -125,6 +154,9 @@ local function insert_warnings(prettyOutput, warnings)
   table.insert(prettyOutput, "")
 end
 
+---Inserts errors into the {prettyOutput}.
+---@param prettyOutput string[]
+---@param buildErrors ParsedBuildError[]
 local function insert_errors(prettyOutput, buildErrors)
   if util.is_empty(buildErrors) then
     return
@@ -152,6 +184,8 @@ local function insert_errors(prettyOutput, buildErrors)
   table.insert(prettyOutput, "")
 end
 
+---Returns whether the panel should be shown based on the {report} and config.
+---@param report ParsedReport
 local function should_show_panel(report)
   local hasErrors = util.is_not_empty(report.buildErrors) or report.failedTestsCount > 0
   local configValue = util.is_not_empty(report.tests)
@@ -161,13 +195,22 @@ local function should_show_panel(report)
   return configValue
 end
 
+---Returns whether the panel should be closed based on the {report} and config.
+---@param report ParsedReport
+---@return boolean
 local function should_close_panel(report)
   local isTesting = util.is_not_empty(report.tests)
   local hasErrors = util.is_not_empty(report.buildErrors)
 
-  return not isTesting and not hasErrors and config.auto_close_on_success_build
+  if not isTesting and not hasErrors and config.auto_close_on_success_build then
+    return true
+  else
+    return false
+  end
 end
 
+---Opens the test file or the test target in the previous window.
+---@param tests table<string,ParsedTest[]>|nil
 local function open_test_file(tests)
   if not tests then
     return
@@ -192,6 +235,13 @@ local function open_test_file(tests)
   end
 end
 
+---Processes {report} and shows logs in the panel.
+---It also writes the logs to the file.
+---{callback} is called after the processing is finished.
+---@param report ParsedReport
+---@param isTesting boolean
+---@param callback function
+---@see xcodebuild.xcode_logs.parser.ParsedReport
 function M.set_logs(report, isTesting, callback)
   appdata.write_original_logs(report.output)
 
@@ -199,7 +249,7 @@ function M.set_logs(report, isTesting, callback)
     insert_summary_header(prettyOutput)
 
     if config.show_warnings then
-      insert_warnings(prettyOutput, report.warnings)
+      insert_warnings(prettyOutput, report.buildWarnings)
     end
 
     if util.is_not_empty(report.buildErrors) then
@@ -220,13 +270,12 @@ function M.set_logs(report, isTesting, callback)
     end
 
     refresh_logs_content()
-
-    if callback then
-      callback()
-    end
+    util.call(callback)
   end)
 end
 
+---Opens the logs panel.
+---@param scrollToBottom boolean
 function M.open_logs(scrollToBottom)
   local logsFilepath = appdata.build_logs_filepath
   local bufnr, winnr = get_buf_and_win_of_logs()
@@ -252,6 +301,7 @@ function M.open_logs(scrollToBottom)
   end
 end
 
+---Closes the logs panel.
 function M.close_logs()
   local _, winnr = get_buf_and_win_of_logs()
 
@@ -261,6 +311,7 @@ function M.close_logs()
   end
 end
 
+---Toggles the logs panel.
 function M.toggle_logs()
   local _, winnr = get_buf_and_win_of_logs()
 
@@ -271,6 +322,8 @@ function M.toggle_logs()
   end
 end
 
+---Sets up the logs buffer.
+---@param bufnr number
 function M.setup_buffer(bufnr)
   local win = vim.fn.win_findbuf(bufnr)
 

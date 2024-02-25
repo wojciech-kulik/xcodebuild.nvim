@@ -1,3 +1,9 @@
+---@mod xcodebuild.core.config Default Options
+---@brief [[
+---This module is responsible for setting up the configuration options.
+---It provides a set of default options and a function to override them.
+---@brief ]]
+
 ---@diagnostic disable: unused-local
 
 local M = {}
@@ -112,6 +118,9 @@ local defaults = {
 
 M.options = defaults
 
+---Set up the configuration options.
+---@param options table|nil
+---@see xcodebuild.options
 function M.setup(options)
   M.options = vim.tbl_deep_extend("force", defaults, options or {})
 end

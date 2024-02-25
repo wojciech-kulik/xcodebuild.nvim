@@ -1,9 +1,20 @@
-local xcode = require("xcodebuild.core.xcode")
-local projectConfig = require("xcodebuild.project.config")
+---@mod xcodebuild.ui.pickers Pickers
+---@tag xcodebuild.pickers
+---@brief [[
+---This module is responsible for showing pickers using Telescope.nvim.
+---@brief ]]
+
+---@class PickerOptions
+---@field on_refresh function|nil
+---@field multiselect boolean|nil
+---@field close_on_select boolean|nil
+
 local util = require("xcodebuild.util")
 local notifications = require("xcodebuild.broadcasting.notifications")
-local snapshots = require("xcodebuild.tests.snapshots")
 local events = require("xcodebuild.broadcasting.events")
+local xcode = require("xcodebuild.core.xcode")
+local projectConfig = require("xcodebuild.project.config")
+local snapshots = require("xcodebuild.tests.snapshots")
 local deviceProxy = require("xcodebuild.platform.device_proxy")
 
 local telescopePickers = require("telescope.pickers")
@@ -31,6 +42,7 @@ local progressFrames = {
   "[    . ]",
 }
 
+---Stops the spinner animation.
 local function stop_telescope_spinner()
   if progressTimer then
     vim.fn.timer_stop(progressTimer)
@@ -38,6 +50,7 @@ local function stop_telescope_spinner()
   end
 end
 
+---Updates the spinner animation.
 local function update_telescope_spinner()
   if activePicker and vim.api.nvim_win_is_valid(activePicker.results_win) then
     currentProgressFrame = currentProgressFrame >= #progressFrames and 1 or currentProgressFrame + 1
@@ -47,12 +60,14 @@ local function update_telescope_spinner()
   end
 end
 
+---Starts the spinner animation.
 local function start_telescope_spinner()
   if not progressTimer then
     progressTimer = vim.fn.timer_start(80, update_telescope_spinner, { ["repeat"] = -1 })
   end
 end
 
+---Updates the results of the picker and stops the animation.
 local function update_results(results)
   if currentJobId == nil then
     return
@@ -72,6 +87,11 @@ local function update_results(results)
   end
 end
 
+---Shows a picker using Telescope.nvim.
+---@param title string
+---@param items string[]
+---@param callback function|nil
+---@param opts PickerOptions|nil
 function M.show(title, items, callback, opts)
   if currentJobId then
     vim.fn.jobstop(currentJobId)
@@ -109,7 +129,7 @@ function M.show(title, items, callback, opts)
           end
         end
 
-        if opts and opts.close_on_select and selection then
+        if opts.close_on_select and selection then
           telescopeActions.close(prompt_bufnr)
         end
 
@@ -128,29 +148,33 @@ function M.show(title, items, callback, opts)
   activePicker:find()
 end
 
+---Shows a picker with the available `xcodeproj` files
+---if this is not already set in the project settings.
+---If the `xcworkspace` is set and there is the corresponding
+-- `xcodeproj` file with the same name, it will be selected automatically.
+---@param callback fun(xcodeproj: string)|nil
+---@param opts PickerOptions|nil
 function M.select_xcodeproj_if_needed(callback, opts)
   if projectConfig.settings.xcodeproj then
-    if callback then
-      callback(projectConfig.settings.xcodeproj)
-    end
+    util.call(callback, projectConfig.settings.xcodeproj)
     return
   end
 
-  local projectFile = projectConfig.settings.projectFile
+  local projectFile = projectConfig.settings.projectFile or ""
   local xcodeproj = string.gsub(projectFile, ".xcworkspace", ".xcodeproj")
 
   if util.file_exists(xcodeproj) then
     projectConfig.settings.xcodeproj = xcodeproj
     projectConfig.save_settings()
-
-    if callback then
-      callback(xcodeproj)
-    end
+    util.call(callback, xcodeproj)
   else
     M.select_xcodeproj(callback, opts)
   end
 end
 
+---Shows a picker with `xcodeproj` files
+---@param callback fun(xcodeproj: string)|nil
+---@param opts PickerOptions|nil
 function M.select_xcodeproj(callback, opts)
   local maxdepth = require("xcodebuild.core.config").options.commands.project_search_max_depth
   local sanitizedFiles = {}
@@ -177,13 +201,13 @@ function M.select_xcodeproj(callback, opts)
 
     projectConfig.settings.xcodeproj = selectedFile
     projectConfig.save_settings()
-
-    if callback then
-      callback(selectedFile)
-    end
+    util.call(callback, selectedFile)
   end, opts)
 end
 
+---Shows a picker with `xcworkspace` and `xcodeproj` files.
+---@param callback fun(projectFile: string)|nil
+---@param opts PickerOptions|nil
 function M.select_project(callback, opts)
   local maxdepth = require("xcodebuild.core.config").options.commands.project_search_max_depth
   local sanitizedFiles = {}
@@ -209,32 +233,31 @@ function M.select_project(callback, opts)
     local projectFile = sanitizedFiles[index]
     local isWorkspace = util.has_suffix(projectFile, "xcworkspace")
 
-    projectConfig.settings.xcodeproj = not isWorkspace and projectFile
+    projectConfig.settings.xcodeproj = isWorkspace and nil or projectFile
     projectConfig.settings.projectFile = projectFile
     projectConfig.settings.projectCommand = (isWorkspace and "-workspace '" or "-project '")
       .. projectFile
       .. "'"
 
     projectConfig.save_settings()
-
-    if callback then
-      callback(projectFile)
-    end
+    util.call(callback, projectFile)
   end, opts)
 end
 
+---Shows a picker with the available schemes.
+---@param schemes string[]|nil
+---@param callback fun(scheme: string)|nil
+---@param opts PickerOptions|nil
+---@return number|nil job id if launched
 function M.select_scheme(schemes, callback, opts)
   if util.is_empty(schemes) then
     start_telescope_spinner()
   end
 
-  M.show("Select Scheme", schemes, function(value, _)
+  M.show("Select Scheme", schemes or {}, function(value, _)
     projectConfig.settings.scheme = value
     projectConfig.save_settings()
-
-    if callback then
-      callback(value)
-    end
+    util.call(callback, value)
   end, opts)
 
   if util.is_empty(schemes) then
@@ -247,6 +270,10 @@ function M.select_scheme(schemes, callback, opts)
   end
 end
 
+---Shows a picker with the available build configurations.
+---@param callback fun(projectConfig: table)|nil
+---@param opts PickerOptions|nil
+---@return number job id
 function M.select_config(callback, opts)
   local xcodeproj = projectConfig.settings.xcodeproj
   local projectInfo = nil
@@ -255,10 +282,7 @@ function M.select_config(callback, opts)
   M.show("Select Build Configuration", {}, function(value, _)
     projectConfig.settings.config = value
     projectConfig.save_settings()
-
-    if callback then
-      callback(projectInfo)
-    end
+    util.call(callback, projectInfo)
   end, opts)
 
   currentJobId = xcode.get_project_information(xcodeproj, function(info)
@@ -269,6 +293,10 @@ function M.select_config(callback, opts)
   return currentJobId
 end
 
+---Shows a picker with the available test plans.
+---@param callback fun(testPlan: string|nil)|nil
+---@param opts PickerOptions|nil
+---@return number job id
 function M.select_testplan(callback, opts)
   local projectCommand = projectConfig.settings.projectCommand
   local scheme = projectConfig.settings.scheme
@@ -278,10 +306,7 @@ function M.select_testplan(callback, opts)
     projectConfig.settings.testPlan = value
     projectConfig.save_settings()
     events.project_settings_updated(projectConfig.settings)
-
-    if callback then
-      callback(value)
-    end
+    util.call(callback, value)
   end, opts)
 
   currentJobId = xcode.get_testplans(projectCommand, scheme, function(testPlans)
@@ -294,9 +319,7 @@ function M.select_testplan(callback, opts)
         telescopeActions.close(activePicker.prompt_bufnr)
       end
 
-      if callback then
-        callback()
-      end
+      util.call(callback)
     else
       update_results(testPlans)
     end
@@ -305,6 +328,13 @@ function M.select_testplan(callback, opts)
   return currentJobId
 end
 
+---Shows a picker with the available devices.
+---It returns devices from cache if available and the `cache_devices`
+---option in config is enabled.
+---@param callback fun(destination: Device[])|nil
+---@param opts PickerOptions|nil
+---@return number|nil job id if launched
+---@see xcodebuild.config
 function M.select_destination(callback, opts)
   opts = opts or {}
 
@@ -386,10 +416,7 @@ function M.select_destination(callback, opts)
     projectConfig.settings.deviceName = results[index].name
     projectConfig.settings.os = results[index].os
     projectConfig.save_settings()
-
-    if callback then
-      callback(results[index])
-    end
+    util.call(callback, results[index])
   end, opts)
 
   if not hasCachedDevices then
@@ -397,6 +424,7 @@ function M.select_destination(callback, opts)
   end
 end
 
+---Shows a picker with the available failing snapshots.
 function M.select_failing_snapshot_test()
   local failingSnapshots = snapshots.get_failing_snapshots()
   local filenames = util.select(failingSnapshots, function(item)
@@ -412,6 +440,8 @@ function M.select_failing_snapshot_test()
   end)
 end
 
+---Shows a picker with the available actions.
+---If the project is not configured, it will show the configuration wizard.
 function M.show_all_actions()
   local actions = require("xcodebuild.actions")
   local actionsNames = {
@@ -495,7 +525,7 @@ function M.show_all_actions()
     table.insert(actionsNames, 13, "Toggle Code Coverage")
     table.insert(actionsPointers, 13, actions.toggle_code_coverage)
 
-    if require("xcodebuild.code_coverage.coverage_report").is_report_available() then
+    if require("xcodebuild.code_coverage.report").is_report_available() then
       table.insert(actionsNames, 14, "Show Code Coverage Report")
       table.insert(actionsPointers, 14, actions.show_code_coverage_report)
     end

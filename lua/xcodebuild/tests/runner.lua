@@ -1,25 +1,35 @@
-local notifications = require("xcodebuild.broadcasting.notifications")
-local logsParser = require("xcodebuild.xcode_logs.parser")
+---@mod xcodebuild.tests.runner Test Runner
+---@brief [[
+---This module contains the functionality to run tests.
+---
+---It interacts with multiple modules to build, run, and
+---present test results.
+---@brief ]]
+
 local util = require("xcodebuild.util")
-local appdata = require("xcodebuild.project.appdata")
-local quickfix = require("xcodebuild.core.quickfix")
-local projectConfig = require("xcodebuild.project.config")
-local xcode = require("xcodebuild.core.xcode")
-local logsPanel = require("xcodebuild.xcode_logs.panel")
-local diagnostics = require("xcodebuild.core.diagnostics")
-local config = require("xcodebuild.core.config").options
-local snapshots = require("xcodebuild.tests.snapshots")
-local coverage = require("xcodebuild.code_coverage.coverage")
-local events = require("xcodebuild.broadcasting.events")
-local projectBuilder = require("xcodebuild.project.builder")
 local helpers = require("xcodebuild.helpers")
+
+local notifications = require("xcodebuild.broadcasting.notifications")
+local events = require("xcodebuild.broadcasting.events")
+
+local xcode = require("xcodebuild.core.xcode")
+local config = require("xcodebuild.core.config").options
+
+local appdata = require("xcodebuild.project.appdata")
+local projectConfig = require("xcodebuild.project.config")
+local projectBuilder = require("xcodebuild.project.builder")
+
+local diagnostics = require("xcodebuild.tests.diagnostics")
 local testSearch = require("xcodebuild.tests.search")
 local testExplorer = require("xcodebuild.tests.explorer")
 local testProvider = require("xcodebuild.tests.provider")
+local snapshots = require("xcodebuild.tests.snapshots")
 
 local M = {}
 local CANCELLED_CODE = 143
 
+---Validates if test plan is set in the project configuration.
+---@return boolean
 local function validate_testplan()
   if not projectConfig.settings.testPlan then
     notifications.send_error("Test plan not found. Please run XcodebuildSelectTestPlan")
@@ -29,6 +39,17 @@ local function validate_testplan()
   return true
 end
 
+---Shows the Test Explorer and runs the provided {callback}
+---after the tests are loaded.
+---
+---It also triggers build for testing if tests are not loaded.
+---
+---If Test Explorer is disabled, it only triggers build for testing.
+---
+---If {opts.skipEnumeration} is true, it skips the enumeration
+---(used when user runs tests from the Test Explorer).
+---@param callback function|nil
+---@param opts {skipEnumeration: boolean}|nil
 function M.show_test_explorer(callback, opts)
   opts = opts or {}
 
@@ -88,6 +109,16 @@ function M.show_test_explorer(callback, opts)
   end)
 end
 
+---Runs the provided {testsToRun} and shows the Test Explorer.
+---If {testsToRun} is nil, it runs all tests.
+---
+---This is a core function to run tests. It coordinates
+---the build, test run, and the presentation of the results.
+---
+---It sets logs, diagnostics, quickfix list, coverage,
+---snapshot previews, and Test Explorer.
+---@param testsToRun string[]|nil test ids
+---@param opts {skipEnumeration: boolean}|nil
 function M.run_tests(testsToRun, opts)
   opts = opts or {}
 
@@ -96,7 +127,7 @@ function M.run_tests(testsToRun, opts)
   end
 
   notifications.send_tests_started()
-  helpers.before_new_run()
+  helpers.clear_state()
 
   local show_finish = function()
     notifications.send_tests_finished(appdata.report, false)
@@ -115,6 +146,7 @@ function M.run_tests(testsToRun, opts)
   local process_coverage = function()
     if config.code_coverage.enabled then
       notifications.send_progress("Gathering coverage...")
+      local coverage = require("xcodebuild.code_coverage.coverage")
 
       coverage.export_coverage(appdata.report.xcresultFilepath, function()
         coverage.refresh_all_buffers()
@@ -126,6 +158,7 @@ function M.run_tests(testsToRun, opts)
   end
 
   local on_stdout = function(_, output)
+    local logsParser = require("xcodebuild.xcode_logs.parser")
     appdata.report = logsParser.parse_logs(output)
     notifications.show_tests_progress(appdata.report)
     diagnostics.refresh_all_test_buffers(appdata.report)
@@ -151,6 +184,9 @@ function M.run_tests(testsToRun, opts)
     if config.restore_on_start then
       appdata.write_report(appdata.report)
     end
+
+    local quickfix = require("xcodebuild.core.quickfix")
+    local logsPanel = require("xcodebuild.xcode_logs.panel")
 
     testSearch.load_targets_map()
     quickfix.set(appdata.report)
@@ -189,6 +225,18 @@ function M.run_tests(testsToRun, opts)
   end, opts)
 end
 
+---@class TestRunnerOptions
+---@field doNotBuild boolean|nil
+---@field currentTarget boolean|nil
+---@field currentClass boolean|nil
+---@field currentTest boolean|nil
+---@field selectedTests boolean|nil
+---@field failingTests boolean|nil
+
+---Runs only selected tests based on {opts}.
+---If target is not found for the current buffer,
+---it additionally triggers build for testing.
+---@param opts TestRunnerOptions
 function M.run_selected_tests(opts)
   if not helpers.validate_project() or not validate_testplan() then
     return
@@ -196,7 +244,11 @@ function M.run_selected_tests(opts)
 
   local selectedClass, selectedTests
   if not opts.currentTarget then
-    selectedClass, selectedTests = testProvider.find_tests(opts)
+    selectedClass, selectedTests = testProvider.find_tests({
+      currentTest = opts.currentTest,
+      selectedTests = opts.selectedTests,
+      failingTests = opts.failingTests,
+    })
   end
 
   local start = function()
@@ -261,6 +313,7 @@ function M.run_selected_tests(opts)
   end
 end
 
+---Shows a picker with failing snapshot tests.
 function M.show_failing_snapshot_tests()
   if not helpers.validate_project() then
     return

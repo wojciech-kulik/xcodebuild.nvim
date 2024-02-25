@@ -1,3 +1,33 @@
+---@mod xcodebuild.project.appdata App Data
+---@brief [[
+---This module provides functionality to manage the project
+---data stored in `.nvim/xcodebuild` folder, such as logs,
+---reports, snapshots, coverage, and settings.
+---
+---It also provides paths to the tools used by the plugin.
+---
+---All data is stored in the current working directory in
+---the `.nvim/xcodebuild` folder. That's why it's important
+---to always run the plugin from the root of the project.
+---@brief ]]
+
+---@class AppData
+---@field report ParsedReport # The last test report (can be empty).
+---@field appdir string # The path to the `.nvim/xcodebuild` folder.
+---@field app_logs_filename string # The name of the app logs file.
+---@field app_logs_filepath string # The path to the app logs file.
+---@field original_logs_filename string # The name of the original logs file.
+---@field original_logs_filepath string # The path to the original logs file.
+---@field build_logs_filename string # The name of the build logs file.
+---@field build_logs_filepath string # The path to the build logs file.
+---@field report_filename string # The name of the report file.
+---@field report_filepath string # The path to the report file.
+---@field tests_filename string # The name of the tests file.
+---@field tests_filepath string # The path to the tests file.
+---@field snapshots_dir string # The path to the snapshots directory.
+---@field coverage_filepath string # The path to the coverage file.
+---@field coverage_report_filepath string # The path to the coverage report file.
+
 local util = require("xcodebuild.util")
 
 local M = {}
@@ -22,24 +52,40 @@ GETSNAPSHOTS_TOOL = "getsnapshots"
 PROJECT_HELPER_TOOL = "project_helper.rb"
 REMOTE_DEBUGGER_TOOL = "remote_debugger"
 
+---Returns the path to the tool with the given {name}.
+---@param name string
+---@return string
 function M.tool_path(name)
   local pathComponents = vim.split(debug.getinfo(1).source:sub(2), "/", { plain = true })
   return table.concat(pathComponents, "/", 1, #pathComponents - 4) .. "/tools/" .. name
 end
 
+---Creates the `.nvim/xcodebuild` folder if it doesn't exist.
 function M.create_app_dir()
   util.shell("mkdir -p .nvim/xcodebuild")
 end
 
+---Reads the original Xcode logs.
+---@return string[]
 function M.read_original_logs()
   return vim.fn.readfile(M.original_logs_filepath)
 end
 
-function M.read_report()
-  local success, json = pcall(vim.fn.readfile, M.report_filepath)
-  return success and vim.fn.json_decode(json)
+---Writes the original Xcode logs to disk.
+---@param data string[]
+function M.write_original_logs(data)
+  vim.fn.writefile(data, M.original_logs_filepath)
 end
 
+---Reads the last test report from disk.
+---@return ParsedReport|nil
+function M.read_report()
+  local success, json = pcall(vim.fn.readfile, M.report_filepath)
+  return success and vim.fn.json_decode(json) or nil
+end
+
+---Writes the given {report} to disk.
+---@param report ParsedReport
 function M.write_report(report)
   local copy = report.output
   report.output = nil
@@ -50,22 +96,29 @@ function M.write_report(report)
   report.output = copy
 end
 
-function M.write_original_logs(data)
-  vim.fn.writefile(data, M.original_logs_filepath)
-end
-
+---Reads the build logs from disk.
+---These logs contain also the summary prepared by this
+---plugin.
+---@return string[]
 function M.read_build_logs()
   return vim.fn.readfile(M.build_logs_filepath)
 end
 
+---Writes the build logs to disk.
+---These logs contain also the summary prepared by this
+---plugin.
+---@param data string[]
 function M.write_build_logs(data)
   vim.fn.writefile(data, M.build_logs_filepath)
 end
 
+---Loads the last test report from disk and updates the
+---quickfix list and the diagnostics.
+---Sets `M.report`.
 function M.load_last_report()
   local logsParser = require("xcodebuild.xcode_logs.parser")
   local quickfix = require("xcodebuild.core.quickfix")
-  local diagnostics = require("xcodebuild.core.diagnostics")
+  local diagnostics = require("xcodebuild.tests.diagnostics")
   local config = require("xcodebuild.core.config").options
   local testSearch = require("xcodebuild.tests.search")
 
@@ -81,6 +134,7 @@ function M.load_last_report()
   end
 end
 
+---Clears the app logs and DAP console.
 function M.clear_app_logs()
   local config = require("xcodebuild.core.config").options.console_logs
 
@@ -91,6 +145,9 @@ function M.clear_app_logs()
   vim.fn.writefile({}, M.app_logs_filepath)
 end
 
+---Appends the given {output} to the app logs file and
+---updates the DAP console.
+---@param output string[]
 function M.append_app_logs(output)
   local logFile = M.app_logs_filepath
   local config = require("xcodebuild.core.config").options.console_logs

@@ -1,0 +1,46 @@
+---@mod xcodebuild.global_variables Global Variables
+---@tag xcodebuild.global-variables
+---@tag xcodebuild.variables
+---@tag xcodebuild.lualine
+---@brief [[
+---This plugin provides several global variables that you can use to
+---integrate with `lualine` or other plugins.
+---
+--- | Variable                     | Description                                        |
+--- | ---------------------------- | -------------------------------------------------- |
+--- | `vim.g.xcodebuild_device_name` | Device name (ex. iPhone 15 Pro)                    |
+--- | `vim.g.xcodebuild_os`          | OS version (ex. 16.4)                              |
+--- | `vim.g.xcodebuild_platform`    | Device platform (macOS or iPhone Simulator)        |
+--- | `vim.g.xcodebuild_config`      | Selected build config (ex. Debug)                  |
+--- | `vim.g.xcodebuild_scheme`      | Selected project scheme (ex. MyApp)                |
+--- | `vim.g.xcodebuild_test_plan`   | Selected Test Plan (ex. MyAppTests)                |
+--- | `vim.g.xcodebuild_last_status` | Last build/test status (ex. Build Succeeded [15s]) |
+---
+---
+---Sample `lualine` integration:
+--->lua
+---    local function xcodebuild_device()
+---      if vim.g.xcodebuild_platform == "macOS" then
+---        return " macOS"
+---      end
+---
+---      if vim.g.xcodebuild_os then
+---        return " " .. vim.g.xcodebuild_device_name .. " (" .. vim.g.xcodebuild_os .. ")"
+---      end
+---
+---      return " " .. vim.g.xcodebuild_device_name
+---    end
+---
+---    ------
+---
+---    lualine_x = {
+---      { "' ' .. vim.g.xcodebuild_last_status", color = { fg = "Gray" } },
+---      { "'󰙨 ' .. vim.g.xcodebuild_test_plan", color = { fg = "#a6e3a1", bg = "#161622" } },
+---      { xcodebuild_device, color = { fg = "#f9e2af", bg = "#161622" } },
+---    },
+---<
+---
+---@brief ]]
+
+local M = {}
+return M

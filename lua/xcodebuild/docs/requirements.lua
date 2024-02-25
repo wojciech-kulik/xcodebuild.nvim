@@ -1,0 +1,35 @@
+---@mod xcodebuild.requirements Requirements
+---@tag xcodebuild.tools
+---@tag xcodebuild.dependencies
+---@brief [[
+---Neovim environment
+--- - `Neovim 0.9.5+`
+--- - `telescope.nvim` to present pickers.
+--- - `nui.nvim` to present floating code coverage report.
+--- - `nvim-tree` to visually manage your project files.
+--- - `nvim-dap` and nvim-dap-ui to debug apps.
+---
+---External tools
+--- - `xcbeautify` - Xcode logs formatter (you can set a different tool or disable formatting in the config).
+--- - `Xcodeproj` to manage project files within Neovim.
+--- - `pymobiledevice3` to debug on physical devices and/or run apps on devices below iOS 17.
+--- - `xcode-build-server` to make LSP work properly with xcodeproj/xcworkspace.
+--- - `codelldb` to debug iOS and macOS Swift apps.
+--- - `Xcode` - make sure that xcodebuild and xcrun simctl work correctly. Tested with Xcode 15.
+---
+---Installation
+--->
+---    brew install xcode-build-server
+---    brew install xcbeautify
+---    gem install xcodeproj
+---    python3 -m pip install -U pymobiledevice3
+---<
+---
+---To debug on physical devices with iOS 17+ you will need to set up `sudo`,
+---more details here: https://github.com/wojciech-kulik/xcodebuild.nvim#-debugging-on-ios-17-device
+---
+---See: https://github.com/wojciech-kulik/xcodebuild.nvim
+---@brief ]]
+
+local M = {}
+return M

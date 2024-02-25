@@ -1,5 +1,34 @@
+---@mod xcodebuild.tests.provider Test Provider
+---@brief [[
+---This module contains the functionality to find tests
+---based on the provided options.
+---
+---It is used by the |xcodebuild.tests.runner| module.
+---@brief ]]
+
+---@class TestProviderOptions
+---@field selectedTests boolean|nil
+---@field currentTest boolean|nil
+---@field failingTests boolean|nil
+
+---@class TestProviderTest
+---@field name string
+---@field class string
+---@field filepath string|nil
+
 local M = {}
 
+---Finds tests based on the provided {opts}.
+---Returns a tuple with the test class found in the buffer
+---and a list of tests.
+---
+---Set `opts.selectedTests` to true to find all selected tests.
+---Set `opts.currentTest` to true to find the current test.
+---Set `opts.failingTests` to true to find all failing tests
+---across the project.
+---@param opts TestProviderOptions
+---@return string|nil # className
+---@return TestProviderTest[] # tests
 function M.find_tests(opts)
   local appdata = require("xcodebuild.project.appdata")
   local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)

@@ -1,5 +1,17 @@
+---@mod xcodebuild.util Lua Utils
+---@brief [[
+---This module contains general lua helper functions used across the plugin.
+---
+---|xcodebuild.util| is for general language utils and |xcodebuild.helpers|
+---are for plugin specific utils.
+---@brief ]]
+
 local M = {}
 
+---Creates a shallow copy of a table.
+---If the table contains other tables, it will only copy the references.
+---@param orig any
+---@return any
 function M.shallow_copy(orig)
   local orig_type = type(orig)
   local copy
@@ -14,14 +26,27 @@ function M.shallow_copy(orig)
   return copy
 end
 
-function M.is_empty(tab)
-  return next(tab or {}) == nil
+---Checks if a table is empty or nil.
+---@param table table
+---@return boolean
+function M.is_empty(table)
+  return next(table or {}) == nil
 end
 
-function M.is_not_empty(tab)
-  return not M.is_empty(tab)
+---Checks if a table is NOT empty and NOT nil.
+---@param table table
+---@return boolean
+function M.is_not_empty(table)
+  return not M.is_empty(table)
 end
 
+---Gets all buffers in the current neovim instance.
+---If `opts.returnNotLoaded` is true, it will
+---return all buffers, including the ones that are not loaded.
+---@param opts table|nil
+---
+---* {returnNotLoaded} (boolean)
+---@return number[]
 function M.get_buffers(opts)
   local result = {}
 
@@ -37,6 +62,9 @@ function M.get_buffers(opts)
   return result
 end
 
+---Checks if a file exists.
+---@param name string
+---@return boolean
 function M.file_exists(name)
   local f = io.open(name, "r")
 
@@ -48,15 +76,24 @@ function M.file_exists(name)
   return false
 end
 
+---Checks if a directory exists.
+---@param path string
+---@return boolean
 function M.dir_exists(path)
   return vim.fn.isdirectory(path) ~= 0
 end
 
-function M.get_buf_by_name(name, opts)
+---Gets a buffer by its filename.
+---If `opts.returnNotLoaded` is true, it will
+---return all buffers, including the ones that are not loaded.
+---@param filename string
+---@param opts table|nil
+---* {returnNotLoaded} (boolean)
+function M.get_buf_by_name(filename, opts)
   local allBuffers = M.get_buffers(opts)
 
   for _, buf in pairs(allBuffers) do
-    if string.match(vim.api.nvim_buf_get_name(buf), ".*/([^/]*)$") == name then
+    if string.match(vim.api.nvim_buf_get_name(buf), ".*/([^/]*)$") == filename then
       return buf
     end
   end
@@ -64,6 +101,9 @@ function M.get_buf_by_name(name, opts)
   return nil
 end
 
+---Gets all buffers that match a pattern.
+---@param pattern string
+---@return {bufnr: number, file: string}[]
 function M.get_bufs_by_matching_name(pattern)
   local allBuffers = M.get_buffers()
   local result = {}
@@ -78,8 +118,12 @@ function M.get_bufs_by_matching_name(pattern)
   return result
 end
 
-function M.focus_buffer(bufNr)
-  local _, window = next(vim.fn.win_findbuf(bufNr))
+---Focuses a buffer by its buffer number.
+---If the buffer's window is not found, it will return false.
+---@param bufnr number
+---@return boolean
+function M.focus_buffer(bufnr)
+  local _, window = next(vim.fn.win_findbuf(bufnr))
 
   if window then
     vim.api.nvim_set_current_win(window)
@@ -89,10 +133,16 @@ function M.focus_buffer(bufNr)
   return false
 end
 
+---Gets the filename from a filepath.
+---@param filepath string
+---@return string
 function M.get_filename(filepath)
   return string.match(filepath, ".*%/([^/]*)%..+$")
 end
 
+---Runs a shell command and returns the output as a list of strings.
+---@param cmd string
+---@return string[]
 function M.shell(cmd)
   local handle = io.popen(cmd)
 
@@ -105,6 +155,10 @@ function M.shell(cmd)
   return {}
 end
 
+---Merges two arrays into a new one.
+---@param lhs any[]
+---@param rhs any[]
+---@return any[]
 function M.merge_array(lhs, rhs)
   local result = lhs
   for _, val in ipairs(rhs) do
@@ -114,10 +168,17 @@ function M.merge_array(lhs, rhs)
   return result
 end
 
+---Trims whitespace from the beginning and end of a string.
+---@param str string
+---@return string
 function M.trim(str)
   return string.match(str, "^%s*(.-)%s*$")
 end
 
+---Maps an array based on a {selector} function.
+---@param tab any[]
+---@param selector fun(value: any): any
+---@return any[]
 function M.select(tab, selector)
   local result = {}
   for _, value in ipairs(tab) do
@@ -127,6 +188,10 @@ function M.select(tab, selector)
   return result
 end
 
+---Filters an array based on a {predicate} function.
+---@param tab any[]
+---@param predicate fun(value: any): boolean
+---@return any[]
 function M.filter(tab, predicate)
   local result = {}
   for _, value in ipairs(tab) do
@@ -138,17 +203,28 @@ function M.filter(tab, predicate)
   return result
 end
 
+---Checks if a string ends with a suffix.
+---@param text string
+---@param suffix string
+---@return boolean
 function M.has_suffix(text, suffix)
   return string.sub(text, -#suffix) == suffix
 end
 
+---Checks if a string starts with a prefix.
+---@param text string
+---@param prefix string
+---@return boolean
 function M.has_prefix(text, prefix)
   return string.sub(text, 1, #prefix) == prefix
 end
 
-function M.contains(tab, val)
-  for _, value in ipairs(tab) do
-    if value == val then
+---Checks if an array contains a value.
+---@param array any[]
+---@param value any
+function M.contains(array, value)
+  for _, val in ipairs(array) do
+    if val == value then
       return true
     end
   end
@@ -156,8 +232,12 @@ function M.contains(tab, val)
   return false
 end
 
-function M.find(tab, predicate)
-  for _, value in ipairs(tab) do
+---Finds the first value in an array that matches a predicate.
+---@param array any[]
+---@param predicate fun(value: any): boolean
+---@return any
+function M.find(array, predicate)
+  for _, value in ipairs(array) do
     if predicate(value) then
       return value
     end
@@ -166,6 +246,11 @@ function M.find(tab, predicate)
   return nil
 end
 
+---Calls {fn} with arguments if {fn} is not nil.
+---Returns the result of the function call.
+---@param fn function|nil
+---@vararg any
+---@return any
 function M.call(fn, ...)
   local args = { ... }
 
@@ -174,6 +259,10 @@ function M.call(fn, ...)
   end
 end
 
+---Finds the index of a value in an array.
+---@param array any[]
+---@param value any
+---@return number|nil
 function M.indexOf(array, value)
   for i, v in ipairs(array) do
     if v == value then

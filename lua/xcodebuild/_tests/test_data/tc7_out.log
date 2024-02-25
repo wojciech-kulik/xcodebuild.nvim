@@ -6,11 +6,11 @@
       lineNumber = 27,
       message = { "Force Try Violation: Force tries should be avoided (force_try)" }
     } },
-  diagnostics = {},
+  buildWarnings = {},
   failedTestsCount = 0,
   output = {},
+  testErrors = {},
   tests = {},
   testsCount = 0,
-  warnings = {},
   xcresultFilepath = "/Users/john/Library/Developer/Xcode/DerivedData/CalendarAppDemo-gpxsuartkqsliqafuudvbkhotrhj/Logs/Test/Test-CalendarAppDemo-2023.10.31_18-30-44-+0100.xcresult"
 }

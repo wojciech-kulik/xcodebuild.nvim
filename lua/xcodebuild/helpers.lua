@@ -1,5 +1,19 @@
+---@mod xcodebuild.helpers General Helpers
+---@brief [[
+---This module contains general helper functions used across the plugin.
+---
+---|xcodebuild.util| is for general language utils and |xcodebuild.helpers|
+---are for plugin specific utils.
+---@brief ]]
+
+---@private
+---@class Cancellable
+---@field currentJobId number|nil
+
 local M = {}
 
+---Cancels the current action from {source} module.
+---@param source Cancellable
 local function cancel(source)
   if source.currentJobId then
     if vim.fn.jobstop(source.currentJobId) == 1 then
@@ -10,12 +24,15 @@ local function cancel(source)
   end
 end
 
+---Cancels all running actions from all modules.
 function M.cancel_actions()
   cancel(require("xcodebuild.platform.device"))
   cancel(require("xcodebuild.project.builder"))
   cancel(require("xcodebuild.tests.runner"))
 end
 
+---Validates if the project is configured.
+---@return boolean
 function M.validate_project()
   local projectConfig = require("xcodebuild.project.config")
   local notifications = require("xcodebuild.broadcasting.notifications")
@@ -28,7 +45,8 @@ function M.validate_project()
   return true
 end
 
-function M.before_new_run()
+---Clears the state before the next build/test action.
+function M.clear_state()
   local snapshots = require("xcodebuild.tests.snapshots")
   local testSearch = require("xcodebuild.tests.search")
   local logsParser = require("xcodebuild.xcode_logs.parser")
@@ -43,6 +61,9 @@ function M.before_new_run()
   testSearch.clear()
 end
 
+---Finds all swift files in project working directory.
+---Returns a map of filename to list of filepaths.
+---@return table<string, string[]>
 function M.find_all_swift_files()
   local util = require("xcodebuild.util")
   local allFiles =
@@ -60,6 +81,9 @@ function M.find_all_swift_files()
   return map
 end
 
+---Returns the major version of the OS (ex. 17 for 17.1.1).
+---It uses the device from the project configuration.
+---@return number|nil
 function M.get_major_os_version()
   local settings = require("xcodebuild.project.config").settings
   return settings.os and tonumber(vim.split(settings.os, ".", { plain = true })[1]) or nil

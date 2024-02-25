@@ -1,0 +1,2690 @@
+==============================================================================
+Table of Contents                                          *xcodebuild.contents*
+
+Introduction ······················································ |xcodebuild|
+Features ················································· |xcodebuild.features|
+Requirements ········································· |xcodebuild.requirements|
+Highlights ············································· |xcodebuild.highlights|
+Key Bindings ············································· |xcodebuild.bindings|
+User Commands ············································ |xcodebuild.commands|
+Global Variables ································· |xcodebuild.global_variables|
+Actions ··················································· |xcodebuild.actions|
+Constants ··············································· |xcodebuild.constants|
+Autocommands ········································· |xcodebuild.core.autocmd|
+Default Options ······································· |xcodebuild.core.config|
+Quickfix List ······································· |xcodebuild.core.quickfix|
+Xcode Logs Parser ······························· |xcodebuild.xcode_logs.parser|
+Logs Panel ······································· |xcodebuild.xcode_logs.panel|
+Project Configuration ······························ |xcodebuild.project.config|
+App Data ·········································· |xcodebuild.project.appdata|
+Project Builder ··································· |xcodebuild.project.builder|
+Device ············································ |xcodebuild.platform.device|
+Device Proxy ································ |xcodebuild.platform.device_proxy|
+Autocommand Events ···························· |xcodebuild.broadcasting.events|
+Notifications ·························· |xcodebuild.broadcasting.notifications|
+Test Diagnostics ································ |xcodebuild.tests.diagnostics|
+Test Enumeration Parser ·················· |xcodebuild.tests.enumeration_parser|
+Test Explorer ······································ |xcodebuild.tests.explorer|
+Test Provider ······································ |xcodebuild.tests.provider|
+Test Runner ·········································· |xcodebuild.tests.runner|
+Test Search ·········································· |xcodebuild.tests.search|
+Snapshot Tests ···································· |xcodebuild.tests.snapshots|
+Code Coverage ······························ |xcodebuild.code_coverage.coverage|
+Code Coverage Report ························· |xcodebuild.code_coverage.report|
+Pickers ················································ |xcodebuild.ui.pickers|
+General Helpers ··········································· |xcodebuild.helpers|
+Lua Utils ···················································· |xcodebuild.util|
+
+==============================================================================
+Introduction                                                        *xcodebuild*
+
+Xcodebuild.nvim is a plugin designed to let you migrate your iOS, iPadOS,
+and macOS app development to Neovim. It provides all essential actions
+for development, including building, launching, and testing.
+
+Make sure to check out Tips & Tricks to improve your development in Neovim:
+https://github.com/wojciech-kulik/xcodebuild.nvim/discussions/categories/tips-tricks
+
+Source Code: https://github.com/wojciech-kulik/xcodebuild.nvim
+
+
+                                                               *xcodebuild.nvim*
+                                                             *xcodebuild.config*
+                                                            *xcodebuild.options*
+M.setup({options})                                            *xcodebuild.setup*
+  Setup and initialize xcodebuild.nvim
+
+  Parameters: ~
+    {options}  (table|nil)
+               All options are optional, below you can see the default values:
+
+  Usage: ~
+>lua
+    require("xcodebuild").setup({
+      restore_on_start = true, -- logs, diagnostics, and marks will be loaded on VimEnter (may affect performance)
+      auto_save = true, -- save all buffers before running build or tests (command: silent wa!)
+      show_build_progress_bar = true, -- shows [ ...    ] progress bar during build, based on the last duration
+      prepare_snapshot_test_previews = true, -- prepares a list with failing snapshot tests
+      test_search = {
+        file_matching = "filename_lsp", -- one of: filename, lsp, lsp_filename, filename_lsp. Check out README for details
+        target_matching = true, -- checks if the test file target matches the one from logs. Try disabling it in case of not showing test results
+        lsp_client = "sourcekit", -- name of your LSP for Swift files
+        lsp_timeout = 200, -- LSP timeout in milliseconds
+      },
+      commands = {
+        cache_devices = true, -- cache recently loaded devices. Restart Neovim to clean cache.
+        extra_build_args = "-parallelizeTargets", -- extra arguments for `xcodebuild build`
+        extra_test_args = "-parallelizeTargets", -- extra arguments for `xcodebuild test`
+        project_search_max_depth = 3, -- maxdepth of xcodeproj/xcworkspace search while using configuration wizard
+        remote_debugger = nil, -- optional path to local copy of remote_debugger (check out README for details)
+        remote_debugger_port = 65123, -- port used by remote debugger (passed to pymobiledevice3)
+      },
+      logs = { -- build & test logs
+        auto_open_on_success_tests = false, -- open logs when tests succeeded
+        auto_open_on_failed_tests = false, -- open logs when tests failed
+        auto_open_on_success_build = false, -- open logs when build succeeded
+        auto_open_on_failed_build = true, -- open logs when build failed
+        auto_close_on_app_launch = false, -- close logs when app is launched
+        auto_close_on_success_build = false, -- close logs when build succeeded (only if auto_open_on_success_build=false)
+        auto_focus = true, -- focus logs buffer when opened
+        filetype = "objc", -- file type set for buffer with logs
+        open_command = "silent botright 20split {path}", -- command used to open logs panel. You must use {path} variable to load the log file
+        logs_formatter = "xcbeautify --disable-colored-output", -- command used to format logs, you can use "" to skip formatting
+        only_summary = false, -- if true logs won't be displayed, just xcodebuild.nvim summary
+        show_warnings = true, -- show warnings in logs summary
+        notify = function(message, severity) -- function to show notifications from this module (like "Build Failed")
+          vim.notify(message, severity)
+        end,
+        notify_progress = function(message) -- function to show live progress (like during tests)
+          vim.cmd("echo '" .. message .. "'")
+        end,
+      },
+      console_logs = {
+        enabled = true, -- enable console logs in dap-ui
+        format_line = function(line) -- format each line of logs
+          return line
+        end,
+        filter_line = function(line) -- filter each line of logs
+          return true
+        end,
+      },
+      marks = {
+        show_signs = true, -- show each test result on the side bar
+        success_sign = "✔", -- passed test icon
+        failure_sign = "✖", -- failed test icon
+        show_test_duration = true, -- show each test duration next to its declaration
+        show_diagnostics = true, -- add test failures to diagnostics
+        file_pattern = "*Tests.swift", -- test diagnostics will be loaded in files matching this pattern (if available)
+      },
+      quickfix = {
+        show_errors_on_quickfixlist = true, -- add build/test errors to quickfix list
+        show_warnings_on_quickfixlist = true, -- add build warnings to quickfix list
+      },
+      test_explorer = {
+        enabled = true, -- enable Test Explorer
+        auto_open = true, -- open Test Explorer when tests are started
+        auto_focus = true, -- focus Test Explorer when opened
+        open_command = "botright 42vsplit Test Explorer", -- command used to open Test Explorer
+        open_expanded = true, -- open Test Explorer with expanded classes
+        success_sign = "✔", -- passed test icon
+        failure_sign = "✖", -- failed test icon
+        progress_sign = "…", -- progress icon (only used when animate_status=false)
+        disabled_sign = "⏸", -- disabled test icon
+        partial_execution_sign = "‐", -- icon for a class or target when only some tests were executed
+        not_executed_sign = " ", -- not executed or partially executed test icon
+        show_disabled_tests = false, -- show disabled tests
+        animate_status = true, -- animate status while running tests
+        cursor_follows_tests = true, -- moves cursor to the last test executed
+      },
+      code_coverage = {
+        enabled = false, -- generate code coverage report and show marks
+        file_pattern = "*.swift", -- coverage will be shown in files matching this pattern
+        -- configuration of line coverage presentation:
+        covered_sign = "",
+        partially_covered_sign = "┃",
+        not_covered_sign = "┃",
+        not_executable_sign = "",
+      },
+      code_coverage_report = {
+        warning_coverage_level = 60,
+        error_coverage_level = 30,
+        open_expanded = false,
+      },
+      integrations = {
+        nvim_tree = {
+          enabled = true, -- enable updating Xcode project files when using nvim-tree
+          should_update_project = function(path) -- path can lead to directory or file
+            -- it could be useful if you mix Xcode project with SPM for example
+            return true
+          end,
+        },
+      },
+      highlights = {
+        -- you can override here any highlight group used by this plugin
+        -- simple color: XcodebuildCoverageReportOk = "#00ff00",
+        -- link highlights: XcodebuildCoverageReportOk = "DiagnosticOk",
+        -- full customization: XcodebuildCoverageReportOk = { fg = "#00ff00", bold = true },
+      },
+    })
+<
+
+
+==============================================================================
+Features                                                   *xcodebuild.features*
+
+ - Support for iOS, iPadOS, and macOS apps built using Swift.
+ - Project-based configuration.
+ - Project Manager to deal with project files without using Xcode.
+ - Test Explorer to visually present a tree with all tests and results.
+ - Built using official command line tools like `xcodebuild` and `xcrun simctl`.
+ - Actions to build, run, debug, and test apps on simulators and physical devices.
+ - Buffer integration with test results (code coverage, success & failure marks, duration, extra diagnostics).
+ - Code coverage report with customizable levels.
+ - Browser of failing snapshot tests with a diff preview (if you use [swift-snapshot-testing](https://github.com/pointfreeco/swift-snapshot-testing)).
+ - Advanced log parser to detect all errors, warnings, and failing tests.
+ - `nvim-tree` integration that automatically reflects all file tree operations and updates Xcode project file.
+ - `nvim-dap` helper functions to let you easily build, run, and debug apps.
+ - `nvim-dap-ui` integration with console window to show app logs.
+ - `lualine.nvim` integration to show selected device, test plan, and other project settings.
+ - Picker with all available actions.
+ - Highly customizable (many config options, auto commands, highlights, and user commands).
+
+==============================================================================
+Requirements                                           *xcodebuild.requirements*
+
+                                                              *xcodebuild.tools*
+                                                       *xcodebuild.dependencies*
+Neovim environment
+ - `Neovim 0.9.5+`
+ - `telescope.nvim` to present pickers.
+ - `nui.nvim` to present floating code coverage report.
+ - `nvim-tree` to visually manage your project files.
+ - `nvim-dap` and nvim-dap-ui to debug apps.
+
+External tools
+ - `xcbeautify` - Xcode logs formatter (you can set a different tool or disable formatting in the config).
+ - `Xcodeproj` to manage project files within Neovim.
+ - `pymobiledevice3` to debug on physical devices and/or run apps on devices below iOS 17.
+ - `xcode-build-server` to make LSP work properly with xcodeproj/xcworkspace.
+ - `codelldb` to debug iOS and macOS Swift apps.
+ - `Xcode` - make sure that xcodebuild and xcrun simctl work correctly. Tested with Xcode 15.
+
+Installation
+>
+    brew install xcode-build-server
+    brew install xcbeautify
+    gem install xcodeproj
+    python3 -m pip install -U pymobiledevice3
+<
+
+To debug on physical devices with iOS 17+ you will need to set up `sudo`,
+more details here: https://github.com/wojciech-kulik/xcodebuild.nvim#-debugging-on-ios-17-device
+
+See: https://github.com/wojciech-kulik/xcodebuild.nvim
+
+==============================================================================
+Highlights                                               *xcodebuild.highlights*
+
+You can customize the highlights by setting `config.highlights`.
+Below you can find all highlight groups used by the plugin.
+
+Test File
+
+ | Highlight Group                   | Description                    |
+ | --------------------------------- | ------------------------------ |
+ | `XcodebuildTestSuccessSign`         | Test passed sign               |
+ | `XcodebuildTestFailureSign`         | Test failed sign               |
+ | `XcodebuildTestSuccessDurationSign` | Test duration of a passed test |
+ | `XcodebuildTestFailureDurationSign` | Test duration of a failed test |
+
+Test Explorer
+
+ | Highlight Group                            | Description                 |
+ | ------------------------------------------ | --------------------------- |
+ | `XcodebuildTestExplorerTest`                 | Test name (function)        |
+ | `XcodebuildTestExplorerClass`                | Test class                  |
+ | `XcodebuildTestExplorerTarget`               | Test target                 |
+ | `XcodebuildTestExplorerTestInProgress`       | Test in progress sign       |
+ | `XcodebuildTestExplorerTestPassed`           | Test passed sign            |
+ | `XcodebuildTestExplorerTestFailed`           | Test failed sign            |
+ | `XcodebuildTestExplorerTestDisabled`         | Test disabled sign          |
+ | `XcodebuildTestExplorerTestNotExecuted`      | Test not executed sign      |
+ | `XcodebuildTestExplorerTestPartialExecution` | Not all tests executed sign |
+
+Code Coverage (inline)
+
+ | Highlight Group                       | Description                          |
+ | ------------------------------------- | ------------------------------------ |
+ | `XcodebuildCoverageFullSign`            | Covered line - sign                  |
+ | `XcodebuildCoverageFullNumber`          | Covered line - line number           |
+ | `XcodebuildCoverageFullLine`            | Covered line - code                  |
+ | `XcodebuildCoveragePartialSign`         | Partially covered line - sign        |
+ | `XcodebuildCoveragePartialNumber`       | Partially covered line - line number |
+ | `XcodebuildCoveragePartialLine`         | Partially covered line - code        |
+ | `XcodebuildCoverageNoneSign`            | Not covered line - sign              |
+ | `XcodebuildCoverageNoneNumber`          | Not covered line - line number       |
+ | `XcodebuildCoverageNoneLine`            | Not covered line - code              |
+ | `XcodebuildCoverageNotExecutableSign`   | Not executable line - sign           |
+ | `XcodebuildCoverageNotExecutableNumber` | Not executable line - line number    |
+ | `XcodebuildCoverageNotExecutableLine`   | Not executable line - code           |
+
+Code Coverage (report)
+
+ | Highlight Group                 | Description                                          |
+ | ------------------------------- | ---------------------------------------------------- |
+ | `XcodebuildCoverageReportOk`      | Percentage color when above `warning_coverage_level` |
+ | `XcodebuildCoverageReportWarning` | Percentage color when below `warning_coverage_level` |
+ | `XcodebuildCoverageReportError`   | Percentage color when below `error_coverage_level`   |
+
+
+==============================================================================
+Key Bindings                                               *xcodebuild.bindings*
+
+                                                        *xcodebuild.keybindings*
+                                                               *xcodebuild.keys*
+                                                            *xcodebuild.keymaps*
+Sample key bindings for the plugin.
+>lua
+    vim.keymap.set("n", "<leader>X", "<cmd>XcodebuildPicker<cr>", { desc = "Show Xcodebuild Actions" })
+    vim.keymap.set("n", "<leader>xf", "<cmd>XcodebuildProjectManager<cr>", { desc = "Show Project Manager Actions" })
+
+    vim.keymap.set("n", "<leader>xb", "<cmd>XcodebuildBuild<cr>", { desc = "Build Project" })
+    vim.keymap.set("n", "<leader>xB", "<cmd>XcodebuildBuildForTesting<cr>", { desc = "Build For Testing" })
+    vim.keymap.set("n", "<leader>xr", "<cmd>XcodebuildBuildRun<cr>", { desc = "Build & Run Project" })
+
+    vim.keymap.set("n", "<leader>xt", "<cmd>XcodebuildTest<cr>", { desc = "Run Tests" })
+    vim.keymap.set("v", "<leader>xt", "<cmd>XcodebuildTestSelected<cr>", { desc = "Run Selected Tests" })
+    vim.keymap.set("n", "<leader>xT", "<cmd>XcodebuildTestClass<cr>", { desc = "Run This Test Class" })
+
+    vim.keymap.set("n", "<leader>xl", "<cmd>XcodebuildToggleLogs<cr>", { desc = "Toggle Xcodebuild Logs" })
+    vim.keymap.set("n", "<leader>xc", "<cmd>XcodebuildToggleCodeCoverage<cr>", { desc = "Toggle Code Coverage" })
+    vim.keymap.set("n", "<leader>xC", "<cmd>XcodebuildShowCodeCoverageReport<cr>", { desc = "Show Code Coverage Report" })
+    vim.keymap.set("n", "<leader>xe", "<cmd>XcodebuildTestExplorerToggle<cr>", { desc = "Toggle Test Explorer" })
+    vim.keymap.set("n", "<leader>xs", "<cmd>XcodebuildFailingSnapshots<cr>", { desc = "Show Failing Snapshots" })
+
+    vim.keymap.set("n", "<leader>xd", "<cmd>XcodebuildSelectDevice<cr>", { desc = "Select Device" })
+    vim.keymap.set("n", "<leader>xp", "<cmd>XcodebuildSelectTestPlan<cr>", { desc = "Select Test Plan" })
+    vim.keymap.set("n", "<leader>xq", "<cmd>Telescope quickfix<cr>", { desc = "Show QuickFix List" })
+
+    vim.keymap.set("n", "<leader>xx", "<cmd>XcodebuildQuickfixLine<cr>", { desc = "Quickfix Line" })
+    vim.keymap.set("n", "<leader>xa", "<cmd>XcodebuildCodeActions<cr>", { desc = "Show Code Actions" })
+<
+Test Explorer
+ - Press `o` to jump to the test implementation
+ - Press `t` to run selected tests
+ - Press `T` to re-run recently selected tests
+ - Press `R` to reload test list
+ - Press `[` to jump to the previous failed test
+ - Press `]` to jump to the next failed test
+ - Press `<cr>` to expand or collapse the current node
+ - Press `<tab>` to expand or collapse all classes
+ - Press `q` to close the Test Explorer
+
+Logs Panel
+ - Press `o` on a failed test in the summary section to jump to the failing location
+ - Press `q` to close the panel
+
+Code Coverage Report
+ - `enter` or `tab` - expand or collapse the current node
+ - `o` - open source file
+
+
+==============================================================================
+User Commands                                              *xcodebuild.commands*
+
+                                                      *xcodebuild.user-commands*
+General
+
+ | Command                    | Description                                              |
+ | -------------------------- | -------------------------------------------------------- |
+ | `XcodebuildSetup`            | Run configuration wizard to select project configuration |
+ | `XcodebuildPicker`           | Show picker with all available actions                   |
+ | `XcodebuildBuild`            | Build project                                            |
+ | `XcodebuildCleanBuild`       | Build project (clean build)                              |
+ | `XcodebuildBuildRun`         | Build & run app                                          |
+ | `XcodebuildBuildForTesting`  | Build for testing                                        |
+ | `XcodebuildRun`              | Run app without building                                 |
+ | `XcodebuildCancel`           | Cancel currently running action                          |
+ | `XcodebuildCleanDerivedData` | Deletes project's DerivedData                            |
+ | `XcodebuildToggleLogs`       | Toggle logs panel                                        |
+ | `XcodebuildOpenLogs`         | Open logs panel                                          |
+ | `XcodebuildCloseLogs`        | Close logs panel                                         |
+ | `XcodebuildOpenInXcode`      | Open project in Xcode                                    |
+ | `XcodebuildQuickfixLine`     | Try fixing issues in the current line                    |
+ | `XcodebuildCodeActions`      | Show code actions for the current line                   |
+
+Project Manager
+
+ | Command                            | Description                                                |
+ | ---------------------------------- | ---------------------------------------------------------- |
+ | `XcodebuildProjectManager`           | Show picker with all Project Manager actions               |
+ | `XcodebuildCreateNewFile`            | Create a new file and add it to target(s)                  |
+ | `XcodebuildAddCurrentFile`           | Add the active file to target(s)                           |
+ | `XcodebuildRenameCurrentFile`        | Rename the current file                                    |
+ | `XcodebuildDeleteCurrentFile`        | Delete the current file                                    |
+ | `XcodebuildCreateNewGroup`           | Create a new directory and add it to the project           |
+ | `XcodebuildAddCurrentGroup`          | Add the parent directory of the active file to the project |
+ | `XcodebuildRenameCurrentGroup`       | Rename the current directory                               |
+ | `XcodebuildDeleteCurrentGroup`       | Delete the current directory including all files inside    |
+ | `XcodebuildUpdateCurrentFileTargets` | Update target membership of the active file                |
+ | `XcodebuildShowCurrentFileTargets`   | Show target membership of the active file                  |
+
+ 👉 To add a file to multiple targets use multi-select feature (by default `tab`).
+
+Testing
+
+ | Command                    | Description                               |
+ | -------------------------- | ----------------------------------------- |
+ | `XcodebuildTest`             | Run tests (whole test plan)               |
+ | `XcodebuildTestTarget`       | Run test target (where the cursor is)     |
+ | `XcodebuildTestClass`        | Run test class (where the cursor is)      |
+ | `XcodebuildTestFunc`         | Run test (where the cursor is)            |
+ | `XcodebuildTestSelected`     | Run selected tests (using visual mode)    |
+ | `XcodebuildTestFailing`      | Rerun previously failed tests             |
+ | `XcodebuildFailingSnapshots` | Show a picker with failing snapshot tests |
+
+Code Coverage
+
+ | Command                          | Description                                |
+ | -------------------------------- | ------------------------------------------ |
+ | `XcodebuildToggleCodeCoverage`     | Toggle code coverage marks on the side bar |
+ | `XcodebuildShowCodeCoverageReport` | Open HTML code coverage report             |
+ | `XcodebuildJumpToNextCoverage`     | Jump to next code coverage mark            |
+ | `XcodebuildJumpToPrevCoverage`     | Jump to previous code coverage mark        |
+
+Test Explorer
+
+ | Command                                | Description                    |
+ | -------------------------------------- | ------------------------------ |
+ | `XcodebuildTestExplorerShow`             | Show Test Explorer             |
+ | `XcodebuildTestExplorerHide`             | Hide Test Explorer             |
+ | `XcodebuildTestExplorerToggle`           | Toggle Test Explorer           |
+ | `XcodebuildTestExplorerRunSelectedTests` | Run Selected Tests             |
+ | `XcodebuildTestExplorerRerunTests`       | Re-run recently selected tests |
+
+Configuration
+
+ | Command                  | Description                         |
+ | -------------------------| ----------------------------------- |
+ | `XcodebuildSelectProject`  | Show project file picker            |
+ | `XcodebuildSelectScheme`   | Show scheme picker                  |
+ | `XcodebuildSelectConfig`   | Show build configuration picker     |
+ | `XcodebuildSelectDevice`   | Show device picker                  |
+ | `XcodebuildSelectTestPlan` | Show test plan picker               |
+ | `XcodebuildShowConfig`     | Print current project configuration |
+ | `XcodebuildBootSimulator`  | Boot selected simulator             |
+ | `XcodebuildInstallApp`     | Install application                 |
+ | `XcodebuildUninstallApp`   | Uninstall application               |
+
+
+==============================================================================
+Global Variables                                   *xcodebuild.global_variables*
+
+                                                   *xcodebuild.global-variables*
+                                                          *xcodebuild.variables*
+                                                            *xcodebuild.lualine*
+This plugin provides several global variables that you can use to
+integrate with `lualine` or other plugins.
+
+ | Variable                     | Description                                        |
+ | ---------------------------- | -------------------------------------------------- |
+ | `vim.g.xcodebuild_device_name` | Device name (ex. iPhone 15 Pro)                    |
+ | `vim.g.xcodebuild_os`          | OS version (ex. 16.4)                              |
+ | `vim.g.xcodebuild_platform`    | Device platform (macOS or iPhone Simulator)        |
+ | `vim.g.xcodebuild_config`      | Selected build config (ex. Debug)                  |
+ | `vim.g.xcodebuild_scheme`      | Selected project scheme (ex. MyApp)                |
+ | `vim.g.xcodebuild_test_plan`   | Selected Test Plan (ex. MyAppTests)                |
+ | `vim.g.xcodebuild_last_status` | Last build/test status (ex. Build Succeeded [15s]) |
+
+
+Sample `lualine` integration:
+>lua
+    local function xcodebuild_device()
+      if vim.g.xcodebuild_platform == "macOS" then
+        return " macOS"
+      end
+
+      if vim.g.xcodebuild_os then
+        return " " .. vim.g.xcodebuild_device_name .. " (" .. vim.g.xcodebuild_os .. ")"
+      end
+
+      return " " .. vim.g.xcodebuild_device_name
+    end
+
+    ------
+
+    lualine_x = {
+      { "' ' .. vim.g.xcodebuild_last_status", color = { fg = "Gray" } },
+      { "'󰙨 ' .. vim.g.xcodebuild_test_plan", color = { fg = "#a6e3a1", bg = "#161622" } },
+      { xcodebuild_device, color = { fg = "#f9e2af", bg = "#161622" } },
+    },
+<
+
+
+==============================================================================
+Actions                                                     *xcodebuild.actions*
+
+This module is responsible for handling actions that the user can
+call programmatically. It is the main entry point to the plugin's API.
+
+The interface should stay relatively stable.
+
+M.open_in_xcode()                             *xcodebuild.actions.open_in_xcode*
+  Opens the project in Xcode.
+
+
+M.open_logs()                                     *xcodebuild.actions.open_logs*
+  Opens the logs panel.
+
+
+M.close_logs()                                   *xcodebuild.actions.close_logs*
+  Closes the logs panel.
+
+
+M.toggle_logs()                                 *xcodebuild.actions.toggle_logs*
+  Toggles the logs panel.
+
+
+M.show_picker()                                 *xcodebuild.actions.show_picker*
+  Shows the pickers with all available actions.
+
+
+M.cancel()                                           *xcodebuild.actions.cancel*
+  Cancels all running actions.
+
+
+M.configure_project()                     *xcodebuild.actions.configure_project*
+  Shows configuration wizard.
+
+
+M.build({callback})                                   *xcodebuild.actions.build*
+  Builds the project.
+
+  Parameters: ~
+    {callback}  (fun(report:ParsedReport)|nil)
+
+
+M.clean_build({callback})                       *xcodebuild.actions.clean_build*
+  Starts clean build.
+
+  Parameters: ~
+    {callback}  (fun(report:ParsedReport)|nil)
+
+
+M.build_for_testing({callback})           *xcodebuild.actions.build_for_testing*
+  Builds the project for testing.
+
+  Parameters: ~
+    {callback}  (fun(report:ParsedReport)|nil)
+
+
+M.build_and_run({callback})                   *xcodebuild.actions.build_and_run*
+  Builds and runs the project.
+
+  Parameters: ~
+    {callback}  (fun(report:ParsedReport)|nil)
+
+
+M.clean_derived_data()                   *xcodebuild.actions.clean_derived_data*
+  Cleans the derived data.
+
+
+M.run({callback})                                       *xcodebuild.actions.run*
+  Launches the app.
+
+  Parameters: ~
+    {callback}  (function|nil)
+
+
+M.run_tests()                                     *xcodebuild.actions.run_tests*
+  Starts tests.
+
+
+M.run_target_tests()                       *xcodebuild.actions.run_target_tests*
+  Starts tests of the current target.
+
+
+M.run_class_tests()                         *xcodebuild.actions.run_class_tests*
+  Starts tests of the current class.
+
+
+M.run_func_test()                             *xcodebuild.actions.run_func_test*
+  Starts test in the current function.
+
+
+M.run_selected_tests()                   *xcodebuild.actions.run_selected_tests*
+  Starts selected tests.
+
+
+M.run_failing_tests()                     *xcodebuild.actions.run_failing_tests*
+  Starts tests that failed previously.
+
+
+                                *xcodebuild.actions.show_failing_snapshot_tests*
+M.show_failing_snapshot_tests()
+  Shows a pickers with failing snapshot tests.
+
+
+M.select_project({callback})                 *xcodebuild.actions.select_project*
+  Starts the pickers with project file selection.
+
+  Parameters: ~
+    {callback}  (function|nil)
+
+
+M.select_scheme({callback})                   *xcodebuild.actions.select_scheme*
+  Starts the pickers with scheme selection.
+
+  Parameters: ~
+    {callback}  (function|nil)
+
+
+M.select_config({callback})                   *xcodebuild.actions.select_config*
+  Starts the pickers with configuration selection.
+
+  Parameters: ~
+    {callback}  (function|nil)
+
+
+M.select_testplan({callback})               *xcodebuild.actions.select_testplan*
+  Starts the pickers with test plan selection.
+
+  Parameters: ~
+    {callback}  (fun(testPlan:string)|nil)
+
+
+M.select_device({callback})                   *xcodebuild.actions.select_device*
+  Starts the pickers with device selection.
+
+  Parameters: ~
+    {callback}  (function|nil)
+
+
+M.show_current_config()                 *xcodebuild.actions.show_current_config*
+  Sends a notification with the current project settings.
+
+
+M.install_app({callback})                       *xcodebuild.actions.install_app*
+  Installs the app on the device.
+
+  Parameters: ~
+    {callback}  (function|nil)
+
+
+M.uninstall_app({callback})                   *xcodebuild.actions.uninstall_app*
+  Uninstalls the app from the device.
+
+  Parameters: ~
+    {callback}  (function|nil)
+
+
+M.boot_simulator({callback})                 *xcodebuild.actions.boot_simulator*
+  Boots the simulator.
+
+  Parameters: ~
+    {callback}  (function|nil)
+
+
+M.toggle_code_coverage({isVisible})    *xcodebuild.actions.toggle_code_coverage*
+  Toggles the code coverage.
+
+  Parameters: ~
+    {isVisible}  (boolean)
+
+
+                                  *xcodebuild.actions.show_code_coverage_report*
+M.show_code_coverage_report()
+  Shows the code coverage report.
+
+
+M.jump_to_next_coverage()             *xcodebuild.actions.jump_to_next_coverage*
+  Jumps to the next coverage marker.
+
+
+                                  *xcodebuild.actions.jump_to_previous_coverage*
+M.jump_to_previous_coverage()
+  Jumps to the previous coverage marker.
+
+
+M.test_explorer_show()                   *xcodebuild.actions.test_explorer_show*
+  Shows the test explorer.
+
+
+M.test_explorer_hide()                   *xcodebuild.actions.test_explorer_hide*
+  Hides the test explorer.
+
+
+M.test_explorer_toggle()               *xcodebuild.actions.test_explorer_toggle*
+  Toggles the test explorer.
+
+
+                           *xcodebuild.actions.test_explorer_run_selected_tests*
+M.test_explorer_run_selected_tests()
+  Runs the selected tests.
+
+
+                                  *xcodebuild.actions.test_explorer_rerun_tests*
+M.test_explorer_rerun_tests()
+  Runs the last tests.
+
+
+M.get_project_targets()                 *xcodebuild.actions.get_project_targets*
+  Returns the project targets.
+
+  Returns: ~
+    (string[]|nil)
+
+
+                                        *xcodebuild.actions.add_file_to_targets*
+M.add_file_to_targets({filepath}, {targets})
+  Adds a file to the targets.
+
+  Parameters: ~
+    {filepath}  (string)
+    {targets}   (string[])
+
+
+M.create_new_file()                         *xcodebuild.actions.create_new_file*
+  Creates a new file and updates the project.
+  It asks the user to input the name and select targets.
+
+
+M.add_current_file()                       *xcodebuild.actions.add_current_file*
+  Adds the current file to the project.
+
+
+M.rename_current_file()                 *xcodebuild.actions.rename_current_file*
+  Renames the current file.
+  It asks the user for a new name.
+
+
+M.delete_current_file()                 *xcodebuild.actions.delete_current_file*
+  Deletes the current file.
+  It asks the user to confirm the action.
+
+
+M.create_new_group()                       *xcodebuild.actions.create_new_group*
+  Creates a new group and updates the project.
+  It asks the user to input the name.
+
+
+M.add_current_group()                     *xcodebuild.actions.add_current_group*
+  Adds the group to the project.
+
+
+M.rename_current_group()               *xcodebuild.actions.rename_current_group*
+  Renames the current group.
+  It asks the user for a new name.
+
+
+M.delete_current_group()               *xcodebuild.actions.delete_current_group*
+  Deletes the current group.
+  It asks the user to confirm the action.
+
+
+                                  *xcodebuild.actions.show_current_file_targets*
+M.show_current_file_targets()
+  Shows a picker with targets of the current file.
+
+
+                                *xcodebuild.actions.update_current_file_targets*
+M.update_current_file_targets()
+  Shows a picker to select the targets for the current file.
+
+
+                               *xcodebuild.actions.show_project_manager_actions*
+M.show_project_manager_actions()
+  Shows all available actions for the project manager.
+
+
+M.quickfix_line()                             *xcodebuild.actions.quickfix_line*
+  Automatically fixes the current line if possible.
+
+
+M.show_code_actions()                     *xcodebuild.actions.show_code_actions*
+  Shows the code actions for the current line.
+
+
+==============================================================================
+Constants                                                 *xcodebuild.constants*
+
+This module contains constants and types definitions that are
+used across the plugin.
+
+PlatformId                                     *xcodebuild.constants.PlatformId*
+  Platform type enum.
+
+  Variants: ~
+    ("iOS")            physical iOS device (iPhone or iPad)
+    ("iOS Simulator")  iOS simulator (iPhone or iPad)
+    ("macOS")          macOS
+
+
+Platform                                         *xcodebuild.constants.Platform*
+  Platform constants.
+
+  Fields: ~
+    {IOS_PHYSICAL_DEVICE}  (PlatformId) physical iOS device (iPhone or iPad)
+    {IOS_SIMULATOR}        (PlatformId) iOS simulator (iPhone or iPad)
+    {MACOS}                (PlatformId) macOS
+
+
+M.Platform                                       *xcodebuild.constants.Platform*
+  Platform type enum.
+
+  Type: ~
+    (Platform)
+
+
+==============================================================================
+Autocommands                                           *xcodebuild.core.autocmd*
+
+This module is responsible for setting up autocommands.
+It listens to the following events:
+- `VimEnter`: when the user starts Neovim,
+- `BufReadPost`: when a buffer is read.
+
+These events are used to refresh marks and diagnostics.
+
+M.setup()                                        *xcodebuild.core.autocmd.setup*
+  Setup the autocommands for xcodebuild.nvim
+
+
+==============================================================================
+Default Options                                         *xcodebuild.core.config*
+
+This module is responsible for setting up the configuration options.
+It provides a set of default options and a function to override them.
+
+M.setup({options})                                *xcodebuild.core.config.setup*
+  Set up the configuration options.
+
+  Parameters: ~
+    {options}  (table|nil)
+
+  See: ~
+    |xcodebuild.options|
+
+
+==============================================================================
+Quickfix List                                         *xcodebuild.core.quickfix*
+
+This module is responsible for setting up the quickfix list with
+errors and warnings.
+
+M.set({report})                                   *xcodebuild.core.quickfix.set*
+  Sets the quickfix list with the given {report}.
+  It sets build errors, build warnings, test failures and test errors
+  if the corresponding options are enabled.
+
+  Parameters: ~
+    {report}  (ParsedReport)
+
+  See: ~
+    |xcodebuild.xcode_logs.parser.ParsedReport|
+
+
+==============================================================================
+Xcode Logs Parser                                 *xcodebuild.xcode_logs.parser*
+
+This module is responsible for processing logs produced by `xcodebuild`
+commands. It parses the logs and generates a report with tests
+results, errors, and warnings.
+
+
+ParsedTest                             *xcodebuild.xcode_logs.parser.ParsedTest*
+
+  Fields: ~
+    {filepath}    (string|nil) The file path of the test.
+    {filename}    (string|nil) The file name of the test.
+    {target}      (string|nil) The target name of the test.
+                  Could be nil when running autogenerated test plan.
+    {class}       (string) The class name of the test.
+    {name}        (string) The test name of the test.
+    {testResult}  (string) The result of the test (passed|failed).
+    {success}     (boolean) If the test passed or failed.
+    {lineNumber}  (number|nil) The line number of the test or
+                  the place where it failed.
+    {time}        (string|nil) The formatted time it took to run the test.
+    {message}     (string[]|nil) The error message if the test failed.
+
+
+                                 *xcodebuild.xcode_logs.parser.ParsedBuildError*
+ParsedBuildError
+
+  Fields: ~
+    {filepath}      (string)
+    {filename}      (string)
+    {lineNumber}    (number)
+    {columnNumber}  (number)
+    {message}       (string[])
+
+
+                          *xcodebuild.xcode_logs.parser.ParsedBuildGenericError*
+ParsedBuildGenericError
+
+  Fields: ~
+    {source}   (string|nil)
+    {message}  (string[])
+
+
+                                  *xcodebuild.xcode_logs.parser.ParsedTestError*
+ParsedTestError
+
+  Fields: ~
+    {filepath}    (string)
+    {filename}    (string)
+    {lineNumber}  (number)
+    {message}     (string[])
+
+
+                               *xcodebuild.xcode_logs.parser.ParsedBuildWarning*
+ParsedBuildWarning
+
+  Fields: ~
+    {filepath}      (string)
+    {filename}      (string)
+    {lineNumber}    (number)
+    {columnNumber}  (number)
+    {message}       (string[])
+
+
+                                     *xcodebuild.xcode_logs.parser.ParsedReport*
+ParsedReport
+
+  Fields: ~
+    {output}            (string[]) The original logs output.
+    {tests}             (table<string,ParsedTest[]>)
+                        Tests report.
+                        The key is `Target:Class` or `Class` if target
+                        is not available.
+    {testsCount}        (number) The total number of executed tests.
+    {failedTestsCount}  (number) The total number of failed tests.
+    {buildErrors}       (ParsedBuildError[]|ParsedBuildGenericError[])
+                        The list of build errors.
+                        It will be injected into LSP diagnostics and
+                        quickfix list.
+    {buildWarnings}     (ParsedBuildWarning[])
+                        The list of build warnings.
+                        It will be injected into LSP diagnostics and
+                        quickfix list.
+    {testErrors}        (ParsedTestError[])
+                        The list of errors that occurred during tests
+                        but not in test functions. It could be for
+                        example some crash like force-unwrapping.
+                        It will be injected into LSP diagnostics and
+                        quickfix list.
+    {xcresultFilepath}  (string|nil) The path to the xcresult file.
+
+
+M.clear()                                   *xcodebuild.xcode_logs.parser.clear*
+  Clears the parser state.
+
+
+M.parse_logs({logLines})               *xcodebuild.xcode_logs.parser.parse_logs*
+  Parses Xcode logs and generates the report with tests results,
+  errors, and warnings.
+
+  Returns partial report based on currently processed logs.
+  Calling it multiple times appends the logs to the report, and
+  returns the updated report.
+
+  To process new logs, call `clear` before calling this function.
+
+  Parameters: ~
+    {logLines}  (string[]) Xcode log lines.
+
+  Returns: ~
+    (ParsedReport)
+
+
+==============================================================================
+Logs Panel                                         *xcodebuild.xcode_logs.panel*
+
+                                                               *xcodebuild.logs*
+This module contains the logs panel related functions.
+
+Key bindings:
+ - Press `o` on a failed test in the summary section to jump to the failing location
+ - Press `q` to close the panel
+
+
+                                          *xcodebuild.xcode_logs.panel.set_logs*
+M.set_logs({report}, {isTesting}, {callback})
+  Processes {report} and shows logs in the panel.
+  It also writes the logs to the file.
+  {callback} is called after the processing is finished.
+
+  Parameters: ~
+    {report}     (ParsedReport)
+    {isTesting}  (boolean)
+    {callback}   (function)
+
+  See: ~
+    |xcodebuild.xcode_logs.parser.ParsedReport|
+
+
+M.open_logs({scrollToBottom})            *xcodebuild.xcode_logs.panel.open_logs*
+  Opens the logs panel.
+
+  Parameters: ~
+    {scrollToBottom}  (boolean)
+
+
+M.close_logs()                          *xcodebuild.xcode_logs.panel.close_logs*
+  Closes the logs panel.
+
+
+M.toggle_logs()                        *xcodebuild.xcode_logs.panel.toggle_logs*
+  Toggles the logs panel.
+
+
+M.setup_buffer({bufnr})               *xcodebuild.xcode_logs.panel.setup_buffer*
+  Sets up the logs buffer.
+
+  Parameters: ~
+    {bufnr}  (number)
+
+
+==============================================================================
+Project Configuration                                *xcodebuild.project.config*
+
+This module is responsible for managing the project settings.
+
+Settings are saved in a JSON file located at `.nvim/xcodebuild/settings.json`.
+This way each project can have its own settings.
+It's important to open Neovim in the root directory of the project,
+so the settings can be loaded.
+
+                                     *xcodebuild.project.config.ProjectSettings*
+ProjectSettings
+
+  Fields: ~
+    {deviceName}      (string|nil) device name (ex. "iPhone 12")
+    {os}              (string|nil) OS version (ex. "14.5")
+    {platform}        (PlatformId|nil) platform (ex. "iOS")
+    {projectFile}     (string|nil) project file path (ex. "path/to/Project.xcodeproj")
+    {projectCommand}  (string|nil) project command (ex. "-project 'path/to/Project.xcodeproj'" or "-workspace 'path/to/Project.xcworkspace'")
+    {scheme}          (string|nil) scheme name (ex. "MyApp")
+    {config}          (string|nil) configuration name (ex. "Debug")
+    {destination}     (string|nil) destination (ex. "28B52DAA-BC2F-410B-A5BE-F485A3AFB0BC")
+    {bundleId}        (string|nil) bundle identifier (ex. "com.mycompany.myapp")
+    {appPath}         (string|nil) app path (ex. "path/to/MyApp.app")
+    {productName}     (string|nil) product name (ex. "MyApp")
+    {testPlan}        (string|nil) test plan name (ex. "MyAppTests")
+    {xcodeproj}       (string|nil) xcodeproj file path (ex. "path/to/Project.xcodeproj")
+    {lastBuildTime}   (number|nil) last build time in seconds
+    {showCoverage}    (boolean|nil) if the inline code coverage should be shown
+
+
+M.settings                                  *xcodebuild.project.config.settings*
+  Current project settings.
+
+  Type: ~
+    (ProjectSettings)
+
+
+M.load_settings()                      *xcodebuild.project.config.load_settings*
+  Loads the settings from the JSON file at `.nvim/xcodebuild/settings.json`.
+  It also updates the global variables with the current settings.
+
+
+M.save_settings()                      *xcodebuild.project.config.save_settings*
+  Saves the settings to the JSON file at `.nvim/xcodebuild/settings.json`.
+  It also updates the global variables with the current settings.
+
+
+                               *xcodebuild.project.config.is_project_configured*
+M.is_project_configured()
+  Checks if the project is configured.
+
+  Returns: ~
+    (boolean)
+
+
+                                     *xcodebuild.project.config.update_settings*
+M.update_settings({callback})
+  Updates the settings (`appPath`, `productName`, and `bundleId`) based on
+  the current project.
+  Calls `xcodebuild` commands to get the build settings.
+
+  Parameters: ~
+    {callback}  (function|nil) the callback function to be called after
+                the settings are updated.
+
+
+                                   *xcodebuild.project.config.configure_project*
+M.configure_project()
+  Starts configuration wizard to set up the project settings.
+
+
+==============================================================================
+App Data                                            *xcodebuild.project.appdata*
+
+This module provides functionality to manage the project
+data stored in `.nvim/xcodebuild` folder, such as logs,
+reports, snapshots, coverage, and settings.
+
+It also provides paths to the tools used by the plugin.
+
+All data is stored in the current working directory in
+the `.nvim/xcodebuild` folder. That's why it's important
+to always run the plugin from the root of the project.
+
+AppData                                     *xcodebuild.project.appdata.AppData*
+
+  Fields: ~
+    {report}                    (ParsedReport) # The last test report (can be empty).
+    {appdir}                    (string) # The path to the `.nvim/xcodebuild` folder.
+    {app_logs_filename}         (string) # The name of the app logs file.
+    {app_logs_filepath}         (string) # The path to the app logs file.
+    {original_logs_filename}    (string) # The name of the original logs file.
+    {original_logs_filepath}    (string) # The path to the original logs file.
+    {build_logs_filename}       (string) # The name of the build logs file.
+    {build_logs_filepath}       (string) # The path to the build logs file.
+    {report_filename}           (string) # The name of the report file.
+    {report_filepath}           (string) # The path to the report file.
+    {tests_filename}            (string) # The name of the tests file.
+    {tests_filepath}            (string) # The path to the tests file.
+    {snapshots_dir}             (string) # The path to the snapshots directory.
+    {coverage_filepath}         (string) # The path to the coverage file.
+    {coverage_report_filepath}  (string) # The path to the coverage report file.
+
+
+M.tool_path({name})                       *xcodebuild.project.appdata.tool_path*
+  Returns the path to the tool with the given {name}.
+
+  Parameters: ~
+    {name}  (string)
+
+  Returns: ~
+    (string)
+
+
+                                     *xcodebuild.project.appdata.create_app_dir*
+M.create_app_dir()
+  Creates the `.nvim/xcodebuild` folder if it doesn't exist.
+
+
+                                 *xcodebuild.project.appdata.read_original_logs*
+M.read_original_logs()
+  Reads the original Xcode logs.
+
+  Returns: ~
+    (string[])
+
+
+                                *xcodebuild.project.appdata.write_original_logs*
+M.write_original_logs({data})
+  Writes the original Xcode logs to disk.
+
+  Parameters: ~
+    {data}  (string[])
+
+
+M.read_report()                         *xcodebuild.project.appdata.read_report*
+  Reads the last test report from disk.
+
+  Returns: ~
+    (ParsedReport|nil)
+
+
+M.write_report({report})               *xcodebuild.project.appdata.write_report*
+  Writes the given {report} to disk.
+
+  Parameters: ~
+    {report}  (ParsedReport)
+
+
+                                    *xcodebuild.project.appdata.read_build_logs*
+M.read_build_logs()
+  Reads the build logs from disk.
+  These logs contain also the summary prepared by this
+  plugin.
+
+  Returns: ~
+    (string[])
+
+
+                                   *xcodebuild.project.appdata.write_build_logs*
+M.write_build_logs({data})
+  Writes the build logs to disk.
+  These logs contain also the summary prepared by this
+  plugin.
+
+  Parameters: ~
+    {data}  (string[])
+
+
+                                   *xcodebuild.project.appdata.load_last_report*
+M.load_last_report()
+  Loads the last test report from disk and updates the
+  quickfix list and the diagnostics.
+  Sets `M.report`.
+
+
+                                     *xcodebuild.project.appdata.clear_app_logs*
+M.clear_app_logs()
+  Clears the app logs and DAP console.
+
+
+                                    *xcodebuild.project.appdata.append_app_logs*
+M.append_app_logs({output})
+  Appends the given {output} to the app logs file and
+  updates the DAP console.
+
+  Parameters: ~
+    {output}  (string[])
+
+
+==============================================================================
+Project Builder                                     *xcodebuild.project.builder*
+
+This module contains the functionality to build the project.
+
+It interacts with multiple modules to build the project
+and present the results.
+
+It also sends notifications and events to the user.
+
+                                  *xcodebuild.project.builder.build_and_run_app*
+M.build_and_run_app({waitForDebugger}, {callback})
+  Builds and runs the app on device or simulator.
+
+  Parameters: ~
+    {waitForDebugger}  (boolean)
+    {callback}         (function|nil)
+
+  See: ~
+    |xcodebuild.platform.device.run_app|
+    |xcodebuild.project.builder.build_project|
+
+
+M.build_project({opts}, {callback})   *xcodebuild.project.builder.build_project*
+  Builds the project.
+  Sets quickfix list, logs, and sends notifications.
+
+  Parameters: ~
+    {opts}      (table|nil)
+                * {buildForTesting} (boolean|nil)
+                * {doNotShowSuccess} (boolean|nil)
+                  if should send the notification
+                * {clean} (boolean|nil) runs clean build
+    {callback}  (function|nil)
+
+  See: ~
+    |xcodebuild.core.xcode.build_project|
+
+
+                                 *xcodebuild.project.builder.clean_derived_data*
+M.clean_derived_data()
+  Cleans the `DerivedData` folder.
+  It will ask for confirmation before deleting it.
+
+
+==============================================================================
+Device                                              *xcodebuild.platform.device*
+
+This module contains the functionality to interact with devices
+and simulators.
+
+It is used to install, uninstall, and run the application.
+You can also boot the simulator and kill the application using this module.
+
+M.kill_app({callback})                     *xcodebuild.platform.device.kill_app*
+  Kills the application on device or simulator.
+  Does not support macOS.
+
+  Parameters: ~
+    {callback}  (function|nil)
+
+
+M.run_app({waitForDebugger}, {callback})    *xcodebuild.platform.device.run_app*
+  Runs the application on device, simulator, or macOS.
+
+  Parameters: ~
+    {waitForDebugger}  (boolean)
+    {callback}         (function|nil)
+
+
+                                     *xcodebuild.platform.device.boot_simulator*
+M.boot_simulator({callback})
+  Boots the simulator.
+
+  Parameters: ~
+    {callback}  (function|nil)
+
+
+M.install_app({callback})               *xcodebuild.platform.device.install_app*
+  Installs the application on device or simulator.
+  Does not support macOS.
+
+  Parameters: ~
+    {callback}  (function|nil)
+
+
+M.uninstall_app({callback})           *xcodebuild.platform.device.uninstall_app*
+  Uninstalls the application from device or simulator.
+  Does not support macOS.
+
+  Parameters: ~
+    {callback}  (function|nil)
+
+
+==============================================================================
+Device Proxy                                  *xcodebuild.platform.device_proxy*
+
+This module contains the functionality to interact with physical devices
+using the `pymobiledevice3` tool.
+
+It allows to install, uninstall, run, kill applications, list connected
+devices, and start the debugger.
+
+This module is used for interactions with physical devices with iOS
+below version 17 and with all physical devices to start debugger.
+For other devices, the |xcodebuild.core.xcode| module is used.
+
+The tool can be installed by:
+>
+    python3 -m pip install -U pymobiledevice
+<
+
+See:
+    https://github.com/wojciech-kulik/xcodebuild.nvim#availability-of-features
+    https://github.com/wojciech-kulik/xcodebuild.nvim#-debugging-on-ios-17-device
+    https://github.com/doronz88/pymobiledevice3
+
+Device                                 *xcodebuild.platform.device_proxy.Device*
+
+  Fields: ~
+    {id}        (string)
+    {name}      (string)
+    {os}        (string)
+    {platform}  (PlatformId)
+
+
+                                 *xcodebuild.platform.device_proxy.is_installed*
+M.is_installed()
+  Checks if the `pymobiledevice3` tool is installed.
+
+  Returns: ~
+    (boolean)
+
+
+                        *xcodebuild.platform.device_proxy.validate_installation*
+M.validate_installation()
+  Validates if the `pymobiledevice3` tool is installed.
+  If not, it sends an error notification.
+
+  Returns: ~
+    (boolean)
+
+
+                                   *xcodebuild.platform.device_proxy.should_use*
+M.should_use()
+  Checks if the `pymobiledevice3` tool is installed and
+  if it should be used. The tools is used only for physical devices
+  with iOS below 17. If the iOS version is unknown, it tries to fetch it
+  and returns false.
+
+  This function is intended to check if the tool should be used
+  for actions like install, uninstall, and run the application.
+
+  This tool should be always used for debugging if it's installed.
+
+  Returns: ~
+    (boolean)
+
+
+                                  *xcodebuild.platform.device_proxy.install_app*
+M.install_app({destination}, {appPath}, {callback})
+  Installs the application on the device.
+
+  Parameters: ~
+    {destination}  (string) # device id
+    {appPath}      (string) # device path to the app
+    {callback}     (function|nil)
+
+  Returns: ~
+    (number)   job id
+
+
+                                *xcodebuild.platform.device_proxy.uninstall_app*
+M.uninstall_app({destination}, {bundleId}, {callback})
+  Uninstalls the application with the provided bundle id.
+
+  Parameters: ~
+    {destination}  (string) # device id
+    {bundleId}     (string)
+    {callback}     (function|nil)
+
+  Returns: ~
+    (number)   job id
+
+
+                                   *xcodebuild.platform.device_proxy.launch_app*
+M.launch_app({destination}, {bundleId}, {callback})
+  Launches the application with the provided bundle id.
+
+  Parameters: ~
+    {destination}  (string) # device id
+    {bundleId}     (string)
+    {callback}     (function|nil)
+
+  Returns: ~
+    (number)   job id
+
+
+                                     *xcodebuild.platform.device_proxy.kill_app*
+M.kill_app({appName}, {callback})
+  Kills the application with the provided name.
+
+  Parameters: ~
+    {appName}   (string)
+    {callback}  (function|nil)
+
+  Returns: ~
+    (number)   job id
+
+
+                        *xcodebuild.platform.device_proxy.get_connected_devices*
+M.get_connected_devices({callback})
+  Returns the list of connected devices.
+
+  Parameters: ~
+    {callback}  (fun(devices:Device[])|nil)
+
+  Returns: ~
+    (number)   job id
+
+
+                                *xcodebuild.platform.device_proxy.find_app_path*
+M.find_app_path({destination}, {bundleId})
+  Returns the path to the application on the device.
+
+  Parameters: ~
+    {destination}  (string) # device id
+    {bundleId}     (string)
+
+  Returns: ~
+    (string|nil)   app path
+
+
+                          *xcodebuild.platform.device_proxy.start_secure_server*
+M.start_secure_server({destination}, {rsd})
+  Starts the secure server.
+  It is used on devices with iOS 17 and above.
+
+  Returns the command to connect to the device using `codelldb`.
+
+  Parameters: ~
+    {destination}  (string) # device id
+    {rsd}          (string) # rsd parameter
+
+  Returns: ~
+    (string|nil)   connection command
+
+
+                                 *xcodebuild.platform.device_proxy.start_server*
+M.start_server({destination}, {port}, {callback})
+  Starts the server.
+  It is used on devices with iOS below 17.
+
+  The callback returns {connection_string} that can be used to connect
+  to the device using `codelldb`.
+
+  This process must be alive during the debugging session.
+  Later, it can be closed with `vim.fn.jobstop({job_id})`.
+
+  Parameters: ~
+    {destination}  (string) # device id
+    {port}         (number)
+    {callback}     (fun(connection_string:string)|nil)
+
+  Returns: ~
+    (number)   job id
+
+
+                         *xcodebuild.platform.device_proxy.create_secure_tunnel*
+M.create_secure_tunnel({destination}, {callback})
+  Creates a secure tunnel with the device.
+  It is used on devices with iOS 17 and above.
+
+  Next with the received {rsd} parameter, the server can be started
+  with the `start_secure_server` function.
+
+  This process must be alive during the debugging session.
+  Later, it can be closed with the `close_secure_tunnel` function.
+
+  It can't be stopped with `vim.fn.jobstop(job_id)` because it's
+  running with `sudo`.
+
+  Requires passwordless `sudo` for the `remote_debugger` tool.
+
+  Parameters: ~
+    {destination}  (string) # device id
+    {callback}     (fun(rsd:string)|nil)
+
+  Returns: ~
+    (number)   job id
+
+
+                          *xcodebuild.platform.device_proxy.close_secure_tunnel*
+M.close_secure_tunnel()
+  Closes the secure tunnel with the device.
+
+  Requires passwordless `sudo` for the `remote_debugger` tool.
+
+
+==============================================================================
+Autocommand Events                              *xcodebuild.broadcasting.events*
+
+                                                             *xcodebuild.events*
+This module is responsible for broadcasting events about the build and
+tests status. It also updates some global variables to be used in the UI.
+
+You can customize integration with xcodebuild.nvim plugin by subscribing to notifications.
+
+Example:
+>lua
+    vim.api.nvim_create_autocmd("User", {
+      pattern = "XcodebuildTestsFinished",
+      callback = function(event)
+        print("Tests finished (passed: "
+            .. event.data.passedCount
+            .. ", failed: "
+            .. event.data.failedCount
+            .. ")"
+        )
+      end,
+    })
+<
+All available autocommand patterns:
+
+ | Pattern                          |
+ | -------------------------------- |
+ | `XcodebuildBuildStarted`           |
+ | `XcodebuildBuildStatus`            |
+ | `XcodebuildBuildFinished`          |
+ | `XcodebuildTestsStarted`           |
+ | `XcodebuildTestsStatus`            |
+ | `XcodebuildTestsFinished`          |
+ | `XcodebuildApplicationLaunched`    |
+ | `XcodebuildActionCancelled`        |
+ | `XcodebuildProjectSettingsUpdated` |
+ | `XcodebuildTestExplorerToggled`    |
+ | `XcodebuildCoverageToggled`        |
+ | `XcodebuildCoverageReportToggled`  |
+ | `XcodebuildLogsToggled`            |
+
+For payload details of each event, see the respective function.
+
+
+                                  *xcodebuild.broadcasting.events.build_started*
+M.build_started({forTesting})
+  Notifies that the build has been started.
+  It triggers the `XcodebuildBuildStarted` autocommand and clears the
+  global variable `xcodebuild_last_status`.
+
+  Parameters: ~
+    {forTesting}  (boolean) if the build is for testing.
+
+
+                                   *xcodebuild.broadcasting.events.build_status*
+M.build_status({forTesting}, {progress}, {duration})
+  Notifies about the build progress.
+  It triggers the `XcodebuildBuildStatus` autocommand and updates global
+  variable `xcodebuild_last_status`.
+
+  Parameters: ~
+    {forTesting}  (boolean) if the build is for testing.
+    {progress}    (number) the progress percentage (0-100).
+    {duration}    (number) the duration of the build in seconds.
+
+
+                                 *xcodebuild.broadcasting.events.build_finished*
+M.build_finished({forTesting}, {success}, {cancelled}, {errors})
+  Notifies that the build has been finished.
+  It triggers the `XcodebuildBuildFinished` autocommand and updates global
+  variable `xcodebuild_last_status`.
+
+  Parameters: ~
+    {forTesting}  (boolean) if the build is for testing.
+    {success}     (boolean) if the build was successful.
+    {cancelled}   (boolean) if the build was cancelled.
+    {errors}      (ParsedBuildError[]|ParsedBuildGenericError[]) build errors.
+
+
+                                  *xcodebuild.broadcasting.events.tests_started*
+M.tests_started()
+  Notifies that tests have been started.
+  It triggers the `XcodebuildTestsStarted` autocommand and clears the
+  global variable `xcodebuild_last_status`.
+
+
+                                   *xcodebuild.broadcasting.events.tests_status*
+M.tests_status({passedCount}, {failedCount})
+  Notifies about tests progress.
+  It triggers the `XcodebuildTestsStatus` autocommand and updates global
+  variable `xcodebuild_last_status`.
+
+  Parameters: ~
+    {passedCount}  (number) the number of passed tests.
+    {failedCount}  (number) the number of failed tests.
+
+
+                                 *xcodebuild.broadcasting.events.tests_finished*
+M.tests_finished({passedCount}, {failedCount}, {cancelled})
+  Notifies that tests have been finished.
+  It triggers the `XcodebuildTestsFinished` autocommand and updates global
+  variable `xcodebuild_last_status`.
+
+  Parameters: ~
+    {passedCount}  (number) the number of passed tests.
+    {failedCount}  (number) the number of failed tests.
+    {cancelled}    (boolean) if tests were cancelled.
+
+
+                           *xcodebuild.broadcasting.events.application_launched*
+M.application_launched()
+  Notifies that the application has been launched.
+  It triggers the `XcodebuildApplicationLaunched` autocommand.
+
+
+                               *xcodebuild.broadcasting.events.action_cancelled*
+M.action_cancelled()
+  Notifies that the last action has been cancelled.
+  It triggers the `XcodebuildActionCancelled` autocommand.
+
+
+                       *xcodebuild.broadcasting.events.project_settings_updated*
+M.project_settings_updated({settings})
+  Notifies that the project settings have been updated.
+  It triggers the `XcodebuildProjectSettingsUpdated` autocommand.
+
+  Parameters: ~
+    {settings}  (ProjectSettings) the updated settings.
+
+
+                          *xcodebuild.broadcasting.events.toggled_test_explorer*
+M.toggled_test_explorer({visible}, {bufnr}, {winnr})
+  Notifies that the test explorer has been toggled.
+  It triggers the `XcodebuildTestExplorerToggled` autocommand.
+
+  Parameters: ~
+    {visible}  (boolean) if the test explorer is visible.
+    {bufnr}    (number|nil) the buffer number with the test explorer.
+    {winnr}    (number|nil) the window number with the test explorer.
+
+
+                          *xcodebuild.broadcasting.events.toggled_code_coverage*
+M.toggled_code_coverage({visible})
+  Notifies that the code coverage has been toggled.
+  It triggers the `XcodebuildCoverageToggled` autocommand.
+
+  Parameters: ~
+    {visible}  (boolean) if the code coverage is visible.
+
+
+                   *xcodebuild.broadcasting.events.toggled_code_coverage_report*
+M.toggled_code_coverage_report({visible}, {bufnr}, {winnr})
+  Notifies that the code coverage report has been toggled.
+  It triggers the `XcodebuildCoverageReportToggled` autocommand.
+
+  Parameters: ~
+    {visible}  (boolean) if the code coverage report is visible.
+    {bufnr}    (number|nil) the buffer number with the report.
+    {winnr}    (number|nil) the window number with the report.
+
+
+                                   *xcodebuild.broadcasting.events.toggled_logs*
+M.toggled_logs({visible}, {bufnr}, {winnr})
+  Notifies that the logs have been toggled.
+  It triggers the `XcodebuildLogsToggled` autocommand.
+
+  Parameters: ~
+    {visible}  (boolean) if the logs are visible.
+    {bufnr}    (number|nil) the buffer number with logs.
+    {winnr}    (number|nil) the window number with logs.
+
+
+==============================================================================
+Notifications                            *xcodebuild.broadcasting.notifications*
+
+                                                      *xcodebuild.notifications*
+This module is responsible for sending notifications to the user.
+
+All notifications are sent via |xcodebuild.core.config.options.logs| functions:
+- `notify({message}, {severity})`
+- `notify_progress({message})`
+
+This way the user can customize the notifications and the progress bar.
+
+They can also be disabled or integrated with other plugins like `fidget.nvim`.
+
+
+                       *xcodebuild.broadcasting.notifications.start_build_timer*
+M.start_build_timer({buildForTesting})
+  Starts the build timer.
+
+  Parameters: ~
+    {buildForTesting}  (boolean) if the build is for testing.
+
+  Returns: ~
+    (number)   the id of the current build
+
+
+                        *xcodebuild.broadcasting.notifications.stop_build_timer*
+M.stop_build_timer()
+  Stops the build timer if exists.
+
+
+                     *xcodebuild.broadcasting.notifications.send_build_finished*
+M.send_build_finished({report}, {id}, {isCancelled}, {opts})
+  Sends a message that the build is finished.
+
+  Parameters: ~
+    {report}       (ParsedReport) the build report.
+    {id}           (number) the id of the current build.
+    {isCancelled}  (boolean) if the build was cancelled.
+    {opts}         (table|nil) additional options.
+                   * {doNotShowSuccess} (boolean|nil)
+                     if true, the success message will not be sent.
+
+
+                      *xcodebuild.broadcasting.notifications.send_tests_started*
+M.send_tests_started()
+  Sends a message that tests have been started.
+
+
+                     *xcodebuild.broadcasting.notifications.show_tests_progress*
+M.show_tests_progress({report})
+  Sends a message that tests are in progress.
+  Notifies about the progress of tests.
+
+  Parameters: ~
+    {report}  (ParsedReport) the test report.
+
+
+                     *xcodebuild.broadcasting.notifications.send_tests_finished*
+M.send_tests_finished({report}, {isCancelled})
+  Sends a message that tests have been finished.
+  Notifies also about the result of tests.
+
+  Parameters: ~
+    {report}       (ParsedReport) the test report.
+    {isCancelled}  (boolean) if tests were cancelled.
+
+
+                   *xcodebuild.broadcasting.notifications.send_project_settings*
+M.send_project_settings({settings})
+  Sends the project settings.
+
+  Parameters: ~
+    {settings}  (ProjectSettings) the project settings.
+
+
+                                    *xcodebuild.broadcasting.notifications.send*
+M.send({message}, {severity})
+  Forwards the notification to the callback from the config.
+
+  Parameters: ~
+    {message}   (string) the message to send.
+    {severity}  (number|nil) the severity of the message.
+
+  See: ~
+    |vim.log.levels|
+
+
+                              *xcodebuild.broadcasting.notifications.send_error*
+M.send_error({message})
+  Forwards the notification to the callback from the config.
+
+  Parameters: ~
+    {message}  (string) the message to send.
+
+
+                            *xcodebuild.broadcasting.notifications.send_warning*
+M.send_warning({message})
+  Forwards the notification to the callback from the config.
+
+  Parameters: ~
+    {message}  (string) the message to send.
+
+
+                           *xcodebuild.broadcasting.notifications.send_progress*
+M.send_progress({message})
+  Forwards the notification to the callback from the config.
+
+  Parameters: ~
+    {message}  (string) the message to send.
+
+
+==============================================================================
+Test Diagnostics                                  *xcodebuild.tests.diagnostics*
+
+This module is responsible for handling diagnostics and marks for test files.
+
+M.setup()                                   *xcodebuild.tests.diagnostics.setup*
+  Set up highlights for tests.
+
+
+                              *xcodebuild.tests.diagnostics.refresh_test_buffer*
+M.refresh_test_buffer({bufnr}, {report})
+  Refreshes the diagnostics and marks for the given buffer.
+
+  Parameters: ~
+    {bufnr}   (number)
+    {report}  (ParsedReport)
+
+  See: ~
+    |xcodebuild.xcode_logs.parser.ParsedReport|
+
+
+                         *xcodebuild.tests.diagnostics.refresh_all_test_buffers*
+M.refresh_all_test_buffers({report})
+  Refreshes the diagnostics and marks for all test buffers.
+
+  Parameters: ~
+    {report}  (ParsedReport)
+
+  See: ~
+    |xcodebuild.xcode_logs.parser.ParsedReport|
+
+
+==============================================================================
+Test Enumeration Parser                    *xcodebuild.tests.enumeration_parser*
+
+This module contains the parser for the:
+`xcodebuild enumerate-tests` command results.
+
+See |xcodebuild.core.xcode.enumerate_tests| for more details.
+
+                                 *xcodebuild.tests.enumeration_parser.XcodeTest*
+XcodeTest
+
+  Fields: ~
+    {id}       (string)
+    {target}   (string)
+    {class}    (string)
+    {name}     (string)
+    {enabled}  (boolean)
+
+
+                                     *xcodebuild.tests.enumeration_parser.parse*
+M.parse({filepath})
+  Parses the test enumeration results from `xcodebuild` command.
+
+  Parameters: ~
+    {filepath}  (string)
+
+  Returns: ~
+    (XcodeTest[])
+
+  See: ~
+    |xcodebuild.core.xcode.enumerate_tests|
+
+
+==============================================================================
+Test Explorer                                        *xcodebuild.tests.explorer*
+
+                                                      *xcodebuild.test-explorer*
+This module contains the Test Explorer functionality.
+
+The Test Explorer is a UI that shows the status of tests
+and allows the user to run, repeat, and open the tests.
+
+Tests are presented as a tree structure with targets,
+classes, and tests.
+
+Key bindings:
+ - Press `o` to jump to the test implementation
+ - Press `t` to run selected tests
+ - Press `T` to re-run recently selected tests
+ - Press `R` to reload test list
+ - Press `[` to jump to the previous failed test
+ - Press `]` to jump to the next failed test
+ - Press `<cr>` to expand or collapse the current node
+ - Press `<tab>` to expand or collapse all classes
+ - Press `q` to close the Test Explorer
+
+
+                              *xcodebuild.tests.explorer.TestExplorerNodeStatus*
+TestExplorerNodeStatus
+  Report node type.
+
+  Variants: ~
+    ("not_executed")
+    ("partial_execution")
+    ("passed")
+    ("running")
+    ("passed")
+    ("failed")
+    ("disabled")
+
+
+                                *xcodebuild.tests.explorer.TestExplorerNodeKind*
+TestExplorerNodeKind
+  Report node status.
+
+  Variants: ~
+    ("target")
+    ("class")
+    ("test")
+
+
+                                    *xcodebuild.tests.explorer.TestExplorerNode*
+TestExplorerNode
+
+  Fields: ~
+    {id}        (string)
+    {kind}      (TestExplorerNodeKind)
+    {status}    (TestExplorerNodeStatus)
+    {name}      (string)
+    {hidden}    (boolean)
+    {filepath}  (string|nil)
+    {classes}   (TestExplorerNode[]|nil)
+    {tests}     (TestExplorerNode[]|nil)
+
+
+M.report                                      *xcodebuild.tests.explorer.report*
+  Tree structure with tests report.
+
+  It's a list of targets, each target has a list of classes,
+  and each class has a list of tests.
+
+
+  Type: ~
+    (TestExplorerNode[]|nil)
+
+
+                                  *xcodebuild.tests.explorer.toggle_all_classes*
+M.toggle_all_classes()
+  Collapses or expands all classes.
+
+
+                                 *xcodebuild.tests.explorer.toggle_current_node*
+M.toggle_current_node()
+  Expands or collapses the current node.
+
+
+                                  *xcodebuild.tests.explorer.open_selected_test*
+M.open_selected_test()
+  Opens the selected test or class under the cursor.
+  It navigates to the previous window to avoid
+  navigation in Test Explorer window.
+
+
+M.start_tests({selectedTests})           *xcodebuild.tests.explorer.start_tests*
+  Changes status to `running` for all test ids from
+  {selectedTests}. If {selectedTests} is nil, then
+  all enabled tests will be marked as `running`.
+
+  Parameters: ~
+    {selectedTests}  (string[]|nil) test ids
+
+
+M.finish_tests()                        *xcodebuild.tests.explorer.finish_tests*
+  Stops the animation and changes the status of `running`
+  tests to `not_executed`.
+
+
+                                  *xcodebuild.tests.explorer.update_test_status*
+M.update_test_status({testId}, {status})
+  Updates the status of the test with the provided {testId}.
+  It also updates parent nodes.
+
+  Parameters: ~
+    {testId}  (string)
+    {status}  (TestExplorerNodeStatus)
+
+
+                                 *xcodebuild.tests.explorer.jump_to_failed_test*
+M.jump_to_failed_test({next})
+  Jumps to the next or previous failed test on the list.
+
+  Parameters: ~
+    {next}  (boolean)
+
+
+                                     *xcodebuild.tests.explorer.repeat_last_run*
+M.repeat_last_run()
+  Repeats the last executed tests.
+
+
+                                  *xcodebuild.tests.explorer.run_selected_tests*
+M.run_selected_tests()
+  Runs the selected tests (in visual-mode).
+
+
+M.toggle()                                    *xcodebuild.tests.explorer.toggle*
+  Toggles the Test Explorer window.
+
+
+M.hide()                                        *xcodebuild.tests.explorer.hide*
+  Hides the Test Explorer window.
+
+
+M.show()                                        *xcodebuild.tests.explorer.show*
+  Shows the Test Explorer window.
+
+
+M.load_tests({tests})                     *xcodebuild.tests.explorer.load_tests*
+  Loads the tests and generates the report.
+
+  Parameters: ~
+    {tests}  (XcodeTest[])
+
+
+M.setup()                                      *xcodebuild.tests.explorer.setup*
+  Sets up the Test Explorer.
+
+
+==============================================================================
+Test Provider                                        *xcodebuild.tests.provider*
+
+This module contains the functionality to find tests
+based on the provided options.
+
+It is used by the |xcodebuild.tests.runner| module.
+
+                                 *xcodebuild.tests.provider.TestProviderOptions*
+TestProviderOptions
+
+  Fields: ~
+    {selectedTests}  (boolean|nil)
+    {currentTest}    (boolean|nil)
+    {failingTests}   (boolean|nil)
+
+
+                                    *xcodebuild.tests.provider.TestProviderTest*
+TestProviderTest
+
+  Fields: ~
+    {name}      (string)
+    {class}     (string)
+    {filepath}  (string|nil)
+
+
+M.find_tests({opts})                      *xcodebuild.tests.provider.find_tests*
+  Finds tests based on the provided {opts}.
+  Returns a tuple with the test class found in the buffer
+  and a list of tests.
+
+  Set `opts.selectedTests` to true to find all selected tests.
+  Set `opts.currentTest` to true to find the current test.
+  Set `opts.failingTests` to true to find all failing tests
+  across the project.
+
+  Parameters: ~
+    {opts}  (TestProviderOptions)
+
+  Returns: ~
+    (string|nil)           className
+    (TestProviderTest[])   tests
+
+
+==============================================================================
+Test Runner                                            *xcodebuild.tests.runner*
+
+This module contains the functionality to run tests.
+
+It interacts with multiple modules to build, run, and
+present test results.
+
+                                    *xcodebuild.tests.runner.show_test_explorer*
+M.show_test_explorer({callback}, {opts})
+  Shows the Test Explorer and runs the provided {callback}
+  after the tests are loaded.
+
+  It also triggers build for testing if tests are not loaded.
+
+  If Test Explorer is disabled, it only triggers build for testing.
+
+  If {opts.skipEnumeration} is true, it skips the enumeration
+  (used when user runs tests from the Test Explorer).
+
+  Parameters: ~
+    {callback}  (function|nil)
+    {opts}      ({skipEnumeration:boolean}|nil)
+
+
+M.run_tests({testsToRun}, {opts})            *xcodebuild.tests.runner.run_tests*
+  Runs the provided {testsToRun} and shows the Test Explorer.
+  If {testsToRun} is nil, it runs all tests.
+
+  This is a core function to run tests. It coordinates
+  the build, test run, and the presentation of the results.
+
+  It sets logs, diagnostics, quickfix list, coverage,
+  snapshot previews, and Test Explorer.
+
+  Parameters: ~
+    {testsToRun}  (string[]|nil) test ids
+    {opts}        ({skipEnumeration:boolean}|nil)
+
+
+                                     *xcodebuild.tests.runner.TestRunnerOptions*
+TestRunnerOptions
+
+  Fields: ~
+    {doNotBuild}     (boolean|nil)
+    {currentTarget}  (boolean|nil)
+    {currentClass}   (boolean|nil)
+    {currentTest}    (boolean|nil)
+    {selectedTests}  (boolean|nil)
+    {failingTests}   (boolean|nil)
+
+
+                                    *xcodebuild.tests.runner.run_selected_tests*
+M.run_selected_tests({opts})
+  Runs only selected tests based on {opts}.
+  If target is not found for the current buffer,
+  it additionally triggers build for testing.
+
+  Parameters: ~
+    {opts}  (TestRunnerOptions)
+
+
+                           *xcodebuild.tests.runner.show_failing_snapshot_tests*
+M.show_failing_snapshot_tests()
+  Shows a picker with failing snapshot tests.
+
+
+==============================================================================
+Test Search                                            *xcodebuild.tests.search*
+
+This module is responsible for providing test locations,
+target names, symbol file paths, and keys for hash maps.
+
+It uses LSP and file name matching to find results.
+
+LSPResult                                    *xcodebuild.tests.search.LSPResult*
+  0 - LSP request succeeded (doesn't mean that there is a match)
+  1 - LSP request timed out
+
+  Type: ~
+    number
+
+
+M.targetsFilesMap                      *xcodebuild.tests.search.targetsFilesMap*
+  Hash map with all targets and their files.
+
+  Type: ~
+    (TargetMap)
+
+
+M.clear()                                        *xcodebuild.tests.search.clear*
+  Clears the LSP cache and the array with all Swift files.
+  Doesn't clear the targets map (`M.targetsFilesMap`).
+
+
+M.load_targets_map()                  *xcodebuild.tests.search.load_targets_map*
+  Loads the targets map based on the build folder.
+  Sets `M.targetsFilesMap`.
+
+
+M.get_test_key({target}, {class})         *xcodebuild.tests.search.get_test_key*
+  Returns the test key based on the {target} and {class}.
+  Returns `Target:Class` or `:Class` if {target} is empty.
+  It also can return only `Class` if target matching is
+  disabled in config.
+
+  Parameters: ~
+    {target}  (string|nil)
+    {class}   (string|nil)
+
+  Returns: ~
+    (string|nil)
+
+
+                                 *xcodebuild.tests.search.get_test_key_for_file*
+M.get_test_key_for_file({filepath}, {class})
+  The same as `get_test_key` but it uses the
+  {filepath} to find the target first.
+
+  Parameters: ~
+    {filepath}  (string)
+    {class}     (string|nil)
+
+  Returns: ~
+    (string|nil)
+
+
+                                  *xcodebuild.tests.search.find_target_for_file*
+M.find_target_for_file({filepath})
+  Finds the target for {filepath} based on the map created
+  from the build folder (`M.targetsFilesMap`).
+
+  Parameters: ~
+    {filepath}  (string)
+
+  Returns: ~
+    (string|nil)
+
+
+                                         *xcodebuild.tests.search.find_filepath*
+M.find_filepath({targetName}, {className})
+  Finds the file path based on the {targetName}
+  and {className}.
+  It uses the configuration to decide the strategy,
+  it could be LSP or filename matching, or both.
+
+  Parameters: ~
+    {targetName}  (string)
+    {className}   (string)
+
+  Returns: ~
+    (string|nil)   filepath
+
+
+==============================================================================
+Snapshot Tests                                      *xcodebuild.tests.snapshots*
+
+This module is responsible for saving and retrieving
+previews of failing snapshot tests.
+
+It uses the `getsnapshots` tool to create diffs.
+
+                             *xcodebuild.tests.snapshots.save_failing_snapshots*
+M.save_failing_snapshots({xcresultFilepath}, {callback})
+  Extracts the failing snapshot tests from the provided
+  {xcresultFilepath} and creates diff images in the
+  `failing-snapshots` directory.
+
+  It uses the external CLI tool located in `tools/getsnapshots`.
+
+  Parameters: ~
+    {xcresultFilepath}  (string)
+    {callback}          (function|nil)
+
+
+                              *xcodebuild.tests.snapshots.get_failing_snapshots*
+M.get_failing_snapshots()
+  Returns a list of sorted file paths with snapshot diffs.
+
+  Returns: ~
+    (string[])
+
+
+                                   *xcodebuild.tests.snapshots.delete_snapshots*
+M.delete_snapshots()
+  Deletes the `failing-snapshots` directory.
+
+
+==============================================================================
+Code Coverage                                *xcodebuild.code_coverage.coverage*
+
+                                                      *xcodebuild.code-coverage*
+This module is responsible for showing the code coverage in the editor.
+
+M.setup()                              *xcodebuild.code_coverage.coverage.setup*
+  Sets up the code coverage signs and highlights.
+
+
+                  *xcodebuild.code_coverage.coverage.is_code_coverage_available*
+M.is_code_coverage_available()
+  Checks if the code coverage report is available.
+
+  Returns: ~
+    (boolean)
+
+
+                         *xcodebuild.code_coverage.coverage.refresh_all_buffers*
+M.refresh_all_buffers()
+  Refreshes the code coverage for all buffers matching `file_pattern` from the config.
+
+
+                       *xcodebuild.code_coverage.coverage.jump_to_next_coverage*
+M.jump_to_next_coverage()
+  Jumps to the next coverage sign.
+
+
+                   *xcodebuild.code_coverage.coverage.jump_to_previous_coverage*
+M.jump_to_previous_coverage()
+  Jumps to the previous coverage sign.
+
+
+                             *xcodebuild.code_coverage.coverage.export_coverage*
+M.export_coverage({xcresultFilepath}, {callback})
+  Exports the code coverage from the xcresult file.
+
+  Parameters: ~
+    {xcresultFilepath}  (string)
+    {callback}          (function|nil)
+
+
+                        *xcodebuild.code_coverage.coverage.toggle_code_coverage*
+M.toggle_code_coverage({isVisible})
+  Toggles the code coverage visibility in all buffers.
+  First, the code coverage must be exported using |export_coverage| function.
+
+  Parameters: ~
+    {isVisible}  (boolean|nil)
+
+
+                               *xcodebuild.code_coverage.coverage.show_coverage*
+M.show_coverage({bufnr})
+  Shows the code coverage in the given buffer.
+  First, the code coverage must be exported using |export_coverage| function.
+
+  Parameters: ~
+    {bufnr}  (number)
+
+
+                                 *xcodebuild.code_coverage.coverage.show_report*
+M.show_report()
+  Shows the code coverage report in a floating window.
+  First, the code coverage must be exported using |export_coverage| function.
+
+
+==============================================================================
+Code Coverage Report                           *xcodebuild.code_coverage.report*
+
+                                               *xcodebuild.code-coverage-report*
+This module is responsible for showing the code coverage report in a floating window.
+It relies on `nui.nvim` plugin to create the floating window.
+
+`nui.nvim` source code: https://github.com/MunifTanjim/nui.nvim
+
+Key bindings:
+ - `enter` or `tab` - expand or collapse the current node
+ - `o` - open source file
+
+
+                           *xcodebuild.code_coverage.report.is_report_available*
+M.is_report_available()
+  Checks if the coverage report file exists.
+
+  Returns: ~
+    (boolean)
+
+
+M.open()                                  *xcodebuild.code_coverage.report.open*
+  Opens the code coverage report in a floating window.
+
+
+M.setup()                                *xcodebuild.code_coverage.report.setup*
+  Sets up the highlight groups for the code coverage report.
+
+
+==============================================================================
+Pickers                                                  *xcodebuild.ui.pickers*
+
+                                                            *xcodebuild.pickers*
+This module is responsible for showing pickers using Telescope.nvim.
+
+PickerOptions                              *xcodebuild.ui.pickers.PickerOptions*
+
+  Fields: ~
+    {on_refresh}       (function|nil)
+    {multiselect}      (boolean|nil)
+    {close_on_select}  (boolean|nil)
+
+
+                                                    *xcodebuild.ui.pickers.show*
+M.show({title}, {items}, {callback}, {opts})
+  Shows a picker using Telescope.nvim.
+
+  Parameters: ~
+    {title}     (string)
+    {items}     (string[])
+    {callback}  (function|nil)
+    {opts}      (PickerOptions|nil)
+
+
+                              *xcodebuild.ui.pickers.select_xcodeproj_if_needed*
+M.select_xcodeproj_if_needed({callback}, {opts})
+
+  Parameters: ~
+    {callback}  (fun(xcodeproj:string)|nil)
+    {opts}      (PickerOptions|nil)
+
+
+M.select_xcodeproj({callback}, {opts})  *xcodebuild.ui.pickers.select_xcodeproj*
+  Shows a picker with `xcodeproj` files
+
+  Parameters: ~
+    {callback}  (fun(xcodeproj:string)|nil)
+    {opts}      (PickerOptions|nil)
+
+
+M.select_project({callback}, {opts})      *xcodebuild.ui.pickers.select_project*
+  Shows a picker with `xcworkspace` and `xcodeproj` files.
+
+  Parameters: ~
+    {callback}  (fun(projectFile:string)|nil)
+    {opts}      (PickerOptions|nil)
+
+
+                                           *xcodebuild.ui.pickers.select_scheme*
+M.select_scheme({schemes}, {callback}, {opts})
+  Shows a picker with the available schemes.
+
+  Parameters: ~
+    {schemes}   (string[]|nil)
+    {callback}  (fun(scheme:string)|nil)
+    {opts}      (PickerOptions|nil)
+
+  Returns: ~
+    (number|nil)  id if launched
+
+
+M.select_config({callback}, {opts})        *xcodebuild.ui.pickers.select_config*
+  Shows a picker with the available build configurations.
+
+  Parameters: ~
+    {callback}  (fun(projectConfig:table)|nil)
+    {opts}      (PickerOptions|nil)
+
+  Returns: ~
+    (number)  id
+
+
+M.select_testplan({callback}, {opts})    *xcodebuild.ui.pickers.select_testplan*
+  Shows a picker with the available test plans.
+
+  Parameters: ~
+    {callback}  (fun(testPlan:string|nil)|nil)
+    {opts}      (PickerOptions|nil)
+
+  Returns: ~
+    (number)  id
+
+
+M.select_destination({callback}, {opts})*xcodebuild.ui.pickers.select_destination*
+  Shows a picker with the available devices.
+  It returns devices from cache if available and the `cache_devices`
+  option in config is enabled.
+
+  Parameters: ~
+    {callback}  (fun(destination:Device[])|nil)
+    {opts}      (PickerOptions|nil)
+
+  Returns: ~
+    (number|nil)  id if launched
+
+  See: ~
+    |xcodebuild.config|
+
+
+                            *xcodebuild.ui.pickers.select_failing_snapshot_test*
+M.select_failing_snapshot_test()
+  Shows a picker with the available failing snapshots.
+
+
+M.show_all_actions()                    *xcodebuild.ui.pickers.show_all_actions*
+  Shows a picker with the available actions.
+  If the project is not configured, it will show the configuration wizard.
+
+
+==============================================================================
+General Helpers                                             *xcodebuild.helpers*
+
+This module contains general helper functions used across the plugin.
+
+|xcodebuild.util| is for general language utils and |xcodebuild.helpers|
+are for plugin specific utils.
+
+M.cancel_actions()                           *xcodebuild.helpers.cancel_actions*
+  Cancels all running actions from all modules.
+
+
+M.validate_project()                       *xcodebuild.helpers.validate_project*
+  Validates if the project is configured.
+
+  Returns: ~
+    (boolean)
+
+
+M.clear_state()                                 *xcodebuild.helpers.clear_state*
+  Clears the state before the next build/test action.
+
+
+M.find_all_swift_files()               *xcodebuild.helpers.find_all_swift_files*
+  Finds all swift files in project working directory.
+  Returns a map of filename to list of filepaths.
+
+  Returns: ~
+    (table<string,string[]>)
+
+
+M.get_major_os_version()               *xcodebuild.helpers.get_major_os_version*
+  Returns the major version of the OS (ex. 17 for 17.1.1).
+  It uses the device from the project configuration.
+
+  Returns: ~
+    (number|nil)
+
+
+==============================================================================
+Lua Utils                                                      *xcodebuild.util*
+
+This module contains general lua helper functions used across the plugin.
+
+|xcodebuild.util| is for general language utils and |xcodebuild.helpers|
+are for plugin specific utils.
+
+M.shallow_copy({orig})                            *xcodebuild.util.shallow_copy*
+  Creates a shallow copy of a table.
+  If the table contains other tables, it will only copy the references.
+
+  Parameters: ~
+    {orig}  (any)
+
+  Returns: ~
+    (any)
+
+
+M.is_empty({table})                                   *xcodebuild.util.is_empty*
+  Checks if a table is empty or nil.
+
+  Parameters: ~
+    {table}  (table)
+
+  Returns: ~
+    (boolean)
+
+
+M.is_not_empty({table})                           *xcodebuild.util.is_not_empty*
+  Checks if a table is NOT empty and NOT nil.
+
+  Parameters: ~
+    {table}  (table)
+
+  Returns: ~
+    (boolean)
+
+
+M.get_buffers({opts})                              *xcodebuild.util.get_buffers*
+  Gets all buffers in the current neovim instance.
+  If `opts.returnNotLoaded` is true, it will
+  return all buffers, including the ones that are not loaded.
+
+  Parameters: ~
+    {opts}  (table|nil)
+            * {returnNotLoaded} (boolean)
+
+  Returns: ~
+    (number[])
+
+
+M.file_exists({name})                              *xcodebuild.util.file_exists*
+  Checks if a file exists.
+
+  Parameters: ~
+    {name}  (string)
+
+  Returns: ~
+    (boolean)
+
+
+M.dir_exists({path})                                *xcodebuild.util.dir_exists*
+  Checks if a directory exists.
+
+  Parameters: ~
+    {path}  (string)
+
+  Returns: ~
+    (boolean)
+
+
+M.get_buf_by_name({filename}, {opts})          *xcodebuild.util.get_buf_by_name*
+  Gets a buffer by its filename.
+  If `opts.returnNotLoaded` is true, it will
+  return all buffers, including the ones that are not loaded.
+
+  Parameters: ~
+    {filename}  (string)
+    {opts}      (table|nil) * {returnNotLoaded} (boolean)
+
+
+                                     *xcodebuild.util.get_bufs_by_matching_name*
+M.get_bufs_by_matching_name({pattern})
+  Gets all buffers that match a pattern.
+
+  Parameters: ~
+    {pattern}  (string)
+
+  Returns: ~
+    ({bufnr:number,file:string}[])
+
+
+M.focus_buffer({bufnr})                           *xcodebuild.util.focus_buffer*
+  Focuses a buffer by its buffer number.
+  If the buffer's window is not found, it will return false.
+
+  Parameters: ~
+    {bufnr}  (number)
+
+  Returns: ~
+    (boolean)
+
+
+M.get_filename({filepath})                        *xcodebuild.util.get_filename*
+  Gets the filename from a filepath.
+
+  Parameters: ~
+    {filepath}  (string)
+
+  Returns: ~
+    (string)
+
+
+M.shell({cmd})                                           *xcodebuild.util.shell*
+  Runs a shell command and returns the output as a list of strings.
+
+  Parameters: ~
+    {cmd}  (string)
+
+  Returns: ~
+    (string[])
+
+
+M.merge_array({lhs}, {rhs})                        *xcodebuild.util.merge_array*
+  Merges two arrays into a new one.
+
+  Parameters: ~
+    {lhs}  (any[])
+    {rhs}  (any[])
+
+  Returns: ~
+    (any[])
+
+
+M.trim({str})                                             *xcodebuild.util.trim*
+  Trims whitespace from the beginning and end of a string.
+
+  Parameters: ~
+    {str}  (string)
+
+  Returns: ~
+    (string)
+
+
+M.select({tab}, {selector})                             *xcodebuild.util.select*
+  Maps an array based on a {selector} function.
+
+  Parameters: ~
+    {tab}       (any[])
+    {selector}  (fun(value:any):any)
+
+  Returns: ~
+    (any[])
+
+
+M.filter({tab}, {predicate})                            *xcodebuild.util.filter*
+  Filters an array based on a {predicate} function.
+
+  Parameters: ~
+    {tab}        (any[])
+    {predicate}  (fun(value:any):boolean)
+
+  Returns: ~
+    (any[])
+
+
+M.has_suffix({text}, {suffix})                      *xcodebuild.util.has_suffix*
+  Checks if a string ends with a suffix.
+
+  Parameters: ~
+    {text}    (string)
+    {suffix}  (string)
+
+  Returns: ~
+    (boolean)
+
+
+M.has_prefix({text}, {prefix})                      *xcodebuild.util.has_prefix*
+  Checks if a string starts with a prefix.
+
+  Parameters: ~
+    {text}    (string)
+    {prefix}  (string)
+
+  Returns: ~
+    (boolean)
+
+
+M.contains({array}, {value})                          *xcodebuild.util.contains*
+  Checks if an array contains a value.
+
+  Parameters: ~
+    {array}  (any[])
+    {value}  (any)
+
+
+M.find({array}, {predicate})                              *xcodebuild.util.find*
+  Finds the first value in an array that matches a predicate.
+
+  Parameters: ~
+    {array}      (any[])
+    {predicate}  (fun(value:any):boolean)
+
+  Returns: ~
+    (any)
+
+
+M.call({fn})                                              *xcodebuild.util.call*
+  Calls {fn} with arguments if {fn} is not nil.
+  Returns the result of the function call.
+
+  Parameters: ~
+    {fn}  (function|nil) @vararg any
+
+  Returns: ~
+    (any)
+
+
+M.indexOf({array}, {value})                            *xcodebuild.util.indexOf*
+  Finds the index of a value in an array.
+
+  Parameters: ~
+    {array}  (any[])
+    {value}  (any)
+
+  Returns: ~
+    (number|nil)
+
+
+vim:tw=78:ts=8:noet:ft=help:norl:

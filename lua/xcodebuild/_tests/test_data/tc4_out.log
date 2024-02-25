@@ -1,13 +1,14 @@
 {
   buildErrors = {},
-  diagnostics = { {
+  buildWarnings = {},
+  failedTestsCount = 3,
+  output = {},
+  testErrors = { {
       filename = "Mocks",
       filepath = "CalendarAppTestMocks/Mocks.swift",
       lineNumber = 1513,
       message = <1>{ "Unexpectedly found nil while implicitly unwrapeventg an Optional value" }
     } },
-  failedTestsCount = 3,
-  output = {},
   tests = {
     CalendarNetworkProviderTests = { {
         class = "CalendarNetworkProviderTests",
@@ -3477,6 +3478,5 @@
       } }
   },
   testsCount = 377,
-  warnings = {},
   xcresultFilepath = "/Users/john/Library/Developer/Xcode/DerivedData/CalendarAppDemo-gpxsuartkqsliqafuudvbkhotrhj/Logs/Test/Test-CalendarAppDemo-2023.10.31_18-54-39-+0100.xcresult"
 }
