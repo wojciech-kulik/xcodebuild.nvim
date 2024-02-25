@@ -1,0 +1,90 @@
+---@mod xcodebuild.commands User Commands
+---@tag xcodebuild.user-commands
+---@brief [[
+---General
+---
+--- | Command                    | Description                                              |
+--- | -------------------------- | -------------------------------------------------------- |
+--- | `XcodebuildSetup`            | Run configuration wizard to select project configuration |
+--- | `XcodebuildPicker`           | Show picker with all available actions                   |
+--- | `XcodebuildBuild`            | Build project                                            |
+--- | `XcodebuildCleanBuild`       | Build project (clean build)                              |
+--- | `XcodebuildBuildRun`         | Build & run app                                          |
+--- | `XcodebuildBuildForTesting`  | Build for testing                                        |
+--- | `XcodebuildRun`              | Run app without building                                 |
+--- | `XcodebuildCancel`           | Cancel currently running action                          |
+--- | `XcodebuildCleanDerivedData` | Deletes project's DerivedData                            |
+--- | `XcodebuildToggleLogs`       | Toggle logs panel                                        |
+--- | `XcodebuildOpenLogs`         | Open logs panel                                          |
+--- | `XcodebuildCloseLogs`        | Close logs panel                                         |
+--- | `XcodebuildOpenInXcode`      | Open project in Xcode                                    |
+--- | `XcodebuildQuickfixLine`     | Try fixing issues in the current line                    |
+--- | `XcodebuildCodeActions`      | Show code actions for the current line                   |
+---
+---Project Manager
+---
+--- | Command                            | Description                                                |
+--- | ---------------------------------- | ---------------------------------------------------------- |
+--- | `XcodebuildProjectManager`           | Show picker with all Project Manager actions               |
+--- | `XcodebuildCreateNewFile`            | Create a new file and add it to target(s)                  |
+--- | `XcodebuildAddCurrentFile`           | Add the active file to target(s)                           |
+--- | `XcodebuildRenameCurrentFile`        | Rename the current file                                    |
+--- | `XcodebuildDeleteCurrentFile`        | Delete the current file                                    |
+--- | `XcodebuildCreateNewGroup`           | Create a new directory and add it to the project           |
+--- | `XcodebuildAddCurrentGroup`          | Add the parent directory of the active file to the project |
+--- | `XcodebuildRenameCurrentGroup`       | Rename the current directory                               |
+--- | `XcodebuildDeleteCurrentGroup`       | Delete the current directory including all files inside    |
+--- | `XcodebuildUpdateCurrentFileTargets` | Update target membership of the active file                |
+--- | `XcodebuildShowCurrentFileTargets`   | Show target membership of the active file                  |
+---
+--- 👉 To add a file to multiple targets use multi-select feature (by default `tab`).
+---
+---Testing
+---
+--- | Command                    | Description                               |
+--- | -------------------------- | ----------------------------------------- |
+--- | `XcodebuildTest`             | Run tests (whole test plan)               |
+--- | `XcodebuildTestTarget`       | Run test target (where the cursor is)     |
+--- | `XcodebuildTestClass`        | Run test class (where the cursor is)      |
+--- | `XcodebuildTestFunc`         | Run test (where the cursor is)            |
+--- | `XcodebuildTestSelected`     | Run selected tests (using visual mode)    |
+--- | `XcodebuildTestFailing`      | Rerun previously failed tests             |
+--- | `XcodebuildFailingSnapshots` | Show a picker with failing snapshot tests |
+---
+---Code Coverage
+---
+--- | Command                          | Description                                |
+--- | -------------------------------- | ------------------------------------------ |
+--- | `XcodebuildToggleCodeCoverage`     | Toggle code coverage marks on the side bar |
+--- | `XcodebuildShowCodeCoverageReport` | Open HTML code coverage report             |
+--- | `XcodebuildJumpToNextCoverage`     | Jump to next code coverage mark            |
+--- | `XcodebuildJumpToPrevCoverage`     | Jump to previous code coverage mark        |
+---
+---Test Explorer
+---
+--- | Command                                | Description                    |
+--- | -------------------------------------- | ------------------------------ |
+--- | `XcodebuildTestExplorerShow`             | Show Test Explorer             |
+--- | `XcodebuildTestExplorerHide`             | Hide Test Explorer             |
+--- | `XcodebuildTestExplorerToggle`           | Toggle Test Explorer           |
+--- | `XcodebuildTestExplorerRunSelectedTests` | Run Selected Tests             |
+--- | `XcodebuildTestExplorerRerunTests`       | Re-run recently selected tests |
+---
+---Configuration
+---
+--- | Command                  | Description                         |
+--- | -------------------------| ----------------------------------- |
+--- | `XcodebuildSelectProject`  | Show project file picker            |
+--- | `XcodebuildSelectScheme`   | Show scheme picker                  |
+--- | `XcodebuildSelectConfig`   | Show build configuration picker     |
+--- | `XcodebuildSelectDevice`   | Show device picker                  |
+--- | `XcodebuildSelectTestPlan` | Show test plan picker               |
+--- | `XcodebuildShowConfig`     | Print current project configuration |
+--- | `XcodebuildBootSimulator`  | Boot selected simulator             |
+--- | `XcodebuildInstallApp`     | Install application                 |
+--- | `XcodebuildUninstallApp`   | Uninstall application               |
+---
+---@brief ]]
+
+local M = {}
+return M

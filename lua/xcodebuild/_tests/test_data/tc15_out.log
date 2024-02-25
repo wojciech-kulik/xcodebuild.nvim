@@ -1,13 +1,26 @@
 {
   buildErrors = {},
-  diagnostics = { {
+  buildWarnings = { {
+      columnNumber = 13,
+      filename = "MainViewModel",
+      filepath = "/Users/john/repositories/calendar-app-ios/DemoApp/CalendarEventDemo/Modules/Main/MainViewModel.swift",
+      lineNumber = 41,
+      message = { "initialization of immutable value 'a' was never used; consider replacing with assignment to '_' or removing it", '        let a = ""', "        ~~~~^" }
+    }, {
+      columnNumber = 21,
+      filename = "MainViewModel",
+      filepath = "/Users/john/repositories/calendar-app-ios/DemoApp/CalendarEventDemo/Modules/Main/MainViewModel.swift",
+      lineNumber = 58,
+      message = { "string interpolation produces a debug description for an optional value; did you mean to make this explicit?", '        print("aa \\(b)")', "                    ^" }
+    } },
+  failedTestsCount = 2,
+  output = {},
+  testErrors = { {
       filename = "Mocks",
       filepath = "CalendarEventTestMocks/Mocks.swift",
       lineNumber = 1513,
       message = <1>{ "Unexpectedly found nil while implicitly unwrapeventg an Optional value" }
     } },
-  failedTestsCount = 2,
-  output = {},
   tests = {
     CalendarNetworkProviderTests = { {
         class = "CalendarNetworkProviderTests",
@@ -3479,18 +3492,5 @@
       } }
   },
   testsCount = 377,
-  warnings = { {
-      columnNumber = 13,
-      filename = "MainViewModel",
-      filepath = "/Users/john/repositories/calendar-app-ios/DemoApp/CalendarEventDemo/Modules/Main/MainViewModel.swift",
-      lineNumber = 41,
-      message = { "initialization of immutable value 'a' was never used; consider replacing with assignment to '_' or removing it", '        let a = ""', "        ~~~~^" }
-    }, {
-      columnNumber = 21,
-      filename = "MainViewModel",
-      filepath = "/Users/john/repositories/calendar-app-ios/DemoApp/CalendarEventDemo/Modules/Main/MainViewModel.swift",
-      lineNumber = 58,
-      message = { "string interpolation produces a debug description for an optional value; did you mean to make this explicit?", '        print("aa \\(b)")', "                    ^" }
-    } },
   xcresultFilepath = "/Users/john/Library/Developer/Xcode/DerivedData/CalendarEventDemo-gpxsuartkqsliqafuudvbkhotrhj/Logs/Test/Test-CalendarEventDemo-2023.11.03_21-55-24-+0100.xcresult"
 }

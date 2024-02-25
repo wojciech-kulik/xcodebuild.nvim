@@ -1,11 +1,6 @@
 {
   buildErrors = {},
-  diagnostics = {},
-  failedTestsCount = 0,
-  output = {},
-  tests = {},
-  testsCount = 0,
-  warnings = { {
+  buildWarnings = { {
       columnNumber = 1,
       filename = "MainViewModel",
       filepath = "/Users/john/repositories/calendar-app-ios/DemoApp/CalendarEventDemo/Modules/Main/MainViewModel.swift",
@@ -23,5 +18,10 @@
       filepath = "/Users/john/repositories/calendar-app-ios/DemoApp/CalendarEventDemo/Modules/Main/MainViewModel.swift",
       lineNumber = 54,
       message = { "(indent) Indent code in accordance with the scope level.", "SwiftFormat completed in 0.2s.", "Source input did not pass lint check.", "1/747 files require formatting, 4 files skipped." }
-    } }
+    } },
+  failedTestsCount = 0,
+  output = {},
+  testErrors = {},
+  tests = {},
+  testsCount = 0
 }

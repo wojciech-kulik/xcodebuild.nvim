@@ -1,8 +1,9 @@
 {
   buildErrors = {},
-  diagnostics = {},
+  buildWarnings = {},
   failedTestsCount = 0,
   output = {},
+  testErrors = {},
   tests = {
     Some_TestTests = { {
         class = "Some_TestTests",
@@ -81,6 +82,5 @@
       } }
   },
   testsCount = 8,
-  warnings = {},
   xcresultFilepath = "/Users/john/Library/Developer/Xcode/DerivedData/Some_Test-ghskumgqpreuafeligineebzxlbq/Logs/Test/Test-Some Test-2024.02.12_00-29-09-+0100.xcresult"
 }

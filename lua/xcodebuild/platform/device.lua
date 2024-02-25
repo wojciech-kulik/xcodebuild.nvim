@@ -1,21 +1,31 @@
+---@mod xcodebuild.platform.device Device
+---@brief [[
+---This module contains the functionality to interact with devices
+---and simulators.
+---
+---It is used to install, uninstall, and run the application.
+---You can also boot the simulator and kill the application using this module.
+---@brief ]]
+
+local util = require("xcodebuild.util")
+local helpers = require("xcodebuild.helpers")
 local notifications = require("xcodebuild.broadcasting.notifications")
 local projectConfig = require("xcodebuild.project.config")
 local xcode = require("xcodebuild.core.xcode")
-local logsPanel = require("xcodebuild.xcode_logs.panel")
-local config = require("xcodebuild.core.config").options
-local events = require("xcodebuild.broadcasting.events")
-local helpers = require("xcodebuild.helpers")
 local deviceProxy = require("xcodebuild.platform.device_proxy")
-local util = require("xcodebuild.util")
 
 local M = {
   currentJobId = nil,
 }
 
+---Launches the application on device, simulator, or macOS.
+---@param waitForDebugger boolean
+---@param callback function|nil
 local function launch_app(waitForDebugger, callback)
   local settings = projectConfig.settings
   local function finished()
     notifications.send("Application has been launched")
+    local events = require("xcodebuild.broadcasting.events")
     events.application_launched()
     util.call(callback)
   end
@@ -45,6 +55,9 @@ local function launch_app(waitForDebugger, callback)
   end
 end
 
+---Kills the application on device or simulator.
+---Does not support macOS.
+---@param callback function|nil
 function M.kill_app(callback)
   if not helpers.validate_project() then
     return
@@ -63,12 +76,18 @@ function M.kill_app(callback)
   end
 end
 
+---Runs the application on device, simulator, or macOS.
+---@param waitForDebugger boolean
+---@param callback function|nil
 function M.run_app(waitForDebugger, callback)
   if not helpers.validate_project() then
     return
   end
 
+  local config = require("xcodebuild.core.config").options
+
   if config.logs.auto_close_on_app_launch then
+    local logsPanel = require("xcodebuild.xcode_logs.panel")
     logsPanel.close_logs()
   end
 
@@ -81,6 +100,8 @@ function M.run_app(waitForDebugger, callback)
   end
 end
 
+---Boots the simulator.
+---@param callback function|nil
 function M.boot_simulator(callback)
   if not helpers.validate_project() then
     return
@@ -103,6 +124,9 @@ function M.boot_simulator(callback)
   end)
 end
 
+---Installs the application on device or simulator.
+---Does not support macOS.
+---@param callback function|nil
 function M.install_app(callback)
   if not helpers.validate_project() then
     return
@@ -128,6 +152,9 @@ function M.install_app(callback)
   end
 end
 
+---Uninstalls the application from device or simulator.
+---Does not support macOS.
+---@param callback function|nil
 function M.uninstall_app(callback)
   if not helpers.validate_project() then
     return

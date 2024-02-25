@@ -1,22 +1,45 @@
-local config = require("xcodebuild.core.config").options.test_search
-local util = require("xcodebuild.util")
-local xcode = require("xcodebuild.core.xcode")
-local projectConfig = require("xcodebuild.project.config")
-local helpers = require("xcodebuild.helpers")
+---@mod xcodebuild.tests.search Test Search
+---@brief [[
+---This module is responsible for providing test locations,
+---target names, symbol file paths, and keys for hash maps.
+---
+---It uses LSP and file name matching to find results.
+---@brief ]]
 
-local M = {
-  targetsFilesMap = {},
-}
+---0 - LSP request succeeded (doesn't mean that there is a match)
+---1 - LSP request timed out
+---@alias LSPResult number
+---| 0 # success
+---| 1 # timeout
+
+local util = require("xcodebuild.util")
+local helpers = require("xcodebuild.helpers")
+local config = require("xcodebuild.core.config").options.test_search
+
+local M = {}
+
+---Hash map with all targets and their files.
+---@type TargetMap
+M.targetsFilesMap = {}
 
 local allSwiftFiles = {}
 local classesCache = {}
 local missingSymbols = {}
 
+---@type LSPResult
 local LSPRESULT = {
   SUCCESS = 0,
   TIMEOUT = 1,
 }
 
+---Asks LSP to search for the {className} symbol.
+---Then, it checks if the file is in the same {targetName}.
+---
+---If {targetName} is empty, it will return the first match.
+---@param targetName string
+---@param className string
+---@return LSPResult
+---@return string|nil # filepath
 local function lsp_search(targetName, className)
   local sourcekitClients = vim.lsp.get_active_clients({ name = config.lsp_client })
 
@@ -67,6 +90,11 @@ local function lsp_search(targetName, className)
   return LSPRESULT.SUCCESS, nil
 end
 
+---Find the file using LSP.
+---It uses cache to avoid multiple requests.
+---@param targetName string|nil
+---@param className string
+---@return string|nil # filepath
 local function find_file_using_lsp(targetName, className)
   local key = (targetName or "") .. ":" .. className
 
@@ -88,6 +116,13 @@ local function find_file_using_lsp(targetName, className)
   return classesCache[key]
 end
 
+---Finds the file using file name matching assuming that
+---the file name is the same as the class name.
+---
+---If {targetName} is empty, it will return the first match.
+---@param targetName string
+---@param className string
+---@return string|nil # filepath
 local function find_file_by_filename(targetName, className)
   local files = allSwiftFiles[className]
   if not files then
@@ -101,22 +136,37 @@ local function find_file_by_filename(targetName, className)
   end
 end
 
+---Loads the targets map if it's empty.
+---Sets `allSwiftFiles` with all swift files in the project.
 local function load_targets_map_if_needed()
   if util.is_empty(M.targetsFilesMap) then
     M.load_targets_map()
   end
 end
 
+---Clears the LSP cache and the array with all Swift files.
+---Doesn't clear the targets map (`M.targetsFilesMap`).
 function M.clear()
   allSwiftFiles = helpers.find_all_swift_files()
   classesCache = {}
   missingSymbols = {}
 end
 
+---Loads the targets map based on the build folder.
+---Sets `M.targetsFilesMap`.
 function M.load_targets_map()
+  local xcode = require("xcodebuild.core.xcode")
+  local projectConfig = require("xcodebuild.project.config")
   M.targetsFilesMap = xcode.get_targets_filemap(projectConfig.settings.appPath)
 end
 
+---Returns the test key based on the {target} and {class}.
+---Returns `Target:Class` or `:Class` if {target} is empty.
+---It also can return only `Class` if target matching is
+---disabled in config.
+---@param target string|nil
+---@param class string|nil
+---@return string|nil
 function M.get_test_key(target, class)
   if not class then
     return nil
@@ -129,19 +179,28 @@ function M.get_test_key(target, class)
   end
 end
 
-function M.get_test_key_for_file(file, class)
+---The same as `get_test_key` but it uses the
+---{filepath} to find the target first.
+---@param filepath string
+---@param class string|nil
+---@return string|nil
+function M.get_test_key_for_file(filepath, class)
   if not class then
     return nil
   end
 
   if config.target_matching then
-    local target = M.find_target_for_file(file)
+    local target = M.find_target_for_file(filepath)
     return M.get_test_key(target, class)
   end
 
   return class
 end
 
+---Finds the target for {filepath} based on the map created
+---from the build folder (`M.targetsFilesMap`).
+---@param filepath string
+---@return string|nil
 function M.find_target_for_file(filepath)
   load_targets_map_if_needed()
 
@@ -156,6 +215,13 @@ function M.find_target_for_file(filepath)
   end
 end
 
+---Finds the file path based on the {targetName}
+---and {className}.
+---It uses the configuration to decide the strategy,
+---it could be LSP or filename matching, or both.
+---@param targetName string
+---@param className string
+---@return string|nil # filepath
 function M.find_filepath(targetName, className)
   local result
 

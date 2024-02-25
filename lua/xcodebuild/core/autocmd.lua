@@ -1,22 +1,25 @@
+---@mod xcodebuild.core.autocmd Autocommands
+---@brief [[
+---This module is responsible for setting up autocommands.
+---It listens to the following events:
+---- `VimEnter`: when the user starts Neovim,
+---- `BufReadPost`: when a buffer is read.
+---
+---These events are used to refresh marks and diagnostics.
+---@brief ]]
+
 local M = {}
 
+---Setup the autocommands for xcodebuild.nvim
 function M.setup()
   local appdata = require("xcodebuild.project.appdata")
   local config = require("xcodebuild.core.config").options
   local projectConfig = require("xcodebuild.project.config")
-  local diagnostics = require("xcodebuild.core.diagnostics")
+  local diagnostics = require("xcodebuild.tests.diagnostics")
   local logsPanel = require("xcodebuild.xcode_logs.panel")
   local coverage = require("xcodebuild.code_coverage.coverage")
   local events = require("xcodebuild.broadcasting.events")
   local autogroup = vim.api.nvim_create_augroup("xcodebuild.nvim", { clear = true })
-
-  vim.api.nvim_create_autocmd({ "BufReadPost" }, {
-    group = autogroup,
-    pattern = "*" .. appdata.build_logs_filename,
-    callback = function(ev)
-      logsPanel.setup_buffer(ev.buf)
-    end,
-  })
 
   if config.restore_on_start then
     vim.api.nvim_create_autocmd({ "VimEnter" }, {
@@ -26,6 +29,14 @@ function M.setup()
       callback = appdata.load_last_report,
     })
   end
+
+  vim.api.nvim_create_autocmd({ "BufReadPost" }, {
+    group = autogroup,
+    pattern = "*" .. appdata.build_logs_filename,
+    callback = function(ev)
+      logsPanel.setup_buffer(ev.buf)
+    end,
+  })
 
   if config.marks.show_diagnostics or config.marks.show_signs then
     vim.api.nvim_create_autocmd({ "BufReadPost" }, {
@@ -55,7 +66,7 @@ function M.setup()
       callback = function()
         projectConfig.load_settings()
 
-        if coverage.is_code_coverage_available() and projectConfig.settings.show_coverage then
+        if coverage.is_code_coverage_available() and projectConfig.settings.showCoverage then
           events.toggled_code_coverage(true)
         end
       end,

@@ -1,17 +1,64 @@
+---@mod xcodebuild.platform.device_proxy Device Proxy
+---@brief [[
+---This module contains the functionality to interact with physical devices
+---using the `pymobiledevice3` tool.
+---
+---It allows to install, uninstall, run, kill applications, list connected
+---devices, and start the debugger.
+---
+---This module is used for interactions with physical devices with iOS
+---below version 17 and with all physical devices to start debugger.
+---For other devices, the |xcodebuild.core.xcode| module is used.
+---
+---The tool can be installed by:
+--->
+---    python3 -m pip install -U pymobiledevice
+---<
+---
+---See:
+---    https://github.com/wojciech-kulik/xcodebuild.nvim#availability-of-features
+---    https://github.com/wojciech-kulik/xcodebuild.nvim#-debugging-on-ios-17-device
+---    https://github.com/doronz88/pymobiledevice3
+---@brief ]]
+
 local util = require("xcodebuild.util")
-local notifications = require("xcodebuild.broadcasting.notifications")
 local helpers = require("xcodebuild.helpers")
+local notifications = require("xcodebuild.broadcasting.notifications")
 local config = require("xcodebuild.core.config")
 local appdata = require("xcodebuild.project.appdata")
+
+---@class Device
+---@field id string
+---@field name string
+---@field os string
+---@field platform PlatformId
 
 local M = {}
 
 local devices_without_os_version = {}
 
+---Returns the path to the wrapper script for `pymobiledevice3` tool.
+---@return string
 local function get_tool_path()
   return config.options.commands.remote_debugger or appdata.tool_path(REMOTE_DEBUGGER_TOOL)
 end
 
+---Returns RSD parameter from the output of the `remote_debugger` tool.
+---
+---The script returns:
+---
+---UDID: 00003212-00231ASDA1131
+---ProductType: iPhone13,3
+---ProductVersion: 17.3.1
+---Interface: utun6
+---Protocol: TunnelProtocol.QUIC
+---RSD Address: ab01:e321:2171::1
+---RSD Port: 57140
+---Use the follow connection option:
+--- --rsd ab01:e321:2171::1 57140
+---
+---@param callback fun(rsd: string)|nil
+---@return fun(_, data: string[], _)
 local function wait_for_rsd_param(callback)
   local rsdParam
 
@@ -30,6 +77,10 @@ local function wait_for_rsd_param(callback)
   end
 end
 
+---Checks if the device is disconnected.
+---Updates the `M.deviceDisconnected` flag when
+---"Device is not connected" message is found in the output.
+---@return fun(_, data: string[], _)
 local function check_if_device_disconnected()
   M.deviceDisconnected = false
 
@@ -46,6 +97,9 @@ local function check_if_device_disconnected()
   end
 end
 
+---Processes the exit code of the `remote_debugger` tool and
+---sends an error notification if the tool failed to start.
+---@return fun(_, code: number, _)
 local function process_remote_debugger_exit()
   return function(_, code, _)
     if M.deviceDisconnected then
@@ -66,6 +120,17 @@ local function process_remote_debugger_exit()
   end
 end
 
+---Waits for the connection string from the `remote_debugger` tool.
+---The tool prints:
+---
+---(lldb) platform select remote-ios
+---(lldb) target create /path/to/local/application.app
+---(lldb) script lldb.target.module[0].SetPlatformFileSpec(lldb.SBFileSpec('/private/var/containers/Bundle/Application/<APP-UUID>/application.app'))
+---(lldb) process connect connect://[127.0.0.1]:65211   <-- ACTUAL CONNECTION DETAILS!
+---(lldb) process launch
+---
+---@param callback fun(connection_string: string)|nil
+---@return fun(_, data: string[], _)
 local function wait_for_connection_string(callback)
   local connection_string
 
@@ -85,6 +150,9 @@ local function wait_for_connection_string(callback)
   end
 end
 
+---Processes the exit code of the `remote_debugger` tool and
+---sends an error notification if the tool failed to start.
+---@return fun(_, code: number, _)
 local function process_remote_debugger_legacy_exit()
   return function(_, code, _)
     if code == 1 then
@@ -95,6 +163,11 @@ local function process_remote_debugger_legacy_exit()
   end
 end
 
+---Returns a function that sends an error notification if the
+---code is not 0. Otherwise, it calls the provided callback.
+---@param action string
+---@param callback function|nil
+---@return fun(_, code: number, _)
 local function callback_or_error(action, callback)
   return function(_, code, _)
     if code ~= 0 then
@@ -105,6 +178,10 @@ local function callback_or_error(action, callback)
   end
 end
 
+---Tries to fetch the OS version of the device with the provided id.
+---If OS version is already known or the device was already checked,
+---it does nothing. Otherwise, it updates project settings.
+---@param id string # device id
 local function try_fetching_os_version(id)
   local settings = require("xcodebuild.project.config").settings
 
@@ -125,10 +202,15 @@ local function try_fetching_os_version(id)
   end)
 end
 
+---Checks if the `pymobiledevice3` tool is installed.
+---@return boolean
 function M.is_installed()
   return vim.fn.executable("pymobiledevice3") ~= 0
 end
 
+---Validates if the `pymobiledevice3` tool is installed.
+---If not, it sends an error notification.
+---@return boolean
 function M.validate_installation()
   if not M.is_installed() then
     notifications.send_error(
@@ -140,6 +222,16 @@ function M.validate_installation()
   return true
 end
 
+---Checks if the `pymobiledevice3` tool is installed and
+---if it should be used. The tools is used only for physical devices
+---with iOS below 17. If the iOS version is unknown, it tries to fetch it
+---and returns false.
+---
+---This function is intended to check if the tool should be used
+---for actions like install, uninstall, and run the application.
+---
+---This tool should be always used for debugging if it's installed.
+---@return boolean
 function M.should_use()
   if not M.is_installed() then
     return false
@@ -151,11 +243,18 @@ function M.should_use()
   end
 
   local majorVersion = helpers.get_major_os_version()
-  local result = settings.platform == "iOS" and majorVersion and majorVersion < 17
-
-  return result
+  if settings.platform == "iOS" and majorVersion and majorVersion < 17 then
+    return true
+  else
+    return false
+  end
 end
 
+---Installs the application on the device.
+---@param destination string # device id
+---@param appPath string # device path to the app
+---@param callback function|nil
+---@return number # job id
 function M.install_app(destination, appPath, callback)
   local command = "pymobiledevice3 apps install '" .. appPath .. "' --udid " .. destination
 
@@ -164,6 +263,11 @@ function M.install_app(destination, appPath, callback)
   })
 end
 
+---Uninstalls the application with the provided bundle id.
+---@param destination string # device id
+---@param bundleId string
+---@param callback function|nil
+---@return number # job id
 function M.uninstall_app(destination, bundleId, callback)
   local command = "pymobiledevice3 apps uninstall " .. bundleId .. " --udid " .. destination
 
@@ -172,6 +276,11 @@ function M.uninstall_app(destination, bundleId, callback)
   })
 end
 
+---Launches the application with the provided bundle id.
+---@param destination string # device id
+---@param bundleId string
+---@param callback function|nil
+---@return number # job id
 function M.launch_app(destination, bundleId, callback)
   local command = "pymobiledevice3 developer dvt launch " .. bundleId .. " --udid " .. destination
 
@@ -180,6 +289,10 @@ function M.launch_app(destination, bundleId, callback)
   })
 end
 
+---Kills the application with the provided name.
+---@param appName string
+---@param callback function|nil
+---@return number # job id
 function M.kill_app(appName, callback)
   local command = "pymobiledevice3 developer dvt pkill '" .. appName .. "'"
 
@@ -188,6 +301,9 @@ function M.kill_app(appName, callback)
   })
 end
 
+---Returns the list of connected devices.
+---@param callback fun(devices: Device[])|nil
+---@return number # job id
 function M.get_connected_devices(callback)
   local cmd = "pymobiledevice3 usbmux list --usb --no-color"
 
@@ -218,14 +334,25 @@ function M.get_connected_devices(callback)
   })
 end
 
+---Returns the path to the application on the device.
+---@param destination string # device id
+---@param bundleId string
+---@return string|nil # app path
 function M.find_app_path(destination, bundleId)
   local apps = util.shell("pymobiledevice3 apps list --no-color --udid " .. destination .. " 2>/dev/null")
   local json = vim.fn.json_decode(apps)
   local app = json[bundleId]
 
-  return app and app.Path
+  return app and app.Path or nil
 end
 
+---Starts the secure server.
+---It is used on devices with iOS 17 and above.
+---
+---Returns the command to connect to the device using `codelldb`.
+---@param destination string # device id
+---@param rsd string # rsd parameter
+---@return string|nil # connection command
 function M.start_secure_server(destination, rsd)
   local instruction = util.shell(
     "pymobiledevice3 developer debugserver start-server " .. rsd .. " --no-color" .. " --udid " .. destination
@@ -242,6 +369,18 @@ function M.start_secure_server(destination, rsd)
   return nil
 end
 
+---Starts the server.
+---It is used on devices with iOS below 17.
+---
+---The callback returns {connection_string} that can be used to connect
+---to the device using `codelldb`.
+---
+---This process must be alive during the debugging session.
+---Later, it can be closed with `vim.fn.jobstop({job_id})`.
+---@param destination string # device id
+---@param port number
+---@param callback fun(connection_string: string)|nil
+---@return number # job id
 function M.start_server(destination, port, callback)
   local cmd = "pymobiledevice3 developer debugserver start-server "
     .. port
@@ -256,6 +395,22 @@ function M.start_server(destination, port, callback)
   })
 end
 
+---Creates a secure tunnel with the device.
+---It is used on devices with iOS 17 and above.
+---
+---Next with the received {rsd} parameter, the server can be started
+---with the `start_secure_server` function.
+---
+---This process must be alive during the debugging session.
+---Later, it can be closed with the `close_secure_tunnel` function.
+---
+---It can't be stopped with `vim.fn.jobstop(job_id)` because it's
+---running with `sudo`.
+---
+---Requires passwordless `sudo` for the `remote_debugger` tool.
+---@param destination string # device id
+---@param callback fun(rsd: string)|nil
+---@return number # job id
 function M.create_secure_tunnel(destination, callback)
   local cmd = "sudo '" .. get_tool_path() .. "' start " .. destination
 
@@ -268,6 +423,9 @@ function M.create_secure_tunnel(destination, callback)
   })
 end
 
+---Closes the secure tunnel with the device.
+---
+---Requires passwordless `sudo` for the `remote_debugger` tool.
 function M.close_secure_tunnel()
   util.shell("sudo '" .. get_tool_path() .. "' kill 2>/dev/null")
 end

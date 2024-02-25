@@ -6,11 +6,11 @@
       lineNumber = 9,
       message = { "compiling for iOS 12.0, but module 'CalendarApp' has a minimum deployment target of iOS 14.0: /Users/john/Library/Developer/Xcode/DerivedData/CalendarAppDemo-gpxsuartkqsliqafuudvbkhotrhj/Build/Products/Debug-iphonesimulator/CalendarApp.swiftmodule/arm64-apple-ios-simulator.swiftmodule", "import CalendarApp", "       ^" }
     } },
-  diagnostics = {},
+  buildWarnings = {},
   failedTestsCount = 0,
   output = {},
+  testErrors = {},
   tests = {},
   testsCount = 0,
-  warnings = {},
   xcresultFilepath = "/Users/john/Library/Developer/Xcode/DerivedData/CalendarAppDemo-gpxsuartkqsliqafuudvbkhotrhj/Logs/Test/Test-CalendarAppDemo-2023.10.31_18-26-38-+0100.xcresult"
 }

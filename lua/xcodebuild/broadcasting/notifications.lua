@@ -1,9 +1,31 @@
+---@mod xcodebuild.broadcasting.notifications Notifications
+---@tag xcodebuild.notifications
+---@brief [[
+---This module is responsible for sending notifications to the user.
+---
+---All notifications are sent via |xcodebuild.core.config.options.logs| functions:
+---- `notify({message}, {severity})`
+---- `notify_progress({message})`
+---
+---This way the user can customize the notifications and the progress bar.
+---
+---They can also be disabled or integrated with other plugins like `fidget.nvim`.
+---
+---@brief ]]
+
 local config = require("xcodebuild.core.config").options.logs
 local util = require("xcodebuild.util")
 
 local M = {}
 
+---@private
+---@class BuildState
+---@field id number|nil the id of the current build
+---@field timer number|nil current timer id
+---@field startTime number|nil the start time of the current build
+---@field buildDuration number|nil the duration of the current build
 local buildState = {}
+
 local currentFrame = 0
 local progressFrames = {
   "..........",
@@ -31,7 +53,11 @@ local progressFrames = {
 ---@diagnostic disable-next-line: param-type-mismatch
 math.randomseed(tonumber(tostring(os.time()):reverse():sub(1, 9)))
 
-function M.start_action_timer(buildForTesting, expectedDuration)
+---Starts a timer to show the build progress.
+---@param buildForTesting boolean if the build is for testing.
+---@param expectedDuration number|nil the expected duration of the build in seconds. if nil, the progress bar will be spinning around without showing the expected duration.
+---@return number # timer id
+local function start_action_timer(buildForTesting, expectedDuration)
   local actionTitle = buildForTesting and "Building For Testing" or "Building"
   local startTime = os.time()
   local shouldShowProgressBar = require("xcodebuild.core.config").options.show_build_progress_bar
@@ -62,15 +88,10 @@ function M.start_action_timer(buildForTesting, expectedDuration)
   return timer
 end
 
-function M.stop_build_timer()
-  if buildState.timer then
-    buildState.buildDuration = os.difftime(os.time(), buildState.startTime)
-    vim.fn.timer_stop(buildState.timer)
-    buildState.timer = nil
-  end
-end
-
-function M.send_build_started(buildForTesting)
+---Starts the build timer.
+---@param buildForTesting boolean if the build is for testing.
+---@return number # the id of the current build
+function M.start_build_timer(buildForTesting)
   if buildState.timer then
     vim.fn.timer_stop(buildState.timer)
   end
@@ -79,12 +100,28 @@ function M.send_build_started(buildForTesting)
   local lastBuildTime = projectConfig.settings.lastBuildTime
 
   buildState.id = math.random(10000000)
-  buildState.timer = M.start_action_timer(buildForTesting or false, lastBuildTime)
+  buildState.timer = start_action_timer(buildForTesting or false, lastBuildTime)
   buildState.startTime = os.time()
 
   return buildState.id
 end
 
+---Stops the build timer if exists.
+function M.stop_build_timer()
+  if buildState.timer then
+    buildState.buildDuration = os.difftime(os.time(), buildState.startTime)
+    vim.fn.timer_stop(buildState.timer)
+    buildState.timer = nil
+  end
+end
+
+---Sends a message that the build is finished.
+---@param report ParsedReport the build report.
+---@param id number the id of the current build.
+---@param isCancelled boolean if the build was cancelled.
+---@param opts table|nil additional options.
+---* {doNotShowSuccess} (boolean|nil)
+---  if true, the success message will not be sent.
 function M.send_build_finished(report, id, isCancelled, opts)
   opts = opts or {}
 
@@ -114,10 +151,14 @@ function M.send_build_finished(report, id, isCancelled, opts)
   buildState = {}
 end
 
+---Sends a message that tests have been started.
 function M.send_tests_started()
   M.send("Starting Tests...")
 end
 
+---Sends a message that tests are in progress.
+---Notifies about the progress of tests.
+---@param report ParsedReport the test report.
 function M.show_tests_progress(report)
   if not next(report.tests) then
     M.send_progress("Starting Tests...")
@@ -128,6 +169,10 @@ function M.show_tests_progress(report)
   end
 end
 
+---Sends a message that tests have been finished.
+---Notifies also about the result of tests.
+---@param report ParsedReport the test report.
+---@param isCancelled boolean if tests were cancelled.
 function M.send_tests_finished(report, isCancelled)
   if isCancelled then
     M.send_warning("Tests cancelled")
@@ -142,6 +187,8 @@ function M.send_tests_finished(report, isCancelled)
   end
 end
 
+---Sends the project settings.
+---@param settings ProjectSettings the project settings.
 function M.send_project_settings(settings)
   M.send([[
       Project Configuration
@@ -172,18 +219,28 @@ function M.send_project_settings(settings)
     ]])
 end
 
+---Forwards the notification to the callback from the config.
+---@param message string the message to send.
+---@param severity number|nil the severity of the message.
+---@see vim.log.levels
 function M.send(message, severity)
   config.notify(message, severity)
 end
 
+---Forwards the notification to the callback from the config.
+---@param message string the message to send.
 function M.send_error(message)
   config.notify(message, vim.log.levels.ERROR)
 end
 
+---Forwards the notification to the callback from the config.
+---@param message string the message to send.
 function M.send_warning(message)
   config.notify(message, vim.log.levels.WARN)
 end
 
+---Forwards the notification to the callback from the config.
+---@param message string the message to send.
 function M.send_progress(message)
   config.notify_progress(message)
 end
