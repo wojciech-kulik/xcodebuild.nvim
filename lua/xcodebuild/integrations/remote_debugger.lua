@@ -31,6 +31,12 @@ M.SECURED_MODE = 2
 ---@type RemoteDebuggerMode
 M.mode = M.SECURED_MODE
 
+---Updates logs in the DAP console.
+---@param lines string[]
+local function update_console(lines)
+  require("xcodebuild.dap").update_console(lines)
+end
+
 ---Removes the listeners.
 local function remove_listeners()
   local listeners = require("dap").listeners.after
@@ -94,15 +100,8 @@ local function setup_connection_listeners()
   end
 end
 
----Sets the mode of the remote debugger.
----Use `M.LEGACY_MODE` or `M.SECURED_MODE`.
----@param mode RemoteDebuggerMode
-function M.set_mode(mode)
-  M.mode = mode
-end
-
----Starts nvim-dap session. It connects to `codelldb`.
-function M.start_dap()
+---Starts `nvim-dap` debug session. It connects to `codelldb`.
+local function start_dap()
   local success, dap = pcall(require, "dap")
   if not success then
     error("xcodebuild.nvim: Could not load nvim-dap plugin")
@@ -141,7 +140,7 @@ function M.start_dap()
           return nil
         end
 
-        require("xcodebuild.dap").update_console({ "App path: " .. appPath, "" })
+        update_console({ "App path: " .. appPath, "" })
 
         return "script lldb.target.module[0].SetPlatformFileSpec(lldb.SBFileSpec('" .. appPath .. "'))"
       end,
@@ -159,10 +158,17 @@ function M.start_dap()
   })
 end
 
+---Sets the mode of the remote debugger.
+---Use `M.LEGACY_MODE` or `M.SECURED_MODE`.
+---@param mode RemoteDebuggerMode
+function M.set_mode(mode)
+  M.mode = mode
+end
+
 ---Starts legacy server without trusted channel.
+---After the server is started, it starts the debug session.
 ---@param callback function|nil
 local function start_legacy_server(callback)
-  local xcodebuildDap = require("xcodebuild.dap")
   local config = require("xcodebuild.core.config")
 
   M.debug_server_job = deviceProxy.start_server(
@@ -171,11 +177,11 @@ local function start_legacy_server(callback)
     function(connection_string)
       M.connection_string = connection_string
 
-      xcodebuildDap.update_console({
+      update_console({
         "Connecting to " .. connection_string:gsub("process connect connect://", ""),
       })
       setup_terminate_listeners()
-      xcodebuildDap.start_dap_in_swift_buffer(true)
+      start_dap()
 
       util.call(callback)
     end
@@ -183,16 +189,15 @@ local function start_legacy_server(callback)
 end
 
 ---Starts secured tunnel with trusted channel.
+---After the tunnel is established, it starts the debug session.
 ---@param callback function|nil
 local function start_secured_tunnel(callback)
-  local xcodebuildDap = require("xcodebuild.dap")
-
   M.debug_server_job = deviceProxy.create_secure_tunnel(projectConfig.settings.destination, function(rsdParam)
     M.rsd_param = rsdParam
 
-    xcodebuildDap.update_console({ "Connecting to " .. rsdParam:gsub("%-%-rsd ", "") })
+    update_console({ "Connecting to " .. rsdParam:gsub("%-%-rsd ", "") })
     setup_terminate_listeners()
-    xcodebuildDap.start_dap_in_swift_buffer(true)
+    start_dap()
 
     util.call(callback)
   end)
@@ -205,11 +210,10 @@ function M.start_remote_debugger(callback)
     return
   end
 
-  local xcodebuildDap = require("xcodebuild.dap")
   M.stop_remote_debugger()
 
   notifications.send("Starting remote debugger...")
-  xcodebuildDap.clear_console()
+  require("xcodebuild.dap").clear_console()
 
   if M.mode == M.LEGACY_MODE then
     start_legacy_server(callback)

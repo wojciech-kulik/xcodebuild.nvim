@@ -2948,17 +2948,6 @@ https://github.com/mfussenegger/nvim-dap
 https://github.com/rcarriga/nvim-dap-ui
 https://github.com/vadimcn/codelldb
 
-                         *xcodebuild.integrations.dap.start_dap_in_swift_buffer*
-M.start_dap_in_swift_buffer({remote})
-  Starts the debugger in the Swift buffer.
-  `dap.continue()` takes the configuration that matches the
-  file type of the buffer. That's why this function tries to
-  find a Swift buffer and starts the debugger in it.
-
-  Parameters: ~
-    {remote}  (boolean|nil) # if true, starts the remote debugger
-
-
                                    *xcodebuild.integrations.dap.build_and_debug*
 M.build_and_debug({callback})
   Builds, installs and runs the project. Also, it starts the debugger.
@@ -3085,11 +3074,6 @@ M.set_mode({mode})
 
   Parameters: ~
     {mode}  (RemoteDebuggerMode)
-
-
-                             *xcodebuild.integrations.remote_debugger.start_dap*
-M.start_dap()
-  Starts nvim-dap session. It connects to `codelldb`.
 
 
                  *xcodebuild.integrations.remote_debugger.start_remote_debugger*
