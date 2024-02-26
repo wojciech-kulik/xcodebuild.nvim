@@ -44,5 +44,5 @@ tools/src/getsnapshots.xcodeproj/project.xcworkspace/xcshareddata/IDEWorkspaceCh
 xcuserdata
 tools/src/getsnapshots.xcodeproj/xcuserdata
 tools/src/getsnapshots.xcodeproj/xcshareddata/xcschemes/getsnapshots.xcscheme
-lua/xcodebuild/_tests/test_data/*.vim
+specs/test_data/*.vim
 doc/tags

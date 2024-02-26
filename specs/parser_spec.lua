@@ -5,7 +5,7 @@ local cwd = vim.fn.getcwd()
 local recordSnapshots = false
 
 local mockSwiftFiles = function()
-  local filetree = vim.fn.readfile(cwd .. "/lua/xcodebuild/_tests/test_data/file_tree.txt")
+  local filetree = vim.fn.readfile(cwd .. "/specs/test_data/file_tree.txt")
 
   ---@diagnostic disable-next-line: duplicate-set-field
   require("xcodebuild.util").shell = function()
@@ -39,7 +39,7 @@ local mockSwiftFiles = function()
 end
 
 local mockLSP = function()
-  local filetree = vim.fn.readfile(cwd .. "/lua/xcodebuild/_tests/test_data/file_tree.txt")
+  local filetree = vim.fn.readfile(cwd .. "/specs/test_data/file_tree.txt")
 
   local filetreeMap = {}
   for _, file in ipairs(filetree) do
@@ -86,9 +86,9 @@ end
 local runTestCase = function(caseId)
   require("xcodebuild.core.config").options.test_search.target_matching = false
 
-  local expectedResultPath = cwd .. "/lua/xcodebuild/_tests/test_data/tc" .. caseId .. "_out.log"
+  local expectedResultPath = cwd .. "/specs/test_data/tc" .. caseId .. "_out.log"
   local exists, expectedResult = pcall(vim.fn.readfile, expectedResultPath)
-  local log = vim.fn.readfile(cwd .. "/lua/xcodebuild/_tests/test_data/tc" .. caseId .. ".log")
+  local log = vim.fn.readfile(cwd .. "/specs/test_data/tc" .. caseId .. ".log")
   mockSwiftFiles()
   mockLSP()
   logsParser.clear()
