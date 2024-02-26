@@ -1,16 +1,97 @@
-local notifications = require("xcodebuild.broadcasting.notifications")
+---@mod xcodebuild.integrations.dap DAP Integration
+---@tag xcodebuild.dap
+---@brief [[
+---This module is responsible for the integration with `nvim-dap` plugin.
+---
+---It provides functions to start the debugger and to manage its state.
+---
+---To configure `nvim-dap` for development:
+---
+---  1. Download codelldb VS Code plugin from: https://github.com/vadimcn/codelldb/releases
+---     For macOS use darwin version. Just unzip vsix file and set paths below.
+---  2. Install also nvim-dap-ui for a nice GUI to debug.
+---  3. Make sure to enable console window from nvim-dap-ui to see simulator logs.
+---
+---Sample `nvim-dap` configuration:
+--->lua
+---    return {
+---      "mfussenegger/nvim-dap",
+---      dependencies = {
+---        "wojciech-kulik/xcodebuild.nvim"
+---      },
+---      config = function()
+---        local dap = require("dap")
+---        local xcodebuild = require("xcodebuild.integrations.dap")
+---
+---        dap.configurations.swift = {
+---          {
+---            name = "iOS App Debugger",
+---            type = "codelldb",
+---            request = "attach",
+---            program = xcodebuild.get_program_path,
+---            cwd = "${workspaceFolder}",
+---            stopOnEntry = false,
+---            waitFor = true,
+---          },
+---        }
+---
+---        dap.adapters.codelldb = {
+---          type = "server",
+---          port = "13000",
+---          executable = {
+---            -- set path to the downloaded codelldb
+---            -- sample path: "/Users/YOU/Downloads/codelldb-aarch64-darwin/extension/adapter/codelldb"
+---            command = "/path/to/codelldb/extension/adapter/codelldb",
+---            args = {
+---              "--port",
+---              "13000",
+---              "--liblldb",
+---              -- make sure that this path is correct on your side
+---              "/Applications/Xcode.app/Contents/SharedFrameworks/LLDB.framework/Versions/A/LLDB",
+---            },
+---          },
+---        }
+---
+---        -- disables annoying warning that requires hitting enter
+---        local orig_notify = require("dap.utils").notify
+---        require("dap.utils").notify = function(msg, log_level)
+---          if not string.find(msg, "Either the adapter is slow") then
+---            orig_notify(msg, log_level)
+---          end
+---        end
+---
+---        -- sample keymaps to debug application
+---        vim.keymap.set("n", "<leader>dd", xcodebuild.build_and_debug, { desc = "Build & Debug" })
+---        vim.keymap.set("n", "<leader>dr", xcodebuild.debug_without_build, { desc = "Debug Without Building" })
+---        vim.keymap.set("n", "<leader>dt", xcodebuild.debug_tests, { desc = "Debug Tests" })
+---
+---        -- you can also debug smaller scope tests:
+---        -- debug_target_tests, debug_class_tests, debug_func_test,
+---        -- debug_selected_tests, debug_failing_tests
+---      end,
+---    }
+---<
+---
+---See:
+---https://github.com/mfussenegger/nvim-dap
+---https://github.com/rcarriga/nvim-dap-ui
+---https://github.com/vadimcn/codelldb
+---@brief ]]
+
+local util = require("xcodebuild.util")
 local helpers = require("xcodebuild.helpers")
 local constants = require("xcodebuild.core.constants")
-local util = require("xcodebuild.util")
+local notifications = require("xcodebuild.broadcasting.notifications")
 local projectConfig = require("xcodebuild.project.config")
-local xcode = require("xcodebuild.core.xcode")
-local projectBuilder = require("xcodebuild.project.builder")
 local device = require("xcodebuild.platform.device")
 local actions = require("xcodebuild.actions")
 local remoteDebugger = require("xcodebuild.integrations.remote_debugger")
 
 local M = {}
 
+---Checks if the project is configured.
+---If not, it sends an error notification.
+---@return boolean
 local function validate_project()
   if not projectConfig.is_project_configured() then
     notifications.send_error("The project is missing some details. Please run XcodebuildSetup first.")
@@ -20,6 +101,7 @@ local function validate_project()
   return true
 end
 
+---Sets the remote debugger mode based on the OS version.
 local function set_remote_debugger_mode()
   local majorVersion = helpers.get_major_os_version()
 
@@ -30,6 +112,11 @@ local function set_remote_debugger_mode()
   end
 end
 
+---Starts the debugger in the Swift buffer.
+---`dap.continue()` takes the configuration that matches the
+---file type of the buffer. That's why this function tries to
+---find a Swift buffer and starts the debugger in it.
+---@param remote boolean|nil # if true, starts the remote debugger
 function M.start_dap_in_swift_buffer(remote)
   local loadedDap, dap = pcall(require, "dap")
   if not loadedDap then
@@ -61,6 +148,8 @@ function M.start_dap_in_swift_buffer(remote)
   error("xcodebuild.nvim: Could not find a Swift buffer to start the debugger")
 end
 
+---Builds, installs and runs the project. Also, it starts the debugger.
+---@param callback function|nil
 function M.build_and_debug(callback)
   local loadedDap, dap = pcall(require, "dap")
   if not loadedDap then
@@ -78,6 +167,8 @@ function M.build_and_debug(callback)
     device.kill_app()
     M.start_dap_in_swift_buffer()
   end
+
+  local projectBuilder = require("xcodebuild.project.builder")
 
   projectBuilder.build_project({}, function(report)
     local success = util.is_empty(report.buildErrors)
@@ -104,6 +195,9 @@ function M.build_and_debug(callback)
   end)
 end
 
+---It only installs the app and starts the debugger without building
+---the project.
+---@param callback function|nil
 function M.debug_without_build(callback)
   if not validate_project() then
     return
@@ -123,6 +217,15 @@ function M.debug_without_build(callback)
   end
 end
 
+---Attaches the debugger to the running application when tests are starting.
+---
+---Tests are controller by `xcodebuild` tool, so we can't request waiting
+---for the debugger to attach. Instead, we listen to the
+---`XcodebuildTestsStatus` to start the debugger.
+---
+---When `XcodebuildTestsFinished` or `XcodebuildActionCancelled` is received,
+---we terminate the debugger session.
+---If build failed, we stop waiting for events.
 function M.attach_debugger_for_tests()
   local loadedDap, dap = pcall(require, "dap")
   if not loadedDap then
@@ -178,36 +281,44 @@ function M.attach_debugger_for_tests()
   })
 end
 
+---Starts the debugger and runs all tests.
 function M.debug_tests()
   actions.run_tests()
   M.attach_debugger_for_tests()
 end
 
+---Starts the debugger and runs all tests in the target.
 function M.debug_target_tests()
   actions.run_target_tests()
   M.attach_debugger_for_tests()
 end
 
+---Starts the debugger and runs all tests in the class.
 function M.debug_class_tests()
   actions.run_class_tests()
   M.attach_debugger_for_tests()
 end
 
+---Starts the debugger and runs the current test.
 function M.debug_func_test()
   actions.run_func_test()
   M.attach_debugger_for_tests()
 end
 
+---Starts the debugger and runs the selected tests.
 function M.debug_selected_tests()
   actions.run_selected_tests()
   M.attach_debugger_for_tests()
 end
 
+---Starts the debugger and re-runs the failing tests.
 function M.debug_failing_tests()
   actions.run_failing_tests()
   M.attach_debugger_for_tests()
 end
 
+---Returns path to the built application.
+---@return string
 function M.get_program_path()
   if projectConfig.settings.platform == constants.Platform.MACOS then
     return projectConfig.settings.appPath .. "/Contents/MacOS/" .. projectConfig.settings.productName
@@ -216,9 +327,12 @@ function M.get_program_path()
   end
 end
 
+---Waits for the application to start and returns its PID.
+---@return thread|nil # coroutine with pid
 function M.wait_for_pid()
   local co = coroutine
   local productName = projectConfig.settings.productName
+  local xcode = require("xcodebuild.core.xcode")
 
   if not productName then
     notifications.send_error("You must build the application first")
@@ -249,6 +363,7 @@ function M.wait_for_pid()
   end)
 end
 
+---Clears the DAP console buffer.
 function M.clear_console()
   local success, dapui = pcall(require, "dapui")
   if not success then
@@ -266,6 +381,12 @@ function M.clear_console()
   vim.bo[bufnr].modifiable = false
 end
 
+---Updates the DAP console buffer with the given output.
+---It also automatically scrolls to the last line if
+---the cursor is in a different window or if the cursor
+---is not on the last line.
+---@param output string[]
+---@param append boolean|nil # if true, appends the output to the last line
 function M.update_console(output, append)
   local success, dapui = pcall(require, "dapui")
   if not success then

@@ -1,4 +1,4 @@
----@mod xcodebuild.helpers General Helpers
+---@mod xcodebuild.helpers Helpers
 ---@brief [[
 ---This module contains general helper functions used across the plugin.
 ---

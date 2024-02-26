@@ -15,11 +15,13 @@ gendocs:
 		./lua/xcodebuild/core/autocmd.lua \
 		./lua/xcodebuild/core/config.lua \
 		./lua/xcodebuild/core/quickfix.lua \
+		./lua/xcodebuild/core/xcode.lua \
 		./lua/xcodebuild/xcode_logs/parser.lua \
 		./lua/xcodebuild/xcode_logs/panel.lua \
 		./lua/xcodebuild/project/config.lua \
 		./lua/xcodebuild/project/appdata.lua \
 		./lua/xcodebuild/project/builder.lua \
+		./lua/xcodebuild/project/manager.lua \
 		./lua/xcodebuild/platform/device.lua \
 		./lua/xcodebuild/platform/device_proxy.lua \
 		./lua/xcodebuild/broadcasting/events.lua \
@@ -33,9 +35,11 @@ gendocs:
 		./lua/xcodebuild/tests/snapshots.lua \
 		./lua/xcodebuild/code_coverage/coverage.lua \
 		./lua/xcodebuild/code_coverage/report.lua \
+		./lua/xcodebuild/integrations/dap.lua \
+		./lua/xcodebuild/integrations/remote_debugger.lua \
+		./lua/xcodebuild/integrations/lsp.lua \
+		./lua/xcodebuild/integrations/nvim-tree.lua \
 		./lua/xcodebuild/ui/pickers.lua \
 		./lua/xcodebuild/helpers.lua \
 		./lua/xcodebuild/util.lua \
 		> doc/xcodebuild.txt
-
-# TODO: integrations, core/xcode, project/manager

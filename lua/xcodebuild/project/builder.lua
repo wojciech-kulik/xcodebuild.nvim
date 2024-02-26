@@ -116,7 +116,6 @@ function M.build_project(opts, callback)
     projectCommand = projectConfig.settings.projectCommand,
     scheme = projectConfig.settings.scheme,
     config = projectConfig.settings.config,
-    testPlan = projectConfig.settings.testPlan,
     extraBuildArgs = config.commands.extra_build_args,
   })
 end
