@@ -112,40 +112,15 @@ local function set_remote_debugger_mode()
   end
 end
 
----Starts the debugger in the Swift buffer.
----`dap.continue()` takes the configuration that matches the
----file type of the buffer. That's why this function tries to
----find a Swift buffer and starts the debugger in it.
----@param remote boolean|nil # if true, starts the remote debugger
-function M.start_dap_in_swift_buffer(remote)
+---Starts `nvim-dap` debug session. It connects to `codelldb`.
+local function start_dap()
   local loadedDap, dap = pcall(require, "dap")
   if not loadedDap then
     error("xcodebuild.nvim: Could not load nvim-dap plugin")
     return
   end
 
-  local windows = vim.api.nvim_list_wins()
-
-  for _, winid in ipairs(windows) do
-    local bufnr = vim.api.nvim_win_get_buf(winid)
-    local bufname = vim.api.nvim_buf_get_name(bufnr)
-    local extension = string.match(bufname, "%.(%a+)$")
-
-    if extension and extension:lower() == "swift" then
-      vim.api.nvim_win_call(winid, function()
-        if remote then
-          set_remote_debugger_mode()
-          remoteDebugger.start_dap()
-        else
-          dap.continue()
-        end
-      end)
-
-      return
-    end
-  end
-
-  error("xcodebuild.nvim: Could not find a Swift buffer to start the debugger")
+  dap.run(dap.configurations.swift[1])
 end
 
 ---Builds, installs and runs the project. Also, it starts the debugger.
@@ -165,7 +140,7 @@ function M.build_and_debug(callback)
 
   if not remote then
     device.kill_app()
-    M.start_dap_in_swift_buffer()
+    start_dap()
   end
 
   local projectBuilder = require("xcodebuild.project.builder")
@@ -212,7 +187,7 @@ function M.debug_without_build(callback)
     end)
   else
     device.kill_app()
-    M.start_dap_in_swift_buffer()
+    start_dap()
     device.run_app(true, callback)
   end
 end
@@ -252,7 +227,7 @@ function M.attach_debugger_for_tests()
     once = true,
     callback = function()
       vim.api.nvim_del_augroup_by_id(group)
-      M.start_dap_in_swift_buffer()
+      start_dap()
     end,
   })
 
