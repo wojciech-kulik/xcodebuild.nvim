@@ -1,5 +1,6 @@
 local util = require("xcodebuild.util")
 local notifications = require("xcodebuild.broadcasting.notifications")
+local constants = require("xcodebuild.core.constants")
 
 local M = {}
 local CANCELLED_CODE = 143
@@ -254,9 +255,9 @@ end
 
 function M.get_build_settings(platform, projectCommand, scheme, config, callback)
   local sdk = "iphonesimulator"
-  if platform == "macOS" then
+  if platform == constants.Platform.MACOS then
     sdk = "macosx"
-  elseif platform == "iOS" then
+  elseif platform == constants.Platform.IOS_PHYSICAL_DEVICE then
     sdk = "iphoneos"
   end
 
@@ -318,7 +319,7 @@ function M.get_build_settings(platform, projectCommand, scheme, config, callback
 end
 
 function M.install_app(platform, destination, appPath, callback)
-  if platform == "iOS" then
+  if platform == constants.Platform.IOS_PHYSICAL_DEVICE then
     return M.install_app_on_device(destination, appPath, callback)
   else
     return M.install_app_on_simulator(destination, appPath, callback)
@@ -408,7 +409,7 @@ function M.launch_app_on_simulator(destination, bundleId, waitForDebugger, callb
 end
 
 function M.launch_app(platform, destination, bundleId, waitForDebugger, callback)
-  if platform == "iOS" then
+  if platform == constants.Platform.IOS_PHYSICAL_DEVICE then
     M.launch_app_on_device(destination, bundleId, callback)
   else
     M.launch_app_on_simulator(destination, bundleId, waitForDebugger, callback)
@@ -458,7 +459,7 @@ function M.uninstall_app_from_device(destination, bundleId, callback)
 end
 
 function M.uninstall_app(platform, destination, bundleId, callback)
-  if platform == "iOS" then
+  if platform == constants.Platform.IOS_PHYSICAL_DEVICE then
     return M.uninstall_app_from_device(destination, bundleId, callback)
   else
     return M.uninstall_app_from_simulator(destination, bundleId, callback)

@@ -9,6 +9,7 @@
 
 local util = require("xcodebuild.util")
 local helpers = require("xcodebuild.helpers")
+local constants = require("xcodebuild.core.constants")
 local notifications = require("xcodebuild.broadcasting.notifications")
 local projectConfig = require("xcodebuild.project.config")
 local xcode = require("xcodebuild.core.xcode")
@@ -32,7 +33,7 @@ local function launch_app(waitForDebugger, callback)
 
   notifications.send("Launching application...")
 
-  if settings.platform == "macOS" then
+  if settings.platform == constants.Platform.MACOS then
     local path = settings.appPath .. "/Contents/MacOS/" .. settings.productName
     finished()
     return vim.fn.jobstart(path, { detach = true })
@@ -64,12 +65,12 @@ function M.kill_app(callback)
   end
 
   local settings = projectConfig.settings
-  if settings.platform == "macOS" then
+  if settings.platform == constants.Platform.MACOS then
     -- TODO: kill macOS process?
     return
   end
 
-  if deviceProxy.is_installed() and settings.platform == "iOS" then
+  if deviceProxy.is_installed() and settings.platform == constants.Platform.IOS_PHYSICAL_DEVICE then
     M.currentJobId = deviceProxy.kill_app(settings.productName, callback)
   else
     M.currentJobId = xcode.kill_app(settings.productName, callback)
@@ -91,7 +92,7 @@ function M.run_app(waitForDebugger, callback)
     logsPanel.close_logs()
   end
 
-  if projectConfig.settings.platform == "macOS" then
+  if projectConfig.settings.platform == constants.Platform.MACOS then
     M.currentJobId = launch_app(waitForDebugger, callback)
   else
     M.currentJobId = M.install_app(function()
@@ -107,12 +108,12 @@ function M.boot_simulator(callback)
     return
   end
 
-  if projectConfig.settings.platform == "macOS" then
+  if projectConfig.settings.platform == constants.Platform.MACOS then
     notifications.send_error("Your selected device is macOS.")
     return
   end
 
-  if projectConfig.settings.platform == "iOS" then
+  if projectConfig.settings.platform == constants.Platform.IOS_PHYSICAL_DEVICE then
     notifications.send_error("Selected device cannot be booted. Please select a simulator.")
     return
   end
@@ -133,7 +134,7 @@ function M.install_app(callback)
   end
 
   local settings = projectConfig.settings
-  if settings.platform == "macOS" then
+  if settings.platform == constants.Platform.MACOS then
     notifications.send_error("macOS apps cannot be installed")
     return
   end
@@ -161,7 +162,7 @@ function M.uninstall_app(callback)
   end
 
   local settings = projectConfig.settings
-  if settings.platform == "macOS" then
+  if settings.platform == constants.Platform.MACOS then
     notifications.send_error("macOS apps cannot be uninstalled")
     return
   end

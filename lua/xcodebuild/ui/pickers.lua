@@ -11,6 +11,7 @@
 
 local util = require("xcodebuild.util")
 local notifications = require("xcodebuild.broadcasting.notifications")
+local constants = require("xcodebuild.core.constants")
 local events = require("xcodebuild.broadcasting.events")
 local xcode = require("xcodebuild.core.xcode")
 local projectConfig = require("xcodebuild.project.config")
@@ -362,14 +363,14 @@ function M.select_destination(callback, opts)
       local destinationNames = util.select(filtered, function(table)
         local name = table.name or ""
 
-        if table.platform and table.platform == "iOS" then
+        if table.platform and table.platform == constants.Platform.IOS_PHYSICAL_DEVICE then
           return util.trim(name) .. (table.os and " (" .. table.os .. ")" or "")
         end
 
-        if table.platform and table.platform ~= "iOS Simulator" then
+        if table.platform and table.platform ~= constants.Platform.IOS_SIMULATOR then
           name = util.trim(name .. " " .. table.platform)
         end
-        if table.platform == "macOS" and table.arch then
+        if table.platform == constants.Platform.MACOS and table.arch then
           name = name .. " (" .. table.arch .. ")"
         end
         if table.os then

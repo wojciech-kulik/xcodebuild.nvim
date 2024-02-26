@@ -1,5 +1,6 @@
 local notifications = require("xcodebuild.broadcasting.notifications")
 local helpers = require("xcodebuild.helpers")
+local constants = require("xcodebuild.core.constants")
 local util = require("xcodebuild.util")
 local projectConfig = require("xcodebuild.project.config")
 local xcode = require("xcodebuild.core.xcode")
@@ -71,7 +72,7 @@ function M.build_and_debug(callback)
     return
   end
 
-  local remote = projectConfig.settings.platform == "iOS"
+  local remote = projectConfig.settings.platform == constants.Platform.IOS_PHYSICAL_DEVICE
 
   if not remote then
     device.kill_app()
@@ -108,7 +109,7 @@ function M.debug_without_build(callback)
     return
   end
 
-  local remote = projectConfig.settings.platform == "iOS"
+  local remote = projectConfig.settings.platform == constants.Platform.IOS_PHYSICAL_DEVICE
 
   if remote then
     device.install_app(function()
@@ -129,7 +130,7 @@ function M.attach_debugger_for_tests()
     return
   end
 
-  if projectConfig.settings.platform == "iOS" then
+  if projectConfig.settings.platform == constants.Platform.IOS_PHYSICAL_DEVICE then
     notifications.send_error(
       "Debugging tests on physical devices is not supported. Please use the simulator."
     )
@@ -208,7 +209,7 @@ function M.debug_failing_tests()
 end
 
 function M.get_program_path()
-  if projectConfig.settings.platform == "macOS" then
+  if projectConfig.settings.platform == constants.Platform.MACOS then
     return projectConfig.settings.appPath .. "/Contents/MacOS/" .. projectConfig.settings.productName
   else
     return projectConfig.settings.appPath
