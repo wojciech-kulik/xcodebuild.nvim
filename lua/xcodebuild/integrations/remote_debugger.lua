@@ -1,51 +1,81 @@
+---@mod xcodebuild.integrations.remote_debugger Remote Debugger Integration
+---@brief [[
+---This module is responsible for the integration of `phymobiledevice3`
+---debug session with `nvim-dap`. It enables debugging on physical devices.
+---
+---The module listens to `nvim-dap` events and starts the remote debugger.
+---
+---See |xcodebuild.requirements|
+---
+---@brief ]]
+
+--- 1 - Legacy mode (iOS <17)
+--- 2 - Secured mode (iOS 17+)
+---@alias RemoteDebuggerMode number
+---| 1 # Legacy mode
+---| 2 # Secured mode
+
 local notifications = require("xcodebuild.broadcasting.notifications")
 local util = require("xcodebuild.util")
 local projectConfig = require("xcodebuild.project.config")
-local appdata = require("xcodebuild.project.appdata")
-local config = require("xcodebuild.core.config")
 local deviceProxy = require("xcodebuild.platform.device_proxy")
 
 local M = {}
 
+local PLUGIN_ID = "xcodebuild"
+
 M.LEGACY_MODE = 1
 M.SECURED_MODE = 2
 
+---The current mode of the remote debugger.
+---@type RemoteDebuggerMode
 M.mode = M.SECURED_MODE
 
+---Removes the listeners.
 local function remove_listeners()
   local listeners = require("dap").listeners.after
 
-  listeners.event_terminated["xcodebuild"] = nil
-  listeners.event_continued["xcodebuild"] = nil
-  listeners.event_output["xcodebuild"] = nil
-  listeners.disconnect["xcodebuild"] = nil
+  listeners.event_terminated[PLUGIN_ID] = nil
+  listeners.event_continued[PLUGIN_ID] = nil
+  listeners.event_output[PLUGIN_ID] = nil
+  listeners.disconnect[PLUGIN_ID] = nil
 end
 
+---Sets up the listeners to observe when the debug session is terminated.
+---WARNING: They are not always triggered ¯\_(ツ)_/¯
+---
+---When the even is received, it stops the remote debugger
+---and removes the listeners.
 local function setup_terminate_listeners()
   local listeners = require("dap").listeners.after
 
-  listeners.event_terminated["xcodebuild"] = function()
+  listeners.event_terminated[PLUGIN_ID] = function()
     remove_listeners()
     M.stop_remote_debugger()
   end
 
-  listeners.disconnect["xcodebuild"] = function()
+  listeners.disconnect[PLUGIN_ID] = function()
     remove_listeners()
     M.stop_remote_debugger()
   end
 end
 
+---Sets up the listeners to observe the connection with the remote debugger.
+---When the connection is established, it sends a notification.
+---When the output is received, it appends the logs to the file and too
+---the DAP console.
 local function setup_connection_listeners()
+  local appdata = require("xcodebuild.project.appdata")
   local listeners = require("dap").listeners.after
   local processLaunched = false
   local buffer = ""
 
-  listeners.event_continued["xcodebuild"] = function()
-    listeners.event_continued["xcodebuild"] = nil
+  listeners.event_continued[PLUGIN_ID] = function()
+    listeners.event_continued[PLUGIN_ID] = nil
     notifications.send("Remote debugger connected")
   end
 
-  listeners.event_output["xcodebuild"] = function(_, body)
+  listeners.event_output[PLUGIN_ID] = function(_, body)
     if not processLaunched and string.find(body.output, "Launched process") then
       processLaunched = true
       return
@@ -64,10 +94,14 @@ local function setup_connection_listeners()
   end
 end
 
+---Sets the mode of the remote debugger.
+---Use `M.LEGACY_MODE` or `M.SECURED_MODE`.
+---@param mode RemoteDebuggerMode
 function M.set_mode(mode)
   M.mode = mode
 end
 
+---Starts nvim-dap session. It connects to `codelldb`.
 function M.start_dap()
   local success, dap = pcall(require, "dap")
   if not success then
@@ -125,8 +159,11 @@ function M.start_dap()
   })
 end
 
+---Starts legacy server without trusted channel.
+---@param callback function|nil
 local function start_legacy_server(callback)
   local xcodebuildDap = require("xcodebuild.dap")
+  local config = require("xcodebuild.core.config")
 
   M.debug_server_job = deviceProxy.start_server(
     projectConfig.settings.destination,
@@ -145,6 +182,8 @@ local function start_legacy_server(callback)
   )
 end
 
+---Starts secured tunnel with trusted channel.
+---@param callback function|nil
 local function start_secured_tunnel(callback)
   local xcodebuildDap = require("xcodebuild.dap")
 
@@ -159,6 +198,8 @@ local function start_secured_tunnel(callback)
   end)
 end
 
+---Starts the remote debugger based on the mode.
+---@param callback function|nil
 function M.start_remote_debugger(callback)
   if not deviceProxy.validate_installation() then
     return
@@ -177,6 +218,7 @@ function M.start_remote_debugger(callback)
   end
 end
 
+---Stops the remote debugger based on the mode.
 function M.stop_remote_debugger()
   if not M.debug_server_job then
     if M.mode == M.SECURED_MODE then

@@ -118,6 +118,9 @@ You can also check out the sample Neovim configuration that I prepared for iOS d
 
 Make sure to open your project's root directory and run `XcodebuildSetup` to configure it. The plugin needs several information like project file, scheme, config, device, and test plan to be able to run commands.
 
+Remember, that all the information are available in the help `:h xcodebuild`.
+Every function is documented and described both in the help and in the code.
+
 ### 🔧 Commands
 
 <details>
@@ -766,3 +769,19 @@ If you encounter issues with test detection, you may want to read this: [Test Fi
 #### LSP
 
 In most cases, it's enough to run the project in Xcode, clean it `CMD+Shift+K`, build again `CMD+B`, and run `xcode-build-server config` again.
+
+#### Useful Help Tags
+
+- `:h xcodebuild`
+- `:h xcodebuild.config`
+- `:h xcodebuild.keys`
+- `:h xcodebuild.tools`
+- `:h xcodebuild.commands`
+- `:h xcodebuild.highlights`
+- `:h xcodebuild.events`
+- `:h xcodebuild.project-manager`
+- `:h xcodebuild.test-explorer`
+- `:h xcodebuild.code-coverage-report`
+- `:h xcodebuild.dap`
+- `:h xcodebuild.lualine`
+- `:h xcodebuild.actions`

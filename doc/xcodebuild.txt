@@ -13,11 +13,13 @@ Constants ···································
 Autocommands ········································· |xcodebuild.core.autocmd|
 Default Options ······································· |xcodebuild.core.config|
 Quickfix List ······································· |xcodebuild.core.quickfix|
+Xcodebuild Wrapper ····································· |xcodebuild.core.xcode|
 Xcode Logs Parser ······························· |xcodebuild.xcode_logs.parser|
 Logs Panel ······································· |xcodebuild.xcode_logs.panel|
 Project Configuration ······························ |xcodebuild.project.config|
 App Data ·········································· |xcodebuild.project.appdata|
 Project Builder ··································· |xcodebuild.project.builder|
+Project Manager ··································· |xcodebuild.project.manager|
 Device ············································ |xcodebuild.platform.device|
 Device Proxy ································ |xcodebuild.platform.device_proxy|
 Autocommand Events ···························· |xcodebuild.broadcasting.events|
@@ -31,8 +33,12 @@ Test Search ··································
 Snapshot Tests ···································· |xcodebuild.tests.snapshots|
 Code Coverage ······························ |xcodebuild.code_coverage.coverage|
 Code Coverage Report ························· |xcodebuild.code_coverage.report|
+DAP Integration ·································· |xcodebuild.integrations.dap|
+Remote Debugger Integration ·········· |xcodebuild.integrations.remote_debugger|
+LSP Integration ·································· |xcodebuild.integrations.lsp|
+nvim-tree Integration ······················ |xcodebuild.integrations.nvim_tree|
 Pickers ················································ |xcodebuild.ui.pickers|
-General Helpers ··········································· |xcodebuild.helpers|
+Helpers ··················································· |xcodebuild.helpers|
 Lua Utils ···················································· |xcodebuild.util|
 
 ==============================================================================
@@ -760,7 +766,7 @@ PlatformId                                     *xcodebuild.constants.PlatformId*
     ("macOS")          macOS
 
 
-Platform                                         *xcodebuild.constants.Platform*
+PlatformConstants                       *xcodebuild.constants.PlatformConstants*
   Platform constants.
 
   Fields: ~
@@ -771,9 +777,10 @@ Platform                                         *xcodebuild.constants.Platform*
 
 M.Platform                                       *xcodebuild.constants.Platform*
   Platform type enum.
+  This is returned by `xcodebuild` commands.
 
   Type: ~
-    (Platform)
+    (PlatformConstants)
 
 
 ==============================================================================
@@ -822,6 +829,396 @@ M.set({report})                                   *xcodebuild.core.quickfix.set*
 
   See: ~
     |xcodebuild.xcode_logs.parser.ParsedReport|
+
+
+==============================================================================
+Xcodebuild Wrapper                                       *xcodebuild.core.xcode*
+
+This module contains the wrapper for the `xcodebuild` tool.
+
+It is used to interact with the Xcode project and perform various actions.
+
+TargetMap                                      *xcodebuild.core.xcode.TargetMap*
+  Hash map of targets to list of file paths.
+
+  Type: ~
+    table<string,string[]>
+
+
+XcodeDevice                                  *xcodebuild.core.xcode.XcodeDevice*
+
+  Fields: ~
+    {platform}  (string|nil)
+    {variant}   (string|nil)
+    {arch}      (string|nil)
+    {id}        (string|nil)
+    {name}      (string|nil)
+    {os}        (string|nil)
+    {error}     (string|nil)
+
+
+XcodeProjectInfo                        *xcodebuild.core.xcode.XcodeProjectInfo*
+
+  Fields: ~
+    {configs}  (string[])
+    {targets}  (string[])
+    {schemes}  (string[])
+
+
+XcodeBuildOptions                      *xcodebuild.core.xcode.XcodeBuildOptions*
+
+  Fields: ~
+    {buildForTesting}  (boolean|nil)
+    {clean}            (boolean|nil)
+    {projectCommand}   (string)
+    {scheme}           (string)
+    {destination}      (string)
+    {config}           (string)
+    {extraBuildArgs}   (string|nil)
+    {on_stdout}        (function)
+    {on_stderr}        (fun(_:any,output:string[],_:any))
+    {on_exit}          (fun(_:any,code:number,_:any))
+
+
+XcodeTestOptions                        *xcodebuild.core.xcode.XcodeTestOptions*
+
+  Fields: ~
+    {withoutBuilding}  (boolean|nil)
+    {projectCommand}   (string)
+    {scheme}           (string)
+    {destination}      (string)
+    {config}           (string)
+    {testPlan}         (string)
+    {testsToRun}       (string[]|nil)
+    {extraTestArgs}    (string|nil)
+    {on_stdout}        (function)
+    {on_stderr}        (fun(_:any,output:string[],_:any))
+    {on_exit}          (fun(_:any,code:number,_:any))
+
+
+                                   *xcodebuild.core.xcode.XcodeEnumerateOptions*
+XcodeEnumerateOptions
+
+  Fields: ~
+    {projectCommand}  (string)
+    {scheme}          (string)
+    {destination}     (string)
+    {config}          (string)
+    {testPlan}        (string)
+    {extraTestArgs}   (string|nil)
+
+
+XcodeBuildSettings                    *xcodebuild.core.xcode.XcodeBuildSettings*
+
+  Fields: ~
+    {appPath}      (string)
+    {productName}  (string)
+    {bundleId}     (string)
+
+
+                                     *xcodebuild.core.xcode.get_targets_filemap*
+M.get_targets_filemap({appPath})
+  Returns a map of targets to list of file paths based on
+  the `SwiftFileList` files in the build directory.
+
+  If the build directory is not found, it returns an empty map.
+
+  Parameters: ~
+    {appPath}  (string)
+
+  Returns: ~
+    (TargetMap)
+
+
+                                        *xcodebuild.core.xcode.get_destinations*
+M.get_destinations({projectCommand}, {scheme}, {callback})
+  Returns the list of devices which match project requirements.
+
+  Parameters: ~
+    {projectCommand}  (string)
+    {scheme}          (string)
+    {callback}        (fun(destinations:XcodeDevice[]))
+
+  Returns: ~
+    (number)   job id
+
+
+                                             *xcodebuild.core.xcode.get_schemes*
+M.get_schemes({projectCommand}, {callback})
+  Returns the list of schemes for the given project.
+
+  Parameters: ~
+    {projectCommand}  (string)
+    {callback}        (fun(schemes:string[]))
+
+  Returns: ~
+    (number)   job id
+
+
+                                 *xcodebuild.core.xcode.get_project_information*
+M.get_project_information({xcodeproj}, {callback})
+  Returns the list of project information including schemes, configs, and
+  targets for the given {xcodeproj}.
+
+  Parameters: ~
+    {xcodeproj}  (string)
+    {callback}   (fun(settings:XcodeProjectInfo[]))
+
+  Returns: ~
+    (number)   job id
+
+
+                                           *xcodebuild.core.xcode.get_testplans*
+M.get_testplans({projectCommand}, {scheme}, {callback})
+  Returns the list of test plans for the given project.
+
+  Parameters: ~
+    {projectCommand}  (string)
+    {scheme}          (string)
+    {callback}        (fun(testPlans:string[]))
+
+  Returns: ~
+    (number)   job id
+
+
+M.build_project({opts})                    *xcodebuild.core.xcode.build_project*
+  Builds the project with the given options.
+
+  Parameters: ~
+    {opts}  (XcodeBuildOptions)
+
+  Returns: ~
+    (number)   job id
+
+
+                                      *xcodebuild.core.xcode.get_build_settings*
+M.get_build_settings({platform}, {projectCommand}, {scheme}, {config}, {callback})
+  Returns the build settings for the given project.
+  If one of the settings is not found, it will send an error notification.
+
+  Parameters: ~
+    {platform}        (string)
+    {projectCommand}  (string)
+    {scheme}          (string)
+    {config}          (string)
+    {callback}        (fun(settings:XcodeBuildSettings))
+
+  Returns: ~
+    (number)   job id
+
+
+                                             *xcodebuild.core.xcode.install_app*
+M.install_app({platform}, {destination}, {appPath}, {callback})
+  Installs the application on the given platform and destination.
+
+  Parameters: ~
+    {platform}     (string)
+    {destination}  (string)
+    {appPath}      (string)
+    {callback}     (function|nil)
+
+  Returns: ~
+    (number)   job id
+
+
+                                   *xcodebuild.core.xcode.install_app_on_device*
+M.install_app_on_device({destination}, {appPath}, {callback})
+  Installs the application on device.
+
+  Parameters: ~
+    {destination}  (string)
+    {appPath}      (string)
+    {callback}     (function|nil)
+
+  Returns: ~
+    (number)   job id
+
+
+                                *xcodebuild.core.xcode.install_app_on_simulator*
+M.install_app_on_simulator({destination}, {appPath}, {callback})
+  Installs the application on simulator.
+
+  Parameters: ~
+    {destination}  (string)
+    {appPath}      (string)
+    {callback}     (function|nil)
+
+  Returns: ~
+    (number)   job id
+
+
+                                    *xcodebuild.core.xcode.launch_app_on_device*
+M.launch_app_on_device({destination}, {bundleId}, {callback})
+  Launches the application on device.
+
+  Parameters: ~
+    {destination}  (string)
+    {bundleId}     (string)
+    {callback}     (function|nil)
+
+  Returns: ~
+    (number)   job id
+
+
+                                 *xcodebuild.core.xcode.launch_app_on_simulator*
+M.launch_app_on_simulator({destination}, {bundleId}, {waitForDebugger}, {callback})
+  Launches the application on simulator.
+  It also streams logs to file and DAP console.
+
+  Parameters: ~
+    {destination}      (string)
+    {bundleId}         (string)
+    {waitForDebugger}  (boolean)
+    {callback}         (function|nil)
+
+  Returns: ~
+    (number)   job id
+
+
+                                              *xcodebuild.core.xcode.launch_app*
+M.launch_app({platform}, {destination}, {bundleId}, {waitForDebugger}, {callback})
+  Launches the application on the given platform and destination.
+
+  Parameters: ~
+    {platform}         (string)
+    {destination}      (string)
+    {bundleId}         (string)
+    {waitForDebugger}  (boolean)
+    {callback}         (function|nil)
+
+
+                                          *xcodebuild.core.xcode.boot_simulator*
+M.boot_simulator({destination}, {callback})
+  Boots the simulator and launches the Simulator app if needed.
+
+  Parameters: ~
+    {destination}  (string)
+    {callback}     (function|nil)
+
+  Returns: ~
+    (number)   job id
+
+
+                            *xcodebuild.core.xcode.uninstall_app_from_simulator*
+M.uninstall_app_from_simulator({destination}, {bundleId}, {callback})
+  Uninstalls the application from simulator.
+
+  Parameters: ~
+    {destination}  (string)
+    {bundleId}     (string)
+    {callback}     (function|nil)
+
+  Returns: ~
+    (number)   job id
+
+
+                               *xcodebuild.core.xcode.uninstall_app_from_device*
+M.uninstall_app_from_device({destination}, {bundleId}, {callback})
+  Uninstalls the application from device.
+
+  Parameters: ~
+    {destination}  (string)
+    {bundleId}     (string)
+    {callback}     (function|nil)
+
+  Returns: ~
+    (number)   job id
+
+
+                                           *xcodebuild.core.xcode.uninstall_app*
+M.uninstall_app({platform}, {destination}, {bundleId}, {callback})
+  Uninstalls the application on the given platform and destination.
+
+  Parameters: ~
+    {platform}     (string)
+    {destination}  (string)
+    {bundleId}     (string)
+    {callback}     (function|nil)
+
+  Returns: ~
+    (number)   job id
+
+
+M.get_app_pid({productName})                 *xcodebuild.core.xcode.get_app_pid*
+  Gets the pid of the application.
+  Works only with simulator.
+
+  Parameters: ~
+    {productName}  (string)
+
+  Returns: ~
+    (number|nil)   pid
+
+
+M.kill_app({productName}, {callback})           *xcodebuild.core.xcode.kill_app*
+  Kills the application.
+  Works only with simulator.
+
+  Parameters: ~
+    {productName}  (string)
+    {callback}     (function|nil)
+
+
+                                       *xcodebuild.core.xcode.get_code_coverage*
+M.get_code_coverage({archive}, {filepath}, {callback})
+  Gets the code coverage for the given {filepath}.
+
+  Parameters: ~
+    {archive}   (string)
+    {filepath}  (string) # file to check
+    {callback}  (fun(coverageData:string[]))
+
+  Returns: ~
+    (number)   job id
+
+
+                                    *xcodebuild.core.xcode.export_code_coverage*
+M.export_code_coverage({xcresultPath}, {outputPath}, {callback})
+  Exports the code coverage from the given {xcresultPath} to the {outputPath}.
+
+  Parameters: ~
+    {xcresultPath}  (string)
+    {outputPath}    (string)
+    {callback}      (function|nil)
+
+  Returns: ~
+    (number)   job id
+
+
+M.enumerate_tests({opts}, {callback})    *xcodebuild.core.xcode.enumerate_tests*
+  Returns the list of tests for the given project.
+
+  Parameters: ~
+    {opts}      (XcodeEnumerateOptions)
+    {callback}  (fun(tests:XcodeTest[]))
+
+  Returns: ~
+    (number)   job id
+
+
+                             *xcodebuild.core.xcode.export_code_coverage_report*
+M.export_code_coverage_report({xcresultPath}, {outputPath}, {callback})
+  Exports the code coverage report from the given {xcresultPath}
+  to the {outputPath}.
+  Reports is exported in the JSON format.
+
+  Parameters: ~
+    {xcresultPath}  (string)
+    {outputPath}    (string)
+    {callback}      (function|nil)
+
+  Returns: ~
+    (number)   job id
+
+
+M.run_tests({opts})                            *xcodebuild.core.xcode.run_tests*
+  Runs tests with the given options.
+
+  Parameters: ~
+    {opts}  (XcodeTestOptions)
+
+  Returns: ~
+    (number)   job id
 
 
 ==============================================================================
@@ -1220,6 +1617,169 @@ M.build_project({opts}, {callback})   *xcodebuild.project.builder.build_project*
 M.clean_derived_data()
   Cleans the `DerivedData` folder.
   It will ask for confirmation before deleting it.
+
+
+==============================================================================
+Project Manager                                     *xcodebuild.project.manager*
+
+                                                    *xcodebuild.project-manager*
+This module is responsible for managing the project files and groups.
+
+It uses the `xcodeproj` tool to update the Xcode project file.
+
+In general, all functions that take paths as arguments, they don't
+change files on disk. These without arguments are interactive and
+perform changes on disk too.
+
+All actions send notifications to the user.
+
+See: https://github.com/CocoaPods/Xcodeproj
+
+                                    *xcodebuild.project.manager.create_new_file*
+M.create_new_file()
+  Creates a new file in the project and on disk.
+  It asks for the file name and creates it in the current directory.
+  It also asks the user to select targets.
+
+
+                                *xcodebuild.project.manager.add_file_to_targets*
+M.add_file_to_targets({filepath}, {targets})
+  Adds the file to the selected targets.
+
+  Parameters: ~
+    {filepath}  (string)
+    {targets}   (string[])
+
+
+                                *xcodebuild.project.manager.get_project_targets*
+M.get_project_targets()
+  Returns all project targets.
+
+  Returns: ~
+    (string[]|nil)
+
+
+M.add_file({filepath})                     *xcodebuild.project.manager.add_file*
+  Adds the file to project.
+  Asks the user to select the targets.
+
+  Parameters: ~
+    {filepath}  (string)
+
+
+                                   *xcodebuild.project.manager.add_current_file*
+M.add_current_file()
+  Adds the current file to the selected targets.
+  Ask the user to select the targets.
+
+
+                                          *xcodebuild.project.manager.move_file*
+M.move_file({oldFilePath}, {newFilePath})
+  Moves the file to the new path in the project.
+
+  Parameters: ~
+    {oldFilePath}  (string)
+    {newFilePath}  (string)
+
+
+                                        *xcodebuild.project.manager.rename_file*
+M.rename_file({oldFilePath}, {newFilePath})
+  Renames the file in the project.
+
+  Parameters: ~
+    {oldFilePath}  (string)
+    {newFilePath}  (string)
+
+
+                                *xcodebuild.project.manager.rename_current_file*
+M.rename_current_file()
+  Renames the current file in the project and on disk.
+  Asks the user for the new file name.
+
+
+M.delete_file({filepath})               *xcodebuild.project.manager.delete_file*
+  Deletes the file from the project.
+
+  Parameters: ~
+    {filepath}  (string)
+
+
+                                *xcodebuild.project.manager.delete_current_file*
+M.delete_current_file()
+  Deletes the current file from the project and disk.
+  Asks the user for confirmation.
+
+
+                                   *xcodebuild.project.manager.create_new_group*
+M.create_new_group()
+  Creates a new group in the project and on disk.
+  Asks the user for the group name.
+
+
+M.add_group({path}, {opts})               *xcodebuild.project.manager.add_group*
+  Adds the group to the project.
+
+  Parameters: ~
+    {path}  (string)
+    {opts}  (table|nil)
+            * silent (boolean): If true, it doesn't send a notification.
+
+
+                                  *xcodebuild.project.manager.add_current_group*
+M.add_current_group()
+  Adds the current group to the project.
+
+
+                                       *xcodebuild.project.manager.rename_group*
+M.rename_group({oldGroupPath}, {newGroupPath})
+  Renames the group in the project.
+
+  Parameters: ~
+    {oldGroupPath}  (string)
+    {newGroupPath}  (string)
+
+
+                               *xcodebuild.project.manager.rename_current_group*
+M.rename_current_group()
+  Renames the current group in the project and on disk.
+  Asks the user for the new group name.
+
+
+                               *xcodebuild.project.manager.move_or_rename_group*
+M.move_or_rename_group({oldGroupPath}, {newGroupPath})
+  Moves or renames the group in the project.
+  If the group name is the same, it moves the group.
+  If the group name is different, it renames the group.
+
+  Parameters: ~
+    {oldGroupPath}  (string)
+    {newGroupPath}  (string)
+
+
+M.delete_group()                       *xcodebuild.project.manager.delete_group*
+  Deletes the group from the project.
+
+
+                               *xcodebuild.project.manager.delete_current_group*
+M.delete_current_group()
+  Deletes the current group from the project and disk.
+  Asks the user for confirmation.
+
+
+                        *xcodebuild.project.manager.update_current_file_targets*
+M.update_current_file_targets()
+  Updates the file targets in the project.
+  Asks the user to select the targets.
+
+
+                          *xcodebuild.project.manager.show_current_file_targets*
+M.show_current_file_targets()
+  Shows the targets for the current file.
+
+
+                                 *xcodebuild.project.manager.show_action_picker*
+M.show_action_picker()
+  Shows the action picker with all available actions.
 
 
 ==============================================================================
@@ -2309,6 +2869,297 @@ M.setup()                                *xcodebuild.code_coverage.report.setup*
 
 
 ==============================================================================
+DAP Integration                                    *xcodebuild.integrations.dap*
+
+                                                                *xcodebuild.dap*
+This module is responsible for the integration with `nvim-dap` plugin.
+
+It provides functions to start the debugger and to manage its state.
+
+To configure `nvim-dap` for development:
+
+  1. Download codelldb VS Code plugin from: https://github.com/vadimcn/codelldb/releases
+     For macOS use darwin version. Just unzip vsix file and set paths below.
+  2. Install also nvim-dap-ui for a nice GUI to debug.
+  3. Make sure to enable console window from nvim-dap-ui to see simulator logs.
+
+Sample `nvim-dap` configuration:
+>lua
+    return {
+      "mfussenegger/nvim-dap",
+      dependencies = {
+        "wojciech-kulik/xcodebuild.nvim"
+      },
+      config = function()
+        local dap = require("dap")
+        local xcodebuild = require("xcodebuild.integrations.dap")
+
+        dap.configurations.swift = {
+          {
+            name = "iOS App Debugger",
+            type = "codelldb",
+            request = "attach",
+            program = xcodebuild.get_program_path,
+            cwd = "${workspaceFolder}",
+            stopOnEntry = false,
+            waitFor = true,
+          },
+        }
+
+        dap.adapters.codelldb = {
+          type = "server",
+          port = "13000",
+          executable = {
+            -- set path to the downloaded codelldb
+            -- sample path: "/Users/YOU/Downloads/codelldb-aarch64-darwin/extension/adapter/codelldb"
+            command = "/path/to/codelldb/extension/adapter/codelldb",
+            args = {
+              "--port",
+              "13000",
+              "--liblldb",
+              -- make sure that this path is correct on your side
+              "/Applications/Xcode.app/Contents/SharedFrameworks/LLDB.framework/Versions/A/LLDB",
+            },
+          },
+        }
+
+        -- disables annoying warning that requires hitting enter
+        local orig_notify = require("dap.utils").notify
+        require("dap.utils").notify = function(msg, log_level)
+          if not string.find(msg, "Either the adapter is slow") then
+            orig_notify(msg, log_level)
+          end
+        end
+
+        -- sample keymaps to debug application
+        vim.keymap.set("n", "<leader>dd", xcodebuild.build_and_debug, { desc = "Build & Debug" })
+        vim.keymap.set("n", "<leader>dr", xcodebuild.debug_without_build, { desc = "Debug Without Building" })
+        vim.keymap.set("n", "<leader>dt", xcodebuild.debug_tests, { desc = "Debug Tests" })
+
+        -- you can also debug smaller scope tests:
+        -- debug_target_tests, debug_class_tests, debug_func_test,
+        -- debug_selected_tests, debug_failing_tests
+      end,
+    }
+<
+
+See:
+https://github.com/mfussenegger/nvim-dap
+https://github.com/rcarriga/nvim-dap-ui
+https://github.com/vadimcn/codelldb
+
+                         *xcodebuild.integrations.dap.start_dap_in_swift_buffer*
+M.start_dap_in_swift_buffer({remote})
+  Starts the debugger in the Swift buffer.
+  `dap.continue()` takes the configuration that matches the
+  file type of the buffer. That's why this function tries to
+  find a Swift buffer and starts the debugger in it.
+
+  Parameters: ~
+    {remote}  (boolean|nil) # if true, starts the remote debugger
+
+
+                                   *xcodebuild.integrations.dap.build_and_debug*
+M.build_and_debug({callback})
+  Builds, installs and runs the project. Also, it starts the debugger.
+
+  Parameters: ~
+    {callback}  (function|nil)
+
+
+                               *xcodebuild.integrations.dap.debug_without_build*
+M.debug_without_build({callback})
+  It only installs the app and starts the debugger without building
+  the project.
+
+  Parameters: ~
+    {callback}  (function|nil)
+
+
+                         *xcodebuild.integrations.dap.attach_debugger_for_tests*
+M.attach_debugger_for_tests()
+  Attaches the debugger to the running application when tests are starting.
+
+  Tests are controller by `xcodebuild` tool, so we can't request waiting
+  for the debugger to attach. Instead, we listen to the
+  `XcodebuildTestsStatus` to start the debugger.
+
+  When `XcodebuildTestsFinished` or `XcodebuildActionCancelled` is received,
+  we terminate the debugger session.
+  If build failed, we stop waiting for events.
+
+
+M.debug_tests()                        *xcodebuild.integrations.dap.debug_tests*
+  Starts the debugger and runs all tests.
+
+
+                                *xcodebuild.integrations.dap.debug_target_tests*
+M.debug_target_tests()
+  Starts the debugger and runs all tests in the target.
+
+
+                                 *xcodebuild.integrations.dap.debug_class_tests*
+M.debug_class_tests()
+  Starts the debugger and runs all tests in the class.
+
+
+                                   *xcodebuild.integrations.dap.debug_func_test*
+M.debug_func_test()
+  Starts the debugger and runs the current test.
+
+
+                              *xcodebuild.integrations.dap.debug_selected_tests*
+M.debug_selected_tests()
+  Starts the debugger and runs the selected tests.
+
+
+                               *xcodebuild.integrations.dap.debug_failing_tests*
+M.debug_failing_tests()
+  Starts the debugger and re-runs the failing tests.
+
+
+                                  *xcodebuild.integrations.dap.get_program_path*
+M.get_program_path()
+  Returns path to the built application.
+
+  Returns: ~
+    (string)
+
+
+M.wait_for_pid()                      *xcodebuild.integrations.dap.wait_for_pid*
+  Waits for the application to start and returns its PID.
+
+  Returns: ~
+    (thread|nil)   coroutine with pid
+
+
+                                     *xcodebuild.integrations.dap.clear_console*
+M.clear_console()
+  Clears the DAP console buffer.
+
+
+                                    *xcodebuild.integrations.dap.update_console*
+M.update_console({output}, {append})
+  Updates the DAP console buffer with the given output.
+  It also automatically scrolls to the last line if
+  the cursor is in a different window or if the cursor
+  is not on the last line.
+
+  Parameters: ~
+    {output}  (string[])
+    {append}  (boolean|nil) # if true, appends the output to the last line
+
+
+==============================================================================
+Remote Debugger Integration            *xcodebuild.integrations.remote_debugger*
+
+This module is responsible for the integration of `phymobiledevice3`
+debug session with `nvim-dap`. It enables debugging on physical devices.
+
+The module listens to `nvim-dap` events and starts the remote debugger.
+
+See |xcodebuild.requirements|
+
+
+                    *xcodebuild.integrations.remote_debugger.RemoteDebuggerMode*
+RemoteDebuggerMode
+   1 - Legacy mode (iOS <17)
+   2 - Secured mode (iOS 17+)
+
+  Type: ~
+    number
+
+
+                                  *xcodebuild.integrations.remote_debugger.mode*
+M.mode
+  The current mode of the remote debugger.
+
+  Type: ~
+    (RemoteDebuggerMode)
+
+
+                              *xcodebuild.integrations.remote_debugger.set_mode*
+M.set_mode({mode})
+  Sets the mode of the remote debugger.
+  Use `M.LEGACY_MODE` or `M.SECURED_MODE`.
+
+  Parameters: ~
+    {mode}  (RemoteDebuggerMode)
+
+
+                             *xcodebuild.integrations.remote_debugger.start_dap*
+M.start_dap()
+  Starts nvim-dap session. It connects to `codelldb`.
+
+
+                 *xcodebuild.integrations.remote_debugger.start_remote_debugger*
+M.start_remote_debugger({callback})
+  Starts the remote debugger based on the mode.
+
+  Parameters: ~
+    {callback}  (function|nil)
+
+
+                  *xcodebuild.integrations.remote_debugger.stop_remote_debugger*
+M.stop_remote_debugger()
+  Stops the remote debugger based on the mode.
+
+
+==============================================================================
+LSP Integration                                    *xcodebuild.integrations.lsp*
+
+This module is responsible for the integration with LSP.
+It provides functions, which fix issues with code actions in Swift.
+
+`sourcekit-lsp` requires from the provided range to match exactly the issue
+location. Neovim by default sends the current cursor position. Because of
+that, code actions won't appear unless you put the cursor in the right place.
+
+Functions from this module find the diagnostic for the current line and
+send the correct range to the LSP server.
+
+                                     *xcodebuild.integrations.lsp.quickfix_line*
+M.quickfix_line()
+  Calls code action for the current line.
+  If one code action is available, it will apply the fix.
+  If more than one code action is available, it will show the list.
+  If no code action is available, nothing will happen.
+
+
+M.code_actions()                      *xcodebuild.integrations.lsp.code_actions*
+  Shows code actions for the current line.
+  If no code action is available, nothing will happen.
+
+
+==============================================================================
+nvim-tree Integration                        *xcodebuild.integrations.nvim_tree*
+
+This module is responsible for the integration with `nvim-tree`.
+It listens to `nvim-tree` events and updates the project file accordingly.
+
+The integrations is enabled only if the current working directory
+contains the project configuration (|xcodebuild.project.config|).
+
+You can always disable the integration in the |xcodebuild.config|.
+
+This feature requires `xcodeproj` to be installed (|xcodebuild.requirements|).
+
+See:
+|xcodebuild.project-manager|
+https://github.com/nvim-tree/nvim-tree.lua
+https://github.com/wojciech-kulik/xcodebuild.nvim#-nvim-tree-integration
+
+
+M.setup()                              *xcodebuild.integrations.nvim_tree.setup*
+  Sets up the integration with `nvim-tree`.
+  It subscribes to `nvim-tree` events and updates
+  the project file accordingly.
+
+  See: ~
+    |xcodebuild.project-manager|
+
+
+==============================================================================
 Pickers                                                  *xcodebuild.ui.pickers*
 
                                                             *xcodebuild.pickers*
@@ -2419,7 +3270,7 @@ M.show_all_actions()                    *xcodebuild.ui.pickers.show_all_actions*
 
 
 ==============================================================================
-General Helpers                                             *xcodebuild.helpers*
+Helpers                                                     *xcodebuild.helpers*
 
 This module contains general helper functions used across the plugin.
 

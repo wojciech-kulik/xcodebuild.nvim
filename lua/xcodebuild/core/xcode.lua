@@ -1,3 +1,65 @@
+---@mod xcodebuild.core.xcode Xcodebuild Wrapper
+---@brief [[
+---This module contains the wrapper for the `xcodebuild` tool.
+---
+---It is used to interact with the Xcode project and perform various actions.
+---@brief ]]
+
+---Hash map of targets to list of file paths.
+---@alias TargetMap table<string, string[]>
+
+---@class XcodeDevice
+---@field platform string|nil
+---@field variant string|nil
+---@field arch string|nil
+---@field id string|nil
+---@field name string|nil
+---@field os string|nil
+---@field error string|nil
+
+---@class XcodeProjectInfo
+---@field configs string[]
+---@field targets string[]
+---@field schemes string[]
+
+---@class XcodeBuildOptions
+---@field buildForTesting boolean|nil
+---@field clean boolean|nil
+---@field projectCommand string
+---@field scheme string
+---@field destination string
+---@field config string
+---@field extraBuildArgs string|nil
+---@field on_stdout function
+---@field on_stderr fun(_, output: string[], _)
+---@field on_exit fun(_, code: number, _)
+
+---@class XcodeTestOptions
+---@field withoutBuilding boolean|nil
+---@field projectCommand string
+---@field scheme string
+---@field destination string
+---@field config string
+---@field testPlan string
+---@field testsToRun string[]|nil
+---@field extraTestArgs string|nil
+---@field on_stdout function
+---@field on_stderr fun(_, output: string[], _)
+---@field on_exit fun(_, code: number, _)
+
+---@class XcodeEnumerateOptions
+---@field projectCommand string
+---@field scheme string
+---@field destination string
+---@field config string
+---@field testPlan string
+---@field extraTestArgs string|nil
+
+---@class XcodeBuildSettings
+---@field appPath string
+---@field productName string
+---@field bundleId string
+
 local util = require("xcodebuild.util")
 local notifications = require("xcodebuild.broadcasting.notifications")
 local constants = require("xcodebuild.core.constants")
@@ -5,12 +67,19 @@ local constants = require("xcodebuild.core.constants")
 local M = {}
 local CANCELLED_CODE = 143
 
+---Sends the stderr output as an error notification.
+---@param _ number
+---@param output string[]
 local function show_stderr_output(_, output)
   if output and (#output > 1 or output[1] ~= "") then
     notifications.send_error(table.concat(output, "\n"))
   end
 end
 
+---Sends the callback or an error notification based on the exit code.
+---@param action string
+---@param callback function|nil
+---@return fun(_, number, _)
 local function callback_or_error(action, callback)
   return function(_, code, _)
     if code ~= 0 then
@@ -21,6 +90,10 @@ local function callback_or_error(action, callback)
   end
 end
 
+---Gets the coverage item id from the xcresult file.
+---It is used to extract code coverage from the xcresult file.
+---@param xcresultPath string
+---@param callback fun(coverageId: string|nil)
 local function get_coverage_item_id(xcresultPath, callback)
   local command = "xcrun xcresulttool get --format json --path '" .. xcresultPath .. "'"
 
@@ -46,11 +119,10 @@ local function get_coverage_item_id(xcresultPath, callback)
   })
 end
 
----Hash map of targets to list of file paths.
----@alias TargetMap table<string, string[]>
-
 ---Returns a map of targets to list of file paths based on
 ---the `SwiftFileList` files in the build directory.
+---
+---If the build directory is not found, it returns an empty map.
 ---@param appPath string
 ---@return TargetMap
 function M.get_targets_filemap(appPath)
@@ -93,6 +165,11 @@ function M.get_targets_filemap(appPath)
   return targetsFilesMap
 end
 
+---Returns the list of devices which match project requirements.
+---@param projectCommand string
+---@param scheme string
+---@param callback fun(destinations: XcodeDevice[])
+---@return number # job id
 function M.get_destinations(projectCommand, scheme, callback)
   local command = "xcodebuild -showdestinations " .. projectCommand .. " -scheme '" .. scheme .. "'"
 
@@ -130,6 +207,10 @@ function M.get_destinations(projectCommand, scheme, callback)
   })
 end
 
+---Returns the list of schemes for the given project.
+---@param projectCommand string
+---@param callback fun(schemes: string[])
+---@return number # job id
 function M.get_schemes(projectCommand, callback)
   local command = "xcodebuild " .. projectCommand .. " -list"
 
@@ -156,6 +237,11 @@ function M.get_schemes(projectCommand, callback)
   })
 end
 
+---Returns the list of project information including schemes, configs, and
+---targets for the given {xcodeproj}.
+---@param xcodeproj string
+---@param callback fun(settings: XcodeProjectInfo[])
+---@return number # job id
 function M.get_project_information(xcodeproj, callback)
   local command = "xcodebuild -project '" .. xcodeproj .. "' -list"
 
@@ -201,6 +287,11 @@ function M.get_project_information(xcodeproj, callback)
   })
 end
 
+---Returns the list of test plans for the given project.
+---@param projectCommand string
+---@param scheme string
+---@param callback fun(testPlans: string[])
+---@return number # job id
 function M.get_testplans(projectCommand, scheme, callback)
   local command = "xcodebuild test " .. projectCommand .. " -scheme '" .. scheme .. "' -showTestPlans"
 
@@ -227,7 +318,12 @@ function M.get_testplans(projectCommand, scheme, callback)
   })
 end
 
+---Builds the project with the given options.
+---@param opts XcodeBuildOptions
+---@return number # job id
 function M.build_project(opts)
+  opts.extraBuildArgs = opts.extraBuildArgs or ""
+
   -- stylua: ignore
   local action = opts.buildForTesting and "build-for-testing " or "build "
   local command = "xcodebuild "
@@ -253,6 +349,14 @@ function M.build_project(opts)
   })
 end
 
+---Returns the build settings for the given project.
+---If one of the settings is not found, it will send an error notification.
+---@param platform string
+---@param projectCommand string
+---@param scheme string
+---@param config string
+---@param callback fun(settings: XcodeBuildSettings)
+---@return number # job id
 function M.get_build_settings(platform, projectCommand, scheme, config, callback)
   local sdk = "iphonesimulator"
   if platform == constants.Platform.MACOS then
@@ -318,6 +422,12 @@ function M.get_build_settings(platform, projectCommand, scheme, config, callback
   })
 end
 
+---Installs the application on the given platform and destination.
+---@param platform string
+---@param destination string
+---@param appPath string
+---@param callback function|nil
+---@return number # job id
 function M.install_app(platform, destination, appPath, callback)
   if platform == constants.Platform.IOS_PHYSICAL_DEVICE then
     return M.install_app_on_device(destination, appPath, callback)
@@ -326,6 +436,11 @@ function M.install_app(platform, destination, appPath, callback)
   end
 end
 
+---Installs the application on device.
+---@param destination string
+---@param appPath string
+---@param callback function|nil
+---@return number # job id
 function M.install_app_on_device(destination, appPath, callback)
   local appdata = require("xcodebuild.project.appdata")
   appdata.clear_app_logs()
@@ -339,6 +454,11 @@ function M.install_app_on_device(destination, appPath, callback)
   })
 end
 
+---Installs the application on simulator.
+---@param destination string
+---@param appPath string
+---@param callback function|nil
+---@return number # job id
 function M.install_app_on_simulator(destination, appPath, callback)
   local command = "xcrun simctl install '" .. destination .. "' '" .. appPath .. "'"
 
@@ -357,6 +477,11 @@ function M.install_app_on_simulator(destination, appPath, callback)
   })
 end
 
+---Launches the application on device.
+---@param destination string
+---@param bundleId string
+---@param callback function|nil
+---@return number # job id
 function M.launch_app_on_device(destination, bundleId, callback)
   local command = "xcrun devicectl device process launch --terminate-existing -d '"
     .. destination
@@ -370,6 +495,13 @@ function M.launch_app_on_device(destination, bundleId, callback)
   })
 end
 
+---Launches the application on simulator.
+---It also streams logs to file and DAP console.
+---@param destination string
+---@param bundleId string
+---@param waitForDebugger boolean
+---@param callback function|nil
+---@return number # job id
 function M.launch_app_on_simulator(destination, bundleId, waitForDebugger, callback)
   local command = "xcrun simctl launch --terminate-running-process --console-pty"
     .. (waitForDebugger and " --wait-for-debugger" or "")
@@ -408,6 +540,12 @@ function M.launch_app_on_simulator(destination, bundleId, waitForDebugger, callb
   })
 end
 
+---Launches the application on the given platform and destination.
+---@param platform string
+---@param destination string
+---@param bundleId string
+---@param waitForDebugger boolean
+---@param callback function|nil
 function M.launch_app(platform, destination, bundleId, waitForDebugger, callback)
   if platform == constants.Platform.IOS_PHYSICAL_DEVICE then
     M.launch_app_on_device(destination, bundleId, callback)
@@ -416,6 +554,10 @@ function M.launch_app(platform, destination, bundleId, waitForDebugger, callback
   end
 end
 
+---Boots the simulator and launches the Simulator app if needed.
+---@param destination string
+---@param callback function|nil
+---@return number # job id
 function M.boot_simulator(destination, callback)
   local command = "xcrun simctl boot '" .. destination .. "' "
 
@@ -433,12 +575,17 @@ function M.boot_simulator(destination, callback)
           })
         end
 
-        callback()
+        util.call(callback)
       end
     end,
   })
 end
 
+---Uninstalls the application from simulator.
+---@param destination string
+---@param bundleId string
+---@param callback function|nil
+---@return number # job id
 function M.uninstall_app_from_simulator(destination, bundleId, callback)
   local command = "xcrun simctl uninstall '" .. destination .. "' " .. bundleId
 
@@ -448,6 +595,11 @@ function M.uninstall_app_from_simulator(destination, bundleId, callback)
   })
 end
 
+---Uninstalls the application from device.
+---@param destination string
+---@param bundleId string
+---@param callback function|nil
+---@return number # job id
 function M.uninstall_app_from_device(destination, bundleId, callback)
   local command = "xcrun devicectl device uninstall app -d  '" .. destination .. "' " .. bundleId
 
@@ -458,6 +610,12 @@ function M.uninstall_app_from_device(destination, bundleId, callback)
   })
 end
 
+---Uninstalls the application on the given platform and destination.
+---@param platform string
+---@param destination string
+---@param bundleId string
+---@param callback function|nil
+---@return number # job id
 function M.uninstall_app(platform, destination, bundleId, callback)
   if platform == constants.Platform.IOS_PHYSICAL_DEVICE then
     return M.uninstall_app_from_device(destination, bundleId, callback)
@@ -466,12 +624,20 @@ function M.uninstall_app(platform, destination, bundleId, callback)
   end
 end
 
+---Gets the pid of the application.
+---Works only with simulator.
+---@param productName string
+---@return number|nil # pid
 function M.get_app_pid(productName)
   local pid = util.shell("ps aux | grep '" .. productName .. ".app' | grep -v grep | awk '{ print$2 }'")
 
   return tonumber(pid and pid[1] or nil)
 end
 
+---Kills the application.
+---Works only with simulator.
+---@param productName string
+---@param callback function|nil
 function M.kill_app(productName, callback)
   -- TODO: kill on device with iOS 17
   local pid = M.get_app_pid(productName)
@@ -483,6 +649,11 @@ function M.kill_app(productName, callback)
   util.call(callback)
 end
 
+---Gets the code coverage for the given {filepath}.
+---@param archive string
+---@param filepath string # file to check
+---@param callback fun(coverageData: string[])
+---@return number # job id
 function M.get_code_coverage(archive, filepath, callback)
   local command = "xcrun xccov view --file '" .. filepath .. "' '" .. archive .. "'"
 
@@ -495,6 +666,11 @@ function M.get_code_coverage(archive, filepath, callback)
   })
 end
 
+---Exports the code coverage from the given {xcresultPath} to the {outputPath}.
+---@param xcresultPath string
+---@param outputPath string
+---@param callback function|nil
+---@return number # job id
 function M.export_code_coverage(xcresultPath, outputPath, callback)
   return get_coverage_item_id(xcresultPath, function(itemId)
     if not itemId then
@@ -526,10 +702,16 @@ function M.export_code_coverage(xcresultPath, outputPath, callback)
   end)
 end
 
+---Returns the list of tests for the given project.
+---@param opts XcodeEnumerateOptions
+---@param callback fun(tests: XcodeTest[])
+---@return number # job id
 function M.enumerate_tests(opts, callback)
   local appdata = require("xcodebuild.project.appdata")
   local outputPath = appdata.tests_filepath
   util.shell("rm -rf '" .. outputPath .. "'")
+
+  opts.extraTestArgs = opts.extraTestArgs or ""
 
   local command = "xcodebuild test-without-building"
     .. " -enumerate-tests"
@@ -568,10 +750,17 @@ function M.enumerate_tests(opts, callback)
   })
 end
 
+---Exports the code coverage report from the given {xcresultPath}
+---to the {outputPath}.
+---Reports is exported in the JSON format.
+---@param xcresultPath string
+---@param outputPath string
+---@param callback function|nil
+---@return number # job id
 function M.export_code_coverage_report(xcresultPath, outputPath, callback)
   local command = "xcrun xccov view --report --json '" .. xcresultPath .. "' > '" .. outputPath .. "'"
 
-  vim.fn.jobstart(command, {
+  return vim.fn.jobstart(command, {
     stdout_buffered = true,
     on_exit = function()
       util.call(callback)
@@ -579,6 +768,9 @@ function M.export_code_coverage_report(xcresultPath, outputPath, callback)
   })
 end
 
+---Runs tests with the given options.
+---@param opts XcodeTestOptions
+---@return number # job id
 function M.run_tests(opts)
   local action = opts.withoutBuilding and "test-without-building" or "test"
 

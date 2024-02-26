@@ -13,14 +13,14 @@ local M = {}
 ---| 'macOS' # macOS
 
 ---Platform constants.
----@class Platform
+---@class PlatformConstants
 ---@field IOS_PHYSICAL_DEVICE PlatformId physical iOS device (iPhone or iPad)
 ---@field IOS_SIMULATOR PlatformId iOS simulator (iPhone or iPad)
 ---@field MACOS PlatformId macOS
 
 ---Platform type enum.
 ---This is returned by `xcodebuild` commands.
----@type Platform
+---@type PlatformConstants
 M.Platform = {
   IOS_PHYSICAL_DEVICE = "iOS",
   IOS_SIMULATOR = "iOS Simulator",

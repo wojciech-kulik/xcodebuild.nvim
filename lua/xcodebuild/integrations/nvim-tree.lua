@@ -1,5 +1,28 @@
+---@mod xcodebuild.integrations.nvim_tree nvim-tree Integration
+---@brief [[
+---This module is responsible for the integration with `nvim-tree`.
+---It listens to `nvim-tree` events and updates the project file accordingly.
+---
+---The integrations is enabled only if the current working directory
+---contains the project configuration (|xcodebuild.project.config|).
+---
+---You can always disable the integration in the |xcodebuild.config|.
+---
+---This feature requires `xcodeproj` to be installed (|xcodebuild.requirements|).
+---
+---See:
+---|xcodebuild.project-manager|
+---https://github.com/nvim-tree/nvim-tree.lua
+---https://github.com/wojciech-kulik/xcodebuild.nvim#-nvim-tree-integration
+---
+---@brief ]]
+
 local M = {}
 
+---Sets up the integration with `nvim-tree`.
+---It subscribes to `nvim-tree` events and updates
+---the project file accordingly.
+---@see xcodebuild.project-manager
 function M.setup()
   local config = require("xcodebuild.core.config").options.integrations.nvim_tree
   if not config.enabled then
