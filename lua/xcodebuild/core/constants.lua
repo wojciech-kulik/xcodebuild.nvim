@@ -19,6 +19,7 @@ local M = {}
 ---@field MACOS PlatformId macOS
 
 ---Platform type enum.
+---This is returned by `xcodebuild` commands.
 ---@type Platform
 M.Platform = {
   IOS_PHYSICAL_DEVICE = "iOS",

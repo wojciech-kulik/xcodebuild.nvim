@@ -23,6 +23,7 @@
 
 local util = require("xcodebuild.util")
 local helpers = require("xcodebuild.helpers")
+local constants = require("xcodebuild.core.constants")
 local notifications = require("xcodebuild.broadcasting.notifications")
 local config = require("xcodebuild.core.config")
 local appdata = require("xcodebuild.project.appdata")
@@ -243,7 +244,7 @@ function M.should_use()
   end
 
   local majorVersion = helpers.get_major_os_version()
-  if settings.platform == "iOS" and majorVersion and majorVersion < 17 then
+  if settings.platform == constants.Platform.IOS_PHYSICAL_DEVICE and majorVersion and majorVersion < 17 then
     return true
   else
     return false
@@ -324,7 +325,7 @@ function M.get_connected_devices(callback)
             id = device.Identifier,
             name = device.DeviceName,
             os = device.ProductVersion,
-            platform = "iOS",
+            platform = constants.Platform.IOS_PHYSICAL_DEVICE,
           })
         end
       end
