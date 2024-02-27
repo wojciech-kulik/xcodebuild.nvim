@@ -1,4 +1,4 @@
-name: Linting, Style, Error Checking
+name: Quality Checks
 
 on:
   push:
@@ -12,44 +12,60 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Set up Homebrew
-        id: set-up-homebrew
-        uses: Homebrew/actions/setup-homebrew@master
       - name: Install
-        run: brew install luacheck
+        run: |
+          eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+          brew install luacheck
       - name: Lint
-        run: make lint
+        run: |
+          eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+          make lint
 
   format-check:
     name: Format Check
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Set up Homebrew
-        uses: Homebrew/actions/setup-homebrew@master
       - name: Install
-        run: brew install stylua
+        run: |
+          eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+          brew install stylua
       - name: Check
-        run: make format-check
+        run: |
+          eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+          make format-check
 
   lsp-check:
     name: LSP Error Check
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Set up Homebrew
-        uses: Homebrew/actions/setup-homebrew@master
       - name: Install
-        run: brew install lua-language-server
+        run: |
+          eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+          brew install lua-language-server
       - name: Check
-        run: make lsp-check
+        run: |
+          eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+          make lsp-check
 
   help-check:
     name: Help Check
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Prepare
+      - name: Cache cargo modules
+        uses: actions/cache@v4
+        id: cache-cargo
+        with:
+          path: |
+            ~/.cargo/bin/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+            ${{ runner.os }}-cargo-
+      - if: ${{ steps.cache-cargo.outputs.cache-hit != 'true' }}
+        name: Install
         run: cargo install lemmy-help --features=cli
       - name: Check
         run: make help-check
