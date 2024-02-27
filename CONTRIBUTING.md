@@ -95,7 +95,7 @@ make lint
 
 ### 2️⃣ Style
 
-Runs [StyLua](https://github.com/JohnnyMorganz/StyLua) using `stylua.toml` settings:
+Runs [StyLua](https://github.com/JohnnyMorganz/StyLua) using `.stylua.toml` settings:
 
 ```
 make format-check
