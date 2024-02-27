@@ -92,7 +92,7 @@ end
 
 ---Find the file using LSP.
 ---It uses cache to avoid multiple requests.
----@param targetName string|nil
+---@param targetName string
 ---@param className string
 ---@return string|nil # filepath
 local function find_file_using_lsp(targetName, className)

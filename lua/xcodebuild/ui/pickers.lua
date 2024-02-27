@@ -263,6 +263,11 @@ function M.select_scheme(schemes, callback, opts)
 
   if util.is_empty(schemes) then
     local xcodeproj = projectConfig.settings.xcodeproj
+    if not xcodeproj then
+      notifications.send_error("Xcode project file not set")
+      return nil
+    end
+
     currentJobId = xcode.get_project_information(xcodeproj, function(info)
       update_results(info.schemes)
     end)
@@ -274,10 +279,15 @@ end
 ---Shows a picker with the available build configurations.
 ---@param callback fun(projectConfig: table)|nil
 ---@param opts PickerOptions|nil
----@return number job id
+---@return number|nil job id
 function M.select_config(callback, opts)
   local xcodeproj = projectConfig.settings.xcodeproj
   local projectInfo = nil
+
+  if not xcodeproj then
+    notifications.send_error("Xcode project file not set")
+    return nil
+  end
 
   start_telescope_spinner()
   M.show("Select Build Configuration", {}, function(value, _)
@@ -297,10 +307,15 @@ end
 ---Shows a picker with the available test plans.
 ---@param callback fun(testPlan: string|nil)|nil
 ---@param opts PickerOptions|nil
----@return number job id
+---@return number|nil job id
 function M.select_testplan(callback, opts)
   local projectCommand = projectConfig.settings.projectCommand
   local scheme = projectConfig.settings.scheme
+
+  if not projectCommand or not scheme then
+    notifications.send_error("Project command and/or scheme not set")
+    return nil
+  end
 
   start_telescope_spinner()
   M.show("Select Test Plan", {}, function(value, _)
@@ -345,6 +360,11 @@ function M.select_destination(callback, opts)
   local useCache = require("xcodebuild.core.config").options.commands.cache_devices
   local hasCachedDevices = useCache and util.is_not_empty(results) and util.is_not_empty(cachedDeviceNames)
 
+  if not projectCommand or not scheme then
+    notifications.send_error("Project command and/or scheme not set")
+    return nil
+  end
+
   local refreshDevices = function(connectedDevices)
     currentJobId = xcode.get_destinations(projectCommand, scheme, function(destinations)
       for _, device in ipairs(connectedDevices) do
@@ -358,6 +378,8 @@ function M.select_destination(callback, opts)
 
           return (not table.name or not string.find(table.name, "^Any")) and not table.error
         end
+
+        return false
       end)
 
       local destinationNames = util.select(filtered, function(table)

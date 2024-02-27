@@ -27,14 +27,14 @@ function M.shallow_copy(orig)
 end
 
 ---Checks if a table is empty or nil.
----@param table table
+---@param table table|nil
 ---@return boolean
 function M.is_empty(table)
   return next(table or {}) == nil
 end
 
 ---Checks if a table is NOT empty and NOT nil.
----@param table table
+---@param table table|nil
 ---@return boolean
 function M.is_not_empty(table)
   return not M.is_empty(table)

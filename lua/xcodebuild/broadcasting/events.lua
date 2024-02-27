@@ -61,8 +61,10 @@ end
 ---Notifies about the build progress.
 ---It triggers the `XcodebuildBuildStatus` autocommand and updates global
 ---variable `xcodebuild_last_status`.
+---
+---Set {progress} to nil when the expected duration is unknown.
 ---@param forTesting boolean if the build is for testing.
----@param progress number the progress percentage (0-100).
+---@param progress number|nil the progress percentage (0-100).
 ---@param duration number the duration of the build in seconds.
 function M.build_status(forTesting, progress, duration)
   vim.api.nvim_exec_autocmds("User", {
