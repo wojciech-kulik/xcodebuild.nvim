@@ -260,9 +260,10 @@ function M.select_scheme(schemes, callback, opts)
     projectConfig.settings.scheme = value
     projectConfig.save_settings()
 
-    if config.update_build_server_on_scheme_change then
-      vim.fn.jobstart(
-        "xcode-build-server config " .. projectConfig.settings.projectCommand .. " -scheme " .. value
+    if config.integrations.xcode_build_server.enabled then
+      require("xcodebuild.integrations.xcode_build_server").run_config(
+        projectConfig.settings.projectCommand,
+        value
       )
     end
 
