@@ -1,0 +1,30 @@
+name: Run Tests
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  unit-tests:
+    name: Unit Tests
+    strategy:
+      fail-fast: false
+      matrix:
+        nvim-version: ["stable", "nightly"]
+        os: ["ubuntu-latest"]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Neovim
+        uses: rhysd/action-setup-vim@v1
+        with:
+          neovim: true
+          version: ${{ matrix.nvim-version }}
+
+      - name: Run tests
+        run: |
+          nvim --version
+          make test

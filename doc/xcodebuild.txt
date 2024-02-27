@@ -1487,6 +1487,9 @@ AppData                                     *xcodebuild.project.appdata.AppData*
     {snapshots_dir}             (string) # The path to the snapshots directory.
     {coverage_filepath}         (string) # The path to the coverage file.
     {coverage_report_filepath}  (string) # The path to the coverage report file.
+    {GETSNAPSHOTS_TOOL}         (string) # The name of the getsnapshots tool.
+    {PROJECT_HELPER_TOOL}       (string) # The name of the project helper tool.
+    {REMOTE_DEBUGGER_TOOL}      (string) # The name of the remote debugger tool.
 
 
 M.tool_path({name})                       *xcodebuild.project.appdata.tool_path*
@@ -3486,7 +3489,7 @@ M.contains({array}, {value})                          *xcodebuild.util.contains*
   Checks if an array contains a value.
 
   Parameters: ~
-    {array}  (any[])
+    {array}  (any[]|nil)
     {value}  (any)
 
 
@@ -3501,12 +3504,12 @@ M.find({array}, {predicate})                              *xcodebuild.util.find*
     (any)
 
 
-M.call({fn})                                              *xcodebuild.util.call*
-  Calls {fn} with arguments if {fn} is not nil.
+M.call({callback})                                        *xcodebuild.util.call*
+  Calls {callback} with arguments if {callback} is not nil.
   Returns the result of the function call.
 
   Parameters: ~
-    {fn}  (function|nil) @vararg any
+    {callback}  (function|nil) @vararg any
 
   Returns: ~
     (any)

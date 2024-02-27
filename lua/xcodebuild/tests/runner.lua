@@ -29,6 +29,7 @@ local M = {}
 local CANCELLED_CODE = 143
 
 ---Validates if test plan is set in the project configuration.
+---Send an error notification if not found.
 ---@return boolean
 local function validate_testplan()
   if not projectConfig.settings.testPlan then

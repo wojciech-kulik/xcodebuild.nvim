@@ -220,9 +220,13 @@ function M.has_prefix(text, prefix)
 end
 
 ---Checks if an array contains a value.
----@param array any[]
+---@param array any[]|nil
 ---@param value any
 function M.contains(array, value)
+  if not array then
+    return false
+  end
+
   for _, val in ipairs(array) do
     if val == value then
       return true
@@ -246,16 +250,14 @@ function M.find(array, predicate)
   return nil
 end
 
----Calls {fn} with arguments if {fn} is not nil.
+---Calls {callback} with arguments if {callback} is not nil.
 ---Returns the result of the function call.
----@param fn function|nil
+---@param callback function|nil
 ---@vararg any
 ---@return any
-function M.call(fn, ...)
-  local args = { ... }
-
-  if fn then
-    return fn(unpack(args))
+function M.call(callback, ...)
+  if callback then
+    return callback(...)
   end
 end
 

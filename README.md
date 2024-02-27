@@ -101,6 +101,12 @@ gem install xcodeproj
 python3 -m pip install -U pymobiledevice3
 ```
 
+To quickly install all required tools you can run:
+
+```shell
+make install
+```
+
 > [!TIP]
 > Make sure to check out [Tips & Tricks](https://github.com/wojciech-kulik/xcodebuild.nvim/discussions/categories/tips-tricks)!
 >

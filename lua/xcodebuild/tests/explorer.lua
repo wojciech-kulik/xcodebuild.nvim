@@ -79,9 +79,9 @@ local spinnerFrames = { "⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", 
 local currentFrame = 1
 local last_updated_id = nil
 local line_to_test = {}
-local last_run_tests = {}
 local collapsed_ids = {}
 local ns = vim.api.nvim_create_namespace("xcodebuild-test-explorer")
+local last_run_tests = {}
 
 ---Generates the report for provided tests.
 ---Sets the `M.report` variable.
@@ -524,7 +524,7 @@ function M.start_tests(selectedTests)
     return
   end
 
-  last_run_tests = selectedTests
+  last_run_tests = selectedTests or {}
 
   for _, target in ipairs(M.report) do
     for _, class in ipairs(target.classes) do
