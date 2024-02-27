@@ -262,12 +262,7 @@ function M.select_scheme(schemes, callback, opts)
 
     if config.update_build_server_on_scheme_change then
       vim.fn.jobstart(
-        "xcode-build-server config " .. projectConfig.settings.projectCommand .. " -scheme " .. value,
-        {
-          on_exit = function()
-            -- print result
-          end,
-        }
+        "xcode-build-server config " .. projectConfig.settings.projectCommand .. " -scheme " .. value
       )
     end
 
