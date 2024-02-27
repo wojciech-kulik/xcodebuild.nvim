@@ -37,6 +37,7 @@ DAP Integration ································
 Remote Debugger Integration ·········· |xcodebuild.integrations.remote_debugger|
 LSP Integration ·································· |xcodebuild.integrations.lsp|
 nvim-tree Integration ······················ |xcodebuild.integrations.nvim_tree|
+xcode-build-server Integration ···· |xcodebuild.integrations.xcode_build_server|
 Pickers ················································ |xcodebuild.ui.pickers|
 Helpers ··················································· |xcodebuild.helpers|
 Lua Utils ···················································· |xcodebuild.util|
@@ -157,6 +158,9 @@ M.setup({options})                                            *xcodebuild.setup*
         open_expanded = false,
       },
       integrations = {
+        xcode_build_server = {
+          enabled = false, -- run "xcode-build-server config" when scheme changes
+        },
         nvim_tree = {
           enabled = true, -- enable updating Xcode project files when using nvim-tree
           should_update_project = function(path) -- path can lead to directory or file
@@ -3144,6 +3148,24 @@ M.setup()                              *xcodebuild.integrations.nvim_tree.setup*
 
   See: ~
     |xcodebuild.project-manager|
+
+
+==============================================================================
+xcode-build-server Integration      *xcodebuild.integrations.xcode_build_server*
+
+This module is responsible for the integration with xcode-build-server.
+It provides a function to update buildServer.json file with the current scheme.
+
+                         *xcodebuild.integrations.xcode_build_server.run_config*
+M.run_config({projectCommand}, {scheme})
+  Calls "config" command of xcode-build-server in order to update buildServer.json file.
+
+  Parameters: ~
+    {projectCommand}  (string) either "-project 'path/to/project.xcodeproj'" or "-workspace 'path/to/workspace.xcworkspace'"
+    {scheme}          (string)
+
+  Returns: ~
+    (number)   job id
 
 
 ==============================================================================
