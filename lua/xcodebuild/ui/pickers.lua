@@ -278,7 +278,6 @@ function M.select_scheme(schemes, callback, opts)
 
     currentJobId = xcode.get_project_information(xcodeproj, function(info)
       update_results(info.schemes)
-      -- run a shell command
     end)
 
     return currentJobId
