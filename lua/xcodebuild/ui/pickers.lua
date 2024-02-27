@@ -234,7 +234,7 @@ function M.select_project(callback, opts)
     local projectFile = sanitizedFiles[index]
     local isWorkspace = util.has_suffix(projectFile, "xcworkspace")
 
-    projectConfig.settings.xcodeproj = isWorkspace and nil or projectFile
+    projectConfig.settings.xcodeproj = not isWorkspace and projectFile or nil
     projectConfig.settings.projectFile = projectFile
     projectConfig.settings.projectCommand = (isWorkspace and "-workspace '" or "-project '")
       .. projectFile

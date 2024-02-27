@@ -209,7 +209,7 @@ function M.send_project_settings(settings)
 
       - destination: ]] .. settings.destination .. [[
 
-      - testPlan: ]] .. (settings.testPlan or "") .. [[
+      - testPlan: ]] .. (settings.testPlan or "-") .. [[
 
       - bundleId: ]] .. settings.bundleId .. [[
 
