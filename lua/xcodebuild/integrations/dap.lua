@@ -9,8 +9,8 @@
 ---
 ---  1. Download codelldb VS Code plugin from: https://github.com/vadimcn/codelldb/releases
 ---     For macOS use darwin version. Just unzip vsix file and set paths below.
----  2. Install also nvim-dap-ui for a nice GUI to debug.
----  3. Make sure to enable console window from nvim-dap-ui to see simulator logs.
+---  2. Install also `nvim-dap-ui` for a nice GUI to debug.
+---  3. Make sure to enable console window from `nvim-dap-ui` to see simulator logs.
 ---
 ---Sample `nvim-dap` configuration:
 --->lua
@@ -73,9 +73,10 @@
 ---<
 ---
 ---See:
----https://github.com/mfussenegger/nvim-dap
----https://github.com/rcarriga/nvim-dap-ui
----https://github.com/vadimcn/codelldb
+---  https://github.com/mfussenegger/nvim-dap
+---  https://github.com/rcarriga/nvim-dap-ui
+---  https://github.com/vadimcn/codelldb
+---
 ---@brief ]]
 
 local util = require("xcodebuild.util")
@@ -194,7 +195,7 @@ end
 
 ---Attaches the debugger to the running application when tests are starting.
 ---
----Tests are controller by `xcodebuild` tool, so we can't request waiting
+---Tests are controlled by `xcodebuild` tool, so we can't request waiting
 ---for the debugger to attach. Instead, we listen to the
 ---`XcodebuildTestsStatus` to start the debugger.
 ---

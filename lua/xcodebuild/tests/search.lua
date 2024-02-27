@@ -215,8 +215,7 @@ function M.find_target_for_file(filepath)
   end
 end
 
----Finds the file path based on the {targetName}
----and {className}.
+---Finds the file path based on the {targetName} and {className}.
 ---It uses the configuration to decide the strategy,
 ---it could be LSP or filename matching, or both.
 ---@param targetName string

@@ -18,15 +18,15 @@
 --- - `Xcode` - make sure that xcodebuild and xcrun simctl work correctly. Tested with Xcode 15.
 ---
 ---Installation
---->
+--->bash
 ---    brew install xcode-build-server
 ---    brew install xcbeautify
 ---    gem install xcodeproj
 ---    python3 -m pip install -U pymobiledevice3
 ---<
 ---
----To debug on physical devices with iOS 17+ you will need to set up `sudo`,
----more details here: https://github.com/wojciech-kulik/xcodebuild.nvim#-debugging-on-ios-17-device
+---To debug on physical devices with iOS 17+ you will need to set up `sudo`, more details here:
+---https://github.com/wojciech-kulik/xcodebuild.nvim#-debugging-on-ios-17-device
 ---
 ---See: https://github.com/wojciech-kulik/xcodebuild.nvim
 ---@brief ]]

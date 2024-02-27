@@ -186,7 +186,7 @@ Features                                                   *xcodebuild.features*
  - Actions to build, run, debug, and test apps on simulators and physical devices.
  - Buffer integration with test results (code coverage, success & failure marks, duration, extra diagnostics).
  - Code coverage report with customizable levels.
- - Browser of failing snapshot tests with a diff preview (if you use [swift-snapshot-testing](https://github.com/pointfreeco/swift-snapshot-testing)).
+ - Browser of failing snapshot tests with a diff preview (if you use `swift-snapshot-testing`).
  - Advanced log parser to detect all errors, warnings, and failing tests.
  - `nvim-tree` integration that automatically reflects all file tree operations and updates Xcode project file.
  - `nvim-dap` helper functions to let you easily build, run, and debug apps.
@@ -216,22 +216,22 @@ External tools
  - `Xcode` - make sure that xcodebuild and xcrun simctl work correctly. Tested with Xcode 15.
 
 Installation
->
+>bash
     brew install xcode-build-server
     brew install xcbeautify
     gem install xcodeproj
     python3 -m pip install -U pymobiledevice3
 <
 
-To debug on physical devices with iOS 17+ you will need to set up `sudo`,
-more details here: https://github.com/wojciech-kulik/xcodebuild.nvim#-debugging-on-ios-17-device
+To debug on physical devices with iOS 17+ you will need to set up `sudo`, more details here:
+https://github.com/wojciech-kulik/xcodebuild.nvim#-debugging-on-ios-17-device
 
 See: https://github.com/wojciech-kulik/xcodebuild.nvim
 
 ==============================================================================
 Highlights                                               *xcodebuild.highlights*
 
-You can customize the highlights by setting `config.highlights`.
+You can customize the highlights by setting `config.highlights` (see |xcodebuild.config|).
 Below you can find all highlight groups used by the plugin.
 
 Test File
@@ -276,8 +276,8 @@ Code Coverage (inline)
 
 Code Coverage (report)
 
- | Highlight Group                 | Description                                          |
- | ------------------------------- | ---------------------------------------------------- |
+ | Highlight Group                 | Description                                        |
+ | ------------------------------- | -------------------------------------------------- |
  | `XcodebuildCoverageReportOk`      | Percentage color when above `warning_coverage_level` |
  | `XcodebuildCoverageReportWarning` | Percentage color when below `warning_coverage_level` |
  | `XcodebuildCoverageReportError`   | Percentage color when below `error_coverage_level`   |
@@ -470,6 +470,7 @@ Sample `lualine` integration:
 ==============================================================================
 Actions                                                     *xcodebuild.actions*
 
+                                                                *xcodebuild.api*
 This module is responsible for handling actions that the user can
 call programmatically. It is the main entry point to the plugin's API.
 
@@ -754,11 +755,12 @@ M.show_code_actions()                     *xcodebuild.actions.show_code_actions*
 ==============================================================================
 Constants                                                 *xcodebuild.constants*
 
-This module contains constants and types definitions that are
+This module contains constants and type definitions that are
 used across the plugin.
 
 PlatformId                                     *xcodebuild.constants.PlatformId*
   Platform type enum.
+  These values match constants emitted by `xcodebuild` commands.
 
   Variants: ~
     ("iOS")            physical iOS device (iPhone or iPad)
@@ -777,7 +779,6 @@ PlatformConstants                       *xcodebuild.constants.PlatformConstants*
 
 M.Platform                                       *xcodebuild.constants.Platform*
   Platform type enum.
-  This is returned by `xcodebuild` commands.
 
   Type: ~
     (PlatformConstants)
@@ -820,7 +821,7 @@ This module is responsible for setting up the quickfix list with
 errors and warnings.
 
 M.set({report})                                   *xcodebuild.core.quickfix.set*
-  Sets the quickfix list with the given {report}.
+  Sets the quickfix list based on the given {report}.
   It sets build errors, build warnings, test failures and test errors
   if the corresponding options are enabled.
 
@@ -1845,14 +1846,14 @@ below version 17 and with all physical devices to start debugger.
 For other devices, the |xcodebuild.core.xcode| module is used.
 
 The tool can be installed by:
->
+>bash
     python3 -m pip install -U pymobiledevice
 <
 
 See:
-    https://github.com/wojciech-kulik/xcodebuild.nvim#availability-of-features
-    https://github.com/wojciech-kulik/xcodebuild.nvim#-debugging-on-ios-17-device
-    https://github.com/doronz88/pymobiledevice3
+  https://github.com/wojciech-kulik/xcodebuild.nvim#availability-of-features
+  https://github.com/wojciech-kulik/xcodebuild.nvim#-debugging-on-ios-17-device
+  https://github.com/doronz88/pymobiledevice3
 
 Device                                 *xcodebuild.platform.device_proxy.Device*
 
@@ -2394,7 +2395,7 @@ Test Explorer                                        *xcodebuild.tests.explorer*
 This module contains the Test Explorer functionality.
 
 The Test Explorer is a UI that shows the status of tests
-and allows the user to run, repeat, and open the tests.
+and allows the user to run, repeat, and open tests.
 
 Tests are presented as a tree structure with targets,
 classes, and tests.
@@ -2413,7 +2414,7 @@ Key bindings:
 
                               *xcodebuild.tests.explorer.TestExplorerNodeStatus*
 TestExplorerNodeStatus
-  Report node type.
+  Report node status.
 
   Variants: ~
     ("not_executed")
@@ -2427,7 +2428,7 @@ TestExplorerNodeStatus
 
                                 *xcodebuild.tests.explorer.TestExplorerNodeKind*
 TestExplorerNodeKind
-  Report node status.
+  Report node type.
 
   Variants: ~
     ("target")
@@ -2467,7 +2468,7 @@ M.toggle_all_classes()
 
                                  *xcodebuild.tests.explorer.toggle_current_node*
 M.toggle_current_node()
-  Expands or collapses the current node.
+  Collapses or expands the current node.
 
 
                                   *xcodebuild.tests.explorer.open_selected_test*
@@ -2532,7 +2533,7 @@ M.show()                                        *xcodebuild.tests.explorer.show*
 
 
 M.load_tests({tests})                     *xcodebuild.tests.explorer.load_tests*
-  Loads the tests and generates the report.
+  Loads tests and generates the report.
 
   Parameters: ~
     {tests}  (XcodeTest[])
@@ -2597,7 +2598,7 @@ present test results.
                                     *xcodebuild.tests.runner.show_test_explorer*
 M.show_test_explorer({callback}, {opts})
   Shows the Test Explorer and runs the provided {callback}
-  after the tests are loaded.
+  after tests are loaded.
 
   It also triggers build for testing if tests are not loaded.
 
@@ -2727,8 +2728,7 @@ M.find_target_for_file({filepath})
 
                                          *xcodebuild.tests.search.find_filepath*
 M.find_filepath({targetName}, {className})
-  Finds the file path based on the {targetName}
-  and {className}.
+  Finds the file path based on the {targetName} and {className}.
   It uses the configuration to decide the strategy,
   it could be LSP or filename matching, or both.
 
@@ -2847,8 +2847,6 @@ Code Coverage Report                           *xcodebuild.code_coverage.report*
 This module is responsible for showing the code coverage report in a floating window.
 It relies on `nui.nvim` plugin to create the floating window.
 
-`nui.nvim` source code: https://github.com/MunifTanjim/nui.nvim
-
 Key bindings:
  - `enter` or `tab` - expand or collapse the current node
  - `o` - open source file
@@ -2882,8 +2880,8 @@ To configure `nvim-dap` for development:
 
   1. Download codelldb VS Code plugin from: https://github.com/vadimcn/codelldb/releases
      For macOS use darwin version. Just unzip vsix file and set paths below.
-  2. Install also nvim-dap-ui for a nice GUI to debug.
-  3. Make sure to enable console window from nvim-dap-ui to see simulator logs.
+  2. Install also `nvim-dap-ui` for a nice GUI to debug.
+  3. Make sure to enable console window from `nvim-dap-ui` to see simulator logs.
 
 Sample `nvim-dap` configuration:
 >lua
@@ -2946,9 +2944,10 @@ Sample `nvim-dap` configuration:
 <
 
 See:
-https://github.com/mfussenegger/nvim-dap
-https://github.com/rcarriga/nvim-dap-ui
-https://github.com/vadimcn/codelldb
+  https://github.com/mfussenegger/nvim-dap
+  https://github.com/rcarriga/nvim-dap-ui
+  https://github.com/vadimcn/codelldb
+
 
                                    *xcodebuild.integrations.dap.build_and_debug*
 M.build_and_debug({callback})
@@ -2971,7 +2970,7 @@ M.debug_without_build({callback})
 M.attach_debugger_for_tests()
   Attaches the debugger to the running application when tests are starting.
 
-  Tests are controller by `xcodebuild` tool, so we can't request waiting
+  Tests are controlled by `xcodebuild` tool, so we can't request waiting
   for the debugger to attach. Instead, we listen to the
   `XcodebuildTestsStatus` to start the debugger.
 
@@ -3131,15 +3130,14 @@ You can always disable the integration in the |xcodebuild.config|.
 This feature requires `xcodeproj` to be installed (|xcodebuild.requirements|).
 
 See:
-|xcodebuild.project-manager|
-https://github.com/nvim-tree/nvim-tree.lua
-https://github.com/wojciech-kulik/xcodebuild.nvim#-nvim-tree-integration
+  |xcodebuild.project-manager|
+  https://github.com/nvim-tree/nvim-tree.lua
+  https://github.com/wojciech-kulik/xcodebuild.nvim#-nvim-tree-integration
 
 
 M.setup()                              *xcodebuild.integrations.nvim_tree.setup*
   Sets up the integration with `nvim-tree`.
-  It subscribes to `nvim-tree` events and updates
-  the project file accordingly.
+  It subscribes to `nvim-tree` events.
 
   See: ~
     |xcodebuild.project-manager|
@@ -3211,7 +3209,7 @@ M.select_config({callback}, {opts})        *xcodebuild.ui.pickers.select_config*
   Shows a picker with the available build configurations.
 
   Parameters: ~
-    {callback}  (fun(projectConfig:table)|nil)
+    {callback}  (fun(projectConfig:XcodeProjectInfo)|nil)
     {opts}      (PickerOptions|nil)
 
   Returns: ~
@@ -3269,6 +3267,7 @@ M.cancel_actions()                           *xcodebuild.helpers.cancel_actions*
 
 M.validate_project()                       *xcodebuild.helpers.validate_project*
   Validates if the project is configured.
+  It sends an error notification if the project is not configured.
 
   Returns: ~
     (boolean)

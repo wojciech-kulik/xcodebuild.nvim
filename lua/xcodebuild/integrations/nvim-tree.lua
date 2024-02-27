@@ -11,17 +11,16 @@
 ---This feature requires `xcodeproj` to be installed (|xcodebuild.requirements|).
 ---
 ---See:
----|xcodebuild.project-manager|
----https://github.com/nvim-tree/nvim-tree.lua
----https://github.com/wojciech-kulik/xcodebuild.nvim#-nvim-tree-integration
+---  |xcodebuild.project-manager|
+---  https://github.com/nvim-tree/nvim-tree.lua
+---  https://github.com/wojciech-kulik/xcodebuild.nvim#-nvim-tree-integration
 ---
 ---@brief ]]
 
 local M = {}
 
 ---Sets up the integration with `nvim-tree`.
----It subscribes to `nvim-tree` events and updates
----the project file accordingly.
+---It subscribes to `nvim-tree` events.
 ---@see xcodebuild.project-manager
 function M.setup()
   local config = require("xcodebuild.core.config").options.integrations.nvim_tree
