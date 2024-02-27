@@ -1,4 +1,4 @@
-name: Linting, Style, And Error Checking
+name: Linting, Style, Error Checking
 
 on:
   push:
@@ -12,11 +12,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Prepare
-        run: |
-          brew update
-          brew install luacheck
-
+      - name: Set up Homebrew
+        id: set-up-homebrew
+        uses: Homebrew/actions/setup-homebrew@master
+      - name: Install
+        run: brew install luacheck
       - name: Lint
         run: make lint
 
@@ -25,11 +25,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Prepare
-        run: |
-          brew update
-          brew install stylua
-
+      - name: Set up Homebrew
+        uses: Homebrew/actions/setup-homebrew@master
+      - name: Install
+        run: brew install stylua
       - name: Check
         run: make format-check
 
@@ -38,11 +37,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Prepare
-        run: |
-          brew update
-          brew install lua-language-server
-
+      - name: Set up Homebrew
+        uses: Homebrew/actions/setup-homebrew@master
+      - name: Install
+        run: brew install lua-language-server
       - name: Check
         run: make lsp-check
 
@@ -53,6 +51,5 @@ jobs:
       - uses: actions/checkout@v4
       - name: Prepare
         run: cargo install lemmy-help --features=cli
-
       - name: Check
         run: make help-check
