@@ -8,7 +8,7 @@
 --- - Actions to build, run, debug, and test apps on simulators and physical devices.
 --- - Buffer integration with test results (code coverage, success & failure marks, duration, extra diagnostics).
 --- - Code coverage report with customizable levels.
---- - Browser of failing snapshot tests with a diff preview (if you use [swift-snapshot-testing](https://github.com/pointfreeco/swift-snapshot-testing)).
+--- - Browser of failing snapshot tests with a diff preview (if you use `swift-snapshot-testing`).
 --- - Advanced log parser to detect all errors, warnings, and failing tests.
 --- - `nvim-tree` integration that automatically reflects all file tree operations and updates Xcode project file.
 --- - `nvim-dap` helper functions to let you easily build, run, and debug apps.

@@ -4,7 +4,7 @@
 ---This module contains the Test Explorer functionality.
 ---
 ---The Test Explorer is a UI that shows the status of tests
----and allows the user to run, repeat, and open the tests.
+---and allows the user to run, repeat, and open tests.
 ---
 ---Tests are presented as a tree structure with targets,
 ---classes, and tests.
@@ -22,7 +22,7 @@
 ---
 ---@brief ]]
 
----Report node type.
+---Report node status.
 ---@alias TestExplorerNodeStatus
 ---| 'not_executed'
 ---| 'partial_execution'
@@ -32,7 +32,7 @@
 ---| 'failed'
 ---| 'disabled'
 
----Report node status.
+---Report node type.
 ---@alias TestExplorerNodeKind
 ---| 'target'
 ---| 'class'
@@ -443,7 +443,7 @@ function M.toggle_all_classes()
   refresh_explorer()
 end
 
----Expands or collapses the current node.
+---Collapses or expands the current node.
 function M.toggle_current_node()
   local currentRow = vim.api.nvim_win_get_cursor(0)[1]
   local line = line_to_test[currentRow]
@@ -751,7 +751,7 @@ function M.show()
   refresh_explorer()
 end
 
----Loads the tests and generates the report.
+---Loads tests and generates the report.
 ---@param tests XcodeTest[]
 function M.load_tests(tests)
   if not config.enabled then

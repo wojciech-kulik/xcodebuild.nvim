@@ -11,14 +11,14 @@
 ---For other devices, the |xcodebuild.core.xcode| module is used.
 ---
 ---The tool can be installed by:
---->
+--->bash
 ---    python3 -m pip install -U pymobiledevice
 ---<
 ---
 ---See:
----    https://github.com/wojciech-kulik/xcodebuild.nvim#availability-of-features
----    https://github.com/wojciech-kulik/xcodebuild.nvim#-debugging-on-ios-17-device
----    https://github.com/doronz88/pymobiledevice3
+---  https://github.com/wojciech-kulik/xcodebuild.nvim#availability-of-features
+---  https://github.com/wojciech-kulik/xcodebuild.nvim#-debugging-on-ios-17-device
+---  https://github.com/doronz88/pymobiledevice3
 ---@brief ]]
 
 local util = require("xcodebuild.util")

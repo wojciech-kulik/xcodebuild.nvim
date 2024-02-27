@@ -40,7 +40,7 @@ local function validate_testplan()
 end
 
 ---Shows the Test Explorer and runs the provided {callback}
----after the tests are loaded.
+---after tests are loaded.
 ---
 ---It also triggers build for testing if tests are not loaded.
 ---

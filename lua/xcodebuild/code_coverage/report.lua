@@ -4,8 +4,6 @@
 ---This module is responsible for showing the code coverage report in a floating window.
 ---It relies on `nui.nvim` plugin to create the floating window.
 ---
----`nui.nvim` source code: https://github.com/MunifTanjim/nui.nvim
----
 ---Key bindings:
 --- - `enter` or `tab` - expand or collapse the current node
 --- - `o` - open source file

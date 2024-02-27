@@ -1,6 +1,6 @@
 ---@mod xcodebuild.highlights Highlights
 ---@brief [[
----You can customize the highlights by setting `config.highlights`.
+---You can customize the highlights by setting `config.highlights` (see |xcodebuild.config|).
 ---Below you can find all highlight groups used by the plugin.
 ---
 ---Test File
@@ -45,8 +45,8 @@
 ---
 ---Code Coverage (report)
 ---
---- | Highlight Group                 | Description                                          |
---- | ------------------------------- | ---------------------------------------------------- |
+--- | Highlight Group                 | Description                                        |
+--- | ------------------------------- | -------------------------------------------------- |
 --- | `XcodebuildCoverageReportOk`      | Percentage color when above `warning_coverage_level` |
 --- | `XcodebuildCoverageReportWarning` | Percentage color when below `warning_coverage_level` |
 --- | `XcodebuildCoverageReportError`   | Percentage color when below `error_coverage_level`   |

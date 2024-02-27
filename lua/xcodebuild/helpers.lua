@@ -32,6 +32,7 @@ function M.cancel_actions()
 end
 
 ---Validates if the project is configured.
+---It sends an error notification if the project is not configured.
 ---@return boolean
 function M.validate_project()
   local projectConfig = require("xcodebuild.project.config")

@@ -100,7 +100,7 @@ local function insert_test_errors(list, testErrors)
   end
 end
 
----Sets the quickfix list with the given {report}.
+---Sets the quickfix list based on the given {report}.
 ---It sets build errors, build warnings, test failures and test errors
 ---if the corresponding options are enabled.
 ---@param report ParsedReport

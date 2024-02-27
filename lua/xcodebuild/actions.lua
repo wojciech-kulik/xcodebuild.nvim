@@ -1,4 +1,5 @@
 ---@mod xcodebuild.actions Actions
+---@tag xcodebuild.api
 ---@brief [[
 ---This module is responsible for handling actions that the user can
 ---call programmatically. It is the main entry point to the plugin's API.

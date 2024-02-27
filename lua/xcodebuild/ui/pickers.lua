@@ -277,7 +277,7 @@ function M.select_scheme(schemes, callback, opts)
 end
 
 ---Shows a picker with the available build configurations.
----@param callback fun(projectConfig: table)|nil
+---@param callback fun(projectConfig: XcodeProjectInfo)|nil
 ---@param opts PickerOptions|nil
 ---@return number|nil job id
 function M.select_config(callback, opts)
