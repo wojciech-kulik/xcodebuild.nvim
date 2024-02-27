@@ -7,7 +7,7 @@
 local M = {}
 
 ---Calls "config" command of xcode-build-server in order to update buildServer.json file.
----@param projectCommand string # either "-project 'path/to/project.xcodeproj'" or "-workspace 'path/to/workspace.xcworkspace'"
+---@param projectCommand string either "-project 'path/to/project.xcodeproj'" or "-workspace 'path/to/workspace.xcworkspace'"
 ---@param scheme string
 ---@return number # job id
 function M.run_config(projectCommand, scheme)
