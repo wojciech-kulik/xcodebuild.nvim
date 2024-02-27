@@ -370,6 +370,9 @@ vim.keymap.set("n", "<leader>xa", "<cmd>XcodebuildCodeActions<cr>", { desc = "Sh
     open_expanded = false,
   },
   integrations = {
+    xcode_build_server = {
+      enabled = false, -- run "xcode-build-server config" when scheme changes
+    },
     nvim_tree = {
       enabled = true, -- enable updating Xcode project files when using nvim-tree
       should_update_project = function(path) -- path can lead to directory or file
