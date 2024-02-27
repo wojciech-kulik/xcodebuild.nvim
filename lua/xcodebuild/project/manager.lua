@@ -23,7 +23,7 @@ local pickers = require("xcodebuild.ui.pickers")
 
 local M = {}
 
-local helper = "ruby '" .. appdata.tool_path(PROJECT_HELPER_TOOL) .. "'"
+local helper = "ruby '" .. appdata.tool_path(appdata.PROJECT_HELPER_TOOL) .. "'"
 
 ---Checks if the `xcodeproj` tool is installed.
 ---If not, sends an error notification.

@@ -27,6 +27,9 @@
 ---@field snapshots_dir string # The path to the snapshots directory.
 ---@field coverage_filepath string # The path to the coverage file.
 ---@field coverage_report_filepath string # The path to the coverage report file.
+---@field GETSNAPSHOTS_TOOL string # The name of the getsnapshots tool.
+---@field PROJECT_HELPER_TOOL string # The name of the project helper tool.
+---@field REMOTE_DEBUGGER_TOOL string # The name of the remote debugger tool.
 
 local util = require("xcodebuild.util")
 
@@ -48,9 +51,9 @@ M.snapshots_dir = M.appdir .. "/failing-snapshots"
 M.coverage_filepath = M.appdir .. "/coverage.xccovarchive"
 M.coverage_report_filepath = M.appdir .. "/coverage.json"
 
-GETSNAPSHOTS_TOOL = "getsnapshots"
-PROJECT_HELPER_TOOL = "project_helper.rb"
-REMOTE_DEBUGGER_TOOL = "remote_debugger"
+M.GETSNAPSHOTS_TOOL = "getsnapshots"
+M.PROJECT_HELPER_TOOL = "project_helper.rb"
+M.REMOTE_DEBUGGER_TOOL = "remote_debugger"
 
 ---Returns the path to the tool with the given {name}.
 ---@param name string

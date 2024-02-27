@@ -25,7 +25,7 @@ function M.save_failing_snapshots(xcresultFilepath, callback)
   end
 
   local savePath = appdata.snapshots_dir
-  local getsnapshotPath = appdata.tool_path(GETSNAPSHOTS_TOOL)
+  local getsnapshotPath = appdata.tool_path(appdata.GETSNAPSHOTS_TOOL)
   local command = getsnapshotPath .. " '" .. xcresultFilepath .. "' '" .. savePath .. "'"
 
   util.shell("mkdir -p '" .. savePath .. "'")

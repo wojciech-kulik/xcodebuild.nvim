@@ -672,6 +672,8 @@ function M.run_selected_tests()
     local test = line_to_test[i]
 
     if test then
+      -- luacheck: ignore
+
       if test.status == STATUS_DISABLED then
         containsDisabledTests = true
       elseif test.kind == KIND_TEST and lastKind == KIND_CLASS then

@@ -41,7 +41,7 @@ local devices_without_os_version = {}
 ---Returns the path to the wrapper script for `pymobiledevice3` tool.
 ---@return string
 local function get_tool_path()
-  return config.options.commands.remote_debugger or appdata.tool_path(REMOTE_DEBUGGER_TOOL)
+  return config.options.commands.remote_debugger or appdata.tool_path(appdata.REMOTE_DEBUGGER_TOOL)
 end
 
 ---Returns RSD parameter from the output of the `remote_debugger` tool.

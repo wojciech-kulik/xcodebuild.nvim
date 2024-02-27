@@ -1,3 +1,6 @@
+lint:
+	luacheck lua
+
 gendocs:
 	lemmy-help \
 		--layout compact:0 \
