@@ -14,6 +14,7 @@ local notifications = require("xcodebuild.broadcasting.notifications")
 local constants = require("xcodebuild.core.constants")
 local events = require("xcodebuild.broadcasting.events")
 local xcode = require("xcodebuild.core.xcode")
+local config = require("xcodebuild.core.config").options
 local projectConfig = require("xcodebuild.project.config")
 local snapshots = require("xcodebuild.tests.snapshots")
 local deviceProxy = require("xcodebuild.platform.device_proxy")
@@ -177,7 +178,7 @@ end
 ---@param callback fun(xcodeproj: string)|nil
 ---@param opts PickerOptions|nil
 function M.select_xcodeproj(callback, opts)
-  local maxdepth = require("xcodebuild.core.config").options.commands.project_search_max_depth
+  local maxdepth = config.commands.project_search_max_depth
   local sanitizedFiles = {}
   local filenames = {}
   local files = util.shell(
@@ -210,7 +211,7 @@ end
 ---@param callback fun(projectFile: string)|nil
 ---@param opts PickerOptions|nil
 function M.select_project(callback, opts)
-  local maxdepth = require("xcodebuild.core.config").options.commands.project_search_max_depth
+  local maxdepth = config.commands.project_search_max_depth
   local sanitizedFiles = {}
   local filenames = {}
   local files = util.shell(
@@ -258,6 +259,18 @@ function M.select_scheme(schemes, callback, opts)
   M.show("Select Scheme", schemes or {}, function(value, _)
     projectConfig.settings.scheme = value
     projectConfig.save_settings()
+
+    if config.update_build_server_on_scheme_change then
+      vim.fn.jobstart(
+        "xcode-build-server config " .. projectConfig.settings.projectCommand .. " -scheme " .. value,
+        {
+          on_exit = function()
+            -- print result
+          end,
+        }
+      )
+    end
+
     util.call(callback, value)
   end, opts)
 
@@ -270,6 +283,7 @@ function M.select_scheme(schemes, callback, opts)
 
     currentJobId = xcode.get_project_information(xcodeproj, function(info)
       update_results(info.schemes)
+      -- run a shell command
     end)
 
     return currentJobId
@@ -357,7 +371,7 @@ function M.select_destination(callback, opts)
   local projectCommand = projectConfig.settings.projectCommand
   local scheme = projectConfig.settings.scheme
   local results = cachedDestinations or {}
-  local useCache = require("xcodebuild.core.config").options.commands.cache_devices
+  local useCache = config.commands.cache_devices
   local hasCachedDevices = useCache and util.is_not_empty(results) and util.is_not_empty(cachedDeviceNames)
 
   if not projectCommand or not scheme then
@@ -534,8 +548,6 @@ function M.show_all_actions()
     actionsNames = { "Show Configuration Wizard" }
     actionsPointers = { actions.configure_project }
   end
-
-  local config = require("xcodebuild.core.config").options
 
   if config.prepare_snapshot_test_previews then
     if util.is_not_empty(snapshots.get_failing_snapshots()) then
