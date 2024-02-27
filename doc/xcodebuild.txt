@@ -3161,7 +3161,7 @@ M.run_config({projectCommand}, {scheme})
   Calls "config" command of xcode-build-server in order to update buildServer.json file.
 
   Parameters: ~
-    {projectCommand}  (string) either "-project 'path/to/project.xcodeproj'" or "-workspace 'path/to/workspace.xcworkspace'"
+    {projectCommand}  (string) # either "-project 'path/to/project.xcodeproj'" or "-workspace 'path/to/workspace.xcworkspace'"
     {scheme}          (string)
 
   Returns: ~
