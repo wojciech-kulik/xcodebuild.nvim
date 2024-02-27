@@ -31,6 +31,7 @@
 
 ---@private
 ---@class CoverageReport
+---@field lineCoverage number percentage (0.0-1.0)
 ---@field coveredLines number percentage (0.0-1.0)
 ---@field executableLines number
 ---@field targets CoverageReportTarget[]

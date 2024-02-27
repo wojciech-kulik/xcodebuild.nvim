@@ -240,7 +240,7 @@ end
 ---Returns the list of project information including schemes, configs, and
 ---targets for the given {xcodeproj}.
 ---@param xcodeproj string
----@param callback fun(settings: XcodeProjectInfo[])
+---@param callback fun(settings: XcodeProjectInfo)
 ---@return number # job id
 function M.get_project_information(xcodeproj, callback)
   local command = "xcodebuild -project '" .. xcodeproj .. "' -list"
@@ -471,7 +471,7 @@ function M.install_app_on_simulator(destination, appPath, callback)
           notifications.send_warning("Make sure that the simulator is booted")
         end
       else
-        callback()
+        util.call(callback)
       end
     end,
   })

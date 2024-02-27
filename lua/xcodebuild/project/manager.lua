@@ -92,7 +92,6 @@ local function run_list_targets()
 end
 
 ---Gets targets and shows the picker to select them.
----@param filepath string
 ---@param callback fun(target: string[])|nil
 local function run_select_targets(callback)
   local targets = run_list_targets()

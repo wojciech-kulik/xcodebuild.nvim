@@ -12,7 +12,7 @@
 ---@brief ]]
 
 ---@class AppData
----@field report ParsedReport # The last test report (can be empty).
+---@field report ParsedReport|table # The last test report (can be empty).
 ---@field appdir string # The path to the `.nvim/xcodebuild` folder.
 ---@field app_logs_filename string # The name of the app logs file.
 ---@field app_logs_filepath string # The path to the app logs file.

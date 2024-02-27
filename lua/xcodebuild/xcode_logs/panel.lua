@@ -282,7 +282,7 @@ function M.open_logs(scrollToBottom)
 
   -- window is visible
   if winnr then
-    if config.auto_focus then
+    if config.auto_focus and bufnr then
       util.focus_buffer(bufnr)
     end
     return

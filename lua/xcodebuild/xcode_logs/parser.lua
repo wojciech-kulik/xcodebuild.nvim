@@ -495,6 +495,7 @@ function M.parse_logs(logLines)
     process_line(line)
   end
 
+  ---@type ParsedReport
   return {
     output = output,
     tests = tests,
