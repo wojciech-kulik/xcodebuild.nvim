@@ -24,11 +24,14 @@
 ---    gem install xcodeproj
 ---    python3 -m pip install -U pymobiledevice3
 ---<
+---or just:
+--->bash
+---    make install
+---<
 ---
----To debug on physical devices with iOS 17+ you will need to set up `sudo`, more details here:
----https://github.com/wojciech-kulik/xcodebuild.nvim#-debugging-on-ios-17-device
+---To debug on physical devices with iOS 17+ you will need to set up `sudo`,
+---see |xcodebuild.sudo| to learn more.
 ---
----See: https://github.com/wojciech-kulik/xcodebuild.nvim
 ---@brief ]]
 
 local M = {}

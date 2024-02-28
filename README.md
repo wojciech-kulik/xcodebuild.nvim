@@ -736,6 +736,11 @@ If you want to use functions directly instead of user commands, then please see 
 
 ### 🧰 Troubleshooting
 
+> [!IMPORTANT]
+> The first thing you should do is to check the output of `:checkhealth xcodebuild` and fix all issues.
+>
+> Run it from your project root directory.
+
 #### Configuration
 
 Processing the project configuration is a very complex task that relies on parsing multiple crazy outputs from `xcodebuild` commands. Those logs are a pure nightmare to work with. This process may not always work.

@@ -8,6 +8,8 @@ Highlights ··································�
 Key Bindings ············································· |xcodebuild.bindings|
 User Commands ············································ |xcodebuild.commands|
 Global Variables ································· |xcodebuild.global_variables|
+Debugging On iOS 17+ Device ···················· |xcodebuild.integrations.ios17|
+Health Check ··············································· |xcodebuild.health|
 Actions ··················································· |xcodebuild.actions|
 Constants ··············································· |xcodebuild.constants|
 Autocommands ········································· |xcodebuild.core.autocmd|
@@ -187,17 +189,44 @@ Features                                                   *xcodebuild.features*
  - Project Manager to deal with project files without using Xcode.
  - Test Explorer to visually present a tree with all tests and results.
  - Built using official command line tools like `xcodebuild` and `xcrun simctl`.
- - Actions to build, run, debug, and test apps on simulators and physical devices.
- - Buffer integration with test results (code coverage, success & failure marks, duration, extra diagnostics).
+ - Actions to build, run, debug, and test apps on simulators and
+   physical devices.
+ - Buffer integration with test results
+   (code coverage, success & failure marks, duration, extra diagnostics).
  - Code coverage report with customizable levels.
- - Browser of failing snapshot tests with a diff preview (if you use `swift-snapshot-testing`).
+ - Browser of failing snapshot tests with a diff preview (if you use
+   `swift-snapshot-testing`).
  - Advanced log parser to detect all errors, warnings, and failing tests.
- - `nvim-tree` integration that automatically reflects all file tree operations and updates Xcode project file.
+ - `nvim-tree` integration that automatically reflects all file tree
+   operations and updates Xcode project file.
  - `nvim-dap` helper functions to let you easily build, run, and debug apps.
  - `nvim-dap-ui` integration with console window to show app logs.
- - `lualine.nvim` integration to show selected device, test plan, and other project settings.
+ - `lualine.nvim` integration to show selected device, test plan,
+   and other project settings.
  - Picker with all available actions.
- - Highly customizable (many config options, auto commands, highlights, and user commands).
+ - Highly customizable (many config options, auto commands, highlights,
+   and user commands).
+
+Availability of features
+
+ |             | Device (iOS <17) | Device (iOS 17+) | via Network (<17 / 17+) | Simulator | MacOS |
+ | :---------: | :--------------: | :--------------: | :---------------------: | :-------: | :---: |
+ |    build    |        🛠️        |        ✅        |         ❌ / ✅         |    ✅     |  ✅   |
+ | (un)install |        🛠️        |        ✅        |         🛠️ / ✅         |    ✅     |  ❌   |
+ |   launch    |        🛠️        |        ✅        |         🛠️ / ✅         |    ✅     |  ✅   |
+ |  run tests  |        🛠️        |        ✅        |         ❌ / ✅         |    ✅     |  ✅   |
+ |    debug    |        🛠️        |       🔐 🛠️      |           ❌            |    ✅     |  ✅   |
+ | debug tests |        ❌        |        ❌        |           ❌            |    ✅     |  ✅   |
+ |  app logs   |        🪲         |       🪲         |          ❌            |    ✅     |  ❌   |
+
+
+ 🔐 - requires passwordless `sudo` permission to `tools/remote_debugger`
+      script (see |xcodebuild.sudo|).
+
+ 🛠️ - available if pymobiledevice3 is installed.
+
+ 🪲  - available while debugging.
+
 
 ==============================================================================
 Requirements                                           *xcodebuild.requirements*
@@ -226,11 +255,14 @@ Installation
     gem install xcodeproj
     python3 -m pip install -U pymobiledevice3
 <
+or just:
+>bash
+    make install
+<
 
-To debug on physical devices with iOS 17+ you will need to set up `sudo`, more details here:
-https://github.com/wojciech-kulik/xcodebuild.nvim#-debugging-on-ios-17-device
+To debug on physical devices with iOS 17+ you will need to set up `sudo`,
+see |xcodebuild.sudo| to learn more.
 
-See: https://github.com/wojciech-kulik/xcodebuild.nvim
 
 ==============================================================================
 Highlights                                               *xcodebuild.highlights*
@@ -469,6 +501,63 @@ Sample `lualine` integration:
       { xcodebuild_device, color = { fg = "#f9e2af", bg = "#161622" } },
     },
 <
+
+
+==============================================================================
+Debugging On iOS 17+ Device                      *xcodebuild.integrations.ios17*
+
+                                                  *xcodebuild.integrations.sudo*
+                                                               *xcodebuild.sudo*
+Since iOS 17, a new secure connection between Mac and mobile devices is
+required. Xcodebuild.nvim uses `pymobiledevice3` to establish a special
+trusted tunnel that is later used for debugging. However, this operation
+requires `sudo`.
+
+Showing a pop-up to enter a password every time you run a debugger would
+be quite annoying. That's why the plugin provides a small script
+`tools/remote_debugger` that wraps the only two operations requiring
+`sudo` (starting a secure tunnel and closing it).
+
+This allows you to configure passwordless access just for this single
+file and make it work with xcodebuild.nvim. You can even make a local
+copy if you are worried that the content of this file could be changed
+in the future.
+
+👉 Passwordless access to `remote_debugger`
+
+You can disable password requirement by updating `/etc/sudoers` file.
+Make sure to use the command below, otherwise you may break your `sudo` command:
+
+>bash
+    sudo visudo -f /etc/sudoers
+<
+
+Append this line, but first update the path and the username:
+
+>bash
+    YOUR_USERNAME ALL = (ALL) NOPASSWD: /Users/YOUR_USERNAME/.local/share/nvim/lazy/xcodebuild.nvim/tools/remote_debugger
+<
+
+👉 Creating a local copy of `remote_debugger`
+
+If you don't want to configure the passwordless permission to the file
+that could be changed in the future, you can make a local copy of this
+script, set your local path in the config `commands.remote_debugger`,
+and update `/etc/sudoers` accordingly.
+
+Please remember that you will have to update this file manually if it
+changes in the future.
+
+
+See also: https://github.com/doronz88/pymobiledevice3/blob/master/misc/RemoteXPC.md#trusted-tunnel
+
+
+==============================================================================
+Health Check                                                 *xcodebuild.health*
+
+ This module checks if everything is installed and configured correctly.
+
+M.check()                                              *xcodebuild.health.check*
 
 
 ==============================================================================

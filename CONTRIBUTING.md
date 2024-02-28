@@ -1,4 +1,4 @@
-# Contributing to xcodebuild.nvim
+# Contributing To Xcodebuild.nvim
 
 Thank you for your interest in contributing 🍻!  
 Below you will find some essential information on how to start.
@@ -93,7 +93,7 @@ Runs [luacheck](https://github.com/lunarmodules/luacheck/) using `.luacheck` set
 make lint
 ```
 
-### 2️⃣ Style
+### 2️⃣ Style Check
 
 Runs [StyLua](https://github.com/JohnnyMorganz/StyLua) using `.stylua.toml` settings:
 
@@ -131,7 +131,7 @@ After introducing changes, you can update the help by calling:
 make help-update
 ```
 
-### 5️⃣ Unit Tests
+### 5️⃣ Run Tests
 
 Runs unit tests located in `./specs` directory using:
 
@@ -227,7 +227,7 @@ end
 It all depends on what you are going to implement. However, below will give you a general guideline on how to extend the current
 functionality assuming that you want to add a new action to the commands picker related to `xcodebuild` tool.
 
-In this case, you would need to:
+👉 In this case, you would need to:
 
 1. Implement the feature in a desired module. In this example, in `core/xcode.lua`. Make sure that the function is documented and
    connected types are defined using annotations.
@@ -239,14 +239,19 @@ In this case, you would need to:
 7. Add tests to `specs` if it makes sense.
 8. Run `make format help-update` and then `make all` to check if everything is OK.
 
-If you want to extend the default options:
+👉 If you add a new plugin option:
 
 1. Add the new option to `core/config.lua`.
 2. Update `README.md`.
 3. Update annotation over `M.setup` in `init.lua`.
 4. Run `make format help-update` and then `make all` to check if everything is OK.
 
-Modules you will most likely need in development:
+👉 If you add a new module:
+
+1. Make sure to add all annotations describing the module and its functions.
+2. Add the file to `scripts/help-update.sh` to include it in the documentation.
+
+👉 Modules you will most likely need in development:
 
 - `xcodebuild.core.config` to access the plugin's options
 - `xcodebuild.project.config` to access the current project configuration
