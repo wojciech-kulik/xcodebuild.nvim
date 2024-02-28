@@ -11,6 +11,8 @@ lemmy-help \
 		./lua/xcodebuild/docs/keybindings.lua \
 		./lua/xcodebuild/docs/commands.lua \
 		./lua/xcodebuild/docs/global_variables.lua \
+		./lua/xcodebuild/docs/ios17.lua \
+		./lua/xcodebuild/health.lua \
 		./lua/xcodebuild/actions.lua \
 		./lua/xcodebuild/core/constants.lua \
 		./lua/xcodebuild/core/autocmd.lua \

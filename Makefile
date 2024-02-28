@@ -18,12 +18,12 @@ lsp-check:
 
 # Check if help is up-to-date
 help-check:
-	scripts/update-help.sh
+	scripts/help-update.sh
 	git diff --exit-code doc/xcodebuild.txt
 
 # Updates help file
 help-update:
-	scripts/update-help.sh
+	scripts/help-update.sh
 	git add doc/xcodebuild.txt
 
 # Runs tests
