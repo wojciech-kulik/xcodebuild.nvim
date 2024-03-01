@@ -52,7 +52,7 @@ end
 function M.load_settings()
   local success, content = pcall(vim.fn.readfile, get_filepath())
 
-  if success then
+  if success and content ~= 0 then
     M.settings = vim.fn.json_decode(content)
     update_global_variables()
   end
