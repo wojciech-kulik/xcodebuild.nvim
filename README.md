@@ -62,7 +62,7 @@ https://github.com/wojciech-kulik/xcodebuild.nvim/assets/3128467/ed7d2d2e-eaa4-4
 |  run tests  |        🛠️        |        ✅        |         ❌ / ✅         |    ✅     |  ✅   |
 |    debug    |        🛠️        |      🔐 🛠️       |           ❌            |    ✅     |  ✅   |
 | debug tests |        ❌        |        ❌        |           ❌            |    ✅     |  ✅   |
-|  app logs   |        🪲        |        🪲        |           ❌            |    ✅     |  ❌   |
+|  app logs   |        🪲        |        🪲        |           ❌            |    ✅     |  🪲   |
 
 🔐 - requires passwordless `sudo` permission for `tools/remote_debugger` script (see below).
 

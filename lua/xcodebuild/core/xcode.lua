@@ -546,11 +546,12 @@ end
 ---@param bundleId string
 ---@param waitForDebugger boolean
 ---@param callback function|nil
+---@return number|nil # job id
 function M.launch_app(platform, destination, bundleId, waitForDebugger, callback)
   if platform == constants.Platform.IOS_PHYSICAL_DEVICE then
-    M.launch_app_on_device(destination, bundleId, callback)
+    return M.launch_app_on_device(destination, bundleId, callback)
   else
-    M.launch_app_on_simulator(destination, bundleId, waitForDebugger, callback)
+    return M.launch_app_on_simulator(destination, bundleId, waitForDebugger, callback)
   end
 end
 

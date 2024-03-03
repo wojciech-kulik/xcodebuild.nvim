@@ -24,6 +24,7 @@ Project Builder ································
 Project Manager ··································· |xcodebuild.project.manager|
 Device ············································ |xcodebuild.platform.device|
 Device Proxy ································ |xcodebuild.platform.device_proxy|
+macOS Platform Integration ························· |xcodebuild.platform.macos|
 Autocommand Events ···························· |xcodebuild.broadcasting.events|
 Notifications ·························· |xcodebuild.broadcasting.notifications|
 Test Diagnostics ································ |xcodebuild.tests.diagnostics|
@@ -217,7 +218,7 @@ Availability of features
  |  run tests  |        🛠️        |        ✅        |         ❌ / ✅         |    ✅     |  ✅   |
  |    debug    |        🛠️        |       🔐 🛠️      |           ❌            |    ✅     |  ✅   |
  | debug tests |        ❌        |        ❌        |           ❌            |    ✅     |  ✅   |
- |  app logs   |        🪲         |       🪲         |          ❌            |    ✅     |  ❌   |
+ |  app logs   |        🪲         |       🪲         |          ❌            |    ✅     |  🪲    |
 
 
  🔐 - requires passwordless `sudo` permission to `tools/remote_debugger`
@@ -1180,6 +1181,9 @@ M.launch_app({platform}, {destination}, {bundleId}, {waitForDebugger}, {callback
     {waitForDebugger}  (boolean)
     {callback}         (function|nil)
 
+  Returns: ~
+    (number|nil)   job id
+
 
                                           *xcodebuild.core.xcode.boot_simulator*
 M.boot_simulator({destination}, {callback})
@@ -1889,8 +1893,7 @@ It is used to install, uninstall, and run the application.
 You can also boot the simulator and kill the application using this module.
 
 M.kill_app({callback})                     *xcodebuild.platform.device.kill_app*
-  Kills the application on device or simulator.
-  Does not support macOS.
+  Kills the application on device, simulator, or macOS.
 
   Parameters: ~
     {callback}  (function|nil)
@@ -2131,6 +2134,36 @@ M.close_secure_tunnel()
   Closes the secure tunnel with the device.
 
   Requires passwordless `sudo` for the `remote_debugger` tool.
+
+
+==============================================================================
+macOS Platform Integration                           *xcodebuild.platform.macos*
+
+This module is responsible for the integration of macOS platform with `nvim-dap`.
+
+                                          *xcodebuild.platform.macos.launch_app*
+M.launch_app({appPath}, {productName}, {callback})
+  Simply starts the application on macOS.
+
+  Parameters: ~
+    {appPath}      (string)
+    {productName}  (string)
+    {callback}     (function|nil)
+
+  Returns: ~
+    (number)   job id
+
+
+                                    *xcodebuild.platform.macos.launch_and_debug*
+M.launch_and_debug({appPath}, {callback})
+  Starts the application on macOS and starts the debugger.
+
+  Parameters: ~
+    {appPath}   (string)
+    {callback}  (function|nil)
+
+  Returns: ~
+    (number|nil)   job id
 
 
 ==============================================================================

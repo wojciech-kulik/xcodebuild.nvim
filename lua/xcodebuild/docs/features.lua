@@ -33,7 +33,7 @@
 --- |  run tests  |        🛠️        |        ✅        |         ❌ / ✅         |    ✅     |  ✅   |
 --- |    debug    |        🛠️        |       🔐 🛠️      |           ❌            |    ✅     |  ✅   |
 --- | debug tests |        ❌        |        ❌        |           ❌            |    ✅     |  ✅   |
---- |  app logs   |        🪲         |       🪲         |          ❌            |    ✅     |  ❌   |
+--- |  app logs   |        🪲         |       🪲         |          ❌            |    ✅     |  🪲    |
 ---
 ---
 --- 🔐 - requires passwordless `sudo` permission to `tools/remote_debugger`

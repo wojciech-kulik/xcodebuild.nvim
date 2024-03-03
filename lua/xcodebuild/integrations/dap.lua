@@ -137,10 +137,15 @@ function M.build_and_debug(callback)
     return
   end
 
-  local remote = projectConfig.settings.platform == constants.Platform.IOS_PHYSICAL_DEVICE
+  local isDevice = projectConfig.settings.platform == constants.Platform.IOS_PHYSICAL_DEVICE
+  local isMacOS = projectConfig.settings.platform == constants.Platform.MACOS
+  local isSimulator = projectConfig.settings.platform == constants.Platform.IOS_SIMULATOR
 
-  if not remote then
+  if isSimulator or isMacOS then
     device.kill_app()
+  end
+
+  if isSimulator then
     start_dap()
   end
 
@@ -160,13 +165,13 @@ function M.build_and_debug(callback)
       return
     end
 
-    if remote then
+    if isDevice then
       device.install_app(function()
         set_remote_debugger_mode()
         remoteDebugger.start_remote_debugger(callback)
       end)
     else
-      device.run_app(false, callback)
+      device.run_app(isMacOS, callback)
     end
   end)
 end
@@ -179,16 +184,19 @@ function M.debug_without_build(callback)
     return
   end
 
-  local remote = projectConfig.settings.platform == constants.Platform.IOS_PHYSICAL_DEVICE
+  local isDevice = projectConfig.settings.platform == constants.Platform.IOS_PHYSICAL_DEVICE
+  local isSimulator = projectConfig.settings.platform == constants.Platform.IOS_SIMULATOR
 
-  if remote then
+  if isDevice then
     device.install_app(function()
       set_remote_debugger_mode()
       remoteDebugger.start_remote_debugger(callback)
     end)
   else
     device.kill_app()
-    start_dap()
+    if isSimulator then
+      start_dap()
+    end
     device.run_app(true, callback)
   end
 end
@@ -296,11 +304,7 @@ end
 ---Returns path to the built application.
 ---@return string
 function M.get_program_path()
-  if projectConfig.settings.platform == constants.Platform.MACOS then
-    return projectConfig.settings.appPath .. "/Contents/MacOS/" .. projectConfig.settings.productName
-  else
-    return projectConfig.settings.appPath
-  end
+  return projectConfig.settings.appPath
 end
 
 ---Waits for the application to start and returns its PID.

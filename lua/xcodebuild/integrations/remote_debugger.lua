@@ -22,7 +22,7 @@ local deviceProxy = require("xcodebuild.platform.device_proxy")
 
 local M = {}
 
-local PLUGIN_ID = "xcodebuild"
+local PLUGIN_ID = "xcodebuild-remote-debugger"
 
 M.LEGACY_MODE = 1
 M.SECURED_MODE = 2
@@ -34,7 +34,7 @@ M.mode = M.SECURED_MODE
 ---Updates logs in the DAP console.
 ---@param lines string[]
 local function update_console(lines)
-  require("xcodebuild.dap").update_console(lines)
+  require("xcodebuild.integrations.dap").update_console(lines)
 end
 
 ---Removes the listeners.
@@ -213,7 +213,7 @@ function M.start_remote_debugger(callback)
   M.stop_remote_debugger()
 
   notifications.send("Starting remote debugger...")
-  require("xcodebuild.dap").clear_console()
+  require("xcodebuild.project.appdata").clear_app_logs()
 
   if M.mode == M.LEGACY_MODE then
     start_legacy_server(callback)

@@ -14,6 +14,7 @@ local notifications = require("xcodebuild.broadcasting.notifications")
 local projectConfig = require("xcodebuild.project.config")
 local xcode = require("xcodebuild.core.xcode")
 local deviceProxy = require("xcodebuild.platform.device_proxy")
+local macos = require("xcodebuild.platform.macos")
 
 local M = {
   currentJobId = nil,
@@ -22,6 +23,7 @@ local M = {
 ---Launches the application on device, simulator, or macOS.
 ---@param waitForDebugger boolean
 ---@param callback function|nil
+---@return number|nil # job id
 local function launch_app(waitForDebugger, callback)
   local settings = projectConfig.settings
   local function finished()
@@ -34,9 +36,11 @@ local function launch_app(waitForDebugger, callback)
   notifications.send("Launching application...")
 
   if settings.platform == constants.Platform.MACOS then
-    local path = settings.appPath .. "/Contents/MacOS/" .. settings.productName
-    finished()
-    return vim.fn.jobstart(path, { detach = true })
+    if waitForDebugger then
+      return macos.launch_and_debug(settings.appPath, finished)
+    else
+      return macos.launch_app(settings.appPath, settings.productName, finished)
+    end
   end
 
   if settings.productName then
@@ -56,8 +60,7 @@ local function launch_app(waitForDebugger, callback)
   end
 end
 
----Kills the application on device or simulator.
----Does not support macOS.
+---Kills the application on device, simulator, or macOS.
 ---@param callback function|nil
 function M.kill_app(callback)
   if not helpers.validate_project() then
@@ -65,10 +68,6 @@ function M.kill_app(callback)
   end
 
   local settings = projectConfig.settings
-  if settings.platform == constants.Platform.MACOS then
-    -- TODO: kill macOS process?
-    return
-  end
 
   if deviceProxy.is_installed() and settings.platform == constants.Platform.IOS_PHYSICAL_DEVICE then
     M.currentJobId = deviceProxy.kill_app(settings.productName, callback)
