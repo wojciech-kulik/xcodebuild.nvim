@@ -142,7 +142,7 @@ function M.clear_app_logs()
   local config = require("xcodebuild.core.config").options.console_logs
 
   if config.enabled then
-    require("xcodebuild.dap").clear_console()
+    require("xcodebuild.integrations.dap").clear_console()
   end
 
   vim.fn.writefile({}, M.app_logs_filepath)
@@ -169,7 +169,7 @@ function M.append_app_logs(output)
       end
     end
 
-    require("xcodebuild.dap").update_console(log_lines)
+    require("xcodebuild.integrations.dap").update_console(log_lines)
   end
 end
 
