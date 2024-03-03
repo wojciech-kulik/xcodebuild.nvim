@@ -1,3 +1,6 @@
 {
+  "workspace.library": ["${3rd}/luassert/library"],
+  "workspace.checkThirdParty": false,
+  "diagnostics.libraryFiles": "Disable",
   "diagnostics.globals": ["vim", "require", "describe", "it", "P"]
 }
