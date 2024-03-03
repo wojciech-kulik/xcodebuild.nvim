@@ -78,6 +78,7 @@ local KIND_TEST = "test"
 local spinnerFrames = { "⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏" }
 local currentFrame = 1
 local last_updated_id = nil
+local last_set_cursor_row = nil
 local line_to_test = {}
 local collapsed_ids = {}
 local ns = vim.api.nvim_create_namespace("xcodebuild-test-explorer")
@@ -344,7 +345,26 @@ local function refresh_explorer()
 
   vim.api.nvim_buf_clear_namespace(M.bufnr, ns, 0, -1)
   vim.api.nvim_buf_set_option(M.bufnr, "modifiable", true)
-  vim.api.nvim_buf_set_lines(M.bufnr, 0, -1, false, lines)
+
+  -- HACK: Neovim nightly has a bug with `nvim_buf_set_lines`
+  --
+  -- This is a temporary workaround.
+  -- Ticket: https://github.com/neovim/neovim/issues/27723
+
+  local isNeovimNightly = vim.fn.has("nvim-0.10.0")
+  if isNeovimNightly then
+    local linesCount = vim.api.nvim_buf_line_count(M.bufnr)
+    if linesCount ~= #lines then
+      vim.api.nvim_buf_set_lines(M.bufnr, 0, -1, false, lines)
+    else
+      for i, line in ipairs(lines) do
+        vim.api.nvim_buf_set_lines(M.bufnr, i - 1, i, false, { line })
+      end
+    end
+  else
+    vim.api.nvim_buf_set_lines(M.bufnr, 0, -1, false, lines)
+  end
+
   vim.api.nvim_buf_set_option(M.bufnr, "modifiable", false)
   vim.api.nvim_buf_set_option(M.bufnr, "modified", false)
 
@@ -359,10 +379,11 @@ local function refresh_explorer()
     )
   end
 
-  if move_cursor_to_row then
+  if move_cursor_to_row and last_set_cursor_row ~= move_cursor_to_row then
     local winnr = vim.fn.win_findbuf(M.bufnr)
     if winnr and winnr[1] then
       vim.api.nvim_win_set_cursor(winnr[1], { move_cursor_to_row, 0 })
+      last_set_cursor_row = move_cursor_to_row
     end
   end
 end
@@ -524,6 +545,7 @@ function M.start_tests(selectedTests)
     return
   end
 
+  last_set_cursor_row = nil
   last_run_tests = selectedTests or {}
 
   for _, target in ipairs(M.report) do
