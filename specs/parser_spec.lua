@@ -87,7 +87,7 @@ local runTestCase = function(caseId)
   require("xcodebuild.core.config").options.test_search.target_matching = false
 
   local expectedResultPath = cwd .. "/specs/test_data/tc" .. caseId .. "_out.log"
-  local exists, expectedResult = pcall(vim.fn.readfile, expectedResultPath)
+  local exists, expectedResult = util.readfile(expectedResultPath)
   local log = vim.fn.readfile(cwd .. "/specs/test_data/tc" .. caseId .. ".log")
   mockSwiftFiles()
   mockLSP()

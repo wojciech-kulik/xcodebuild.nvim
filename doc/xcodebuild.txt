@@ -3670,4 +3670,12 @@ M.indexOf({array}, {value})                            *xcodebuild.util.indexOf*
     (number|nil)
 
 
+M.readfile({filepath})                                *xcodebuild.util.readfile*
+  Reads file content and returns it as a list of lines.
+  If the file does not exist, it will return false and an empty list.
+
+  Parameters: ~
+    {filepath}  (string) @return boolean, string[] # success: boolean, lines: string[]
+
+
 vim:tw=78:ts=8:noet:ft=help:norl:

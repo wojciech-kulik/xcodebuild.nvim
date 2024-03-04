@@ -275,4 +275,26 @@ function M.indexOf(array, value)
   return nil
 end
 
+---Reads file content and returns it as a list of lines.
+---If the file does not exist, it will return false and an empty list.
+---@param filepath string
+---@return boolean, string[] # success: boolean, lines: string[]
+function M.readfile(filepath)
+  local handle = io.open(filepath, "r")
+  if not handle then
+    return false, {}
+  end
+
+  local content = handle:read("*a")
+  local lines = vim.split(content, "\n", { plain = true })
+
+  if #lines > 0 and lines[#lines] == "" then
+    table.remove(lines, #lines)
+  end
+
+  handle:close()
+
+  return true, lines
+end
+
 return M

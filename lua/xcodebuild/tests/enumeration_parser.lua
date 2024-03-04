@@ -22,7 +22,8 @@ local M = {}
 ---@return XcodeTest[]
 ---@see xcodebuild.core.xcode.enumerate_tests
 function M.parse(filepath)
-  local readResult, jsonContent = pcall(vim.fn.readfile, filepath)
+  local util = require("xcodebuild.util")
+  local readResult, jsonContent = util.readfile(filepath)
   if not readResult then
     notifications.send_error("Could not read test list")
     return {}

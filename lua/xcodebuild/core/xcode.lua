@@ -149,7 +149,7 @@ function M.get_targets_filemap(appPath)
   for _, file in ipairs(fileListFiles) do
     if file ~= "" then
       local target = util.get_filename(file)
-      local success, content = pcall(vim.fn.readfile, file)
+      local success, content = util.readfile(file)
 
       if success then
         targetsFilesMap[target] = targetsFilesMap[target] or {}
