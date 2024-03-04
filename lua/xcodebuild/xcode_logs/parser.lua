@@ -237,7 +237,7 @@ end
 ---@param testName string
 ---@return number|nil
 local function find_test_line(filepath, testName)
-  local success, lines = pcall(vim.fn.readfile, filepath)
+  local success, lines = util.readfile(filepath)
   if not success then
     return nil
   end

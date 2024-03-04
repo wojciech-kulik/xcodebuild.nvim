@@ -50,9 +50,10 @@ end
 ---Loads the settings from the JSON file at `.nvim/xcodebuild/settings.json`.
 ---It also updates the global variables with the current settings.
 function M.load_settings()
-  local success, content = pcall(vim.fn.readfile, get_filepath())
+  local util = require("xcodebuild.util")
+  local success, content = util.readfile(get_filepath())
 
-  if success and content ~= 0 then
+  if success then
     M.settings = vim.fn.json_decode(content)
     update_global_variables()
   end

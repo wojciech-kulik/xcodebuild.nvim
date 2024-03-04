@@ -83,7 +83,7 @@ end
 ---Reads the last test report from disk.
 ---@return ParsedReport|nil
 function M.read_report()
-  local success, json = pcall(vim.fn.readfile, M.report_filepath)
+  local success, json = util.readfile(M.report_filepath)
   return success and vim.fn.json_decode(json) or nil
 end
 
