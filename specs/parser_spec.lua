@@ -131,6 +131,16 @@ describe("ensure xcodebuild logs are processed correctly", function()
   end)
 
   --
+  -- multiline test failure
+  --
+  describe("when tests failed producing multiline message", function()
+    it("should parse test results", function()
+      local expectedResult, result = runTestCase(17)
+      assert.are.same(expectedResult, result)
+    end)
+  end)
+
+  --
   -- tests crashed
   --
   describe("when tests crashed in a different file than test file", function()

@@ -432,6 +432,7 @@ local function process_line(line)
 
     parse_test_started(line)
   elseif string.find(line, "^Test [Cc]ase.*passed") or string.find(line, "^Test [Cc]ase.*failed") then
+    flush() -- flush if there is anything
     parse_test_finished(line)
   elseif string.find(line, "error%:") then
     flush()
@@ -453,7 +454,11 @@ local function process_line(line)
   elseif string.find(line, "%s*~*%^~*%s*") then
     flush(line)
   elseif string.find(line, "^%s*$") then
-    flush()
+    -- test errors can contain multiple lines with empty lines
+    -- we'll flush when we encounter finished test line.
+    if lineType ~= TEST_ERROR then
+      flush()
+    end
   elseif string.find(line, "^Linting") or string.find(line, "^note%:") then
     flush()
   elseif string.find(line, "%.xcresult$") then
