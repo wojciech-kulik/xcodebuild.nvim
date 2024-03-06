@@ -136,14 +136,16 @@ local function generate_report(tests)
       table.insert(current_target.classes, current_class)
     end
 
-    table.insert(current_class.tests, {
-      id = test.id,
-      kind = KIND_TEST,
-      status = test.enabled and STATUS_NOT_EXECUTED or STATUS_DISABLED,
-      name = test.name,
-      filepath = filepath,
-      hidden = collapsed_ids[test.target] or collapsed_ids[test.target .. "/" .. test.class] or false,
-    })
+    if test.name then
+      table.insert(current_class.tests, {
+        id = test.id,
+        kind = KIND_TEST,
+        status = test.enabled and STATUS_NOT_EXECUTED or STATUS_DISABLED,
+        name = test.name,
+        filepath = filepath,
+        hidden = collapsed_ids[test.target] or collapsed_ids[test.target .. "/" .. test.class] or false,
+      })
+    end
 
     ::continue::
   end
@@ -616,28 +618,53 @@ function M.update_test_status(testId, status)
     return
   end
 
+  ---@param target TestExplorerNode
+  ---@param class TestExplorerNode
+  ---@param test TestExplorerNode
+  local function update_status(target, class, test)
+    test.status = test.status == STATUS_DISABLED and STATUS_DISABLED or status
+    class.status = get_aggregated_status(class.tests)
+    target.status = get_aggregated_status(target.classes)
+
+    if status == STATUS_PASSED or status == STATUS_FAILED then
+      if test.hidden then
+        last_updated_id = class.hidden and target.id or class.id
+      else
+        last_updated_id = test.id
+      end
+    end
+
+    if not config.animate_status then
+      refresh_explorer()
+    end
+  end
+
+  local idComponents = vim.split(testId, "/", { plain = true })
+  local classId = table.concat({ idComponents[1], idComponents[2] }, "/")
+
   for _, target in ipairs(M.report) do
     for _, class in ipairs(target.classes) do
       for _, t in ipairs(class.tests) do
         if t.id == testId then
-          t.status = t.status == STATUS_DISABLED and STATUS_DISABLED or status
-          class.status = get_aggregated_status(class.tests)
-          target.status = get_aggregated_status(target.classes)
-
-          if status == STATUS_PASSED or status == STATUS_FAILED then
-            if t.hidden then
-              last_updated_id = class.hidden and target.id or class.id
-            else
-              last_updated_id = t.id
-            end
-          end
-
-          if not config.animate_status then
-            refresh_explorer()
-          end
-
+          update_status(target, class, t)
           return
         end
+      end
+
+      -- if we found the class, but the test is not there, insert it.
+      -- It happens when using Quick installed via SPM.
+      if classId == class.id and idComponents[3] then
+        table.insert(class.tests, {
+          id = testId,
+          kind = KIND_TEST,
+          status = STATUS_NOT_EXECUTED,
+          name = idComponents[3],
+          filepath = class.filepath,
+          hidden = collapsed_ids[target.id] or collapsed_ids[class.id] or false,
+        })
+
+        update_status(target, class, class.tests[#class.tests])
+        return
       end
     end
   end
