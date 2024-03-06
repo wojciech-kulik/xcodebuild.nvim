@@ -17,6 +17,28 @@ local notifications = require("xcodebuild.broadcasting.notifications")
 
 local M = {}
 
+---Inserts a test into the list if the {testId} is correct.
+---@param tests XcodeTest[]
+---@param testId string
+---@param enabled boolean
+local function insert_test_if_correct(tests, testId, enabled)
+  local target, class, name = string.match(testId, "([^%/]+)%/([^%/]+)%/?(.*)")
+
+  if class and class ~= "QuickSpec" and class ~= "_QuickSpecBase" then
+    if name == "" then
+      name = nil
+    end
+
+    table.insert(tests, {
+      id = testId,
+      target = target,
+      class = class,
+      name = name,
+      enabled = enabled,
+    })
+  end
+end
+
 ---Parses the test enumeration results from `xcodebuild` command.
 ---@param filepath string
 ---@return XcodeTest[]
@@ -43,29 +65,11 @@ function M.parse(filepath)
   local tests = {}
 
   for _, test in ipairs(json.values[1].enabledTests) do
-    local target, class, name = string.match(test.identifier, "([^%/]+)%/([^%/]+)%/(.+)")
-    if name then
-      table.insert(tests, {
-        id = test.identifier,
-        target = target,
-        class = class,
-        name = name,
-        enabled = true,
-      })
-    end
+    insert_test_if_correct(tests, test.identifier, true)
   end
 
   for _, test in ipairs(json.values[1].disabledTests) do
-    local target, class, name = string.match(test.identifier, "([^%/]+)%/([^%/]+)%/(.+)")
-    if name then
-      table.insert(tests, {
-        id = test.identifier,
-        target = target,
-        class = class,
-        name = name,
-        enabled = false,
-      })
-    end
+    insert_test_if_correct(tests, test.identifier, false)
   end
 
   return tests
