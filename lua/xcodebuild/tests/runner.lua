@@ -49,8 +49,10 @@ end
 ---
 ---If {opts.skipEnumeration} is true, it skips the enumeration
 ---(used when user runs tests from the Test Explorer).
+---If {opts.forceShow} is true, it forces showing the Test Explorer,
+---even if it's disabled in the configuration.
 ---@param callback function|nil
----@param opts {skipEnumeration: boolean}|nil
+---@param opts {skipEnumeration: boolean|nil,forceShow: boolean|nil}|nil
 function M.show_test_explorer(callback, opts)
   opts = opts or {}
 
@@ -63,7 +65,7 @@ function M.show_test_explorer(callback, opts)
   end
 
   local show = function()
-    if config.test_explorer.auto_open then
+    if config.test_explorer.auto_open or opts.forceShow then
       testExplorer.show()
     end
 
@@ -119,7 +121,7 @@ end
 ---It sets logs, diagnostics, quickfix list, coverage,
 ---snapshot previews, and Test Explorer.
 ---@param testsToRun string[]|nil test ids
----@param opts {skipEnumeration: boolean}|nil
+---@param opts {skipEnumeration: boolean|nil,forceShow: boolean|nil}|nil
 function M.run_tests(testsToRun, opts)
   opts = opts or {}
 

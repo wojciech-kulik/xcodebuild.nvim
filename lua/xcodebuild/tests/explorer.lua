@@ -756,7 +756,7 @@ function M.show()
   if not M.report then
     require("xcodebuild.tests.runner").show_test_explorer(function()
       notifications.send("")
-    end)
+    end, { forceShow = true })
 
     return
   end
