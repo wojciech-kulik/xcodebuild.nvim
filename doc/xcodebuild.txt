@@ -2735,10 +2735,12 @@ M.show_test_explorer({callback}, {opts})
 
   If {opts.skipEnumeration} is true, it skips the enumeration
   (used when user runs tests from the Test Explorer).
+  If {opts.forceShow} is true, it forces showing the Test Explorer,
+  even if it's disabled in the configuration.
 
   Parameters: ~
     {callback}  (function|nil)
-    {opts}      ({skipEnumeration:boolean}|nil)
+    {opts}      ({skipEnumeration:boolean|nil,forceShow:boolean|nil}|nil)
 
 
 M.run_tests({testsToRun}, {opts})            *xcodebuild.tests.runner.run_tests*
@@ -2753,7 +2755,7 @@ M.run_tests({testsToRun}, {opts})            *xcodebuild.tests.runner.run_tests*
 
   Parameters: ~
     {testsToRun}  (string[]|nil) test ids
-    {opts}        ({skipEnumeration:boolean}|nil)
+    {opts}        ({skipEnumeration:boolean|nil,forceShow:boolean|nil}|nil)
 
 
                                      *xcodebuild.tests.runner.TestRunnerOptions*
