@@ -6,6 +6,9 @@
 
 local M = {}
 
+---@alias Buffer number
+---@alias Row number
+
 ---Platform type enum.
 ---These values match constants emitted by `xcodebuild` commands.
 ---@alias PlatformId

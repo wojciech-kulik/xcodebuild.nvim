@@ -852,6 +852,18 @@ Constants                                                 *xcodebuild.constants*
 This module contains constants and type definitions that are
 used across the plugin.
 
+Buffer                                             *xcodebuild.constants.Buffer*
+
+  Type: ~
+    number
+
+
+Row                                                   *xcodebuild.constants.Row*
+
+  Type: ~
+    number
+
+
 PlatformId                                     *xcodebuild.constants.PlatformId*
   Platform type enum.
   These values match constants emitted by `xcodebuild` commands.
