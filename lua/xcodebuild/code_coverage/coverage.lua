@@ -16,7 +16,8 @@ local events = require("xcodebuild.broadcasting.events")
 local M = {}
 
 local buffersWithCoverage = {}
-local ns = vim.api.nvim_create_namespace("xcodebuild-coverage")
+local nsCovered = vim.api.nvim_create_namespace("xcodebuild-coverage-covered")
+local nsNotCovered = vim.api.nvim_create_namespace("xcodebuild-coverage-not-covered")
 
 ---Jumps to the next or previous coverage sign.
 ---If `next` is `true`, jumps to the next sign, otherwise jumps to the previous sign.
@@ -27,8 +28,8 @@ local function jump_to_coverage(next)
   end
 
   local cursorRow = vim.api.nvim_win_get_cursor(0)[1] - 1
-  local marks = next and vim.api.nvim_buf_get_extmarks(0, ns, { cursorRow + 1, 0 }, -1, {})
-    or vim.api.nvim_buf_get_extmarks(0, ns, 0, { cursorRow, 0 }, {})
+  local marks = next and vim.api.nvim_buf_get_extmarks(0, nsNotCovered, { cursorRow + 1, 0 }, -1, {})
+    or vim.api.nvim_buf_get_extmarks(0, nsNotCovered, 0, { cursorRow, 0 }, {})
   local lastRow = cursorRow
 
   if util.is_empty(marks) then
@@ -77,7 +78,8 @@ end
 ---Refreshes the code coverage for all buffers matching `file_pattern` from the config.
 function M.refresh_all_buffers()
   for _, bufnr in ipairs(buffersWithCoverage) do
-    vim.api.nvim_buf_clear_namespace(bufnr, ns, 0, -1)
+    vim.api.nvim_buf_clear_namespace(bufnr, nsNotCovered, 0, -1)
+    vim.api.nvim_buf_clear_namespace(bufnr, nsCovered, 0, -1)
   end
   buffersWithCoverage = {}
 
@@ -173,7 +175,8 @@ function M.show_coverage(bufnr)
     return
   end
 
-  vim.api.nvim_buf_clear_namespace(bufnr, ns, 0, -1)
+  vim.api.nvim_buf_clear_namespace(bufnr, nsCovered, 0, -1)
+  vim.api.nvim_buf_clear_namespace(bufnr, nsNotCovered, 0, -1)
   table.insert(buffersWithCoverage, bufnr)
 
   xcode.get_code_coverage(appdata.coverage_filepath, vim.api.nvim_buf_get_name(bufnr), function(lines)
@@ -200,12 +203,15 @@ function M.show_coverage(bufnr)
           line_hl_group = nil,
         }
 
+        local namespace = nsCovered
+
         if isPartial then
           mark.sign_text = config.partially_covered_sign
           mark.sign_hl_group = "XcodebuildCoveragePartialSign"
           mark.number_hl_group = "XcodebuildCoveragePartialNumber"
           mark.line_hl_group = "XcodebuildCoveragePartialLine"
           isPartial = false
+          namespace = nsNotCovered
         elseif count == "*" then
           mark.sign_text = config.not_executable_sign
           mark.sign_hl_group = "XcodebuildCoverageNotExecutableSign"
@@ -216,6 +222,7 @@ function M.show_coverage(bufnr)
           mark.sign_hl_group = "XcodebuildCoverageNoneSign"
           mark.number_hl_group = "XcodebuildCoverageNoneNumber"
           mark.line_hl_group = "XcodebuildCoverageNoneLine"
+          namespace = nsNotCovered
         else
           mark.sign_text = config.covered_sign
           mark.sign_hl_group = "XcodebuildCoverageFullSign"
@@ -224,7 +231,7 @@ function M.show_coverage(bufnr)
         end
 
         if mark.sign_text ~= "" then
-          vim.api.nvim_buf_set_extmark(bufnr, ns, tonumber(lineNumber) - 1, -1, mark)
+          vim.api.nvim_buf_set_extmark(bufnr, namespace, tonumber(lineNumber) - 1, -1, mark)
         end
 
         lineNumber = nil
