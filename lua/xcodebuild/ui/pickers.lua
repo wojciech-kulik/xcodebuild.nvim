@@ -44,6 +44,22 @@ local progressFrames = {
   "[    . ]",
 }
 
+---Updates xcode-build-server config if needed.
+local function update_xcode_build_server_config()
+  local xcodeBuildServer = require("xcodebuild.integrations.xcode_build_server")
+
+  if not xcodeBuildServer.is_enabled() or not xcodeBuildServer.is_installed() then
+    return
+  end
+
+  local projectCommand = projectConfig.settings.projectCommand
+  local scheme = projectConfig.settings.scheme
+
+  if projectCommand and scheme then
+    xcodeBuildServer.run_config(projectCommand, scheme)
+  end
+end
+
 ---Stops the spinner animation.
 local function stop_telescope_spinner()
   if progressTimer then
@@ -242,6 +258,7 @@ function M.select_project(callback, opts)
       .. "'"
 
     projectConfig.save_settings()
+    update_xcode_build_server_config()
     util.call(callback, projectFile)
   end, opts)
 end
@@ -259,14 +276,7 @@ function M.select_scheme(schemes, callback, opts)
   M.show("Select Scheme", schemes or {}, function(value, _)
     projectConfig.settings.scheme = value
     projectConfig.save_settings()
-
-    if config.integrations.xcode_build_server.enabled then
-      require("xcodebuild.integrations.xcode_build_server").run_config(
-        projectConfig.settings.projectCommand,
-        value
-      )
-    end
-
+    update_xcode_build_server_config()
     util.call(callback, value)
   end, opts)
 

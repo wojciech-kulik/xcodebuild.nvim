@@ -42,4 +42,18 @@ function M.code_actions()
   call_code_action(false)
 end
 
+---Restarts the `sourcekit-lsp` client.
+function M.restart_sourcekit_lsp()
+  local client = vim.lsp.get_clients({ name = "sourcekit" })[1]
+
+  ---@diagnostic disable-next-line: undefined-field
+  local clientId = client and client.id
+
+  if not clientId then
+    return
+  end
+
+  vim.cmd("LspRestart " .. clientId)
+end
+
 return M
