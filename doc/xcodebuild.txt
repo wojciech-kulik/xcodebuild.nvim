@@ -134,7 +134,7 @@ M.setup({options})                                            *xcodebuild.setup*
         enabled = true, -- enable Test Explorer
         auto_open = true, -- open Test Explorer when tests are started
         auto_focus = true, -- focus Test Explorer when opened
-        open_command = "botright 42vsplit Test Explorer", -- command used to open Test Explorer
+        open_command = "botright 42vsplit Test Explorer", -- command used to open Test Explorer, must create a buffer with "Test Explorer" name
         open_expanded = true, -- open Test Explorer with expanded classes
         success_sign = "✔", -- passed test icon
         failure_sign = "✖", -- failed test icon
@@ -1596,6 +1596,7 @@ AppData                                     *xcodebuild.project.appdata.AppData*
     {snapshots_dir}             (string) # The path to the snapshots directory.
     {coverage_filepath}         (string) # The path to the coverage file.
     {coverage_report_filepath}  (string) # The path to the coverage report file.
+    {test_explorer_filepath}    (string) # The path to the test explorer file.
     {GETSNAPSHOTS_TOOL}         (string) # The name of the getsnapshots tool.
     {PROJECT_HELPER_TOOL}       (string) # The name of the project helper tool.
     {REMOTE_DEBUGGER_TOOL}      (string) # The name of the remote debugger tool.
@@ -1685,6 +1686,22 @@ M.append_app_logs({output})
 
   Parameters: ~
     {output}  (string[])
+
+
+                           *xcodebuild.project.appdata.write_test_explorer_data*
+M.write_test_explorer_data({report})
+  Writes Test Explorer data to disk.
+
+  Parameters: ~
+    {report}  (TestExplorerNode[])
+
+
+                            *xcodebuild.project.appdata.read_test_explorer_data*
+M.read_test_explorer_data()
+  Reads Test Explorer data from disk.
+
+  Returns: ~
+    (TestExplorerNode[]|nil)
 
 
 ==============================================================================
@@ -2681,7 +2698,7 @@ M.load_tests({tests})                     *xcodebuild.tests.explorer.load_tests*
 
 
 M.setup()                                      *xcodebuild.tests.explorer.setup*
-  Sets up the Test Explorer.
+  Sets up the Test Explorer. Loads last report if available.
 
 
 ==============================================================================
@@ -3549,7 +3566,8 @@ M.dir_exists({path})                                *xcodebuild.util.dir_exists*
     (boolean)
 
 
-M.get_buf_by_name({filename}, {opts})          *xcodebuild.util.get_buf_by_name*
+                                           *xcodebuild.util.get_buf_by_filename*
+M.get_buf_by_filename({filename}, {opts})
   Gets a buffer by its filename.
   If `opts.returnNotLoaded` is true, it will
   return all buffers, including the ones that are not loaded.
@@ -3557,6 +3575,26 @@ M.get_buf_by_name({filename}, {opts})          *xcodebuild.util.get_buf_by_name*
   Parameters: ~
     {filename}  (string)
     {opts}      (table|nil) * {returnNotLoaded} (boolean)
+
+
+M.get_buf_by_name({name})                      *xcodebuild.util.get_buf_by_name*
+  Gets a buffer by its name.
+
+  Parameters: ~
+    {name}  (string)
+
+  Returns: ~
+    (number|nil)
+
+
+M.get_buf_by_filetype({filetype})          *xcodebuild.util.get_buf_by_filetype*
+  Gets a buffer by its filetype.
+
+  Parameters: ~
+    {filetype}  (string)
+
+  Returns: ~
+    (number|nil)
 
 
                                      *xcodebuild.util.get_bufs_by_matching_name*

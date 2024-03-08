@@ -52,6 +52,7 @@ local util = require("xcodebuild.util")
 local config = require("xcodebuild.core.config").options.test_explorer
 local notifications = require("xcodebuild.broadcasting.notifications")
 local events = require("xcodebuild.broadcasting.events")
+local appdata = require("xcodebuild.project.appdata")
 
 local M = {}
 
@@ -151,6 +152,7 @@ local function generate_report(tests)
   end
 
   M.report = targets
+  appdata.write_test_explorer_data(M.report)
 end
 
 ---Gets the highlight group for the provided status.
@@ -411,6 +413,7 @@ local function setup_buffer()
   vim.api.nvim_win_set_option(0, "scl", "no")
   vim.api.nvim_win_set_option(0, "spell", false)
 
+  vim.api.nvim_buf_set_option(M.bufnr, "filetype", "TestExplorer")
   vim.api.nvim_buf_set_option(M.bufnr, "fileencoding", "utf-8")
   vim.api.nvim_buf_set_option(M.bufnr, "modified", false)
   vim.api.nvim_buf_set_option(M.bufnr, "readonly", false)
@@ -443,6 +446,36 @@ local function setup_buffer()
     end,
     nowait = true,
   })
+end
+
+---Loads the saved state of the Test Explorer.
+local function load_saved_state()
+  M.report = appdata.read_test_explorer_data()
+
+  if not M.report then
+    return
+  end
+
+  local callback = function()
+    M.load_autocmd = nil
+    M.bufnr = util.get_buf_by_name("Test Explorer")
+
+    if M.bufnr then
+      setup_buffer()
+      refresh_explorer()
+    end
+  end
+
+  if util.get_buf_by_name("Test Explorer") then
+    callback()
+  else
+    M.load_autocmd = vim.api.nvim_create_autocmd("BufNewFile", {
+      group = vim.api.nvim_create_augroup("xcodebuild-test-explorer", { clear = true }),
+      pattern = "Test Explorer",
+      once = true,
+      callback = callback,
+    })
+  end
 end
 
 ---Collapses or expands all classes.
@@ -607,6 +640,7 @@ function M.finish_tests()
   end
 
   refresh_explorer()
+  appdata.write_test_explorer_data(M.report)
 end
 
 ---Updates the status of the test with the provided {testId}.
@@ -789,6 +823,11 @@ function M.show()
   end
 
   if not M.bufnr or util.is_empty(vim.fn.win_findbuf(M.bufnr)) then
+    if M.load_autocmd then
+      vim.api.nvim_del_autocmd(M.load_autocmd)
+      M.load_autocmd = nil
+    end
+
     vim.cmd(config.open_command)
     M.bufnr = vim.api.nvim_get_current_buf()
     setup_buffer()
@@ -813,7 +852,7 @@ function M.load_tests(tests)
   generate_report(tests)
 end
 
----Sets up the Test Explorer.
+---Sets up the Test Explorer. Loads last report if available.
 function M.setup()
   -- stylua: ignore start
   vim.api.nvim_set_hl(0, "XcodebuildTestExplorerTest", { link = "Function", default = true })
@@ -826,6 +865,8 @@ function M.setup()
   vim.api.nvim_set_hl(0, "XcodebuildTestExplorerTestDisabled", { link = "Comment", default = true })
   vim.api.nvim_set_hl(0, "XcodebuildTestExplorerTestNotExecuted", { link = "Normal", default = true })
   -- stylua: ignore end
+
+  load_saved_state()
 end
 
 return M
