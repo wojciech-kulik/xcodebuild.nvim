@@ -163,7 +163,7 @@ end
 ---  },
 ---  integrations = {
 ---    xcode_build_server = {
----      enabled = false, -- run "xcode-build-server config" when scheme changes
+---      enabled = true, -- enable calling "xcode-build-server config" when project config changes
 ---    },
 ---    nvim_tree = {
 ---      enabled = true, -- enable updating Xcode project files when using nvim-tree

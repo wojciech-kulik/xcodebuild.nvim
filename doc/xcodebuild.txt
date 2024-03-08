@@ -162,7 +162,7 @@ M.setup({options})                                            *xcodebuild.setup*
       },
       integrations = {
         xcode_build_server = {
-          enabled = false, -- run "xcode-build-server config" when scheme changes
+          enabled = true, -- enable calling "xcode-build-server config" when project config changes
         },
         nvim_tree = {
           enabled = true, -- enable updating Xcode project files when using nvim-tree
@@ -3259,6 +3259,11 @@ M.code_actions()                      *xcodebuild.integrations.lsp.code_actions*
   If no code action is available, nothing will happen.
 
 
+                             *xcodebuild.integrations.lsp.restart_sourcekit_lsp*
+M.restart_sourcekit_lsp()
+  Restarts the `sourcekit-lsp` client.
+
+
 ==============================================================================
 nvim-tree Integration                        *xcodebuild.integrations.nvim_tree*
 
@@ -3290,7 +3295,25 @@ M.setup()                              *xcodebuild.integrations.nvim_tree.setup*
 xcode-build-server Integration      *xcodebuild.integrations.xcode_build_server*
 
 This module is responsible for the integration with xcode-build-server.
-It provides a function to update buildServer.json file with the current scheme.
+
+See: https://github.com/SolaWing/xcode-build-server
+
+
+                       *xcodebuild.integrations.xcode_build_server.is_installed*
+M.is_installed()
+  Returns whether the xcode-build-server is installed.
+
+  Returns: ~
+    (boolean)
+
+
+                         *xcodebuild.integrations.xcode_build_server.is_enabled*
+M.is_enabled()
+  Returns whether the integration is enabled.
+
+  Returns: ~
+    (boolean)
+
 
                          *xcodebuild.integrations.xcode_build_server.run_config*
 M.run_config({projectCommand}, {scheme})

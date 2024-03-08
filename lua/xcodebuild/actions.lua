@@ -180,10 +180,8 @@ function M.select_scheme(callback)
   defer_send("Loading schemes...")
   helpers.cancel_actions()
 
-  pickers.select_xcodeproj_if_needed(function()
-    pickers.select_scheme(nil, function()
-      update_settings(callback)
-    end, { close_on_select = true })
+  pickers.select_scheme(nil, function()
+    update_settings(callback)
   end, { close_on_select = true })
 end
 
@@ -193,10 +191,8 @@ function M.select_config(callback)
   defer_send("Loading schemes...")
   helpers.cancel_actions()
 
-  pickers.select_xcodeproj_if_needed(function()
-    pickers.select_config(function()
-      update_settings(callback)
-    end, { close_on_select = true })
+  pickers.select_config(function()
+    update_settings(callback)
   end, { close_on_select = true })
 end
 
