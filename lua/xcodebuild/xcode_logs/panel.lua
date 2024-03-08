@@ -37,7 +37,7 @@ end
 ---Returns buffer and window number of the logs buffer.
 ---@return number|nil, number|nil
 local function get_buf_and_win_of_logs()
-  local bufnr = util.get_buf_by_name(appdata.build_logs_filename, { returnNotLoaded = true })
+  local bufnr = util.get_buf_by_filename(appdata.build_logs_filename, { returnNotLoaded = true })
 
   if bufnr then
     local winnr = vim.fn.win_findbuf(bufnr)

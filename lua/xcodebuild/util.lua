@@ -89,11 +89,37 @@ end
 ---@param filename string
 ---@param opts table|nil
 ---* {returnNotLoaded} (boolean)
-function M.get_buf_by_name(filename, opts)
+function M.get_buf_by_filename(filename, opts)
   local allBuffers = M.get_buffers(opts)
 
   for _, buf in pairs(allBuffers) do
     if string.match(vim.api.nvim_buf_get_name(buf), ".*/([^/]*)$") == filename then
+      return buf
+    end
+  end
+
+  return nil
+end
+
+---Gets a buffer by its name.
+---@param name string
+---@return number|nil
+function M.get_buf_by_name(name)
+  for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+    if vim.fn.bufname(buf) == name then
+      return buf
+    end
+  end
+
+  return nil
+end
+
+---Gets a buffer by its filetype.
+---@param filetype string
+---@return number|nil
+function M.get_buf_by_filetype(filetype)
+  for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+    if vim.api.nvim_buf_get_option(buf, "filetype") == filetype then
       return buf
     end
   end

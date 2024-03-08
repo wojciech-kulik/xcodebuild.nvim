@@ -27,6 +27,7 @@
 ---@field snapshots_dir string # The path to the snapshots directory.
 ---@field coverage_filepath string # The path to the coverage file.
 ---@field coverage_report_filepath string # The path to the coverage report file.
+---@field test_explorer_filepath string # The path to the test explorer file.
 ---@field GETSNAPSHOTS_TOOL string # The name of the getsnapshots tool.
 ---@field PROJECT_HELPER_TOOL string # The name of the project helper tool.
 ---@field REMOTE_DEBUGGER_TOOL string # The name of the remote debugger tool.
@@ -50,6 +51,7 @@ M.tests_filepath = M.appdir .. "/" .. M.tests_filename
 M.snapshots_dir = M.appdir .. "/failing-snapshots"
 M.coverage_filepath = M.appdir .. "/coverage.xccovarchive"
 M.coverage_report_filepath = M.appdir .. "/coverage.json"
+M.test_explorer_filepath = M.appdir .. "/test-explorer.json"
 
 M.GETSNAPSHOTS_TOOL = "getsnapshots"
 M.PROJECT_HELPER_TOOL = "project_helper.rb"
@@ -171,6 +173,25 @@ function M.append_app_logs(output)
 
     require("xcodebuild.integrations.dap").update_console(log_lines)
   end
+end
+
+---Writes Test Explorer data to disk.
+---@param report TestExplorerNode[]
+function M.write_test_explorer_data(report)
+  local json = vim.split(vim.fn.json_encode(report), "\n", { plain = true })
+  vim.fn.writefile(json, M.test_explorer_filepath)
+end
+
+---Reads Test Explorer data from disk.
+---@return TestExplorerNode[]|nil
+function M.read_test_explorer_data()
+  local success, json = util.readfile(M.test_explorer_filepath)
+
+  if success then
+    return vim.fn.json_decode(json)
+  end
+
+  return nil
 end
 
 return M

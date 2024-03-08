@@ -40,6 +40,25 @@ local function setupHighlights()
   end
 end
 
+--- Checks if the user is using a deprecated configuration.
+---@param options table|nil
+local function validate_options(options)
+  if not options then
+    return
+  end
+
+  if
+    options.test_explorer
+    and options.test_explorer.open_command
+    and not string.find(options.test_explorer.open_command, "Test Explorer")
+  then
+    print(
+      'xcodebuild.nvim: Make sure that your `test_explorer.open_command` option creates a buffer with "Test Explorer" name.'
+    )
+    print("xcodebuild.nvim: Otherwise, restoring Test Explorer on start won't work.")
+  end
+end
+
 ---Checks if the user is using a deprecated configuration.
 local function warnAboutOldConfig()
   local config = require("xcodebuild.core.config").options
@@ -135,7 +154,7 @@ end
 ---    enabled = true, -- enable Test Explorer
 ---    auto_open = true, -- open Test Explorer when tests are started
 ---    auto_focus = true, -- focus Test Explorer when opened
----    open_command = "botright 42vsplit Test Explorer", -- command used to open Test Explorer
+---    open_command = "botright 42vsplit Test Explorer", -- command used to open Test Explorer, must create a buffer with "Test Explorer" name
 ---    open_expanded = true, -- open Test Explorer with expanded classes
 ---    success_sign = "✔", -- passed test icon
 ---    failure_sign = "✖", -- failed test icon
@@ -182,6 +201,8 @@ end
 ---})
 ---@usage ]]
 function M.setup(options)
+  validate_options(options)
+
   require("xcodebuild.core.config").setup(options)
 
   local autocmd = require("xcodebuild.core.autocmd")
