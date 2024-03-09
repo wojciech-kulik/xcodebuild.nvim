@@ -13,16 +13,8 @@ local assert = require("luassert")
 local manager = require("xcodebuild.project.manager")
 local util = require("xcodebuild.util")
 local cwd = vim.fn.getcwd()
-local lastCommand = nil
 local pickerReceivedItems = nil
 local projectRoot = cwd .. "/specs/tmp/XcodebuildNvimApp/"
-
----@param filepath string
-local function create_file(filepath)
-  local dir = vim.fn.fnamemodify(filepath, ":h")
-  util.shell("mkdir -p '" .. dir .. "'")
-  util.shell("touch '" .. filepath .. "'")
-end
 
 ---@param filepath string
 local function setFilePath(filepath)
@@ -43,7 +35,6 @@ local function assertGroupInProject(groupName, expectedResult)
   local lines = vim.fn.readfile(projectRoot .. "XcodebuildNvimApp.xcodeproj/project.pbxproj")
   local found = false
   local expectedLines = {
-    "name = " .. groupName .. ";",
     "path = " .. groupName .. ";",
     'sourceTree = "<group>";',
   }
@@ -52,7 +43,6 @@ local function assertGroupInProject(groupName, expectedResult)
     if
       string.find(lines[i], expectedLines[1], 1, true)
       and string.find(lines[i + 1], expectedLines[2], 1, true)
-      and string.find(lines[i + 2], expectedLines[3], 1, true)
     then
       found = true
       break
@@ -171,11 +161,9 @@ describe("ensure", function()
 
   describe("when file does not exist", function()
     local newFilePath = projectRoot .. "XcodebuildNvimApp/Modules/NewModule/new_file.swift"
-    local newFileGroupPath = projectRoot .. "XcodebuildNvimApp/Modules/NewModule"
 
     describe("add_file_to_targets", function()
       before_each(function()
-        create_file(newFilePath)
         setFilePath(newFilePath)
         manager.add_current_group()
         manager.add_file_to_targets(newFilePath, { "XcodebuildNvimApp", "XcodebuildNvimAppTests", "Helpers" })
@@ -191,6 +179,8 @@ describe("ensure", function()
         vim.fn.input = function(_, _)
           return "new_file.swift"
         end
+
+        local newFileGroupPath = vim.fn.fnamemodify(newFilePath, ":h")
         util.shell("mkdir -p '" .. newFileGroupPath .. "'")
         manager.create_new_file()
       end)
@@ -206,7 +196,6 @@ describe("ensure", function()
 
     describe("add_file", function()
       before_each(function()
-        create_file(newFilePath)
         manager.add_file(newFilePath)
       end)
 
@@ -218,7 +207,6 @@ describe("ensure", function()
     describe("add_file with nested dirs", function()
       local nestedFilePath = projectRoot .. "XcodebuildNvimApp/SomeDir/Nested/NewModule/File.swift"
       before_each(function()
-        create_file(nestedFilePath)
         manager.add_file(nestedFilePath)
       end)
 
@@ -235,7 +223,6 @@ describe("ensure", function()
 
     describe("add_current_file", function()
       before_each(function()
-        create_file(newFilePath)
         setFilePath(newFilePath)
         manager.add_current_file()
       end)
@@ -256,11 +243,8 @@ describe("ensure", function()
       local movedFilePath = projectRoot .. "XcodebuildNvimApp/Modules/MovedModule/moved_file.swift"
 
       before_each(function()
-        util.shell("mkdir -p '" .. movedGroupPath .. "'")
         manager.add_file_to_targets(filepath, { "XcodebuildNvimApp", "Helpers" })
         manager.add_group(movedGroupPath)
-
-        util.shell("mv '" .. filepath .. "' '" .. movedFilePath .. "'")
         manager.move_file(filepath, movedFilePath)
       end)
 
@@ -274,7 +258,6 @@ describe("ensure", function()
 
       before_each(function()
         manager.add_file_to_targets(filepath, { "XcodebuildNvimApp", "Helpers" })
-        util.shell("mv '" .. filepath .. "' '" .. changedFilePath .. "'")
         manager.rename_file(filepath, changedFilePath)
       end)
 
@@ -363,7 +346,6 @@ describe("ensure", function()
 
     describe("add_group", function()
       before_each(function()
-        util.shell("mkdir -p '" .. newGroupPath .. "'")
         manager.add_group(newGroupPath)
       end)
 
@@ -396,6 +378,7 @@ describe("ensure", function()
 
       it("updates xcodeproj", function()
         assertGroupInProject("MainChanged")
+        assertGroupInProject("Main", false)
       end)
     end)
 
@@ -403,12 +386,12 @@ describe("ensure", function()
       local changedGroupPath = projectRoot .. "XcodebuildNvimApp/Modules/MainChanged"
 
       before_each(function()
-        util.shell("mv '" .. groupPath .. "' '" .. changedGroupPath .. "'")
         manager.move_or_rename_group(groupPath, changedGroupPath)
       end)
 
       it("updates xcodeproj", function()
         assertGroupInProject("MainChanged")
+        assertGroupInProject("Main", false)
       end)
     end)
 
@@ -416,13 +399,13 @@ describe("ensure", function()
       local changedGroupPath = projectRoot .. "XcodebuildNvimApp/NewPath/Modules/MainChanged"
 
       before_each(function()
-        util.shell("mkdir -p '" .. changedGroupPath .. "'")
-        util.shell("mv '" .. groupPath .. "' '" .. changedGroupPath .. "'")
-        manager.add_group(changedGroupPath)
+        manager.add_group(vim.fn.fnamemodify(changedGroupPath, ":h"))
         manager.move_or_rename_group(groupPath, changedGroupPath)
       end)
 
       it("updates xcodeproj", function()
+        assertGroupInProject("Modules")
+        assertGroupInProject("NewPath")
         assertGroupInProject("MainChanged")
       end)
     end)

@@ -1775,6 +1775,7 @@ M.create_new_file()
                                 *xcodebuild.project.manager.add_file_to_targets*
 M.add_file_to_targets({filepath}, {targets})
   Adds the file to the selected targets.
+  The group from {filepath} must exist in the project.
 
   Parameters: ~
     {filepath}  (string)
@@ -1792,6 +1793,7 @@ M.get_project_targets()
 M.add_file({filepath})                     *xcodebuild.project.manager.add_file*
   Adds the file to project.
   Asks the user to select the targets.
+  All groups from {filepath} will be added to the project if they are not already there.
 
   Parameters: ~
     {filepath}  (string)
@@ -1801,11 +1803,13 @@ M.add_file({filepath})                     *xcodebuild.project.manager.add_file*
 M.add_current_file()
   Adds the current file to the selected targets.
   Ask the user to select the targets.
+  All groups will be added to the project if they are not already there.
 
 
                                           *xcodebuild.project.manager.move_file*
 M.move_file({oldFilePath}, {newFilePath})
   Moves the file to the new path in the project.
+  The group from {newFilePath} must exist in the project.
 
   Parameters: ~
     {oldFilePath}  (string)
@@ -1878,8 +1882,9 @@ M.rename_current_group()
                                *xcodebuild.project.manager.move_or_rename_group*
 M.move_or_rename_group({oldGroupPath}, {newGroupPath})
   Moves or renames the group in the project.
-  If the group name is the same, it moves the group.
-  If the group name is different, it renames the group.
+  If the parent path is different, it moves the group.
+  If the parent path is the same, it renames the group.
+  The parent group of {newGroupPath} must exist.
 
   Parameters: ~
     {oldGroupPath}  (string)

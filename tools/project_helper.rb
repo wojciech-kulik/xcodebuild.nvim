@@ -160,6 +160,7 @@ def move_group(project, old_path, new_path)
   new_parent_group = find_group_by_absolute_dir_path(project, new_parent_path)
   old_group = find_group_by_absolute_dir_path(project, old_path)
   old_group.move(new_parent_group)
+  old_group.set_path(new_path)
 
   project.save
 end

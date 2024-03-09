@@ -99,6 +99,7 @@ local function run_select_targets(callback)
 end
 
 ---Adds file to the selected targets.
+---The group from {filepath} must exist in the project.
 ---@param filepath string
 ---@param targets string[]
 local function run_add_file_to_targets(filepath, targets)
@@ -194,6 +195,7 @@ function M.create_new_file()
 end
 
 ---Adds the file to the selected targets.
+---The group from {filepath} must exist in the project.
 ---@param filepath string
 ---@param targets string[]
 function M.add_file_to_targets(filepath, targets)
@@ -216,6 +218,7 @@ end
 
 ---Adds the file to project.
 ---Asks the user to select the targets.
+---All groups from {filepath} will be added to the project if they are not already there.
 ---@param filepath string
 function M.add_file(filepath)
   if not helpers.validate_project() or not validate_xcodeproj_tool() then
@@ -237,11 +240,13 @@ end
 
 ---Adds the current file to the selected targets.
 ---Ask the user to select the targets.
+---All groups will be added to the project if they are not already there.
 function M.add_current_file()
   M.add_file(vim.fn.expand("%:p"))
 end
 
 ---Moves the file to the new path in the project.
+---The group from {newFilePath} must exist in the project.
 ---@param oldFilePath string
 ---@param newFilePath string
 function M.move_file(oldFilePath, newFilePath)
@@ -404,8 +409,9 @@ function M.rename_current_group()
 end
 
 ---Moves or renames the group in the project.
----If the group name is the same, it moves the group.
----If the group name is different, it renames the group.
+---If the parent path is different, it moves the group.
+---If the parent path is the same, it renames the group.
+---The parent group of {newGroupPath} must exist.
 ---@param oldGroupPath string
 ---@param newGroupPath string
 function M.move_or_rename_group(oldGroupPath, newGroupPath)
@@ -413,7 +419,10 @@ function M.move_or_rename_group(oldGroupPath, newGroupPath)
     return
   end
 
-  if vim.fs.basename(oldGroupPath) == vim.fs.basename(newGroupPath) then
+  local oldDir = vim.fn.fnamemodify(oldGroupPath, ":h")
+  local newDir = vim.fn.fnamemodify(newGroupPath, ":h")
+
+  if oldDir ~= newDir then
     run_move_group(oldGroupPath, newGroupPath)
     notifications.send("Group has been moved")
   else
