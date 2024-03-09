@@ -1,0 +1,812 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		1680AC7C2B9C80AB0036CB34 /* XcodebuildNvimApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1680AC7B2B9C80AB0036CB34 /* XcodebuildNvimApp.swift */; };
+		1680AC7E2B9C80AB0036CB34 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1680AC7D2B9C80AB0036CB34 /* ContentView.swift */; };
+		1680AC802B9C80AD0036CB34 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1680AC7F2B9C80AD0036CB34 /* Assets.xcassets */; };
+		1680AC832B9C80AD0036CB34 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1680AC822B9C80AD0036CB34 /* Preview Assets.xcassets */; };
+		1680AC8D2B9C80AD0036CB34 /* XcodebuildNvimAppTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1680AC8C2B9C80AD0036CB34 /* XcodebuildNvimAppTests.swift */; };
+		1680AC972B9C80AD0036CB34 /* XcodebuildNvimAppUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1680AC962B9C80AD0036CB34 /* XcodebuildNvimAppUITests.swift */; };
+		1680AC992B9C80AD0036CB34 /* XcodebuildNvimAppUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1680AC982B9C80AD0036CB34 /* XcodebuildNvimAppUITestsLaunchTests.swift */; };
+		1680ACA82B9C80F80036CB34 /* MainViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1680ACA72B9C80F80036CB34 /* MainViewModel.swift */; };
+		1680ACB12B9C83780036CB34 /* Helpers.h in Headers */ = {isa = PBXBuildFile; fileRef = 1680ACB02B9C83780036CB34 /* Helpers.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1680ACB42B9C83780036CB34 /* Helpers.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1680ACAE2B9C83780036CB34 /* Helpers.framework */; };
+		1680ACB52B9C83780036CB34 /* Helpers.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 1680ACAE2B9C83780036CB34 /* Helpers.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		1680ACBC2B9C83D80036CB34 /* String+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1680ACBB2B9C83D80036CB34 /* String+Extensions.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		1680AC892B9C80AD0036CB34 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 1680AC702B9C80AB0036CB34 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 1680AC772B9C80AB0036CB34;
+			remoteInfo = XcodebuildNvimApp;
+		};
+		1680AC932B9C80AD0036CB34 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 1680AC702B9C80AB0036CB34 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 1680AC772B9C80AB0036CB34;
+			remoteInfo = XcodebuildNvimApp;
+		};
+		1680ACB22B9C83780036CB34 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 1680AC702B9C80AB0036CB34 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 1680ACAD2B9C83780036CB34;
+			remoteInfo = Helpers;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		1680ACB92B9C83780036CB34 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				1680ACB52B9C83780036CB34 /* Helpers.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		1680AC782B9C80AB0036CB34 /* XcodebuildNvimApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = XcodebuildNvimApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		1680AC7B2B9C80AB0036CB34 /* XcodebuildNvimApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XcodebuildNvimApp.swift; sourceTree = "<group>"; };
+		1680AC7D2B9C80AB0036CB34 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		1680AC7F2B9C80AD0036CB34 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		1680AC822B9C80AD0036CB34 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		1680AC882B9C80AD0036CB34 /* XcodebuildNvimAppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = XcodebuildNvimAppTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		1680AC8C2B9C80AD0036CB34 /* XcodebuildNvimAppTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XcodebuildNvimAppTests.swift; sourceTree = "<group>"; };
+		1680AC922B9C80AD0036CB34 /* XcodebuildNvimAppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = XcodebuildNvimAppUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		1680AC962B9C80AD0036CB34 /* XcodebuildNvimAppUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XcodebuildNvimAppUITests.swift; sourceTree = "<group>"; };
+		1680AC982B9C80AD0036CB34 /* XcodebuildNvimAppUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XcodebuildNvimAppUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		1680ACA72B9C80F80036CB34 /* MainViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewModel.swift; sourceTree = "<group>"; };
+		1680ACAE2B9C83780036CB34 /* Helpers.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Helpers.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		1680ACB02B9C83780036CB34 /* Helpers.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Helpers.h; sourceTree = "<group>"; };
+		1680ACBB2B9C83D80036CB34 /* String+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Extensions.swift"; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		1680AC752B9C80AB0036CB34 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1680ACB42B9C83780036CB34 /* Helpers.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1680AC852B9C80AD0036CB34 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1680AC8F2B9C80AD0036CB34 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1680ACAB2B9C83780036CB34 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		1680AC6F2B9C80AB0036CB34 = {
+			isa = PBXGroup;
+			children = (
+				1680AC7A2B9C80AB0036CB34 /* XcodebuildNvimApp */,
+				1680AC8B2B9C80AD0036CB34 /* XcodebuildNvimAppTests */,
+				1680AC952B9C80AD0036CB34 /* XcodebuildNvimAppUITests */,
+				1680ACAF2B9C83780036CB34 /* Helpers */,
+				1680AC792B9C80AB0036CB34 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		1680AC792B9C80AB0036CB34 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				1680AC782B9C80AB0036CB34 /* XcodebuildNvimApp.app */,
+				1680AC882B9C80AD0036CB34 /* XcodebuildNvimAppTests.xctest */,
+				1680AC922B9C80AD0036CB34 /* XcodebuildNvimAppUITests.xctest */,
+				1680ACAE2B9C83780036CB34 /* Helpers.framework */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		1680AC7A2B9C80AB0036CB34 /* XcodebuildNvimApp */ = {
+			isa = PBXGroup;
+			children = (
+				1680ACA52B9C80E50036CB34 /* Modules */,
+				1680AC7B2B9C80AB0036CB34 /* XcodebuildNvimApp.swift */,
+				1680AC7F2B9C80AD0036CB34 /* Assets.xcassets */,
+				1680AC812B9C80AD0036CB34 /* Preview Content */,
+			);
+			path = XcodebuildNvimApp;
+			sourceTree = "<group>";
+		};
+		1680AC812B9C80AD0036CB34 /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				1680AC822B9C80AD0036CB34 /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		1680AC8B2B9C80AD0036CB34 /* XcodebuildNvimAppTests */ = {
+			isa = PBXGroup;
+			children = (
+				1680AC8C2B9C80AD0036CB34 /* XcodebuildNvimAppTests.swift */,
+			);
+			path = XcodebuildNvimAppTests;
+			sourceTree = "<group>";
+		};
+		1680AC952B9C80AD0036CB34 /* XcodebuildNvimAppUITests */ = {
+			isa = PBXGroup;
+			children = (
+				1680AC962B9C80AD0036CB34 /* XcodebuildNvimAppUITests.swift */,
+				1680AC982B9C80AD0036CB34 /* XcodebuildNvimAppUITestsLaunchTests.swift */,
+			);
+			path = XcodebuildNvimAppUITests;
+			sourceTree = "<group>";
+		};
+		1680ACA52B9C80E50036CB34 /* Modules */ = {
+			isa = PBXGroup;
+			children = (
+				1680ACA62B9C80EC0036CB34 /* Main */,
+			);
+			path = Modules;
+			sourceTree = "<group>";
+		};
+		1680ACA62B9C80EC0036CB34 /* Main */ = {
+			isa = PBXGroup;
+			children = (
+				1680AC7D2B9C80AB0036CB34 /* ContentView.swift */,
+				1680ACA72B9C80F80036CB34 /* MainViewModel.swift */,
+			);
+			path = Main;
+			sourceTree = "<group>";
+		};
+		1680ACAF2B9C83780036CB34 /* Helpers */ = {
+			isa = PBXGroup;
+			children = (
+				1680ACBA2B9C83CF0036CB34 /* GeneralUtils */,
+				1680ACB02B9C83780036CB34 /* Helpers.h */,
+			);
+			path = Helpers;
+			sourceTree = "<group>";
+		};
+		1680ACBA2B9C83CF0036CB34 /* GeneralUtils */ = {
+			isa = PBXGroup;
+			children = (
+				1680ACBB2B9C83D80036CB34 /* String+Extensions.swift */,
+			);
+			path = GeneralUtils;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		1680ACA92B9C83780036CB34 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1680ACB12B9C83780036CB34 /* Helpers.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		1680AC772B9C80AB0036CB34 /* XcodebuildNvimApp */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1680AC9C2B9C80AD0036CB34 /* Build configuration list for PBXNativeTarget "XcodebuildNvimApp" */;
+			buildPhases = (
+				1680AC742B9C80AB0036CB34 /* Sources */,
+				1680AC752B9C80AB0036CB34 /* Frameworks */,
+				1680AC762B9C80AB0036CB34 /* Resources */,
+				1680ACB92B9C83780036CB34 /* Embed Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				1680ACB32B9C83780036CB34 /* PBXTargetDependency */,
+			);
+			name = XcodebuildNvimApp;
+			productName = XcodebuildNvimApp;
+			productReference = 1680AC782B9C80AB0036CB34 /* XcodebuildNvimApp.app */;
+			productType = "com.apple.product-type.application";
+		};
+		1680AC872B9C80AD0036CB34 /* XcodebuildNvimAppTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1680AC9F2B9C80AD0036CB34 /* Build configuration list for PBXNativeTarget "XcodebuildNvimAppTests" */;
+			buildPhases = (
+				1680AC842B9C80AD0036CB34 /* Sources */,
+				1680AC852B9C80AD0036CB34 /* Frameworks */,
+				1680AC862B9C80AD0036CB34 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				1680AC8A2B9C80AD0036CB34 /* PBXTargetDependency */,
+			);
+			name = XcodebuildNvimAppTests;
+			productName = XcodebuildNvimAppTests;
+			productReference = 1680AC882B9C80AD0036CB34 /* XcodebuildNvimAppTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		1680AC912B9C80AD0036CB34 /* XcodebuildNvimAppUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1680ACA22B9C80AD0036CB34 /* Build configuration list for PBXNativeTarget "XcodebuildNvimAppUITests" */;
+			buildPhases = (
+				1680AC8E2B9C80AD0036CB34 /* Sources */,
+				1680AC8F2B9C80AD0036CB34 /* Frameworks */,
+				1680AC902B9C80AD0036CB34 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				1680AC942B9C80AD0036CB34 /* PBXTargetDependency */,
+			);
+			name = XcodebuildNvimAppUITests;
+			productName = XcodebuildNvimAppUITests;
+			productReference = 1680AC922B9C80AD0036CB34 /* XcodebuildNvimAppUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+		1680ACAD2B9C83780036CB34 /* Helpers */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1680ACB62B9C83780036CB34 /* Build configuration list for PBXNativeTarget "Helpers" */;
+			buildPhases = (
+				1680ACA92B9C83780036CB34 /* Headers */,
+				1680ACAA2B9C83780036CB34 /* Sources */,
+				1680ACAB2B9C83780036CB34 /* Frameworks */,
+				1680ACAC2B9C83780036CB34 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Helpers;
+			productName = Helpers;
+			productReference = 1680ACAE2B9C83780036CB34 /* Helpers.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		1680AC702B9C80AB0036CB34 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1530;
+				LastUpgradeCheck = 1530;
+				TargetAttributes = {
+					1680AC772B9C80AB0036CB34 = {
+						CreatedOnToolsVersion = 15.3;
+					};
+					1680AC872B9C80AD0036CB34 = {
+						CreatedOnToolsVersion = 15.3;
+						TestTargetID = 1680AC772B9C80AB0036CB34;
+					};
+					1680AC912B9C80AD0036CB34 = {
+						CreatedOnToolsVersion = 15.3;
+						TestTargetID = 1680AC772B9C80AB0036CB34;
+					};
+					1680ACAD2B9C83780036CB34 = {
+						CreatedOnToolsVersion = 15.3;
+						LastSwiftMigration = 1530;
+					};
+				};
+			};
+			buildConfigurationList = 1680AC732B9C80AB0036CB34 /* Build configuration list for PBXProject "XcodebuildNvimApp" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 1680AC6F2B9C80AB0036CB34;
+			productRefGroup = 1680AC792B9C80AB0036CB34 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				1680AC772B9C80AB0036CB34 /* XcodebuildNvimApp */,
+				1680AC872B9C80AD0036CB34 /* XcodebuildNvimAppTests */,
+				1680AC912B9C80AD0036CB34 /* XcodebuildNvimAppUITests */,
+				1680ACAD2B9C83780036CB34 /* Helpers */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		1680AC762B9C80AB0036CB34 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1680AC832B9C80AD0036CB34 /* Preview Assets.xcassets in Resources */,
+				1680AC802B9C80AD0036CB34 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1680AC862B9C80AD0036CB34 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1680AC902B9C80AD0036CB34 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1680ACAC2B9C83780036CB34 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		1680AC742B9C80AB0036CB34 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1680AC7E2B9C80AB0036CB34 /* ContentView.swift in Sources */,
+				1680AC7C2B9C80AB0036CB34 /* XcodebuildNvimApp.swift in Sources */,
+				1680ACA82B9C80F80036CB34 /* MainViewModel.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1680AC842B9C80AD0036CB34 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1680AC8D2B9C80AD0036CB34 /* XcodebuildNvimAppTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1680AC8E2B9C80AD0036CB34 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1680AC972B9C80AD0036CB34 /* XcodebuildNvimAppUITests.swift in Sources */,
+				1680AC992B9C80AD0036CB34 /* XcodebuildNvimAppUITestsLaunchTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1680ACAA2B9C83780036CB34 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1680ACBC2B9C83D80036CB34 /* String+Extensions.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		1680AC8A2B9C80AD0036CB34 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 1680AC772B9C80AB0036CB34 /* XcodebuildNvimApp */;
+			targetProxy = 1680AC892B9C80AD0036CB34 /* PBXContainerItemProxy */;
+		};
+		1680AC942B9C80AD0036CB34 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 1680AC772B9C80AB0036CB34 /* XcodebuildNvimApp */;
+			targetProxy = 1680AC932B9C80AD0036CB34 /* PBXContainerItemProxy */;
+		};
+		1680ACB32B9C83780036CB34 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 1680ACAD2B9C83780036CB34 /* Helpers */;
+			targetProxy = 1680ACB22B9C83780036CB34 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		1680AC9A2B9C80AD0036CB34 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		1680AC9B2B9C80AD0036CB34 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		1680AC9D2B9C80AD0036CB34 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"XcodebuildNvimApp/Preview Content\"";
+				DEVELOPMENT_TEAM = "";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = pl.wojciechkulik.xcodebuildnvim.XcodebuildNvimApp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		1680AC9E2B9C80AD0036CB34 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"XcodebuildNvimApp/Preview Content\"";
+				DEVELOPMENT_TEAM = "";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = pl.wojciechkulik.xcodebuildnvim.XcodebuildNvimApp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		1680ACA02B9C80AD0036CB34 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = pl.wojciechkulik.xcodebuildnvim.XcodebuildNvimAppTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/XcodebuildNvimApp.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/XcodebuildNvimApp";
+			};
+			name = Debug;
+		};
+		1680ACA12B9C80AD0036CB34 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = pl.wojciechkulik.xcodebuildnvim.XcodebuildNvimAppTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/XcodebuildNvimApp.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/XcodebuildNvimApp";
+			};
+			name = Release;
+		};
+		1680ACA32B9C80AD0036CB34 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = pl.wojciechkulik.xcodebuildnvim.XcodebuildNvimAppUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = XcodebuildNvimApp;
+			};
+			name = Debug;
+		};
+		1680ACA42B9C80AD0036CB34 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = pl.wojciechkulik.xcodebuildnvim.XcodebuildNvimAppUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = XcodebuildNvimApp;
+			};
+			name = Release;
+		};
+		1680ACB72B9C83780036CB34 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = "";
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_MODULE_VERIFIER = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.4;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
+				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
+				PRODUCT_BUNDLE_IDENTIFIER = pl.wojciechkulik.xcodebuildnvim.Helpers;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_INSTALL_OBJC_HEADER = NO;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		1680ACB82B9C83780036CB34 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = "";
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_MODULE_VERIFIER = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.4;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
+				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
+				PRODUCT_BUNDLE_IDENTIFIER = pl.wojciechkulik.xcodebuildnvim.Helpers;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_INSTALL_OBJC_HEADER = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		1680AC732B9C80AB0036CB34 /* Build configuration list for PBXProject "XcodebuildNvimApp" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1680AC9A2B9C80AD0036CB34 /* Debug */,
+				1680AC9B2B9C80AD0036CB34 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		1680AC9C2B9C80AD0036CB34 /* Build configuration list for PBXNativeTarget "XcodebuildNvimApp" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1680AC9D2B9C80AD0036CB34 /* Debug */,
+				1680AC9E2B9C80AD0036CB34 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		1680AC9F2B9C80AD0036CB34 /* Build configuration list for PBXNativeTarget "XcodebuildNvimAppTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1680ACA02B9C80AD0036CB34 /* Debug */,
+				1680ACA12B9C80AD0036CB34 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		1680ACA22B9C80AD0036CB34 /* Build configuration list for PBXNativeTarget "XcodebuildNvimAppUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1680ACA32B9C80AD0036CB34 /* Debug */,
+				1680ACA42B9C80AD0036CB34 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		1680ACB62B9C83780036CB34 /* Build configuration list for PBXNativeTarget "Helpers" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1680ACB72B9C83780036CB34 /* Debug */,
+				1680ACB82B9C83780036CB34 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 1680AC702B9C80AB0036CB34 /* Project object */;
+}

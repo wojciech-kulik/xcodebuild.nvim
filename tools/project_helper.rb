@@ -1,11 +1,19 @@
-require 'xcodeproj'
+# frozen_string_literal: true
+
+require "xcodeproj"
 
 action = ARGV[0]
+
+# @type [Xcodeproj::Project]
 project = Xcodeproj::Project.open(ARGV[1])
 
+# @param [Xcodeproj::Project] project
+# @param [String] path
+# @param [Boolean] exit_on_not_found
+# @return [Xcodeproj::Project::Object::PBXGroup?]
 def find_group_by_absolute_file_path(project, path, exit_on_not_found = true)
   groups = project.groups.lazy.filter_map do |group|
-    relative_path = path.sub(group.real_path.to_s + "/", "")
+    relative_path = path.sub("#{group.real_path}/", "")
     relative_dir = File.dirname(relative_path)
 
     if group.real_path.to_s == File.dirname(path)
@@ -24,9 +32,13 @@ def find_group_by_absolute_file_path(project, path, exit_on_not_found = true)
   groups.first
 end
 
+# @param [Xcodeproj::Project] project
+# @param [String] path
+# @param [Boolean] exit_on_not_found
+# @return [Xcodeproj::Project::Object::PBXGroup?]
 def find_group_by_absolute_dir_path(project, path, exit_on_not_found = true)
   groups = project.groups.lazy.filter_map do |group|
-    relative_dir = path.sub(group.real_path.to_s + "/", "")
+    relative_dir = path.sub("#{group.real_path}/", "")
 
     if group.real_path.to_s == path
       return group
@@ -44,6 +56,10 @@ def find_group_by_absolute_dir_path(project, path, exit_on_not_found = true)
   groups.first
 end
 
+# @param [Xcodeproj::Project] project
+# @param [String] file_path
+# @param [Boolean] exit_on_not_found
+# @return [Xcodeproj::Project::Object::PBXFileReference?]
 def find_file(project, file_path, exit_on_not_found = true)
   file_ref = project.files.find { |file| file.real_path.to_s == file_path }
 
@@ -56,6 +72,9 @@ def find_file(project, file_path, exit_on_not_found = true)
   file_ref
 end
 
+# @param [Xcodeproj::Project] project
+# @param [String] targets
+# @param [String] file_path
 def add_file_to_targets(project, targets, file_path)
   file_ref = find_file(project, file_path, false)
 
@@ -65,51 +84,67 @@ def add_file_to_targets(project, targets, file_path)
   end
 
   targets.split(",").each do |target|
-    target = project.targets.find { |current| current.name == target }
+    target = project.native_targets.find { |current| current.name == target }
     target.add_file_references([file_ref])
   end
 
   project.save
 end
 
+# @param [Xcodeproj::Project] project
+# @param [String] targets
+# @param [String] file_path
 def update_file_targets(project, targets, file_path)
   find_file(project, file_path).remove_from_project
   add_file_to_targets(project, targets, file_path)
 end
 
+# @param [Xcodeproj::Project] project
+# @param [String] file_path
 def delete_file(project, file_path)
   find_file(project, file_path).remove_from_project
   project.save
 end
 
+# @param [Xcodeproj::Project] project
+# @param [String] old_file_path
+# @param [String] new_file_path
 def rename_file(project, old_file_path, new_file_path)
   find_file(project, old_file_path).set_path(new_file_path)
   project.save
 end
 
+# @param [Xcodeproj::Project] project
+# @param [String] old_path
+# @param [String] new_path
 def move_file(project, old_path, new_path)
   targets = get_targets_for_file(project, old_path)
   delete_file(project, old_path)
   add_file_to_targets(project, targets.join(","), new_path)
 end
 
+# @param [Xcodeproj::Project] project
+# @param [String] group_path
 def add_group(project, group_path)
   splitted_path = group_path.split("/")
 
-  for i in 1..(splitted_path.length - 2)
+  (1..(splitted_path.length - 2)).each do |i|
     current_path = splitted_path[0..i].join("/")
-    new_group_path = current_path + "/" + splitted_path[i + 1]
+    new_group_path = "#{current_path}/#{splitted_path[i + 1]}"
     parent_group = find_group_by_absolute_dir_path(project, current_path, false)
     current_group = find_group_by_absolute_dir_path(project, new_group_path, false)
 
-    if current_group.nil?
-      parent_group.new_group(splitted_path[i + 1], new_group_path) unless parent_group.nil?
+    if current_group.nil? && !parent_group.nil?
+      parent_group.new_group(splitted_path[i + 1], new_group_path)
     end
   end
 
   project.save
 end
 
+# @param [Xcodeproj::Project] project
+# @param [String] old_group_path
+# @param [String] new_group_path
 def rename_group(project, old_group_path, new_group_path)
   group = find_group_by_absolute_dir_path(project, old_group_path)
   group.name = File.basename(new_group_path)
@@ -117,6 +152,9 @@ def rename_group(project, old_group_path, new_group_path)
   project.save
 end
 
+# @param [Xcodeproj::Project] project
+# @param [String] old_path
+# @param [String] new_path
 def move_group(project, old_path, new_path)
   new_parent_path = File.dirname(new_path)
   new_parent_group = find_group_by_absolute_dir_path(project, new_parent_path)
@@ -126,6 +164,8 @@ def move_group(project, old_path, new_path)
   project.save
 end
 
+# @param [Xcodeproj::Project] project
+# @param [String] group_path
 def delete_group(project, group_path)
   group = find_group_by_absolute_dir_path(project, group_path)
   group.recursive_children_groups.reverse.each(&:clear)
@@ -134,24 +174,29 @@ def delete_group(project, group_path)
   project.save
 end
 
+# @param [Xcodeproj::Project] project
 def list_targets(project)
-  project.targets.each do |target|
+  project.native_targets.each do |target|
     puts target.name
   end
 end
 
+# @param [Xcodeproj::Project] project
+# @param [String] file_path
 def list_targets_for_file(project, file_path)
-  project.targets.each do |target|
+  project.native_targets.each do |target|
     target.source_build_phase.files_references.each do |file|
       puts target.name if file.real_path.to_s == file_path
     end
   end
 end
 
+# @param [Xcodeproj::Project] project
+# @param [String] file_path
 def get_targets_for_file(project, file_path)
   result = []
 
-  project.targets.each do |target|
+  project.native_targets.each do |target|
     target.source_build_phase.files_references.each do |file|
       result << target.name if file.real_path.to_s == file_path
     end
@@ -160,6 +205,10 @@ def get_targets_for_file(project, file_path)
   result
 end
 
+# rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity,
+# rubocop:disable Metrics/AbcSize, Metrics/MethodLength, Style/GuardClause
+# @param [Xcodeproj::Project] project
+# @param [String] action
 def handle_action(project, action)
   if action == "add_file"
     add_file_to_targets(project, ARGV[2], ARGV[3])
@@ -215,5 +264,7 @@ def handle_action(project, action)
     exit
   end
 end
+# rubocop:enable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity,
+# rubocop:enable Metrics/AbcSize, Metrics/MethodLength, Style/GuardClause
 
 handle_action(project, action)

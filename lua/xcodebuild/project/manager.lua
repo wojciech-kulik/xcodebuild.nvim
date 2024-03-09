@@ -224,6 +224,11 @@ function M.add_file(filepath)
 
   run_select_targets(function(targets)
     local dir = vim.fs.dirname(filepath)
+    if not dir then
+      notifications.send_error("Could not get the directory of: " .. filepath)
+      return
+    end
+
     M.add_group(dir, { silent = true })
     run_add_file_to_targets(filepath, targets)
     notifications.send("File has been added to targets")
