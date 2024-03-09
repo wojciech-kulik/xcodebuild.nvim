@@ -40,11 +40,14 @@ luac.out
 *.hex
 
 .DS_Store
-tools/src/getsnapshots.xcodeproj/project.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist
+tools/getsnapshots_src/getsnapshots.xcodeproj/project.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist
 xcuserdata
-tools/src/getsnapshots.xcodeproj/xcuserdata
-tools/src/getsnapshots.xcodeproj/xcshareddata/xcschemes/getsnapshots.xcscheme
+tools/getsnapshots_src/getsnapshots.xcodeproj/xcuserdata
+tools/getsnapshots_src/getsnapshots.xcodeproj/xcshareddata/xcschemes/getsnapshots.xcscheme
 specs/test_data/*.vim
 doc/tags
 luals-out
 .tests
+tools/doc
+tools/.yardoc
+specs/tmp/XcodebuildNvimApp
