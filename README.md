@@ -45,12 +45,13 @@ https://github.com/wojciech-kulik/xcodebuild.nvim/assets/3128467/ed7d2d2e-eaa4-4
 
 ##### External tools
 
-- [xcbeautify](https://github.com/tuist/xcbeautify) - Xcode logs formatter (you can set a different tool or disable formatting in the config).
+- [xcbeautify](https://github.com/tuist/xcbeautify) to format Xcode logs (you can set a different tool or disable formatting in the config).
 - [Xcodeproj](https://github.com/CocoaPods/Xcodeproj) to manage project files within Neovim.
+- [Ruby](https://www.ruby-lang.org) to use `xcodeproj` gem.
 - [pymobiledevice3](https://github.com/doronz88/pymobiledevice3) to debug on physical devices and/or run apps on devices below iOS 17.
 - [xcode-build-server](https://github.com/SolaWing/xcode-build-server) to make LSP work properly with xcodeproj/xcworkspace.
 - [codelldb](https://github.com/vadimcn/codelldb) to debug iOS and macOS Swift apps.
-- [Xcode](https://developer.apple.com/xcode/) - make sure that `xcodebuild` and `xcrun simctl` work correctly. Tested with Xcode 15.
+- [Xcode](https://developer.apple.com/xcode/) to build, run, and test apps. Make sure that `xcodebuild` and `xcrun simctl` work correctly. Tested with Xcode 15.
 
 ##### Availability of features
 
@@ -97,6 +98,7 @@ Install external tools:
 ```shell
 brew install xcode-build-server
 brew install xcbeautify
+brew install ruby
 gem install xcodeproj
 python3 -m pip install -U pymobiledevice3
 ```

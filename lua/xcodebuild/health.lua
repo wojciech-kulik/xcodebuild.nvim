@@ -192,16 +192,56 @@ end
 local function check_xcodebuild_version()
   local util = require("xcodebuild.util")
   local response = util.shell("xcodebuild -version 2>/dev/null")
-  local majorVersion = response[1]:match("Xcode (%d+)")
+  local majorVersion, minorVersion = response[1]:match("Xcode (%d+)%.(%d+)")
 
   if majorVersion then
     if tonumber(majorVersion) < 15 then
-      warn("xcodebuild: version " .. majorVersion .. " was not tested. Use version 15 or higher.")
+      warn(
+        "xcodebuild: version "
+          .. majorVersion
+          .. "."
+          .. minorVersion
+          .. " was not tested. Use version 15 or higher."
+      )
     else
-      ok("xcodebuild: version " .. majorVersion)
+      ok("xcodebuild: version " .. majorVersion .. "." .. minorVersion)
     end
   else
     error("xcodebuild: could not determine version.")
+  end
+end
+
+local function check_ruby_version()
+  local util = require("xcodebuild.util")
+  local response = util.shell("ruby --version 2>/dev/null")
+  local major, minor, patch = response[1]:match("(%d+)%.(%d+)%.(%d+)")
+
+  if major and minor then
+    if tonumber(major .. minor) < 27 then
+      error(
+        "ruby: version "
+          .. major
+          .. "."
+          .. minor
+          .. "."
+          .. patch
+          .. " is not supported. Use version 2.7 or higher. Required by `xcodeproj`."
+      )
+    elseif tonumber(major .. minor) < 30 then
+      warn(
+        "ruby: "
+          .. major
+          .. "."
+          .. minor
+          .. "."
+          .. patch
+          .. " - you are using an old version. Please consider update. Required by `xcodeproj`."
+      )
+    else
+      ok("ruby: version " .. major .. "." .. minor .. "." .. patch)
+    end
+  else
+    error("ruby: could not determine version.")
   end
 end
 
@@ -246,9 +286,31 @@ local function check_sudo()
   warn("see `:h xcodebuild.sudo` for more information.")
 end
 
+local function check_plugin_commit()
+  local util = require("xcodebuild.util")
+  local pathComponents = vim.split(debug.getinfo(1).source:sub(2), "/", { plain = true })
+  local pluginDir = table.concat(pathComponents, "/", 1, #pathComponents - 3)
+  local commit = util.shell("git --git-dir '" .. pluginDir .. "/.git' rev-parse --short HEAD 2>/dev/null")[1]
+  local upstreamCommit =
+    util.shell("git --git-dir '" .. pluginDir .. "/.git' rev-parse --short @{u} 2>/dev/null")[1]
+
+  if commit then
+    if upstreamCommit and commit ~= upstreamCommit then
+      warn("xcodebuild.nvim: commit #" .. commit .. " is outdated. Please update plugin.")
+    else
+      ok("xcodebuild.nvim: commit #" .. commit)
+    end
+  else
+    warn("xcodebuild.nvim: commit not found.")
+  end
+end
+
 local M = {}
 
 M.check = function()
+  start("Checking xcodebuild.nvim")
+  check_plugin_commit()
+
   start("Checking OS")
   check_os()
 
@@ -261,6 +323,9 @@ M.check = function()
 
   start("Checking optional dependencies")
   check_tools(optional_dependencies, true)
+  if check_binary_installed("xcodeproj") then
+    check_ruby_version()
+  end
 
   start("Checking debugger")
   check_debugger()
