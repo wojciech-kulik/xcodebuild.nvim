@@ -292,7 +292,7 @@ local function check_plugin_commit()
   local pluginDir = table.concat(pathComponents, "/", 1, #pathComponents - 3)
   local commit = util.shell("git --git-dir '" .. pluginDir .. "/.git' rev-parse --short HEAD 2>/dev/null")[1]
   local upstreamCommit =
-    util.shell("git --git-dir '" .. pluginDir .. "/.git' rev-parse --short @{u} 2>/dev/null")[1]
+    util.shell("git --git-dir '" .. pluginDir .. "/.git' rev-parse --short origin/main 2>/dev/null")[1]
 
   if commit then
     if upstreamCommit and commit ~= upstreamCommit then
