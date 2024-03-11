@@ -1599,6 +1599,7 @@ AppData                                     *xcodebuild.project.appdata.AppData*
     {coverage_filepath}         (string) # The path to the coverage file.
     {coverage_report_filepath}  (string) # The path to the coverage report file.
     {test_explorer_filepath}    (string) # The path to the test explorer file.
+    {breakpoints_filepath}      (string) # The path to the breakpoints file.
     {GETSNAPSHOTS_TOOL}         (string) # The name of the getsnapshots tool.
     {PROJECT_HELPER_TOOL}       (string) # The name of the project helper tool.
     {REMOTE_DEBUGGER_TOOL}      (string) # The name of the remote debugger tool.
@@ -3045,7 +3046,7 @@ It provides functions to start the debugger and to manage its state.
 
 To configure `nvim-dap` for development:
 
-  1. Download codelldb VS Code plugin from: https://github.com/vadimcn/codelldb/releases
+  1. Download `codelldb` VS Code plugin from: https://github.com/vadimcn/codelldb/releases
      For macOS use darwin version. Just unzip vsix file and set paths below.
   2. Install also `nvim-dap-ui` for a nice GUI to debug.
   3. Make sure to enable console window from `nvim-dap-ui` to see simulator logs.
@@ -3060,35 +3061,10 @@ Sample `nvim-dap` configuration:
       config = function()
         local dap = require("dap")
         local xcodebuild = require("xcodebuild.integrations.dap")
+        -- SAMPLE PATH, change it to your local codelldb path
+        local codelldbPath = "/YOUR_PATH/codelldb-aarch64-darwin/extension/adapter/codelldb"
 
-        dap.configurations.swift = {
-          {
-            name = "iOS App Debugger",
-            type = "codelldb",
-            request = "attach",
-            program = xcodebuild.get_program_path,
-            cwd = "${workspaceFolder}",
-            stopOnEntry = false,
-            waitFor = true,
-          },
-        }
-
-        dap.adapters.codelldb = {
-          type = "server",
-          port = "13000",
-          executable = {
-            -- set path to the downloaded codelldb
-            -- sample path: "/Users/YOU/Downloads/codelldb-aarch64-darwin/extension/adapter/codelldb"
-            command = "/path/to/codelldb/extension/adapter/codelldb",
-            args = {
-              "--port",
-              "13000",
-              "--liblldb",
-              -- make sure that this path is correct on your side
-              "/Applications/Xcode.app/Contents/SharedFrameworks/LLDB.framework/Versions/A/LLDB",
-            },
-          },
-        }
+        xcodebuild.setup(codelldbPath)
 
         -- disables annoying warning that requires hitting enter
         local orig_notify = require("dap.utils").notify
@@ -3102,10 +3078,15 @@ Sample `nvim-dap` configuration:
         vim.keymap.set("n", "<leader>dd", xcodebuild.build_and_debug, { desc = "Build & Debug" })
         vim.keymap.set("n", "<leader>dr", xcodebuild.debug_without_build, { desc = "Debug Without Building" })
         vim.keymap.set("n", "<leader>dt", xcodebuild.debug_tests, { desc = "Debug Tests" })
-
-        -- you can also debug smaller scope tests:
-        -- debug_target_tests, debug_class_tests, debug_func_test,
-        -- debug_selected_tests, debug_failing_tests
+        vim.keymap.set("n", "<leader>dT", xcodebuild.debug_class_tests, { desc = "Debug Class Tests" })
+        vim.keymap.set("n", "<leader>b", xcodebuild.toggle_breakpoint, { desc = "Toggle Breakpoint" })
+        vim.keymap.set("n", "<leader>B", xcodebuild.toggle_message_breakpoint, { desc = "Toggle Message Breakpoint" })
+        vim.keymap.set("n", "<Leader>dx", function()
+          if dap.session() then
+            dap.terminate()
+          end
+          require("xcodebuild.actions").cancel()
+        end, { desc = "Terminate debugger" })
       end,
     }
 <
@@ -3205,6 +3186,80 @@ M.update_console({output}, {append})
   Parameters: ~
     {output}  (string[])
     {append}  (boolean|nil) # if true, appends the output to the last line
+
+
+                           *xcodebuild.integrations.dap.get_swift_configuration*
+M.get_swift_configuration()
+  Returns the `coodelldb` configuration for `nvim-dap`.
+
+  Returns: ~
+    (table[])
+
+  Usage: ~
+>lua
+    require("dap").configurations.swift = require("xcodebuild.integrations.dap").get_swift_configuration()
+<
+
+
+                              *xcodebuild.integrations.dap.get_codelldb_adapter*
+M.get_codelldb_adapter({codelldbPath}, {lldbPath}, {port})
+  Returns the `codelldb` adapter for `nvim-dap`.
+
+  Examples:
+    {codelldbPath} - `/your/path/to/codelldb-aarch64-darwin/extension/adapter/codelldb`
+    {lldbPath} - (default) `/Applications/Xcode.app/Contents/SharedFrameworks/LLDB.framework/Versions/A/LLDB`
+
+  Parameters: ~
+    {codelldbPath}  (string)
+    {lldbPath}      (string|nil)
+    {port}          (number|nil)
+
+  Returns: ~
+    (table)
+
+  Usage: ~
+>lua
+    require("dap").adapters.codelldb = require("xcodebuild.integrations.dap")
+      .get_codelldb_adapter("path/to/codelldb")
+<
+
+
+                                  *xcodebuild.integrations.dap.save_breakpoints*
+M.save_breakpoints()
+  Saves breakpoints to `.nvim/xcodebuild/breakpoints.json` file.
+
+
+                                  *xcodebuild.integrations.dap.load_breakpoints*
+M.load_breakpoints({bufnr})
+  Loads breakpoints from `.nvim/xcodebuild/breakpoints.json` file and sets them
+  in {bufnr} or in all loaded buffers if {bufnr} is nil.
+
+  Parameters: ~
+    {bufnr}  (number|nil)
+
+
+                                 *xcodebuild.integrations.dap.toggle_breakpoint*
+M.toggle_breakpoint()
+  Toggles a breakpoint in the current line and saves breakpoints to disk.
+
+
+                         *xcodebuild.integrations.dap.toggle_message_breakpoint*
+M.toggle_message_breakpoint()
+  Toggles a breakpoint with a log message in the current line and saves breakpoints to disk.
+  To print a variable, wrap it with {}: `{myObject.myProperty}`.
+
+
+                                             *xcodebuild.integrations.dap.setup*
+M.setup({codelldbPath}, {loadBreakpoints})
+  Sets up the adapter and configuration for the `nvim-dap` plugin.
+  {codelldbPath} - path to the `codelldb` binary.
+
+  Sample {codelldbPath} - `/your/path/to/codelldb-aarch64-darwin/extension/adapter/codelldb`
+  {loadBreakpoints} - if true or nil, sets up an autocmd to load breakpoints when a Swift file is opened.
+
+  Parameters: ~
+    {codelldbPath}     (string)
+    {loadBreakpoints}  (boolean|nil) default: true
 
 
 ==============================================================================

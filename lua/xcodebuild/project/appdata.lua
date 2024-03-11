@@ -28,6 +28,7 @@
 ---@field coverage_filepath string # The path to the coverage file.
 ---@field coverage_report_filepath string # The path to the coverage report file.
 ---@field test_explorer_filepath string # The path to the test explorer file.
+---@field breakpoints_filepath string # The path to the breakpoints file.
 ---@field GETSNAPSHOTS_TOOL string # The name of the getsnapshots tool.
 ---@field PROJECT_HELPER_TOOL string # The name of the project helper tool.
 ---@field REMOTE_DEBUGGER_TOOL string # The name of the remote debugger tool.
@@ -52,6 +53,7 @@ M.snapshots_dir = M.appdir .. "/failing-snapshots"
 M.coverage_filepath = M.appdir .. "/coverage.xccovarchive"
 M.coverage_report_filepath = M.appdir .. "/coverage.json"
 M.test_explorer_filepath = M.appdir .. "/test-explorer.json"
+M.breakpoints_filepath = M.appdir .. "/breakpoints.json"
 
 M.GETSNAPSHOTS_TOOL = "getsnapshots"
 M.PROJECT_HELPER_TOOL = "project_helper.rb"

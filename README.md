@@ -522,35 +522,10 @@ return {
   config = function()
     local dap = require("dap")
     local xcodebuild = require("xcodebuild.integrations.dap")
+    -- SAMPLE PATH, change it to your local codelldb path
+    local codelldbPath = os.getenv("HOME") .. "/tools/codelldb-aarch64-darwin/extension/adapter/codelldb"
 
-    dap.configurations.swift = {
-      {
-        name = "iOS App Debugger",
-        type = "codelldb",
-        request = "attach",
-        program = xcodebuild.get_program_path,
-        cwd = "${workspaceFolder}",
-        stopOnEntry = false,
-        waitFor = true,
-      },
-    }
-
-    dap.adapters.codelldb = {
-      type = "server",
-      port = "13000",
-      executable = {
-        -- set path to the downloaded codelldb
-        -- sample path: "/Users/YOU/Downloads/codelldb-aarch64-darwin/extension/adapter/codelldb"
-        command = "/path/to/codelldb/extension/adapter/codelldb",
-        args = {
-          "--port",
-          "13000",
-          "--liblldb",
-          -- make sure that this path is correct on your side
-          "/Applications/Xcode.app/Contents/SharedFrameworks/LLDB.framework/Versions/A/LLDB",
-        },
-      },
-    }
+    xcodebuild.setup(codelldbPath)
 
     -- disables annoying warning that requires hitting enter
     local orig_notify = require("dap.utils").notify
@@ -564,10 +539,15 @@ return {
     vim.keymap.set("n", "<leader>dd", xcodebuild.build_and_debug, { desc = "Build & Debug" })
     vim.keymap.set("n", "<leader>dr", xcodebuild.debug_without_build, { desc = "Debug Without Building" })
     vim.keymap.set("n", "<leader>dt", xcodebuild.debug_tests, { desc = "Debug Tests" })
-
-    -- you can also debug smaller scope tests:
-    -- debug_target_tests, debug_class_tests, debug_func_test,
-    -- debug_selected_tests, debug_failing_tests
+    vim.keymap.set("n", "<leader>dT", xcodebuild.debug_class_tests, { desc = "Debug Class Tests" })
+    vim.keymap.set("n", "<leader>b", xcodebuild.toggle_breakpoint, { desc = "Toggle Breakpoint" })
+    vim.keymap.set("n", "<leader>B", xcodebuild.toggle_message_breakpoint, { desc = "Toggle Message Breakpoint" })
+    vim.keymap.set("n", "<Leader>dx", function()
+      if dap.session() then
+        dap.terminate()
+      end
+      require("xcodebuild.actions").cancel()
+    end, { desc = "Terminate debugger" })
   end,
 }
 ```
