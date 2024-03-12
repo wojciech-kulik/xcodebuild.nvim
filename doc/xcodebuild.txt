@@ -3059,34 +3059,19 @@ Sample `nvim-dap` configuration:
         "wojciech-kulik/xcodebuild.nvim"
       },
       config = function()
-        local dap = require("dap")
         local xcodebuild = require("xcodebuild.integrations.dap")
         -- SAMPLE PATH, change it to your local codelldb path
         local codelldbPath = "/YOUR_PATH/codelldb-aarch64-darwin/extension/adapter/codelldb"
 
         xcodebuild.setup(codelldbPath)
 
-        -- disables annoying warning that requires hitting enter
-        local orig_notify = require("dap.utils").notify
-        require("dap.utils").notify = function(msg, log_level)
-          if not string.find(msg, "Either the adapter is slow") then
-            orig_notify(msg, log_level)
-          end
-        end
-
-        -- sample keymaps to debug application
         vim.keymap.set("n", "<leader>dd", xcodebuild.build_and_debug, { desc = "Build & Debug" })
         vim.keymap.set("n", "<leader>dr", xcodebuild.debug_without_build, { desc = "Debug Without Building" })
         vim.keymap.set("n", "<leader>dt", xcodebuild.debug_tests, { desc = "Debug Tests" })
         vim.keymap.set("n", "<leader>dT", xcodebuild.debug_class_tests, { desc = "Debug Class Tests" })
         vim.keymap.set("n", "<leader>b", xcodebuild.toggle_breakpoint, { desc = "Toggle Breakpoint" })
         vim.keymap.set("n", "<leader>B", xcodebuild.toggle_message_breakpoint, { desc = "Toggle Message Breakpoint" })
-        vim.keymap.set("n", "<Leader>dx", function()
-          if dap.session() then
-            dap.terminate()
-          end
-          require("xcodebuild.actions").cancel()
-        end, { desc = "Terminate debugger" })
+        vim.keymap.set("n", "<leader>dx", xcodebuild.terminate_session, { desc = "Terminate Debugger" })
       end,
     }
 <
@@ -3247,6 +3232,11 @@ M.toggle_breakpoint()
 M.toggle_message_breakpoint()
   Toggles a breakpoint with a log message in the current line and saves breakpoints to disk.
   To print a variable, wrap it with {}: `{myObject.myProperty}`.
+
+
+                                 *xcodebuild.integrations.dap.terminate_session*
+M.terminate_session()
+  Terminates the debugger session, cancels the current action, and closes the `nvim-dap-ui`.
 
 
                                              *xcodebuild.integrations.dap.setup*

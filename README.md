@@ -504,9 +504,6 @@ This plugin supports only iOS and macOS applications. However, if you develop Sw
 
 [nvim-dap](https://github.com/mfussenegger/nvim-dap) plugin lets you debug applications like in any other IDE. On top of that [nvim-dap-ui](https://github.com/rcarriga/nvim-dap-ui) extension will present for you all panels with stack, breakpoints, variables, logs, etc.
 
-<details>
-  <summary>See nvim-dap configuration</summary>
-
 To configure DAP for development:
 
 - Download codelldb VS Code plugin from: [HERE](https://github.com/vadimcn/codelldb/releases). For macOS use `darwin` version. Just unzip `vsix` file and set paths below.
@@ -520,39 +517,22 @@ return {
     "wojciech-kulik/xcodebuild.nvim"
   },
   config = function()
-    local dap = require("dap")
     local xcodebuild = require("xcodebuild.integrations.dap")
     -- SAMPLE PATH, change it to your local codelldb path
     local codelldbPath = os.getenv("HOME") .. "/tools/codelldb-aarch64-darwin/extension/adapter/codelldb"
 
     xcodebuild.setup(codelldbPath)
 
-    -- disables annoying warning that requires hitting enter
-    local orig_notify = require("dap.utils").notify
-    require("dap.utils").notify = function(msg, log_level)
-      if not string.find(msg, "Either the adapter is slow") then
-        orig_notify(msg, log_level)
-      end
-    end
-
-    -- sample keymaps to debug application
     vim.keymap.set("n", "<leader>dd", xcodebuild.build_and_debug, { desc = "Build & Debug" })
     vim.keymap.set("n", "<leader>dr", xcodebuild.debug_without_build, { desc = "Debug Without Building" })
     vim.keymap.set("n", "<leader>dt", xcodebuild.debug_tests, { desc = "Debug Tests" })
     vim.keymap.set("n", "<leader>dT", xcodebuild.debug_class_tests, { desc = "Debug Class Tests" })
     vim.keymap.set("n", "<leader>b", xcodebuild.toggle_breakpoint, { desc = "Toggle Breakpoint" })
     vim.keymap.set("n", "<leader>B", xcodebuild.toggle_message_breakpoint, { desc = "Toggle Message Breakpoint" })
-    vim.keymap.set("n", "<Leader>dx", function()
-      if dap.session() then
-        dap.terminate()
-      end
-      require("xcodebuild.actions").cancel()
-    end, { desc = "Terminate debugger" })
+    vim.keymap.set("n", "<leader>dx", xcodebuild.terminate_session, { desc = "Terminate Debugger" })
   end,
 }
 ```
-
-</details>
 
 ### 📲 Debugging On iOS 17+ Device
 

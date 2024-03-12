@@ -20,34 +20,19 @@
 ---        "wojciech-kulik/xcodebuild.nvim"
 ---      },
 ---      config = function()
----        local dap = require("dap")
 ---        local xcodebuild = require("xcodebuild.integrations.dap")
 ---        -- SAMPLE PATH, change it to your local codelldb path
 ---        local codelldbPath = "/YOUR_PATH/codelldb-aarch64-darwin/extension/adapter/codelldb"
 ---
 ---        xcodebuild.setup(codelldbPath)
 ---
----        -- disables annoying warning that requires hitting enter
----        local orig_notify = require("dap.utils").notify
----        require("dap.utils").notify = function(msg, log_level)
----          if not string.find(msg, "Either the adapter is slow") then
----            orig_notify(msg, log_level)
----          end
----        end
----
----        -- sample keymaps to debug application
 ---        vim.keymap.set("n", "<leader>dd", xcodebuild.build_and_debug, { desc = "Build & Debug" })
 ---        vim.keymap.set("n", "<leader>dr", xcodebuild.debug_without_build, { desc = "Debug Without Building" })
 ---        vim.keymap.set("n", "<leader>dt", xcodebuild.debug_tests, { desc = "Debug Tests" })
 ---        vim.keymap.set("n", "<leader>dT", xcodebuild.debug_class_tests, { desc = "Debug Class Tests" })
 ---        vim.keymap.set("n", "<leader>b", xcodebuild.toggle_breakpoint, { desc = "Toggle Breakpoint" })
 ---        vim.keymap.set("n", "<leader>B", xcodebuild.toggle_message_breakpoint, { desc = "Toggle Message Breakpoint" })
----        vim.keymap.set("n", "<Leader>dx", function()
----          if dap.session() then
----            dap.terminate()
----          end
----          require("xcodebuild.actions").cancel()
----        end, { desc = "Terminate debugger" })
+---        vim.keymap.set("n", "<leader>dx", xcodebuild.terminate_session, { desc = "Terminate Debugger" })
 ---      end,
 ---    }
 ---<
@@ -511,6 +496,20 @@ function M.toggle_message_breakpoint()
   M.save_breakpoints()
 end
 
+---Terminates the debugger session, cancels the current action, and closes the `nvim-dap-ui`.
+function M.terminate_session()
+  if require("dap").session() then
+    require("dap").terminate()
+  end
+
+  require("xcodebuild.actions").cancel()
+
+  local success, dapui = pcall(require, "dapui")
+  if success then
+    dapui.close()
+  end
+end
+
 ---Sets up the adapter and configuration for the `nvim-dap` plugin.
 ---{codelldbPath} - path to the `codelldb` binary.
 ---
@@ -531,6 +530,14 @@ function M.setup(codelldbPath, loadBreakpoints)
         M.load_breakpoints(event.buf)
       end,
     })
+  end
+
+  local orig_notify = require("dap.utils").notify
+  ---@diagnostic disable-next-line: duplicate-set-field
+  require("dap.utils").notify = function(msg, log_level)
+    if not string.find(msg, "Either the adapter is slow", 1, true) then
+      orig_notify(msg, log_level)
+    end
   end
 end
 
