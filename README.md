@@ -6,6 +6,8 @@ A plugin designed to let you migrate your iOS, iPadOS, and macOS app development
 
 ![Xcodebuild Debugging](./media/debugging.png)
 
+&nbsp;
+
 ## ✨ Features
 
 - [x] Support for iOS, iPadOS, and macOS apps built using Swift.
@@ -25,6 +27,8 @@ A plugin designed to let you migrate your iOS, iPadOS, and macOS app development
 - [x] Picker with all available actions.
 - [x] Highly customizable (many config options, auto commands, highlights, and user commands).
 
+&nbsp;
+
 ## 🌳 Nvim-tree Integration
 
 Xcodebuild.nvim is integrated with [nvim-tree](https://github.com/nvim-tree/nvim-tree.lua) to let you manage your project and files in a convenient way.
@@ -32,6 +36,8 @@ Xcodebuild.nvim is integrated with [nvim-tree](https://github.com/nvim-tree/nvim
 Every change in the file tree presented by [nvim-tree](https://github.com/nvim-tree/nvim-tree.lua) will be automatically reflected in the Xcode project.
 
 https://github.com/wojciech-kulik/xcodebuild.nvim/assets/3128467/ed7d2d2e-eaa4-44ea-a1e6-0027ace4fb97
+
+&nbsp;
 
 ## ⚡️ Requirements
 
@@ -70,6 +76,8 @@ https://github.com/wojciech-kulik/xcodebuild.nvim/assets/3128467/ed7d2d2e-eaa4-4
 🛠️ - available if [pymobiledevice3](https://github.com/doronz88/pymobiledevice3) is installed.
 
 🪲 - available while debugging.
+
+&nbsp;
 
 ## 📦 Installation
 
@@ -114,6 +122,8 @@ make install
 >
 > You will find there a collection of useful tips & tricks for iOS/macOS development in Neovim.
 
+&nbsp;
+
 ## 📱 Setup Neovim For iOS Development
 
 I wrote an article that gathers all the steps required to set up Neovim from scratch to develop iOS and macOS apps:
@@ -121,6 +131,8 @@ I wrote an article that gathers all the steps required to set up Neovim from scr
 [The Complete Guide To iOS & macOS Development In Neovim](https://wojciechkulik.pl/ios/the-complete-guide-to-ios-macos-development-in-neovim)
 
 You can also check out the sample Neovim configuration that I prepared for iOS development: [ios-dev-starter-nvim](https://github.com/wojciech-kulik/ios-dev-starter-nvim)
+
+&nbsp;
 
 ## 🚀 Usage
 
@@ -272,6 +284,8 @@ vim.keymap.set("n", "<leader>xa", "<cmd>XcodebuildCodeActions<cr>", { desc = "Sh
 - Press `<cr>` to expand or collapse the current node
 - Press `<tab>` to expand or collapse all classes
 - Press `q` to close the Test Explorer
+
+&nbsp;
 
 ## ⚙️ Configuration
 
@@ -498,9 +512,9 @@ Below you can find a list of all available auto commands.
 
 This plugin supports only iOS and macOS applications. However, if you develop Swift Package for one of those platforms, you can easily use this plugin by creating a sample iOS/macOS project in your root directory and by adding your package as a dependency.
 
-## 🦾 Extra Features
+&nbsp;
 
-### 🔬 Debugger Configuration
+## 🔬 Debugger Configuration
 
 [nvim-dap](https://github.com/mfussenegger/nvim-dap) plugin lets you debug applications like in any other IDE. On top of that [nvim-dap-ui](https://github.com/rcarriga/nvim-dap-ui) extension will present for you all panels with stack, breakpoints, variables, logs, etc.
 
@@ -534,7 +548,9 @@ return {
 }
 ```
 
-### 📲 Debugging On iOS 17+ Device
+&nbsp;
+
+## 📲 Debugging On iOS 17+ Device
 
 Since iOS 17, a new secure connection between Mac and mobile devices is required. Xcodebuild.nvim uses [pymobiledevice3](https://github.com/doronz88/pymobiledevice3)
 to establish a special trusted tunnel that is later used for debugging. However, this operation requires `sudo`
@@ -567,7 +583,9 @@ set your local path in the config `commands.remote_debugger`, and update `/etc/s
 
 **Please remember that you will have to update this file manually if it changes in the future.**
 
-### 🐛 Application Logs
+&nbsp;
+
+## 🐛 Application Logs
 
 If you installed [nvim-dap](https://github.com/mfussenegger/nvim-dap) and [nvim-dap-ui](https://github.com/rcarriga/nvim-dap-ui), you can easily track your app logs. The plugin automatically sends logs to the `console` window provided by [nvim-dap-ui](https://github.com/rcarriga/nvim-dap-ui).
 
@@ -596,7 +614,9 @@ tail -f .nvim/xcodebuild/app_logs.log
 
 This approach works especially well if you are using tmux.
 
-### 🚥 Lualine Integration
+&nbsp;
+
+## 🚥 Lualine Integration
 
 You can also integrate this plugin with [lualine.nvim](https://github.com/nvim-lualine/lualine.nvim).
 
@@ -641,7 +661,9 @@ Global variables that you can use:
 
 </details>
 
-### 🧪 Code Coverage
+&nbsp;
+
+## 🧪 Code Coverage
 
 ![Xcodebuild Code Coverage Report](./media/coverage-report.png)
 
@@ -684,7 +706,9 @@ Coverage Report Keys:
 
 </details>
 
-### 📸 Snapshot Tests Preview
+&nbsp;
+
+## 📸 Snapshot Tests Preview
 
 This plugin offers a nice list of failing snapshot tests. For each test it generates a preview image combining reference, failure, and difference images into one. It works with [swift-snapshot-testing](https://github.com/pointfreeco/swift-snapshot-testing) library.
 
@@ -692,11 +716,15 @@ Run `:XcodebuildFailingSnapshots` to see the list.
 
 ![Xcodebuild Snapshots](./media/snapshots.png)
 
-### 👨‍💻 API
+&nbsp;
+
+## 👨‍💻 API
 
 If you want to use functions directly instead of user commands, then please see [xcodebuild.actions](./lua/xcodebuild/actions.lua) module.
 
-### 🧰 Troubleshooting
+&nbsp;
+
+## 🧰 Troubleshooting
 
 > [!IMPORTANT]
 > The first thing you should do is to check the output of `:checkhealth xcodebuild` and fix all issues.
