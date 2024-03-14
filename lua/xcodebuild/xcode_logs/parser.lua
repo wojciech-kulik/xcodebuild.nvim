@@ -416,8 +416,6 @@ end
 ---Processes the log line and updates the state machine.
 ---@param line string
 local function process_line(line)
-  table.insert(output, line)
-
   -- POSSIBLE PATHS:
   -- BEGIN -> BUILD_ERROR -> BEGIN
   -- BEGIN -> BUILD_WARNING -> BEGIN
@@ -498,6 +496,15 @@ end
 function M.parse_logs(logLines)
   for _, line in ipairs(logLines) do
     process_line(line)
+  end
+
+  if next(output) and next(logLines) then
+    output[#output] = output[#output] .. logLines[1]
+    table.remove(logLines, 1)
+  end
+
+  for _, line in ipairs(logLines) do
+    table.insert(output, line)
   end
 
   ---@type ParsedReport
