@@ -274,7 +274,7 @@ local function parse_build_error(line)
     end
   else
     local source, message = string.match(line, "(.*)%: %w*%s*error%: (.*)")
-    message = message or string.match(line, "error%: (.*)")
+    message = message or string.match(line, "^error%: (.*)")
 
     if message then
       lineType = BUILD_ERROR
