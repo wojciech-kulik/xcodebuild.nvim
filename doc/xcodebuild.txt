@@ -453,7 +453,6 @@ Configuration
  | -------------------------| ----------------------------------- |
  | `XcodebuildSelectProject`  | Show project file picker            |
  | `XcodebuildSelectScheme`   | Show scheme picker                  |
- | `XcodebuildSelectConfig`   | Show build configuration picker     |
  | `XcodebuildSelectDevice`   | Show device picker                  |
  | `XcodebuildSelectTestPlan` | Show test plan picker               |
  | `XcodebuildShowConfig`     | Print current project configuration |
@@ -476,7 +475,6 @@ integrate with `lualine` or other plugins.
  | `vim.g.xcodebuild_device_name` | Device name (ex. iPhone 15 Pro)                    |
  | `vim.g.xcodebuild_os`          | OS version (ex. 16.4)                              |
  | `vim.g.xcodebuild_platform`    | Device platform (macOS or iPhone Simulator)        |
- | `vim.g.xcodebuild_config`      | Selected build config (ex. Debug)                  |
  | `vim.g.xcodebuild_scheme`      | Selected project scheme (ex. MyApp)                |
  | `vim.g.xcodebuild_test_plan`   | Selected Test Plan (ex. MyAppTests)                |
  | `vim.g.xcodebuild_last_status` | Last build/test status (ex. Build Succeeded [15s]) |
@@ -677,13 +675,6 @@ M.select_project({callback})                 *xcodebuild.actions.select_project*
 
 M.select_scheme({callback})                   *xcodebuild.actions.select_scheme*
   Starts the pickers with scheme selection.
-
-  Parameters: ~
-    {callback}  (function|nil)
-
-
-M.select_config({callback})                   *xcodebuild.actions.select_config*
-  Starts the pickers with configuration selection.
 
   Parameters: ~
     {callback}  (function|nil)
@@ -982,7 +973,6 @@ XcodeBuildOptions                      *xcodebuild.core.xcode.XcodeBuildOptions*
     {projectCommand}   (string)
     {scheme}           (string)
     {destination}      (string)
-    {config}           (string)
     {extraBuildArgs}   (string|nil)
     {on_stdout}        (function)
     {on_stderr}        (fun(_:any,output:string[],_:any))
@@ -996,7 +986,6 @@ XcodeTestOptions                        *xcodebuild.core.xcode.XcodeTestOptions*
     {projectCommand}   (string)
     {scheme}           (string)
     {destination}      (string)
-    {config}           (string)
     {testPlan}         (string)
     {testsToRun}       (string[]|nil)
     {extraTestArgs}    (string|nil)
@@ -1012,7 +1001,6 @@ XcodeEnumerateOptions
     {projectCommand}  (string)
     {scheme}          (string)
     {destination}     (string)
-    {config}          (string)
     {testPlan}        (string)
     {extraTestArgs}   (string|nil)
 
@@ -1101,15 +1089,16 @@ M.build_project({opts})                    *xcodebuild.core.xcode.build_project*
 
 
                                       *xcodebuild.core.xcode.get_build_settings*
-M.get_build_settings({platform}, {projectCommand}, {scheme}, {config}, {callback})
+M.get_build_settings({platform}, {projectCommand}, {scheme}, {xcodeprojPath}, {callback})
   Returns the build settings for the given project.
+
   If one of the settings is not found, it will send an error notification.
 
   Parameters: ~
     {platform}        (string)
     {projectCommand}  (string)
     {scheme}          (string)
-    {config}          (string)
+    {xcodeprojPath}   (string)
     {callback}        (fun(settings:XcodeBuildSettings))
 
   Returns: ~
@@ -1515,7 +1504,6 @@ ProjectSettings
     {projectFile}     (string|nil) project file path (ex. "path/to/Project.xcodeproj")
     {projectCommand}  (string|nil) project command (ex. "-project 'path/to/Project.xcodeproj'" or "-workspace 'path/to/Project.xcworkspace'")
     {scheme}          (string|nil) scheme name (ex. "MyApp")
-    {config}          (string|nil) configuration name (ex. "Debug")
     {destination}     (string|nil) destination (ex. "28B52DAA-BC2F-410B-A5BE-F485A3AFB0BC")
     {bundleId}        (string|nil) bundle identifier (ex. "com.mycompany.myapp")
     {appPath}         (string|nil) app path (ex. "path/to/MyApp.app")
@@ -3445,28 +3433,15 @@ M.select_project({callback}, {opts})      *xcodebuild.ui.pickers.select_project*
     {opts}      (PickerOptions|nil)
 
 
-                                           *xcodebuild.ui.pickers.select_scheme*
-M.select_scheme({schemes}, {callback}, {opts})
+M.select_scheme({callback}, {opts})        *xcodebuild.ui.pickers.select_scheme*
   Shows a picker with the available schemes.
 
   Parameters: ~
-    {schemes}   (string[]|nil)
     {callback}  (fun(scheme:string)|nil)
     {opts}      (PickerOptions|nil)
 
   Returns: ~
     (number|nil)  id if launched
-
-
-M.select_config({callback}, {opts})        *xcodebuild.ui.pickers.select_config*
-  Shows a picker with the available build configurations.
-
-  Parameters: ~
-    {callback}  (fun(projectConfig:XcodeProjectInfo)|nil)
-    {opts}      (PickerOptions|nil)
-
-  Returns: ~
-    (number|nil)  id
 
 
 M.select_testplan({callback}, {opts})    *xcodebuild.ui.pickers.select_testplan*

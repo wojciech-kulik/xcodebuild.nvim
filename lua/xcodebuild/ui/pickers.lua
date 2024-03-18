@@ -264,60 +264,27 @@ function M.select_project(callback, opts)
 end
 
 ---Shows a picker with the available schemes.
----@param schemes string[]|nil
 ---@param callback fun(scheme: string)|nil
 ---@param opts PickerOptions|nil
 ---@return number|nil job id if launched
-function M.select_scheme(schemes, callback, opts)
-  if util.is_empty(schemes) then
-    start_telescope_spinner()
-  end
+function M.select_scheme(callback, opts)
+  start_telescope_spinner()
 
-  M.show("Select Scheme", schemes or {}, function(value, _)
+  M.show("Select Scheme", {}, function(value, _)
     projectConfig.settings.scheme = value
     projectConfig.save_settings()
     update_xcode_build_server_config()
     util.call(callback, value)
   end, opts)
 
-  if util.is_empty(schemes) then
-    local xcodeproj = projectConfig.settings.xcodeproj
-    if not xcodeproj then
-      notifications.send_error("Xcode project file not set")
-      return nil
-    end
-
-    currentJobId = xcode.get_project_information(xcodeproj, function(info)
-      update_results(info.schemes)
-    end)
-
-    return currentJobId
-  end
-end
-
----Shows a picker with the available build configurations.
----@param callback fun(projectConfig: XcodeProjectInfo)|nil
----@param opts PickerOptions|nil
----@return number|nil job id
-function M.select_config(callback, opts)
   local xcodeproj = projectConfig.settings.xcodeproj
-  local projectInfo = nil
-
   if not xcodeproj then
     notifications.send_error("Xcode project file not set")
     return nil
   end
 
-  start_telescope_spinner()
-  M.show("Select Build Configuration", {}, function(value, _)
-    projectConfig.settings.config = value
-    projectConfig.save_settings()
-    util.call(callback, projectInfo)
-  end, opts)
-
   currentJobId = xcode.get_project_information(xcodeproj, function(info)
-    projectInfo = info
-    update_results(info.configs)
+    update_results(info.schemes)
   end)
 
   return currentJobId
@@ -503,7 +470,6 @@ function M.show_all_actions()
 
     "Select Project File",
     "Select Scheme",
-    "Select Build Configuration",
     "Select Device",
     "Select Test Plan",
 
@@ -534,7 +500,6 @@ function M.show_all_actions()
 
     actions.select_project,
     actions.select_scheme,
-    actions.select_config,
     actions.select_device,
     actions.select_testplan,
 

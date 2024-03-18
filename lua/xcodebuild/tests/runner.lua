@@ -90,7 +90,6 @@ function M.show_test_explorer(callback, opts)
 
     M.currentJobId = xcode.enumerate_tests({
       destination = projectConfig.settings.destination,
-      config = projectConfig.settings.config,
       projectCommand = projectConfig.settings.projectCommand,
       scheme = projectConfig.settings.scheme,
       testPlan = projectConfig.settings.testPlan,
@@ -220,7 +219,6 @@ function M.run_tests(testsToRun, opts)
       destination = projectConfig.settings.destination,
       projectCommand = projectConfig.settings.projectCommand,
       scheme = projectConfig.settings.scheme,
-      config = projectConfig.settings.config,
       testPlan = projectConfig.settings.testPlan,
       testsToRun = testsToRun,
       extraTestArgs = config.commands.extra_test_args,
