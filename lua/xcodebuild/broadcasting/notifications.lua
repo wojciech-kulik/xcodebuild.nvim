@@ -201,8 +201,6 @@ function M.send_project_settings(settings)
 
       - scheme: ]] .. settings.scheme .. [[
 
-      - config: ]] .. settings.config .. [[
-
       - device: ]] .. (settings.deviceName or settings.platform or "-") .. [[
 
       - osVersion: ]] .. (settings.os or "-") .. [[

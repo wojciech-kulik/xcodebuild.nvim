@@ -15,7 +15,6 @@
 ---@field projectFile string|nil project file path (ex. "path/to/Project.xcodeproj")
 ---@field projectCommand string|nil project command (ex. "-project 'path/to/Project.xcodeproj'" or "-workspace 'path/to/Project.xcworkspace'")
 ---@field scheme string|nil scheme name (ex. "MyApp")
----@field config string|nil configuration name (ex. "Debug")
 ---@field destination string|nil destination (ex. "28B52DAA-BC2F-410B-A5BE-F485A3AFB0BC")
 ---@field bundleId string|nil bundle identifier (ex. "com.mycompany.myapp")
 ---@field appPath string|nil app path (ex. "path/to/MyApp.app")
@@ -39,12 +38,13 @@ end
 
 ---Updates the global variables with the current settings.
 local function update_global_variables()
+  ---@diagnostic disable: inject-field
   vim.g.xcodebuild_device_name = M.settings.deviceName
   vim.g.xcodebuild_os = M.settings.os
   vim.g.xcodebuild_platform = M.settings.platform
-  vim.g.xcodebuild_config = M.settings.config
   vim.g.xcodebuild_scheme = M.settings.scheme
   vim.g.xcodebuild_test_plan = M.settings.testPlan
+  ---@diagnostic enable: inject-field
 end
 
 ---Loads the settings from the JSON file at `.nvim/xcodebuild/settings.json`.
@@ -76,7 +76,6 @@ function M.is_project_configured()
     and settings.projectFile
     and settings.projectCommand
     and settings.scheme
-    and settings.config
     and settings.destination
     and settings.bundleId
     and settings.appPath
@@ -99,7 +98,7 @@ function M.update_settings(callback)
     M.settings.platform,
     M.settings.projectCommand,
     M.settings.scheme,
-    M.settings.config,
+    M.settings.xcodeproj,
     function(buildSettings)
       M.settings.appPath = buildSettings.appPath
       M.settings.productName = buildSettings.productName
@@ -128,18 +127,16 @@ function M.configure_project()
 
   pickers.select_project(function()
     pickers.select_xcodeproj_if_needed(function()
-      defer_print("Loading project information...")
-      pickers.select_config(function(projectInfo)
-        pickers.select_scheme(projectInfo.schemes, function()
-          defer_print("Loading devices...")
-          pickers.select_destination(function()
-            defer_print("Updating settings...")
-            M.update_settings(function()
-              defer_print("Loading test plans...")
-              pickers.select_testplan(function()
-                defer_print("Xcodebuild configuration has been saved!")
-              end, { close_on_select = true })
-            end)
+      defer_print("Loading schemes...")
+      pickers.select_scheme(function()
+        defer_print("Loading devices...")
+        pickers.select_destination(function()
+          defer_print("Updating settings...")
+          M.update_settings(function()
+            defer_print("Loading test plans...")
+            pickers.select_testplan(function()
+              defer_print("Xcodebuild configuration has been saved!")
+            end, { close_on_select = true })
           end)
         end)
       end)

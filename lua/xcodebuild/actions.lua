@@ -180,18 +180,7 @@ function M.select_scheme(callback)
   defer_send("Loading schemes...")
   helpers.cancel_actions()
 
-  pickers.select_scheme(nil, function()
-    update_settings(callback)
-  end, { close_on_select = true })
-end
-
----Starts the pickers with configuration selection.
----@param callback function|nil
-function M.select_config(callback)
-  defer_send("Loading schemes...")
-  helpers.cancel_actions()
-
-  pickers.select_config(function()
+  pickers.select_scheme(function()
     update_settings(callback)
   end, { close_on_select = true })
 end

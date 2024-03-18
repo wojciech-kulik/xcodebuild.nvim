@@ -223,7 +223,6 @@ Xcodebuild.nvim comes with the following commands:
 | -------------------------- | ----------------------------------- |
 | `XcodebuildSelectProject`  | Show project file picker            |
 | `XcodebuildSelectScheme`   | Show scheme picker                  |
-| `XcodebuildSelectConfig`   | Show build configuration picker     |
 | `XcodebuildSelectDevice`   | Show device picker                  |
 | `XcodebuildSelectTestPlan` | Show test plan picker               |
 | `XcodebuildShowConfig`     | Print current project configuration |

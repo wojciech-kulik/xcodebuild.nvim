@@ -28,7 +28,6 @@
 ---@field projectCommand string
 ---@field scheme string
 ---@field destination string
----@field config string
 ---@field extraBuildArgs string|nil
 ---@field on_stdout function
 ---@field on_stderr fun(_, output: string[], _)
@@ -39,7 +38,6 @@
 ---@field projectCommand string
 ---@field scheme string
 ---@field destination string
----@field config string
 ---@field testPlan string
 ---@field testsToRun string[]|nil
 ---@field extraTestArgs string|nil
@@ -51,7 +49,6 @@
 ---@field projectCommand string
 ---@field scheme string
 ---@field destination string
----@field config string
 ---@field testPlan string
 ---@field extraTestArgs string|nil
 
@@ -335,9 +332,6 @@ function M.build_project(opts)
     .. "' -destination 'id="
     .. opts.destination
     .. "'"
-    .. " -configuration '"
-    .. opts.config
-    .. "'"
     .. (string.len(opts.extraBuildArgs) > 0 and " " .. opts.extraBuildArgs or "")
 
   return vim.fn.jobstart(command, {
@@ -350,14 +344,15 @@ function M.build_project(opts)
 end
 
 ---Returns the build settings for the given project.
+---
 ---If one of the settings is not found, it will send an error notification.
 ---@param platform string
 ---@param projectCommand string
 ---@param scheme string
----@param config string
+---@param xcodeprojPath string
 ---@param callback fun(settings: XcodeBuildSettings)
 ---@return number # job id
-function M.get_build_settings(platform, projectCommand, scheme, config, callback)
+function M.get_build_settings(platform, projectCommand, scheme, xcodeprojPath, callback)
   local sdk = "iphonesimulator"
   if platform == constants.Platform.MACOS then
     sdk = "macosx"
@@ -365,15 +360,25 @@ function M.get_build_settings(platform, projectCommand, scheme, config, callback
     sdk = "iphoneos"
   end
 
-  local command = "xcodebuild "
+  ---@type string|nil
+  local config = nil
+  local success, lines = util.readfile(xcodeprojPath .. "/xcshareddata/xcschemes/" .. scheme .. ".xcscheme")
+  if success then
+    local xml = table.concat(lines, "\n")
+    config = xml:match('<LaunchAction[^>]*buildConfiguration%s?=%s?"([^"]+)"')
+  end
+
+  local command = "xcodebuild build "
     .. projectCommand
     .. " -scheme '"
     .. scheme
-    .. "' -configuration '"
-    .. config
     .. "' -showBuildSettings"
     .. " -sdk "
     .. sdk
+
+  if config then
+    command = command .. " -configuration '" .. config .. "'"
+  end
 
   local find_setting = function(source, key)
     return string.match(source, "%s+" .. key .. " = (.*)%s*")
@@ -720,8 +725,6 @@ function M.enumerate_tests(opts, callback)
     .. opts.scheme
     .. "' -destination 'id="
     .. opts.destination
-    .. "' -configuration '"
-    .. opts.config
     .. "' "
     .. opts.projectCommand
     .. " -testPlan '"
@@ -784,9 +787,6 @@ function M.run_tests(opts)
     .. opts.projectCommand
     .. " -testPlan '"
     .. opts.testPlan
-    .. "'"
-    .. " -configuration '"
-    .. opts.config
     .. "'"
     .. (string.len(opts.extraTestArgs) > 0 and " " .. opts.extraTestArgs or "")
 
