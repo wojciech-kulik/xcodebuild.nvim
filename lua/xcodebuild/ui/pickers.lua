@@ -468,7 +468,6 @@ function M.show_all_actions()
     "Run Selected Tests",
     "Run Failed Tests",
 
-    "Select Project File",
     "Select Scheme",
     "Select Device",
     "Select Test Plan",
@@ -498,7 +497,6 @@ function M.show_all_actions()
     actions.run_selected_tests,
     actions.run_failing_tests,
 
-    actions.select_project,
     actions.select_scheme,
     actions.select_device,
     actions.select_testplan,

@@ -74,7 +74,6 @@
 ---
 --- | Command                  | Description                         |
 --- | -------------------------| ----------------------------------- |
---- | `XcodebuildSelectProject`  | Show project file picker            |
 --- | `XcodebuildSelectScheme`   | Show scheme picker                  |
 --- | `XcodebuildSelectDevice`   | Show device picker                  |
 --- | `XcodebuildSelectTestPlan` | Show test plan picker               |
