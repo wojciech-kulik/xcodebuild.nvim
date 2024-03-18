@@ -57,6 +57,10 @@
 ---@field productName string
 ---@field bundleId string
 
+---@class XcodeScheme
+---@field name string
+---@field filepath string
+
 local util = require("xcodebuild.util")
 local notifications = require("xcodebuild.broadcasting.notifications")
 local constants = require("xcodebuild.core.constants")
@@ -234,6 +238,30 @@ function M.get_schemes(projectCommand, callback)
   })
 end
 
+---Returns the list of schemes for the given project.
+---@param xcodeprojPath string
+---@return XcodeScheme[]
+function M.find_schemes(xcodeprojPath)
+  local schemes = util.shell("find '" .. xcodeprojPath .. "' -name '*.xcscheme' -type file 2>/dev/null")
+
+  ---@type XcodeScheme[]
+  local result = {}
+
+  for _, scheme in ipairs(schemes) do
+    local path = vim.trim(scheme)
+    local filename = util.get_filename(path)
+    if path and filename and path ~= "" and filename ~= "" then
+      table.insert(result, { name = filename, filepath = path })
+    end
+  end
+
+  table.sort(result, function(a, b)
+    return a.name < b.name
+  end)
+
+  return result
+end
+
 ---Returns the list of project information including schemes, configs, and
 ---targets for the given {xcodeproj}.
 ---@param xcodeproj string
@@ -360,12 +388,21 @@ function M.get_build_settings(platform, projectCommand, scheme, xcodeprojPath, c
     sdk = "iphoneos"
   end
 
+  local schemes = M.find_schemes(xcodeprojPath)
+
+  ---@type XcodeScheme|nil
+  local matchingScheme = util.find(schemes, function(s)
+    return s.name == scheme
+  end)
+
   ---@type string|nil
   local config = nil
-  local success, lines = util.readfile(xcodeprojPath .. "/xcshareddata/xcschemes/" .. scheme .. ".xcscheme")
-  if success then
-    local xml = table.concat(lines, "\n")
-    config = xml:match('<LaunchAction[^>]*buildConfiguration%s?=%s?"([^"]+)"')
+  if matchingScheme then
+    local success, lines = util.readfile(matchingScheme.filepath)
+    if success then
+      local xml = table.concat(lines, "\n")
+      config = xml:match('<LaunchAction[^>]*buildConfiguration%s?=%s?"([^"]+)"')
+    end
   end
 
   local command = "xcodebuild build "

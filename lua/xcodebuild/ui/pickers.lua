@@ -266,28 +266,29 @@ end
 ---Shows a picker with the available schemes.
 ---@param callback fun(scheme: string)|nil
 ---@param opts PickerOptions|nil
----@return number|nil job id if launched
 function M.select_scheme(callback, opts)
-  start_telescope_spinner()
+  local xcodeproj = projectConfig.settings.xcodeproj
+  if not xcodeproj then
+    notifications.send_error("Xcode project file not set")
+    return
+  end
 
-  M.show("Select Scheme", {}, function(value, _)
+  local schemes = xcode.find_schemes(xcodeproj)
+  local names = util.select(schemes, function(scheme)
+    return scheme.name
+  end)
+
+  if util.is_empty(names) then
+    notifications.send_error("No schemes found")
+    return
+  end
+
+  M.show("Select Scheme", names, function(value, _)
     projectConfig.settings.scheme = value
     projectConfig.save_settings()
     update_xcode_build_server_config()
     util.call(callback, value)
   end, opts)
-
-  local xcodeproj = projectConfig.settings.xcodeproj
-  if not xcodeproj then
-    notifications.send_error("Xcode project file not set")
-    return nil
-  end
-
-  currentJobId = xcode.get_project_information(xcodeproj, function(info)
-    update_results(info.schemes)
-  end)
-
-  return currentJobId
 end
 
 ---Shows a picker with the available test plans.

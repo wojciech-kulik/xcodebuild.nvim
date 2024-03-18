@@ -1012,6 +1012,13 @@ XcodeBuildSettings                    *xcodebuild.core.xcode.XcodeBuildSettings*
     {bundleId}     (string)
 
 
+XcodeScheme                                  *xcodebuild.core.xcode.XcodeScheme*
+
+  Fields: ~
+    {name}      (string)
+    {filepath}  (string)
+
+
                                      *xcodebuild.core.xcode.get_targets_filemap*
 M.get_targets_filemap({appPath})
   Returns a map of targets to list of file paths based on
@@ -1049,6 +1056,16 @@ M.get_schemes({projectCommand}, {callback})
 
   Returns: ~
     (number)   job id
+
+
+M.find_schemes({xcodeprojPath})             *xcodebuild.core.xcode.find_schemes*
+  Returns the list of schemes for the given project.
+
+  Parameters: ~
+    {xcodeprojPath}  (string)
+
+  Returns: ~
+    (XcodeScheme[])
 
 
                                  *xcodebuild.core.xcode.get_project_information*
@@ -3438,9 +3455,6 @@ M.select_scheme({callback}, {opts})        *xcodebuild.ui.pickers.select_scheme*
   Parameters: ~
     {callback}  (fun(scheme:string)|nil)
     {opts}      (PickerOptions|nil)
-
-  Returns: ~
-    (number|nil)  id if launched
 
 
 M.select_testplan({callback}, {opts})    *xcodebuild.ui.pickers.select_testplan*
