@@ -11,6 +11,10 @@
 ---
 ---All actions send notifications to the user.
 ---
+---Additionally, the `Project Manager` will try predicting targets for newly created files based on their location.
+---If you prefer to select targets manually, you can always disable it in the configuration using
+---`integrations.nvim_tree.guess_target` or `integrations.oil_nvim.guess_target`.
+---
 ---See: https://github.com/CocoaPods/Xcodeproj
 ---@brief ]]
 
@@ -240,27 +244,43 @@ end
 
 ---Adds the file to project.
 ---Asks the user to select the targets.
----All groups from {filepath} will be added to the project if they are not already there.
+---
+---If {opts.createGroups} is `true`, all groups from {filepath} will be created if needed.
 ---
 ---If {opts.guessTarget} is `true`, it tries to guess the target for the file.
 ---
 ---Calls the {callback} after the file has been added to the targets or the user has canceled the action.
 ---@param filepath string
 ---@param callback function|nil
----@param opts {guessTarget: boolean}|nil
+---@param opts {guessTarget: boolean, createGroups: boolean}|nil
 function M.add_file(filepath, callback, opts)
   if not helpers.validate_project() or not validate_xcodeproj_tool() then
     return
   end
 
-  local filename = util.get_filename(filepath)
+  opts = opts or {}
 
-  if opts and opts.guessTarget then
+  local filename = util.get_filename(filepath)
+  local function addFile(targets)
+    local dir = vim.fs.dirname(filepath)
+    if not dir then
+      notifications.send_error("Could not get the directory of: " .. filepath)
+      return
+    end
+
+    if opts.createGroups then
+      M.add_group(dir, { silent = true })
+    end
+
+    run_add_file_to_targets(filepath, targets)
+    notifications.send('"' .. filename .. '" has been added to target(s): ' .. table.concat(targets, ", "))
+  end
+
+  if opts.guessTarget then
     local targets = run_find_target_for_group(vim.fn.fnamemodify(filepath, ":h"))
 
     if targets and #targets > 0 then
-      run_add_file_to_targets(filepath, targets)
-      notifications.send('"' .. filename .. '" has been added to target(s): ' .. table.concat(targets, ", "))
+      addFile(targets)
       util.call(callback)
       return
     end
@@ -281,15 +301,7 @@ function M.add_file(filepath, callback, opts)
     "Select Target(s) for " .. filename,
     { autoselect = true },
     function(targets)
-      local dir = vim.fs.dirname(filepath)
-      if not dir then
-        notifications.send_error("Could not get the directory of: " .. filepath)
-        return
-      end
-
-      M.add_group(dir, { silent = true })
-      run_add_file_to_targets(filepath, targets)
-      notifications.send("File has been added to targets")
+      addFile(targets)
     end
   )
 
@@ -304,7 +316,7 @@ end
 ---Ask the user to select the targets.
 ---All groups will be added to the project if they are not already there.
 function M.add_current_file()
-  M.add_file(vim.fn.expand("%:p"))
+  M.add_file(vim.fn.expand("%:p"), nil, { createGroups = true, guessTarget = true })
 end
 
 ---Moves the file to the new path in the project.

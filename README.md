@@ -27,7 +27,8 @@ It provides all essential actions for development, including building, launching
 - [x] [nvim-dap] integration to let you easily build, run, and debug apps.
 - [x] [nvim-dap-ui] integration to show app logs in the console window.
 - [x] [lualine.nvim] integration to show selected device, test plan, and other project settings.
-- [x] Picker with all available actions.
+- [x] Auto-detection of the target membership for new files.
+- [x] Picker with all available plugin actions.
 - [x] Highly customizable (many config options, auto commands, highlights, and user commands).
 
 &nbsp;
@@ -39,6 +40,10 @@ in a convenient way.
 
 Every change in the file tree presented by these plugins will be automatically reflected in the
 Xcode project file.
+
+Additionally, the `Project Manager` will try predicting targets for newly created files based on their location.
+If you prefer to select targets manually, you can always disable it in the configuration using
+`integrations.nvim_tree.guess_target` or `integrations.oil_nvim.guess_target`.
 
 https://github.com/wojciech-kulik/xcodebuild.nvim/assets/3128467/ed7d2d2e-eaa4-44ea-a1e6-0027ace4fb97
 

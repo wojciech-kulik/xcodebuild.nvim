@@ -213,7 +213,8 @@ Features                                                   *xcodebuild.features*
  - `nvim-dap-ui` integration to show app logs in the console window.
  - `lualine.nvim` integration to show selected device, test plan,
    and other project settings.
- - Picker with all available actions.
+ - Auto-detection of the target membership for new files.
+ - Picker with all available plugin actions.
  - Highly customizable (many config options, auto commands, highlights,
    and user commands).
 
@@ -1779,6 +1780,10 @@ perform changes on disk too.
 
 All actions send notifications to the user.
 
+Additionally, the `Project Manager` will try predicting targets for newly created files based on their location.
+If you prefer to select targets manually, you can always disable it in the configuration using
+`integrations.nvim_tree.guess_target` or `integrations.oil_nvim.guess_target`.
+
 See: https://github.com/CocoaPods/Xcodeproj
 
                                     *xcodebuild.project.manager.create_new_file*
@@ -1810,7 +1815,8 @@ M.get_project_targets()
 M.add_file({filepath}, {callback}, {opts})
   Adds the file to project.
   Asks the user to select the targets.
-  All groups from {filepath} will be added to the project if they are not already there.
+
+  If {opts.createGroups} is `true`, all groups from {filepath} will be created if needed.
 
   If {opts.guessTarget} is `true`, it tries to guess the target for the file.
 
@@ -1819,7 +1825,7 @@ M.add_file({filepath}, {callback}, {opts})
   Parameters: ~
     {filepath}  (string)
     {callback}  (function|nil)
-    {opts}      ({guessTarget:boolean}|nil)
+    {opts}      ({guessTarget:boolean,createGroups:boolean}|nil)
 
 
                                    *xcodebuild.project.manager.add_current_file*

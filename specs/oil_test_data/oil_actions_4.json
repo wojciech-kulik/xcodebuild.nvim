@@ -1,0 +1,17 @@
+[
+  {
+    "url": "oil:///absolute/path/dev/MyAppMyCalendarLibrary/Modules/MyCalendar/New",
+    "type": "create",
+    "entry_type": "directory"
+  },
+  {
+    "url": "oil:///absolute/path/dev/MyAppMyCalendarLibrary/Modules/MyCalendar/New/Empty",
+    "type": "create",
+    "entry_type": "directory"
+  },
+  {
+    "url": "oil:///absolute/path/dev/MyAppMyCalendarLibrary/Modules/MyCalendar/New/Empty/Dir",
+    "type": "create",
+    "entry_type": "directory"
+  }
+]
