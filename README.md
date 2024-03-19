@@ -32,7 +32,7 @@ A plugin designed to let you migrate your iOS, iPadOS, and macOS app development
 
 ## 🌳 Nvim-tree Integration
 
-Xcodebuild.nvim is integrated with [nvim-tree](https://github.com/nvim-tree/nvim-tree.lua) to let you manage your project and files in a convenient way.
+Xcodebuild.nvim is integrated with [nvim-tree](https://github.com/nvim-tree/nvim-tree.lua) (and [oil.nvim](https://github.com/stevearc/oil.nvim)) to let you manage your project and files in a convenient way.
 
 Every change in the file tree presented by [nvim-tree](https://github.com/nvim-tree/nvim-tree.lua) will be automatically reflected in the Xcode project.
 
