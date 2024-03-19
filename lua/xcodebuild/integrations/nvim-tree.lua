@@ -8,7 +8,7 @@
 ---
 ---You can always disable the integration in the |xcodebuild.config|.
 ---
----This feature requires `xcodeproj` to be installed (|xcodebuild.requirements|).
+---This feature requires `Xcodeproj` to be installed (|xcodebuild.requirements|).
 ---
 ---See:
 ---  |xcodebuild.project-manager|

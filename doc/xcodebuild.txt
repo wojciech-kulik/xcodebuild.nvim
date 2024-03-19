@@ -171,6 +171,13 @@ M.setup({options})                                            *xcodebuild.setup*
             return true
           end,
         },
+        oil_nvim = {
+          enabled = true, -- enable updating Xcode project files when using oil.nvim
+          should_update_project = function(path) -- path can lead to directory or file
+            -- it could be useful if you mix Xcode project with SPM for example
+            return true
+          end,
+        },
       },
       highlights = {
         -- you can override here any highlight group used by this plugin
@@ -198,7 +205,7 @@ Features                                                   *xcodebuild.features*
  - Browser of failing snapshot tests with a diff preview (if you use
    `swift-snapshot-testing`).
  - Advanced log parser to detect all errors, warnings, and failing tests.
- - `nvim-tree` integration that automatically reflects all file tree
+ - `nvim-tree` and `oil.nvim` integration that automatically reflects all file tree
    operations and updates Xcode project file.
  - `nvim-dap` helper functions to let you easily build, run, and debug apps.
  - `nvim-dap-ui` integration with console window to show app logs.
@@ -238,7 +245,7 @@ Neovim environment
  - `Neovim 0.9.5+`
  - `telescope.nvim` to present pickers.
  - `nui.nvim` to present floating code coverage report.
- - `nvim-tree` to visually manage your project files.
+ - `nvim-tree` or `oil.nvim` to visually manage your project files.
  - `nvim-dap` and nvim-dap-ui to debug apps.
 
 External tools
@@ -1797,13 +1804,16 @@ M.get_project_targets()
     (string[]|nil)
 
 
-M.add_file({filepath})                     *xcodebuild.project.manager.add_file*
+M.add_file({filepath}, {callback})         *xcodebuild.project.manager.add_file*
   Adds the file to project.
   Asks the user to select the targets.
   All groups from {filepath} will be added to the project if they are not already there.
 
+  Calls the {callback} after the file has been added to the targets or the user has canceled the action.
+
   Parameters: ~
     {filepath}  (string)
+    {callback}  (function|nil)
 
 
                                    *xcodebuild.project.manager.add_current_file*
@@ -3348,7 +3358,7 @@ contains the project configuration (|xcodebuild.project.config|).
 
 You can always disable the integration in the |xcodebuild.config|.
 
-This feature requires `xcodeproj` to be installed (|xcodebuild.requirements|).
+This feature requires `Xcodeproj` to be installed (|xcodebuild.requirements|).
 
 See:
   |xcodebuild.project-manager|

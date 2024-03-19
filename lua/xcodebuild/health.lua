@@ -67,19 +67,25 @@ local required_plugins = {
     name = "nvim-tree",
     lib = "nvim-tree",
     optional = true,
-    info = "(Required to visually manage project files)",
+    info = "(Optional to visually manage project files)",
+  },
+  {
+    name = "oil.nvim",
+    lib = "oil",
+    optional = true,
+    info = "(Optional to visually manage project files)",
   },
   {
     name = "nvim-dap",
     lib = "dap",
     optional = true,
-    info = "(Required to debug applications)",
+    info = "(Optional to debug applications)",
   },
   {
     name = "nvim-dap-ui",
     lib = "dapui",
     optional = true,
-    info = "(Required to present debugger UI)",
+    info = "(Optional to present debugger UI)",
   },
 }
 
