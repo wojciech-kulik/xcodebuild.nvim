@@ -74,7 +74,7 @@ function M.setup()
             vim.schedule(function()
               projectManager.add_file(atPath, function()
                 coroutine.resume(co, co)
-              end)
+              end, { guessTarget = config.guess_target })
             end)
             coroutine.yield()
           end

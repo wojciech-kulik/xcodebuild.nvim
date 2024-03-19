@@ -106,6 +106,7 @@ local defaults = {
     },
     nvim_tree = {
       enabled = true, -- enable updating Xcode project files when using nvim-tree
+      guess_target = true, -- guess target for the new file based on the file path
       should_update_project = function(path) -- path can lead to directory or file
         -- it could be useful if you mix Xcode project with SPM for example
         return true
@@ -113,6 +114,7 @@ local defaults = {
     },
     oil_nvim = {
       enabled = true, -- enable updating Xcode project files when using oil.nvim
+      guess_target = true, -- guess target for the file based on the file path
       should_update_project = function(path) -- path can lead to directory or file
         -- it could be useful if you mix Xcode project with SPM for example
         return true

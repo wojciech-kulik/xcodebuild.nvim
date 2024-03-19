@@ -15,8 +15,8 @@
 --- - Advanced log parser to detect all errors, warnings, and failing tests.
 --- - `nvim-tree` and `oil.nvim` integration that automatically reflects all file tree
 ---   operations and updates Xcode project file.
---- - `nvim-dap` helper functions to let you easily build, run, and debug apps.
---- - `nvim-dap-ui` integration with console window to show app logs.
+--- - `nvim-dap` integration to let you easily build, run, and debug apps.
+--- - `nvim-dap-ui` integration to show app logs in the console window.
 --- - `lualine.nvim` integration to show selected device, test plan,
 ---   and other project settings.
 --- - Picker with all available actions.

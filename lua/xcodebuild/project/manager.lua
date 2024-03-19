@@ -91,6 +91,13 @@ local function run_list_targets()
   return run("list_targets")
 end
 
+---Runs the `find_target_for_group` action and returns the output.
+---@param groupPath string
+---@return string[]
+local function run_find_target_for_group(groupPath)
+  return run("find_target_for_group", { groupPath })
+end
+
 ---Gets targets and shows the picker to select them.
 ---
 ---If there is only one target and {opts.autoselect} is `true`, it calls the {callback}
@@ -235,15 +242,29 @@ end
 ---Asks the user to select the targets.
 ---All groups from {filepath} will be added to the project if they are not already there.
 ---
+---If {opts.guessTarget} is `true`, it tries to guess the target for the file.
+---
 ---Calls the {callback} after the file has been added to the targets or the user has canceled the action.
 ---@param filepath string
 ---@param callback function|nil
-function M.add_file(filepath, callback)
+---@param opts {guessTarget: boolean}|nil
+function M.add_file(filepath, callback, opts)
   if not helpers.validate_project() or not validate_xcodeproj_tool() then
     return
   end
 
   local filename = util.get_filename(filepath)
+
+  if opts and opts.guessTarget then
+    local targets = run_find_target_for_group(vim.fn.fnamemodify(filepath, ":h"))
+
+    if targets and #targets > 0 then
+      run_add_file_to_targets(filepath, targets)
+      notifications.send('"' .. filename .. '" has been added to target(s): ' .. table.concat(targets, ", "))
+      util.call(callback)
+      return
+    end
+  end
 
   local autocmd = vim.api.nvim_create_autocmd("BufWinLeave", {
     group = vim.api.nvim_create_augroup("project-manager-add-file", { clear = true }),
@@ -515,6 +536,23 @@ function M.update_current_file_targets()
     run_update_file_targets(filepath, targets)
     notifications.send("File targets have been updated")
   end)
+end
+
+---Finds the first existing group in the project for the provided {groupPath}
+---and tries to list targets for the first Swift file it encounters there or in subgroups.
+---
+---If it fails, it repeats the process one more time for the parent group.
+---
+---Note: This method could be inaccurate. However, it's good enough heuristic for most cases.
+---If needed, you can always manually select the targets.
+---@param groupPath string
+---@return string[]|nil
+function M.guess_target(groupPath)
+  if not helpers.validate_project() or not validate_xcodeproj_tool() then
+    return
+  end
+
+  return run_find_target_for_group(groupPath)
 end
 
 ---Shows the targets for the current file.

@@ -118,6 +118,7 @@ describe("ensure", function()
         "XcodebuildNvimAppTests",
         "XcodebuildNvimAppUITests",
         "Helpers",
+        "EmptyTarget",
       })
     end)
   end)
@@ -150,6 +151,90 @@ describe("ensure", function()
 
     it("shows current file targets", function()
       assert.are.same({ "XcodebuildNvimApp" }, pickerReceivedItems)
+    end)
+  end)
+
+  describe("guess_target", function()
+    describe("when the group contains Swift files", function()
+      local targets
+
+      before_each(function()
+        targets = manager.guess_target(projectRoot .. "XcodebuildNvimApp/Modules/Main")
+      end)
+
+      it("returns a target", function()
+        assert.are_same({ "XcodebuildNvimApp" }, targets)
+      end)
+    end)
+
+    describe("when the group does not exist", function()
+      local targets
+
+      before_each(function()
+        setFilePath(projectRoot .. "XcodebuildNvimApp/Modules/Main/ContentView.swift")
+        manager.add_file_to_targets(
+          projectRoot .. "XcodebuildNvimApp/Modules/Main/ContentView.swift",
+          { "XcodebuildNvimApp", "XcodebuildNvimAppTests" }
+        )
+        targets = manager.guess_target(projectRoot .. "XcodebuildNvimApp/Modules/SomeNewGroup")
+      end)
+
+      it("returns targets for a file from the common existing group", function()
+        assert.are_same({ "XcodebuildNvimApp", "XcodebuildNvimAppTests" }, targets)
+      end)
+    end)
+
+    describe("when the group does not contain Swift files", function()
+      local targets
+
+      before_each(function()
+        setFilePath(projectRoot .. "XcodebuildNvimApp/XcodebuildNvimApp.swift")
+        manager.add_file_to_targets(
+          projectRoot .. "XcodebuildNvimApp/XcodebuildNvimApp.swift",
+          { "XcodebuildNvimApp", "XcodebuildNvimAppTests" }
+        )
+        targets = manager.guess_target(projectRoot .. "XcodebuildNvimApp/Preview Content")
+      end)
+
+      it("returns targets for a file from the parent group", function()
+        assert.are_same({ "XcodebuildNvimApp", "XcodebuildNvimAppTests" }, targets)
+      end)
+    end)
+
+    describe("when the group is target root without Swift files", function()
+      local targets
+
+      before_each(function()
+        targets = manager.guess_target(projectRoot .. "Helpers")
+      end)
+
+      it("returns target for a file in a nested group", function()
+        assert.are_same({ "Helpers" }, targets)
+      end)
+    end)
+
+    describe("when the group is project root", function()
+      local targets
+
+      before_each(function()
+        targets = manager.guess_target(projectRoot)
+      end)
+
+      it("returns empty list", function()
+        assert.are_equal(0, #targets)
+      end)
+    end)
+
+    describe("when the target has no Swift files", function()
+      local targets
+
+      before_each(function()
+        targets = manager.guess_target(projectRoot .. "EmptyTarget")
+      end)
+
+      it("returns empty list", function()
+        assert.are_equal(0, #targets)
+      end)
     end)
   end)
 

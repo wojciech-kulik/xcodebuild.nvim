@@ -12,7 +12,7 @@
 ---External tools
 --- - `xcbeautify` to format Xcode logs (you can set a different tool or disable formatting in the config).
 --- - `Xcodeproj` to manage project files within Neovim.
---- - `Ruby` to use `xcodeproj` gem.
+--- - `Ruby` to use `Xcodeproj` gem.
 --- - `pymobiledevice3` to debug on physical devices and/or run apps on devices below iOS 17.
 --- - `xcode-build-server` to make LSP work properly with xcodeproj/xcworkspace.
 --- - `codelldb` to debug iOS and macOS Swift apps.

@@ -185,18 +185,56 @@ end
 # @param [Xcodeproj::Project] project
 # @param [String] file_path
 def list_targets_for_file(project, file_path)
-  project.native_targets.each do |target|
-    target.source_build_phase.files_references.each do |file|
-      puts target.name if file.real_path.to_s == file_path
-    end
+  get_targets_for_file(project, file_path).each do |target|
+    puts target
   end
+end
+
+# rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+# @param [Xcodeproj::Project] project
+# @param [String] dir_path
+# @param [Boolean] go_up
+def find_target_for_group(project, dir_path, go_up = true)
+  dir_path = dir_path.chomp("/")
+  group = find_group_by_absolute_dir_path(project, dir_path, false)
+  project_dir = File.dirname(project.path.to_s)
+
+  # Look for the first group that exists in the project.
+  # We could be just creating a new path that doesn't exist yet.
+  while group.nil? && dir_path != "" && dir_path != "/" && dir_path != project_dir
+    dir_path = File.dirname(dir_path)
+    group = find_group_by_absolute_dir_path(project, dir_path, false)
+  end
+
+  exit if group.nil? || group.instance_of?(Xcodeproj::Project::Object::PBXProject)
+
+  # First look for Swift files in the current group then in nested groups
+  merged_children = group.files + group.recursive_children
+
+  merged_children.each do |child|
+    next unless child.instance_of?(Xcodeproj::Project::Object::PBXFileReference)
+
+    # skip if the file is not a swift file
+    extension = File.extname(child.real_path.to_s)
+    next if extension != ".swift"
+
+    # skip if the file doesn't belong to any target
+    targets = get_targets_for_file(project, child.real_path.to_s)
+    next if targets.empty?
+
+    # print targets and exit
+    targets.each { |target| puts target }
+    exit
+  end
+
+  # Last chance, go up one level and try again
+  find_target_for_group(project, File.dirname(dir_path), false) if go_up
 end
 
 # @param [Xcodeproj::Project] project
 # @param [String] file_path
 def get_targets_for_file(project, file_path)
   result = []
-
   project.native_targets.each do |target|
     target.source_build_phase.files_references.each do |file|
       result << target.name if file.real_path.to_s == file_path
@@ -206,8 +244,7 @@ def get_targets_for_file(project, file_path)
   result
 end
 
-# rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity,
-# rubocop:disable Metrics/AbcSize, Metrics/MethodLength, Style/GuardClause
+# rubocop:disable Metrics/MethodLength, Style/GuardClause
 # @param [Xcodeproj::Project] project
 # @param [String] action
 def handle_action(project, action)
@@ -262,6 +299,11 @@ def handle_action(project, action)
 
   if action == "list_targets_for_file"
     list_targets_for_file(project, ARGV[2])
+    exit
+  end
+
+  if action == "find_target_for_group"
+    find_target_for_group(project, ARGV[2])
     exit
   end
 end

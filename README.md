@@ -1,6 +1,7 @@
 # 🛠️ xcodebuild.nvim
 
-A plugin designed to let you migrate your iOS, iPadOS, and macOS app development to Neovim. It provides all essential actions for development, including building, launching, and testing.
+A plugin designed to let you migrate your iOS, iPadOS, and macOS app development to Neovim.
+It provides all essential actions for development, including building, launching, and testing.
 
 ![Xcodebuild Testing](./media/testing.png)
 
@@ -16,25 +17,28 @@ A plugin designed to let you migrate your iOS, iPadOS, and macOS app development
 - [x] Test Explorer to visually present a tree with all tests and results.
 - [x] Built using official command line tools like `xcodebuild` and `xcrun simctl`.
 - [x] Actions to build, run, debug, and test apps on simulators and physical devices.
-- [x] Buffer integration with test results (code coverage, success & failure marks, duration, extra diagnostics).
+- [x] Buffer integration with test results (code coverage, success & failure marks, duration,
+      extra diagnostics).
 - [x] Code coverage report with customizable levels.
-- [x] Browser of failing snapshot tests with a diff preview (if you use [swift-snapshot-testing](https://github.com/pointfreeco/swift-snapshot-testing)).
+- [x] Browser of failing snapshot tests with a diff preview (if you use [swift-snapshot-testing]).
 - [x] Advanced log parser to detect all errors, warnings, and failing tests.
-- [x] [nvim-tree](https://github.com/nvim-tree/nvim-tree.lua) integration that automatically reflects all file tree operations and updates Xcode project file.
-- [x] [oil.nvim](https://github.com/stevearc/oil.nvim) integration to let you manage your Xcode project files in a convenient way.
-- [x] [nvim-dap](https://github.com/mfussenegger/nvim-dap) helper functions to let you easily build, run, and debug apps.
-- [x] [nvim-dap-ui](https://github.com/rcarriga/nvim-dap-ui) integration with console window to show app logs.
-- [x] [lualine.nvim](https://github.com/nvim-lualine/lualine.nvim) integration to show selected device, test plan, and other project settings.
+- [x] [nvim-tree] and [oil.nvim] integration that automatically reflects all file tree operations
+      and updates Xcode project file.
+- [x] [nvim-dap] integration to let you easily build, run, and debug apps.
+- [x] [nvim-dap-ui] integration to show app logs in the console window.
+- [x] [lualine.nvim] integration to show selected device, test plan, and other project settings.
 - [x] Picker with all available actions.
 - [x] Highly customizable (many config options, auto commands, highlights, and user commands).
 
 &nbsp;
 
-## 🌳 Nvim-tree Integration
+## 🌳 File Tree Integration
 
-Xcodebuild.nvim is integrated with [nvim-tree](https://github.com/nvim-tree/nvim-tree.lua) (and [oil.nvim](https://github.com/stevearc/oil.nvim)) to let you manage your project and files in a convenient way.
+Xcodebuild.nvim is integrated with [nvim-tree] and [oil.nvim] to let you manage your project and files
+in a convenient way.
 
-Every change in the file tree presented by [nvim-tree](https://github.com/nvim-tree/nvim-tree.lua) will be automatically reflected in the Xcode project.
+Every change in the file tree presented by these plugins will be automatically reflected in the
+Xcode project file.
 
 https://github.com/wojciech-kulik/xcodebuild.nvim/assets/3128467/ed7d2d2e-eaa4-44ea-a1e6-0027ace4fb97
 
@@ -44,21 +48,22 @@ https://github.com/wojciech-kulik/xcodebuild.nvim/assets/3128467/ed7d2d2e-eaa4-4
 
 ##### Neovim environment
 
-- [Neovim 0.9.5+](https://neovim.io)
-- [telescope.nvim](https://github.com/nvim-telescope/telescope.nvim) to present pickers.
-- [nui.nvim](https://github.com/MunifTanjim/nui.nvim) to present floating code coverage report.
-- [nvim-tree](https://github.com/nvim-tree/nvim-tree.lua) or [oil.nvim](https://github.com/stevearc/oil.nvim) to visually manage your project files.
-- [nvim-dap](https://github.com/mfussenegger/nvim-dap) and [nvim-dap-ui](https://github.com/rcarriga/nvim-dap-ui) to debug apps.
+- [Neovim 0.9.5+][neovim]
+- [telescope.nvim] to present pickers.
+- [nui.nvim] to present floating code coverage report.
+- [nvim-tree] or [oil.nvim] to visually manage your project files.
+- [nvim-dap] and [nvim-dap-ui] to debug apps.
 
 ##### External tools
 
-- [xcbeautify](https://github.com/tuist/xcbeautify) to format Xcode logs (you can set a different tool or disable formatting in the config).
-- [Xcodeproj](https://github.com/CocoaPods/Xcodeproj) to manage project files within Neovim.
-- [Ruby](https://www.ruby-lang.org) to use `xcodeproj` gem.
-- [pymobiledevice3](https://github.com/doronz88/pymobiledevice3) to debug on physical devices and/or run apps on devices below iOS 17.
-- [xcode-build-server](https://github.com/SolaWing/xcode-build-server) to make LSP work properly with xcodeproj/xcworkspace.
-- [codelldb](https://github.com/vadimcn/codelldb) to debug iOS and macOS Swift apps.
-- [Xcode](https://developer.apple.com/xcode/) to build, run, and test apps. Make sure that `xcodebuild` and `xcrun simctl` work correctly. Tested with Xcode 15.
+- [xcbeautify] to format Xcode logs (you can set a different tool or disable formatting in the config).
+- [Xcodeproj] to manage project files within Neovim.
+- [Ruby] to use [Xcodeproj] gem.
+- [pymobiledevice3] to debug on physical devices and/or run apps on devices below iOS 17.
+- [xcode-build-server] to make LSP work properly with xcodeproj/xcworkspace.
+- [codelldb] to debug iOS and macOS Swift apps.
+- [Xcode] to build, run, and test apps. Make sure that `xcodebuild` and `xcrun simctl` work correctly.
+  Tested with Xcode 15.
 
 ##### Availability of features
 
@@ -74,7 +79,7 @@ https://github.com/wojciech-kulik/xcodebuild.nvim/assets/3128467/ed7d2d2e-eaa4-4
 
 🔐 - requires passwordless `sudo` permission for `tools/remote_debugger` script (see below).
 
-🛠️ - available if [pymobiledevice3](https://github.com/doronz88/pymobiledevice3) is installed.
+🛠️ - available if [pymobiledevice3] is installed.
 
 🪲 - available while debugging.
 
@@ -84,7 +89,7 @@ https://github.com/wojciech-kulik/xcodebuild.nvim/assets/3128467/ed7d2d2e-eaa4-4
 
 Install the plugin using your preferred package manager.
 
-### 💤 [lazy.nvim](https://github.com/folke/lazy.nvim)
+### 💤 [lazy.nvim]
 
 ```lua
 return {
@@ -120,7 +125,7 @@ make install
 ```
 
 > [!TIP]
-> Make sure to check out [Tips & Tricks](https://github.com/wojciech-kulik/xcodebuild.nvim/discussions/categories/tips-tricks)!
+> Make sure to check out [Tips & Tricks][tips-and-tricks]!
 >
 > You will find there a collection of useful tips & tricks for iOS/macOS development in Neovim.
 
@@ -128,17 +133,21 @@ make install
 
 ## 📱 Setup Neovim For iOS Development
 
-I wrote an article that gathers all the steps required to set up Neovim from scratch to develop iOS and macOS apps:
+I wrote an article that gathers all the steps required to set up Neovim from scratch to
+develop iOS and macOS apps:
 
-[The Complete Guide To iOS & macOS Development In Neovim](https://wojciechkulik.pl/ios/the-complete-guide-to-ios-macos-development-in-neovim)
+[The Complete Guide To iOS & macOS Development In Neovim][ios-guide]
 
-You can also check out the sample Neovim configuration that I prepared for iOS development: [ios-dev-starter-nvim](https://github.com/wojciech-kulik/ios-dev-starter-nvim)
+You can also check out the sample Neovim configuration that I prepared for iOS development:
+[ios-dev-starter-nvim]
 
 &nbsp;
 
 ## 🚀 Usage
 
-Make sure to open your project's root directory and run `XcodebuildSetup` to configure it. The plugin needs several information like project file, scheme, config, device, and test plan to be able to run commands.
+Make sure to open your project's root directory and run `XcodebuildSetup` to configure it.
+The plugin needs several information like project file, scheme, config, device, and test plan to be able to
+run commands.
 
 Remember, that all the information are available in the help `:h xcodebuild`.
 Every function is documented and described both in the help and in the code.
@@ -391,6 +400,7 @@ vim.keymap.set("n", "<leader>xa", "<cmd>XcodebuildCodeActions<cr>", { desc = "Sh
     },
     nvim_tree = {
       enabled = true, -- enable updating Xcode project files when using nvim-tree
+      guess_target = true, -- guess target for the new file based on the file path
       should_update_project = function(path) -- path can lead to directory or file
         -- it could be useful if you mix Xcode project with SPM for example
         return true
@@ -398,6 +408,7 @@ vim.keymap.set("n", "<leader>xa", "<cmd>XcodebuildCodeActions<cr>", { desc = "Sh
     },
     oil_nvim = {
       enabled = true, -- enable updating Xcode project files when using oil.nvim
+      guess_target = true, -- guess target for the new file based on the file path
       should_update_project = function(path) -- path can lead to directory or file
         -- it could be useful if you mix Xcode project with SPM for example
         return true
@@ -517,18 +528,22 @@ Below you can find a list of all available auto commands.
 
 ### 📦 Swift Packages Development
 
-This plugin supports only iOS and macOS applications. However, if you develop Swift Package for one of those platforms, you can easily use this plugin by creating a sample iOS/macOS project in your root directory and by adding your package as a dependency.
+This plugin supports only iOS and macOS applications. However, if you develop Swift Package for one of
+those platforms, you can easily use this plugin by creating a sample iOS/macOS project in your root
+directory and by adding your package as a dependency.
 
 &nbsp;
 
 ## 🔬 Debugger Configuration
 
-[nvim-dap](https://github.com/mfussenegger/nvim-dap) plugin lets you debug applications like in any other IDE. On top of that [nvim-dap-ui](https://github.com/rcarriga/nvim-dap-ui) extension will present for you all panels with stack, breakpoints, variables, logs, etc.
+[nvim-dap] plugin lets you debug applications like in any other IDE. On top of that [nvim-dap-ui]
+extension will present for you all panels with stack, breakpoints, variables, logs, etc.
 
 To configure DAP for development:
 
-- Download codelldb VS Code plugin from: [HERE](https://github.com/vadimcn/codelldb/releases). For macOS use `darwin` version. Just unzip `vsix` file and set paths below.
-- Install also [nvim-dap-ui](https://github.com/rcarriga/nvim-dap-ui) for a nice GUI to debug.
+- Download codelldb VS Code plugin from: [HERE][codelldb-download] For macOS use `darwin` version.
+  Just unzip `vsix` file and set paths below.
+- Install also [nvim-dap-ui] for a nice GUI to debug.
 - Make sure to enable `console` window from `nvim-dap-ui` to see simulator logs.
 
 ```lua
@@ -559,19 +574,22 @@ return {
 
 ## 📲 Debugging On iOS 17+ Device
 
-Since iOS 17, a new secure connection between Mac and mobile devices is required. Xcodebuild.nvim uses [pymobiledevice3](https://github.com/doronz88/pymobiledevice3)
-to establish a special trusted tunnel that is later used for debugging. However, this operation requires `sudo`
-([more details](https://github.com/doronz88/pymobiledevice3/blob/master/misc/RemoteXPC.md#trusted-tunnel)).
+Since iOS 17, a new secure connection between Mac and mobile devices is required.
+Xcodebuild.nvim uses [pymobiledevice3] to establish a special trusted tunnel that
+is later used for debugging. However, this operation requires `sudo` ([more details][pymobiledevice3-details]).
 
-Showing a pop-up to enter a password every time you run a debugger would be quite annoying. That's why the plugin provides a small script ([tools/remote_debugger](./tools/remote_debugger))
+Showing a pop-up to enter a password every time you run a debugger would be quite annoying.
+That's why the plugin provides a small script ([tools/remote_debugger](./tools/remote_debugger))
 that wraps the only two operations requiring `sudo` (starting a secure tunnel and closing it).
 
-This allows you to configure passwordless access just for this single file and make it work with xcodebuild.nvim. You can even make a local copy if you are worried that the content of
-this file could be changed in the future.
+This allows you to configure passwordless access just for this single file and make it work with
+xcodebuild.nvim. You can even make a local copy if you are worried that the content of this file
+could be changed in the future.
 
 #### Passwordless access to `remote_debugger`
 
-You can disable password requirement by updating `/etc/sudoers` file. Make sure to use the command below, otherwise you may break your `sudo` command:
+You can disable password requirement by updating `/etc/sudoers` file. Make sure to use the command below,
+otherwise you may break your `sudo` command:
 
 ```shell
 sudo visudo -f /etc/sudoers
@@ -585,8 +603,9 @@ YOUR_USERNAME ALL = (ALL) NOPASSWD: /Users/YOUR_USERNAME/.local/share/nvim/lazy/
 
 #### Creating a local copy of `remote_debugger`
 
-If you don't want to configure the passwordless permission to the file that could be changed in the future, you can make a local copy of this script,
-set your local path in the config `commands.remote_debugger`, and update `/etc/sudoers` accordingly.
+If you don't want to configure the passwordless permission to the file that could be changed in the future,
+you can make a local copy of this script, set your local path in the config `commands.remote_debugger`,
+and update `/etc/sudoers` accordingly.
 
 **Please remember that you will have to update this file manually if it changes in the future.**
 
@@ -594,9 +613,11 @@ set your local path in the config `commands.remote_debugger`, and update `/etc/s
 
 ## 🐛 Application Logs
 
-If you installed [nvim-dap](https://github.com/mfussenegger/nvim-dap) and [nvim-dap-ui](https://github.com/rcarriga/nvim-dap-ui), you can easily track your app logs. The plugin automatically sends logs to the `console` window provided by [nvim-dap-ui](https://github.com/rcarriga/nvim-dap-ui).
+If you installed [nvim-dap] and [nvim-dap-ui], you can easily track your app logs. The plugin automatically
+sends logs to the `console` window provided by [nvim-dap-ui].
 
-To see **SIMULATOR** logs you don't need to run the debugger. You can just show the `console` and run the app (remember that the app must be launched using xcodebuild.nvim).
+To see **SIMULATOR** logs you don't need to run the debugger. You can just show the `console` and run the app
+(remember that the app must be launched using xcodebuild.nvim).
 
 ```
 :lua require("dapui").toggle()
@@ -613,7 +634,8 @@ You can always clear the console window by calling:
 
 #### Logs without using nvim-dap
 
-If you don't want to use [nvim-dap](https://github.com/mfussenegger/nvim-dap) you can always print logs directly to your terminal by calling (from your root directory):
+If you don't want to use [nvim-dap] you can always print logs directly to your terminal by calling
+(from your root directory):
 
 ```bash
 tail -f .nvim/xcodebuild/app_logs.log
@@ -625,7 +647,7 @@ This approach works especially well if you are using tmux.
 
 ## 🚥 Lualine Integration
 
-You can also integrate this plugin with [lualine.nvim](https://github.com/nvim-lualine/lualine.nvim).
+You can also integrate this plugin with [lualine.nvim].
 
 ![Xcodebuild Lualine](./media/lualine.png)
 
@@ -691,7 +713,8 @@ code_coverage = {
 5. You can jump between code coverage marks using `:XcodebuildJumpToPrevCoverage` and `:XcodebuildJumpToNextCoverage`.
 6. You can also check out the report using `:XcodebuildShowCodeCoverageReport` command.
 
-The plugin sends `XcodebuildCoverageToggled` event that you can use to disable other plugins presenting lines on the side bar (like `gitsigns`). Example:
+The plugin sends `XcodebuildCoverageToggled` event that you can use to disable other plugins presenting
+lines on the side bar (like `gitsigns`). Example:
 
 ```lua
 vim.api.nvim_create_autocmd("User", {
@@ -716,7 +739,8 @@ Coverage Report Keys:
 
 ## 📸 Snapshot Tests Preview
 
-This plugin offers a nice list of failing snapshot tests. For each test it generates a preview image combining reference, failure, and difference images into one. It works with [swift-snapshot-testing](https://github.com/pointfreeco/swift-snapshot-testing) library.
+This plugin offers a nice list of failing snapshot tests. For each test it generates a preview image
+combining reference, failure, and difference images into one. It works with [swift-snapshot-testing] library.
 
 Run `:XcodebuildFailingSnapshots` to see the list.
 
@@ -726,7 +750,8 @@ Run `:XcodebuildFailingSnapshots` to see the list.
 
 ## 👨‍💻 API
 
-If you want to use functions directly instead of user commands, then please see [xcodebuild.actions](./lua/xcodebuild/actions.lua) module.
+If you want to use functions directly instead of user commands, then please see
+[xcodebuild.actions](./lua/xcodebuild/actions.lua) module.
 
 &nbsp;
 
@@ -739,9 +764,11 @@ If you want to use functions directly instead of user commands, then please see 
 
 #### Configuration
 
-Processing the project configuration is a very complex task that relies on parsing multiple crazy outputs from `xcodebuild` commands. Those logs are a pure nightmare to work with. This process may not always work.
+Processing the project configuration is a very complex task that relies on parsing multiple crazy outputs
+from `xcodebuild` commands. Those logs are a pure nightmare to work with. This process may not always work.
 
-In case of any issues with, you can try manually providing the configuration file `.nvim/xcodebuild/settings.json` in your root directory.
+In case of any issues with, you can try manually providing the configuration file
+`.nvim/xcodebuild/settings.json` in your root directory.
 
 <details>
     <summary>See a sample settings.json file</summary>
@@ -774,11 +801,13 @@ In case of any issues with, you can try manually providing the configuration fil
 
 #### Tests
 
-If you encounter issues with test detection, you may want to read this: [Test File Search - File Matching](https://github.com/wojciech-kulik/xcodebuild.nvim/discussions/41).
+If you encounter issues with test detection, you may want to read this:
+[Test File Search - File Matching][test-file-search].
 
 #### LSP
 
-In most cases, it's enough to run the project in Xcode, clean it `CMD+Shift+K`, build again `CMD+B`, and run `xcode-build-server config` again.
+In most cases, it's enough to run the project in Xcode, clean it `CMD+Shift+K`, build again `CMD+B`,
+and run `xcode-build-server config` again.
 
 #### Useful Help Tags
 
@@ -795,3 +824,27 @@ In most cases, it's enough to run the project in Xcode, clean it `CMD+Shift+K`, 
 - `:h xcodebuild.dap`
 - `:h xcodebuild.lualine`
 - `:h xcodebuild.actions`
+
+[nvim-tree]: https://github.com/nvim-tree/nvim-tree.lua
+[oil.nvim]: https://github.com/stevearc/oil.nvim
+[nvim-dap]: https://github.com/mfussenegger/nvim-dap
+[nvim-dap-ui]: https://github.com/rcarriga/nvim-dap-ui
+[nui.nvim]: https://github.com/MunifTanjim/nui.nvim
+[telescope.nvim]: https://github.com/nvim-telescope/telescope.nvim
+[neovim]: https://neovim.io
+[lualine.nvim]: https://github.com/nvim-lualine/lualine.nvim
+[xcbeautify]: https://github.com/tuist/xcbeautify
+[xcodeproj]: https://github.com/CocoaPods/Xcodeproj
+[ruby]: https://www.ruby-lang.org
+[pymobiledevice3]: https://github.com/doronz88/pymobiledevice3
+[pymobiledevice3-details]: https://github.com/doronz88/pymobiledevice3/blob/master/misc/RemoteXPC.md#trusted-tunnel
+[xcode-build-server]: https://github.com/SolaWing/xcode-build-server
+[codelldb]: https://github.com/vadimcn/codelldb
+[codelldb-download]: https://github.com/vadimcn/codelldb/releases
+[xcode]: https://developer.apple.com/xcode/
+[lazy.nvim]: https://github.com/folke/lazy.nvim
+[tips-and-tricks]: https://github.com/wojciech-kulik/xcodebuild.nvim/discussions/categories/tips-tricks
+[ios-guide]: https://wojciechkulik.pl/ios/the-complete-guide-to-ios-macos-development-in-neovim
+[ios-dev-starter-nvim]: https://github.com/wojciech-kulik/ios-dev-starter-nvim
+[swift-snapshot-testing]: https://github.com/pointfreeco/swift-snapshot-testing
+[test-file-search]: https://github.com/wojciech-kulik/xcodebuild.nvim/discussions/41
