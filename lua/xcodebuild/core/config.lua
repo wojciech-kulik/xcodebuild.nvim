@@ -111,6 +111,13 @@ local defaults = {
         return true
       end,
     },
+    oil_nvim = {
+      enabled = true, -- enable updating Xcode project files when using oil.nvim
+      should_update_project = function(path) -- path can lead to directory or file
+        -- it could be useful if you mix Xcode project with SPM for example
+        return true
+      end,
+    },
   },
   highlights = {
     -- you can override here any highlight group used by this plugin

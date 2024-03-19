@@ -92,10 +92,11 @@ local function run_list_targets()
 end
 
 ---Gets targets and shows the picker to select them.
+---@param title string
 ---@param callback fun(target: string[])|nil
-local function run_select_targets(callback)
+local function run_select_targets(title, callback)
   local targets = run_list_targets()
-  pickers.show("Select Target(s)", targets, callback, { close_on_select = true, multiselect = true })
+  pickers.show(title, targets, callback, { close_on_select = true, multiselect = true })
 end
 
 ---Adds file to the selected targets.
@@ -219,13 +220,17 @@ end
 ---Adds the file to project.
 ---Asks the user to select the targets.
 ---All groups from {filepath} will be added to the project if they are not already there.
+---
+---Calls the {callback} after the file has been added to the targets or the user has canceled the action.
 ---@param filepath string
-function M.add_file(filepath)
+---@param callback function|nil
+function M.add_file(filepath, callback)
   if not helpers.validate_project() or not validate_xcodeproj_tool() then
     return
   end
 
-  run_select_targets(function(targets)
+  local filename = util.get_filename(filepath)
+  run_select_targets("Select Target(s) for " .. filename, function(targets)
     local dir = vim.fs.dirname(filepath)
     if not dir then
       notifications.send_error("Could not get the directory of: " .. filepath)
@@ -236,6 +241,20 @@ function M.add_file(filepath)
     run_add_file_to_targets(filepath, targets)
     notifications.send("File has been added to targets")
   end)
+
+  vim.api.nvim_create_autocmd("BufWinLeave", {
+    group = vim.api.nvim_create_augroup("project-manager-add-file", { clear = true }),
+    pattern = "*",
+    once = true,
+    callback = function()
+      local filetype = vim.bo.filetype
+      if filetype == "TelescopePrompt" then
+        vim.schedule(function()
+          util.call(callback)
+        end)
+      end
+    end,
+  })
 end
 
 ---Adds the current file to the selected targets.
@@ -468,8 +487,9 @@ function M.update_current_file_targets()
   end
 
   local filepath = vim.fn.expand("%:p")
+  local filename = util.get_filename(filepath)
 
-  run_select_targets(function(targets)
+  run_select_targets("Select Target(s) for " .. filename, function(targets)
     run_update_file_targets(filepath, targets)
     notifications.send("File targets have been updated")
   end)

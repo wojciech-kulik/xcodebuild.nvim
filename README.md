@@ -21,6 +21,7 @@ A plugin designed to let you migrate your iOS, iPadOS, and macOS app development
 - [x] Browser of failing snapshot tests with a diff preview (if you use [swift-snapshot-testing](https://github.com/pointfreeco/swift-snapshot-testing)).
 - [x] Advanced log parser to detect all errors, warnings, and failing tests.
 - [x] [nvim-tree](https://github.com/nvim-tree/nvim-tree.lua) integration that automatically reflects all file tree operations and updates Xcode project file.
+- [x] [oil.nvim](https://github.com/stevearc/oil.nvim) integration to let you manage your Xcode project files in a convenient way.
 - [x] [nvim-dap](https://github.com/mfussenegger/nvim-dap) helper functions to let you easily build, run, and debug apps.
 - [x] [nvim-dap-ui](https://github.com/rcarriga/nvim-dap-ui) integration with console window to show app logs.
 - [x] [lualine.nvim](https://github.com/nvim-lualine/lualine.nvim) integration to show selected device, test plan, and other project settings.
@@ -46,7 +47,7 @@ https://github.com/wojciech-kulik/xcodebuild.nvim/assets/3128467/ed7d2d2e-eaa4-4
 - [Neovim 0.9.5+](https://neovim.io)
 - [telescope.nvim](https://github.com/nvim-telescope/telescope.nvim) to present pickers.
 - [nui.nvim](https://github.com/MunifTanjim/nui.nvim) to present floating code coverage report.
-- [nvim-tree](https://github.com/nvim-tree/nvim-tree.lua) to visually manage your project files.
+- [nvim-tree](https://github.com/nvim-tree/nvim-tree.lua) or [oil.nvim](https://github.com/stevearc/oil.nvim) to visually manage your project files.
 - [nvim-dap](https://github.com/mfussenegger/nvim-dap) and [nvim-dap-ui](https://github.com/rcarriga/nvim-dap-ui) to debug apps.
 
 ##### External tools
@@ -91,7 +92,8 @@ return {
   dependencies = {
     "nvim-telescope/telescope.nvim",
     "MunifTanjim/nui.nvim",
-    "nvim-tree/nvim-tree.lua", -- if you want the integration with file tree
+    "nvim-tree/nvim-tree.lua", -- (optional) to manage project files
+    "stevearc/oil.nvim", -- (optional) to manage project files
   },
   config = function()
     require("xcodebuild").setup({
@@ -389,6 +391,13 @@ vim.keymap.set("n", "<leader>xa", "<cmd>XcodebuildCodeActions<cr>", { desc = "Sh
     },
     nvim_tree = {
       enabled = true, -- enable updating Xcode project files when using nvim-tree
+      should_update_project = function(path) -- path can lead to directory or file
+        -- it could be useful if you mix Xcode project with SPM for example
+        return true
+      end,
+    },
+    oil_nvim = {
+      enabled = true, -- enable updating Xcode project files when using oil.nvim
       should_update_project = function(path) -- path can lead to directory or file
         -- it could be useful if you mix Xcode project with SPM for example
         return true

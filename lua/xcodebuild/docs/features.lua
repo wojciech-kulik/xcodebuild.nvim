@@ -13,7 +13,7 @@
 --- - Browser of failing snapshot tests with a diff preview (if you use
 ---   `swift-snapshot-testing`).
 --- - Advanced log parser to detect all errors, warnings, and failing tests.
---- - `nvim-tree` integration that automatically reflects all file tree
+--- - `nvim-tree` and `oil.nvim` integration that automatically reflects all file tree
 ---   operations and updates Xcode project file.
 --- - `nvim-dap` helper functions to let you easily build, run, and debug apps.
 --- - `nvim-dap-ui` integration with console window to show app logs.
