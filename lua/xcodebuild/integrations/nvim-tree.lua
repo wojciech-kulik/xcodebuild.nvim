@@ -65,7 +65,10 @@ function M.setup()
 
   api.events.subscribe(Event.FileCreated, function(data)
     if shouldUpdateProject(data.fname) then
-      projectManager.add_file(data.fname, nil, { guessTarget = config.guess_target })
+      projectManager.add_file(data.fname, nil, {
+        guessTarget = config.guess_target,
+        createGroups = true,
+      })
     end
   end)
 

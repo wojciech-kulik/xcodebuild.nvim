@@ -1,0 +1,22 @@
+[
+  {
+    "url": "oil:///absolute/path/dev/MyAppMyCalendarLibrary/Modules/MyCalendar/JustNewFile.swift",
+    "type": "create",
+    "entry_type": "file"
+  },
+  {
+    "url": "oil:///absolute/path/dev/MyAppMyCalendarLibrary/Modules/MyCalendar/Subfolder",
+    "type": "delete",
+    "entry_type": "directory"
+  },
+  {
+    "url": "oil:///absolute/path/dev/MyAppMyCalendarLibrary/Modules/MyCalendar/New",
+    "type": "delete",
+    "entry_type": "directory"
+  },
+  {
+    "url": "oil:///absolute/path/dev/MyAppMyCalendarLibrary/Modules/MyCalendar/SimpleFile.swift",
+    "type": "delete",
+    "entry_type": "file"
+  }
+]

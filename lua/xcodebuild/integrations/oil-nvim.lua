@@ -18,6 +18,47 @@
 
 local M = {}
 
+---@param url string
+---@return string|nil
+local function parseUrl(url)
+  if not url then
+    return nil
+  end
+
+  return url:match("^.*://(.*)$")
+end
+
+---@private
+---Skips actions that create a directory if there is a file or another directory
+---being created at the same path.
+function M.__normalizeOilActions(actions)
+  local createActions = vim.tbl_filter(function(action)
+    return action.type == "create"
+  end, actions)
+
+  for i = #actions, 1, -1 do
+    local action = actions[i]
+
+    if action.type == "create" and action.entry_type == "directory" then
+      local actionPath = parseUrl(action.url)
+
+      for _, currentAction in ipairs(createActions) do
+        local currentPath = parseUrl(currentAction.url)
+
+        if
+          currentAction ~= action
+          and currentPath
+          and actionPath
+          and vim.startswith(currentPath, actionPath)
+        then
+          table.remove(actions, i)
+          break
+        end
+      end
+    end
+  end
+end
+
 ---Sets up the integration with `oil.nvim`.
 ---It subscribes to `oil.nvim` events.
 ---@see xcodebuild.project-manager
@@ -44,16 +85,6 @@ function M.setup()
     return isProjectFile(path) and config.should_update_project(path)
   end
 
-  ---@param url string
-  ---@return string|nil
-  local function parseUrl(url)
-    if not url then
-      return nil
-    end
-
-    return url:match("^.*://(.*)$")
-  end
-
   vim.api.nvim_create_autocmd("User", {
     group = vim.api.nvim_create_augroup("xcodebuild-integrations-oil", { clear = true }),
     pattern = "OilActionsPost",
@@ -61,6 +92,8 @@ function M.setup()
       if args.data.err then
         return
       end
+
+      M.__normalizeOilActions(args.data.actions)
 
       local co = coroutine.create(function(co)
         for _, action in ipairs(args.data.actions) do
@@ -74,7 +107,10 @@ function M.setup()
             vim.schedule(function()
               projectManager.add_file(atPath, function()
                 coroutine.resume(co, co)
-              end, { guessTarget = config.guess_target })
+              end, {
+                guessTarget = config.guess_target,
+                createGroups = true,
+              })
             end)
             coroutine.yield()
           end

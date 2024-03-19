@@ -1,0 +1,7 @@
+[
+  {
+    "url": "oil:///absolute/path/dev/MyAppMyCalendarLibrary/Modules/MyCalendar/New/Empty/Dir",
+    "type": "create",
+    "entry_type": "directory"
+  }
+]

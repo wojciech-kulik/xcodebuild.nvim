@@ -19,7 +19,8 @@
 --- - `nvim-dap-ui` integration to show app logs in the console window.
 --- - `lualine.nvim` integration to show selected device, test plan,
 ---   and other project settings.
---- - Picker with all available actions.
+--- - Auto-detection of the target membership for new files.
+--- - Picker with all available plugin actions.
 --- - Highly customizable (many config options, auto commands, highlights,
 ---   and user commands).
 ---

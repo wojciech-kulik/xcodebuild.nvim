@@ -1,0 +1,32 @@
+[
+  {
+    "url": "oil:///absolute/path/dev/MyAppMyCalendarLibrary/Modules/MyCalendar/Nested",
+    "type": "create",
+    "entry_type": "directory"
+  },
+  {
+    "url": "oil:///absolute/path/dev/MyAppMyCalendarLibrary/Modules/MyCalendar/Nested",
+    "type": "create",
+    "entry_type": "directory"
+  },
+  {
+    "url": "oil:///absolute/path/dev/MyAppMyCalendarLibrary/Modules/MyCalendar/Nested/Dir",
+    "type": "create",
+    "entry_type": "directory"
+  },
+  {
+    "url": "oil:///absolute/path/dev/MyAppMyCalendarLibrary/Modules/MyCalendar/Nested/Dir",
+    "type": "create",
+    "entry_type": "directory"
+  },
+  {
+    "url": "oil:///absolute/path/dev/MyAppMyCalendarLibrary/Modules/MyCalendar/Nested/Dir/Subfolder",
+    "type": "create",
+    "entry_type": "directory"
+  },
+  {
+    "url": "oil:///absolute/path/dev/MyAppMyCalendarLibrary/Modules/MyCalendar/Nested/Dir/NewFile.swift",
+    "type": "create",
+    "entry_type": "file"
+  }
+]

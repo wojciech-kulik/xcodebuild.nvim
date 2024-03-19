@@ -104,12 +104,12 @@ local runTestCase = function(caseId)
   return expectedResult, result
 end
 
-describe("ensure xcodebuild logs are processed correctly", function()
+describe("ENSURE parse_logs", function()
   --
   -- tests passed
   --
-  describe("when tests passed", function()
-    it("should set list of tests with correct data", function()
+  describe("WHEN tests passed", function()
+    it("THEN should set list of tests with correct data", function()
       local expectedResult, result = runTestCase(5)
       assert.are.same(expectedResult, result)
     end)
@@ -118,13 +118,13 @@ describe("ensure xcodebuild logs are processed correctly", function()
   --
   -- tests failed
   --
-  describe("when tests failed", function()
-    it("should set failed test message, lineNumber, and update counter", function()
+  describe("WHEN tests failed", function()
+    it("THEN should set failed test message, lineNumber, and update counter", function()
       local expectedResult, result = runTestCase(10)
       assert.are.same(expectedResult, result)
     end)
 
-    it("should set 2 warnings and 2 tests failed", function()
+    it("THEN should set 2 warnings and 2 tests failed", function()
       local expectedResult, result = runTestCase(15)
       assert.are.same(expectedResult, result)
     end)
@@ -133,8 +133,8 @@ describe("ensure xcodebuild logs are processed correctly", function()
   --
   -- multiline test failure
   --
-  describe("when tests failed producing multiline message", function()
-    it("should parse test results", function()
+  describe("WHEN tests failed producing multiline message", function()
+    it("THEN should parse test results", function()
       local expectedResult, result = runTestCase(17)
       assert.are.same(expectedResult, result)
     end)
@@ -143,13 +143,13 @@ describe("ensure xcodebuild logs are processed correctly", function()
   --
   -- tests crashed
   --
-  describe("when tests crashed in a different file than test file", function()
-    it("should fill 5 diagnostics & set fail lineNumber at test header", function()
+  describe("WHEN tests crashed in a different file than test file", function()
+    it("THEN should fill 5 diagnostics & set fail lineNumber at test header", function()
       local expectedResult, result = runTestCase(1)
       assert.are.same(expectedResult, result)
     end)
 
-    it("should fill 3 diagnostics & set fail lineNumber at test header", function()
+    it("THEN should fill 3 diagnostics & set fail lineNumber at test header", function()
       local expectedResult, result = runTestCase(4)
       assert.are.same(expectedResult, result)
     end)
@@ -158,14 +158,14 @@ describe("ensure xcodebuild logs are processed correctly", function()
   --
   -- build succeeded
   --
-  describe("when build passed", function()
-    describe("when warnings are available", function()
-      it("should set 3 warnings", function()
+  describe("WHEN build passed", function()
+    describe("WHEN warnings are available", function()
+      it("THEN should set 3 warnings", function()
         local expectedResult, result = runTestCase(13)
         assert.are.same(expectedResult, result)
       end)
 
-      it("should set 2 warnings", function()
+      it("THEN should set 2 warnings", function()
         local expectedResult, result = runTestCase(14)
         assert.are.same(expectedResult, result)
       end)
@@ -175,44 +175,44 @@ describe("ensure xcodebuild logs are processed correctly", function()
   --
   -- build failure
   --
-  describe("when build failed", function()
+  describe("WHEN build failed", function()
     describe("because of platform version incomatibility", function()
-      it("should set build errors", function()
+      it("THEN should set build errors", function()
         local expectedResult, result = runTestCase(2)
         assert.are.same(expectedResult, result)
       end)
     end)
 
     describe("because of typo in code", function()
-      it("should set build errors", function()
+      it("THEN should set build errors", function()
         local expectedResult, result = runTestCase(3)
         assert.are.same(expectedResult, result)
       end)
     end)
 
     describe("because of incorrect platform in Package.swift", function()
-      it("should set build errors", function()
+      it("THEN should set build errors", function()
         local expectedResult, result = runTestCase(6)
         assert.are.same(expectedResult, result)
       end)
     end)
 
     describe("because of linter violation", function()
-      it("should set build errors", function()
+      it("THEN should set build errors", function()
         local expectedResult, result = runTestCase(7)
         assert.are.same(expectedResult, result)
       end)
     end)
 
     describe("because of Info.plist incorrect structure", function()
-      it("should set build errors", function()
+      it("THEN should set build errors", function()
         local expectedResult, result = runTestCase(8)
         assert.are.same(expectedResult, result)
       end)
     end)
 
     describe("because of incorrect version of dependency", function()
-      it("should set build errors", function()
+      it("THEN should set build errors", function()
         local expectedResult, result = runTestCase(9)
         assert.are.same(expectedResult, result)
       end)
@@ -222,16 +222,16 @@ describe("ensure xcodebuild logs are processed correctly", function()
   --
   -- auto generated test plan
   --
-  describe("when the project is using auto-generated test plan", function()
-    describe("when tests failed", function()
-      it("should parse test results", function()
+  describe("WHEN the project is using auto-generated test plan", function()
+    describe("WHEN tests failed", function()
+      it("THEN should parse test results", function()
         local expectedResult, result = runTestCase(11)
         assert.are.same(expectedResult, result)
       end)
     end)
 
-    describe("when tests passed", function()
-      it("should parse test results", function()
+    describe("WHEN tests passed", function()
+      it("THEN should parse test results", function()
         local expectedResult, result = runTestCase(12)
         assert.are.same(expectedResult, result)
       end)
@@ -241,8 +241,8 @@ describe("ensure xcodebuild logs are processed correctly", function()
   --
   -- fresh project
   --
-  describe("when the project is newly created with tests", function()
-    it("should parse test results", function()
+  describe("WHEN the project is newly created with tests", function()
+    it("THEN should parse test results", function()
       local expectedResult, result = runTestCase(16)
       assert.are.same(expectedResult, result)
     end)

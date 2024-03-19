@@ -111,7 +111,7 @@ describe("ensure", function()
   ----------------
 
   describe("get_project_targets", function()
-    it("returns all targets", function()
+    it("THEN returns all targets", function()
       local targets = manager.get_project_targets()
       assert.are.same(targets, {
         "XcodebuildNvimApp",
@@ -135,7 +135,7 @@ describe("ensure", function()
       manager.update_current_file_targets()
     end)
 
-    it("updates xcodeproj", function()
+    it("THEN updates xcodeproj", function()
       assertFileInProject(
         projectRoot .. "XcodebuildNvimApp/Modules/Main/MainViewModel.swift",
         { "XcodebuildNvimApp", "XcodebuildNvimAppTests" }
@@ -149,25 +149,25 @@ describe("ensure", function()
       manager.show_current_file_targets()
     end)
 
-    it("shows current file targets", function()
+    it("THEN shows current file targets", function()
       assert.are.same({ "XcodebuildNvimApp" }, pickerReceivedItems)
     end)
   end)
 
   describe("guess_target", function()
-    describe("when the group contains Swift files", function()
+    describe("WHEN the group contains Swift files", function()
       local targets
 
       before_each(function()
         targets = manager.guess_target(projectRoot .. "XcodebuildNvimApp/Modules/Main")
       end)
 
-      it("returns a target", function()
+      it("THEN returns a target", function()
         assert.are_same({ "XcodebuildNvimApp" }, targets)
       end)
     end)
 
-    describe("when the group does not exist", function()
+    describe("WHEN the group does not exist", function()
       local targets
 
       before_each(function()
@@ -179,12 +179,12 @@ describe("ensure", function()
         targets = manager.guess_target(projectRoot .. "XcodebuildNvimApp/Modules/SomeNewGroup")
       end)
 
-      it("returns targets for a file from the common existing group", function()
+      it("THEN returns targets for a file from the common existing group", function()
         assert.are_same({ "XcodebuildNvimApp", "XcodebuildNvimAppTests" }, targets)
       end)
     end)
 
-    describe("when the group does not contain Swift files", function()
+    describe("WHEN the group does not contain Swift files", function()
       local targets
 
       before_each(function()
@@ -196,43 +196,43 @@ describe("ensure", function()
         targets = manager.guess_target(projectRoot .. "XcodebuildNvimApp/Preview Content")
       end)
 
-      it("returns targets for a file from the parent group", function()
+      it("THEN returns targets for a file from the parent group", function()
         assert.are_same({ "XcodebuildNvimApp", "XcodebuildNvimAppTests" }, targets)
       end)
     end)
 
-    describe("when the group is target root without Swift files", function()
+    describe("WHEN the group is target root without Swift files", function()
       local targets
 
       before_each(function()
         targets = manager.guess_target(projectRoot .. "Helpers")
       end)
 
-      it("returns target for a file in a nested group", function()
+      it("THEN returns target for a file in a nested group", function()
         assert.are_same({ "Helpers" }, targets)
       end)
     end)
 
-    describe("when the group is project root", function()
+    describe("WHEN the group is project root", function()
       local targets
 
       before_each(function()
         targets = manager.guess_target(projectRoot)
       end)
 
-      it("returns empty list", function()
+      it("THEN returns empty list", function()
         assert.are_equal(0, #targets)
       end)
     end)
 
-    describe("when the target has no Swift files", function()
+    describe("WHEN the target has no Swift files", function()
       local targets
 
       before_each(function()
         targets = manager.guess_target(projectRoot .. "EmptyTarget")
       end)
 
-      it("returns empty list", function()
+      it("THEN returns empty list", function()
         assert.are_equal(0, #targets)
       end)
     end)
@@ -244,7 +244,7 @@ describe("ensure", function()
 
   -- New file operations
 
-  describe("when file does not exist", function()
+  describe("WHEN file does not exist", function()
     local newFilePath = projectRoot .. "XcodebuildNvimApp/Modules/NewModule/new_file.swift"
 
     describe("add_file_to_targets", function()
@@ -254,7 +254,7 @@ describe("ensure", function()
         manager.add_file_to_targets(newFilePath, { "XcodebuildNvimApp", "XcodebuildNvimAppTests", "Helpers" })
       end)
 
-      it("adds file to targets", function()
+      it("THEN adds file to targets", function()
         assertFileInProject(newFilePath, { "XcodebuildNvimApp", "XcodebuildNvimAppTests", "Helpers" })
       end)
     end)
@@ -270,21 +270,21 @@ describe("ensure", function()
         manager.create_new_file()
       end)
 
-      it("creates a new file on disk", function()
+      it("THEN creates a new file on disk", function()
         assert.is_true(util.file_exists(newFilePath))
       end)
 
-      it("updates xcodeproj", function()
+      it("THEN updates xcodeproj", function()
         assertFileInProject(newFilePath)
       end)
     end)
 
     describe("add_file", function()
       before_each(function()
-        manager.add_file(newFilePath)
+        manager.add_file(newFilePath, nil, { createGroups = true })
       end)
 
-      it("updates xcodeproj", function()
+      it("THEN updates xcodeproj", function()
         assertFileInProject(newFilePath)
       end)
     end)
@@ -292,16 +292,16 @@ describe("ensure", function()
     describe("add_file with nested dirs", function()
       local nestedFilePath = projectRoot .. "XcodebuildNvimApp/SomeDir/Nested/NewModule/File.swift"
       before_each(function()
-        manager.add_file(nestedFilePath)
+        manager.add_file(nestedFilePath, nil, { createGroups = true })
       end)
 
-      it("creates intermediate groups", function()
+      it("THEN creates intermediate groups", function()
         assertGroupInProject("SomeDir")
         assertGroupInProject("Nested")
         assertGroupInProject("NewModule")
       end)
 
-      it("updates xcodeproj", function()
+      it("THEN updates xcodeproj", function()
         assertFileInProject(nestedFilePath)
       end)
     end)
@@ -312,7 +312,7 @@ describe("ensure", function()
         manager.add_current_file()
       end)
 
-      it("updates xcodeproj", function()
+      it("THEN updates xcodeproj", function()
         assertFileInProject(newFilePath)
       end)
     end)
@@ -320,7 +320,7 @@ describe("ensure", function()
 
   -- Existing file operations
 
-  describe("when file exists in project", function()
+  describe("WHEN file exists in project", function()
     local filepath = projectRoot .. "XcodebuildNvimApp/Modules/Main/MainViewModel.swift"
 
     describe("move_file", function()
@@ -333,7 +333,7 @@ describe("ensure", function()
         manager.move_file(filepath, movedFilePath)
       end)
 
-      it("updates xcodeproj and keeps original targets", function()
+      it("THEN updates xcodeproj and keeps original targets", function()
         assertFileInProject(movedFilePath, { "XcodebuildNvimApp", "Helpers" })
       end)
     end)
@@ -346,7 +346,7 @@ describe("ensure", function()
         manager.rename_file(filepath, changedFilePath)
       end)
 
-      it("updates xcodeproj and keeps original targets", function()
+      it("THEN updates xcodeproj and keeps original targets", function()
         assertFileInProject(changedFilePath, { "XcodebuildNvimApp", "Helpers" })
       end)
     end)
@@ -363,12 +363,12 @@ describe("ensure", function()
         manager.rename_current_file()
       end)
 
-      it("moves file on disk", function()
+      it("THEN moves file on disk", function()
         assert.is_true(util.file_exists(changedFilePath))
         assert.is_false(util.file_exists(filepath))
       end)
 
-      it("updates xcodeproj and keeps original targets", function()
+      it("THEN updates xcodeproj and keeps original targets", function()
         assertFileInProject(changedFilePath, { "XcodebuildNvimApp", "Helpers" })
       end)
     end)
@@ -378,7 +378,7 @@ describe("ensure", function()
         manager.delete_file(filepath)
       end)
 
-      it("updates xcodeproj", function()
+      it("THEN updates xcodeproj", function()
         assertFileInProject(filepath, {})
       end)
     end)
@@ -392,11 +392,11 @@ describe("ensure", function()
         manager.delete_current_file()
       end)
 
-      it("deletes file from disk", function()
+      it("THEN deletes file from disk", function()
         assert.is_false(util.file_exists(filepath))
       end)
 
-      it("updates xcodeproj", function()
+      it("THEN updates xcodeproj", function()
         assertFileInProject(filepath, {})
       end)
     end)
@@ -408,7 +408,7 @@ describe("ensure", function()
 
   -- New group operations
 
-  describe("when group does not exist", function()
+  describe("WHEN group does not exist", function()
     local newGroupPath = projectRoot .. "XcodebuildNvimApp/Modules/NewModule"
 
     describe("create_new_group", function()
@@ -420,11 +420,11 @@ describe("ensure", function()
         manager.create_new_group()
       end)
 
-      it("creates a new group on disk", function()
+      it("THEN creates a new group on disk", function()
         assert.is_true(util.dir_exists(newGroupPath))
       end)
 
-      it("updates xcodeproj", function()
+      it("THEN updates xcodeproj", function()
         assertGroupInProject("NewModule")
       end)
     end)
@@ -434,7 +434,7 @@ describe("ensure", function()
         manager.add_group(newGroupPath)
       end)
 
-      it("updates xcodeproj", function()
+      it("THEN updates xcodeproj", function()
         assertGroupInProject("NewModule")
       end)
     end)
@@ -442,7 +442,7 @@ describe("ensure", function()
 
   -- Existing group operations
 
-  describe("when group exists", function()
+  describe("WHEN group exists", function()
     local groupPath = projectRoot .. "XcodebuildNvimApp/Modules/Main"
 
     describe("rename_current_group", function()
@@ -456,31 +456,31 @@ describe("ensure", function()
         manager.rename_current_group()
       end)
 
-      it("renames group on disk", function()
+      it("THEN renames group on disk", function()
         assert.is_true(util.dir_exists(changedGroupPath))
         assert.is_false(util.dir_exists(groupPath))
       end)
 
-      it("updates xcodeproj", function()
+      it("THEN updates xcodeproj", function()
         assertGroupInProject("MainChanged")
         assertGroupInProject("Main", false)
       end)
     end)
 
-    describe("move_or_rename_group when path is not changed", function()
+    describe("move_or_rename_group WHEN path is not changed", function()
       local changedGroupPath = projectRoot .. "XcodebuildNvimApp/Modules/MainChanged"
 
       before_each(function()
         manager.move_or_rename_group(groupPath, changedGroupPath)
       end)
 
-      it("updates xcodeproj", function()
+      it("THEN updates xcodeproj", function()
         assertGroupInProject("MainChanged")
         assertGroupInProject("Main", false)
       end)
     end)
 
-    describe("move_or_rename_group when path is changed", function()
+    describe("move_or_rename_group WHEN path is changed", function()
       local changedGroupPath = projectRoot .. "XcodebuildNvimApp/NewPath/Modules/MainChanged"
 
       before_each(function()
@@ -488,7 +488,7 @@ describe("ensure", function()
         manager.move_or_rename_group(groupPath, changedGroupPath)
       end)
 
-      it("updates xcodeproj", function()
+      it("THEN updates xcodeproj", function()
         assertGroupInProject("Modules")
         assertGroupInProject("NewPath")
         assertGroupInProject("MainChanged")
@@ -500,7 +500,7 @@ describe("ensure", function()
         manager.delete_group(groupPath)
       end)
 
-      it("updates xcodeproj", function()
+      it("THEN updates xcodeproj", function()
         assertGroupInProject("Main", false)
       end)
     end)
@@ -514,11 +514,11 @@ describe("ensure", function()
         manager.delete_current_group()
       end)
 
-      it("deletes group from disk", function()
+      it("THEN deletes group from disk", function()
         assert.is_false(util.dir_exists(groupPath))
       end)
 
-      it("updates xcodeproj", function()
+      it("THEN updates xcodeproj", function()
         assertGroupInProject("Main", false)
       end)
     end)

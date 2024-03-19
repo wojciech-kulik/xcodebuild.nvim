@@ -1,0 +1,12 @@
+[
+  {
+    "url": "oil:///absolute/path/dev/MyAppMyCalendarLibrary/Modules/MyCalendar/Nested/Dir/Subfolder",
+    "type": "create",
+    "entry_type": "directory"
+  },
+  {
+    "url": "oil:///absolute/path/dev/MyAppMyCalendarLibrary/Modules/MyCalendar/Nested/Dir/NewFile.swift",
+    "type": "create",
+    "entry_type": "file"
+  }
+]
