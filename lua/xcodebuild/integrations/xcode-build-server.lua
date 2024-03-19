@@ -1,4 +1,4 @@
----@mod xcodebuild.integrations.xcode_build_server xcode-build-server Integration
+---@mod xcodebuild.integrations.xcode-build-server xcode-build-server Integration
 ---@brief [[
 ---This module is responsible for the integration with xcode-build-server.
 ---

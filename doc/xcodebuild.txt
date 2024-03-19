@@ -40,7 +40,7 @@ DAP Integration ································
 Remote Debugger Integration ·········· |xcodebuild.integrations.remote_debugger|
 LSP Integration ·································· |xcodebuild.integrations.lsp|
 nvim-tree Integration ······················ |xcodebuild.integrations.nvim_tree|
-xcode-build-server Integration ···· |xcodebuild.integrations.xcode_build_server|
+xcode-build-server Integration ···· |xcodebuild.integrations.xcode-build-server|
 Pickers ················································ |xcodebuild.ui.pickers|
 Helpers ··················································· |xcodebuild.helpers|
 Lua Utils ···················································· |xcodebuild.util|
@@ -166,6 +166,7 @@ M.setup({options})                                            *xcodebuild.setup*
         },
         nvim_tree = {
           enabled = true, -- enable updating Xcode project files when using nvim-tree
+          guess_target = true, -- guess target for the new file based on the file path
           should_update_project = function(path) -- path can lead to directory or file
             -- it could be useful if you mix Xcode project with SPM for example
             return true
@@ -173,6 +174,7 @@ M.setup({options})                                            *xcodebuild.setup*
         },
         oil_nvim = {
           enabled = true, -- enable updating Xcode project files when using oil.nvim
+          guess_target = true, -- guess target for the new file based on the file path
           should_update_project = function(path) -- path can lead to directory or file
             -- it could be useful if you mix Xcode project with SPM for example
             return true
@@ -207,8 +209,8 @@ Features                                                   *xcodebuild.features*
  - Advanced log parser to detect all errors, warnings, and failing tests.
  - `nvim-tree` and `oil.nvim` integration that automatically reflects all file tree
    operations and updates Xcode project file.
- - `nvim-dap` helper functions to let you easily build, run, and debug apps.
- - `nvim-dap-ui` integration with console window to show app logs.
+ - `nvim-dap` integration to let you easily build, run, and debug apps.
+ - `nvim-dap-ui` integration to show app logs in the console window.
  - `lualine.nvim` integration to show selected device, test plan,
    and other project settings.
  - Picker with all available actions.
@@ -251,7 +253,7 @@ Neovim environment
 External tools
  - `xcbeautify` to format Xcode logs (you can set a different tool or disable formatting in the config).
  - `Xcodeproj` to manage project files within Neovim.
- - `Ruby` to use `xcodeproj` gem.
+ - `Ruby` to use `Xcodeproj` gem.
  - `pymobiledevice3` to debug on physical devices and/or run apps on devices below iOS 17.
  - `xcode-build-server` to make LSP work properly with xcodeproj/xcworkspace.
  - `codelldb` to debug iOS and macOS Swift apps.
@@ -1804,16 +1806,20 @@ M.get_project_targets()
     (string[]|nil)
 
 
-M.add_file({filepath}, {callback})         *xcodebuild.project.manager.add_file*
+                                           *xcodebuild.project.manager.add_file*
+M.add_file({filepath}, {callback}, {opts})
   Adds the file to project.
   Asks the user to select the targets.
   All groups from {filepath} will be added to the project if they are not already there.
+
+  If {opts.guessTarget} is `true`, it tries to guess the target for the file.
 
   Calls the {callback} after the file has been added to the targets or the user has canceled the action.
 
   Parameters: ~
     {filepath}  (string)
     {callback}  (function|nil)
+    {opts}      ({guessTarget:boolean}|nil)
 
 
                                    *xcodebuild.project.manager.add_current_file*
@@ -1922,6 +1928,22 @@ M.delete_current_group()
 M.update_current_file_targets()
   Updates the file targets in the project.
   Asks the user to select the targets.
+
+
+M.guess_target({groupPath})            *xcodebuild.project.manager.guess_target*
+  Finds the first existing group in the project for the provided {groupPath}
+  and tries to list targets for the first Swift file it encounters there or in subgroups.
+
+  If it fails, it repeats the process one more time for the parent group.
+
+  Note: This method could be inaccurate. However, it's good enough heuristic for most cases.
+  If needed, you can always manually select the targets.
+
+  Parameters: ~
+    {groupPath}  (string)
+
+  Returns: ~
+    (string[]|nil)
 
 
                           *xcodebuild.project.manager.show_current_file_targets*
@@ -3375,14 +3397,14 @@ M.setup()                              *xcodebuild.integrations.nvim_tree.setup*
 
 
 ==============================================================================
-xcode-build-server Integration      *xcodebuild.integrations.xcode_build_server*
+xcode-build-server Integration      *xcodebuild.integrations.xcode-build-server*
 
 This module is responsible for the integration with xcode-build-server.
 
 See: https://github.com/SolaWing/xcode-build-server
 
 
-                       *xcodebuild.integrations.xcode_build_server.is_installed*
+                       *xcodebuild.integrations.xcode-build-server.is_installed*
 M.is_installed()
   Returns whether the xcode-build-server is installed.
 
@@ -3390,7 +3412,7 @@ M.is_installed()
     (boolean)
 
 
-                         *xcodebuild.integrations.xcode_build_server.is_enabled*
+                         *xcodebuild.integrations.xcode-build-server.is_enabled*
 M.is_enabled()
   Returns whether the integration is enabled.
 
@@ -3398,7 +3420,7 @@ M.is_enabled()
     (boolean)
 
 
-                         *xcodebuild.integrations.xcode_build_server.run_config*
+                         *xcodebuild.integrations.xcode-build-server.run_config*
 M.run_config({projectCommand}, {scheme})
   Calls "config" command of xcode-build-server in order to update buildServer.json file.
 

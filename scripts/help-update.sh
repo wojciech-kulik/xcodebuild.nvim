@@ -43,7 +43,7 @@ lemmy-help \
 		./lua/xcodebuild/integrations/remote_debugger.lua \
 		./lua/xcodebuild/integrations/lsp.lua \
 		./lua/xcodebuild/integrations/nvim-tree.lua \
-		./lua/xcodebuild/integrations/xcode_build_server.lua \
+		./lua/xcodebuild/integrations/xcode-build-server.lua \
 		./lua/xcodebuild/ui/pickers.lua \
 		./lua/xcodebuild/helpers.lua \
 		./lua/xcodebuild/util.lua \

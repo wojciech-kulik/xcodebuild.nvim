@@ -46,7 +46,7 @@ local progressFrames = {
 
 ---Updates xcode-build-server config if needed.
 local function update_xcode_build_server_config()
-  local xcodeBuildServer = require("xcodebuild.integrations.xcode_build_server")
+  local xcodeBuildServer = require("xcodebuild.integrations.xcode-build-server")
 
   if not xcodeBuildServer.is_enabled() or not xcodeBuildServer.is_installed() then
     return
