@@ -71,8 +71,10 @@ function M.setup()
           end
 
           local function addFileAndWaitForTargetSelection(atPath)
-            projectManager.add_file(atPath, function()
-              coroutine.resume(co, co)
+            vim.schedule(function()
+              projectManager.add_file(atPath, function()
+                coroutine.resume(co, co)
+              end)
             end)
             coroutine.yield()
           end
