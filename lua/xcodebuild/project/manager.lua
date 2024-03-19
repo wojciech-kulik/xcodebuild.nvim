@@ -92,11 +92,25 @@ local function run_list_targets()
 end
 
 ---Gets targets and shows the picker to select them.
+---
+---If there is only one target and {opts.autoselect} is `true`, it calls the {callback}
+---without showing the picker.
+---
+---Returns `true` if the picker has been shown, otherwise `false`.
 ---@param title string
+---@param opts {autoselect: boolean}|nil
 ---@param callback fun(target: string[])|nil
-local function run_select_targets(title, callback)
+---@return boolean
+local function run_select_targets(title, opts, callback)
   local targets = run_list_targets()
+
+  if opts and opts.autoselect and #targets == 1 then
+    util.call(callback, targets)
+    return false
+  end
+
   pickers.show(title, targets, callback, { close_on_select = true, multiselect = true })
+  return true
 end
 
 ---Adds file to the selected targets.
@@ -230,31 +244,39 @@ function M.add_file(filepath, callback)
   end
 
   local filename = util.get_filename(filepath)
-  run_select_targets("Select Target(s) for " .. filename, function(targets)
-    local dir = vim.fs.dirname(filepath)
-    if not dir then
-      notifications.send_error("Could not get the directory of: " .. filepath)
-      return
-    end
 
-    M.add_group(dir, { silent = true })
-    run_add_file_to_targets(filepath, targets)
-    notifications.send("File has been added to targets")
-  end)
-
-  vim.api.nvim_create_autocmd("BufWinLeave", {
+  local autocmd = vim.api.nvim_create_autocmd("BufWinLeave", {
     group = vim.api.nvim_create_augroup("project-manager-add-file", { clear = true }),
     pattern = "*",
     once = true,
     callback = function()
-      local filetype = vim.bo.filetype
-      if filetype == "TelescopePrompt" then
-        vim.schedule(function()
-          util.call(callback)
-        end)
+      if vim.bo.filetype == "TelescopePrompt" then
+        util.call(callback)
       end
     end,
   })
+
+  local pickerShown = run_select_targets(
+    "Select Target(s) for " .. filename,
+    { autoselect = true },
+    function(targets)
+      local dir = vim.fs.dirname(filepath)
+      if not dir then
+        notifications.send_error("Could not get the directory of: " .. filepath)
+        return
+      end
+
+      M.add_group(dir, { silent = true })
+      run_add_file_to_targets(filepath, targets)
+      notifications.send("File has been added to targets")
+    end
+  )
+
+  -- The target has been selected automatically, so we can remove the autocmd.
+  if not pickerShown then
+    vim.api.nvim_del_autocmd(autocmd)
+    util.call(callback)
+  end
 end
 
 ---Adds the current file to the selected targets.
@@ -489,7 +511,7 @@ function M.update_current_file_targets()
   local filepath = vim.fn.expand("%:p")
   local filename = util.get_filename(filepath)
 
-  run_select_targets("Select Target(s) for " .. filename, function(targets)
+  run_select_targets("Select Target(s) for " .. filename, nil, function(targets)
     run_update_file_targets(filepath, targets)
     notifications.send("File targets have been updated")
   end)
