@@ -23,7 +23,7 @@ It provides all essential actions for development, including building, launching
 - [x] Browser of failing snapshot tests with a diff preview (if you use [swift-snapshot-testing]).
 - [x] Advanced log parser to detect all errors, warnings, and failing tests.
 - [x] [nvim-tree] and [oil.nvim] integration that automatically reflects all file tree operations
-      and updates Xcode project file.
+      and updates Xcode project.
 - [x] [nvim-dap] integration to let you easily build, run, and debug apps.
 - [x] [nvim-dap-ui] integration to show app logs in the console window.
 - [x] [lualine.nvim] integration to show selected device, test plan, and other project settings.
