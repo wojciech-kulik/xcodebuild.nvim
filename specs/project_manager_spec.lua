@@ -14,6 +14,7 @@ local manager = require("xcodebuild.project.manager")
 local util = require("xcodebuild.util")
 local cwd = vim.fn.getcwd()
 local pickerReceivedItems = nil
+local pickerShown = false
 local projectRoot = cwd .. "/specs/tmp/XcodebuildNvimApp/"
 
 ---@param filepath string
@@ -76,12 +77,16 @@ local function mock()
 
   require("xcodebuild.ui.pickers").show = function(_, list, callback, _)
     pickerReceivedItems = list
+    pickerShown = true
 
     if callback then
       callback({ list[1] })
+      vim.bo.filetype = "TelescopePrompt"
+      vim.api.nvim_exec_autocmds("BufWinLeave", {})
     end
   end
 
+  pickerShown = false
   pickerReceivedItems = {}
 
   local originalVimCmd = vim.cmd
@@ -242,7 +247,105 @@ describe("ensure", function()
   ----- FILES ----
   ----------------
 
-  -- New file operations
+  -- New file operations with guessing target
+
+  describe("add_file", function()
+    describe("WHEN guessing target is enabled", function()
+      describe("AND group does not exist", function()
+        local newFilePath = projectRoot .. "Helpers/Modules/NewModule/new_file2.swift"
+        local callbackCalled = false
+
+        before_each(function()
+          manager.add_file(newFilePath, function()
+            callbackCalled = true
+          end, { createGroups = true, guessTarget = true })
+        end)
+
+        it("THEN the target is correctly guessed and added", function()
+          assert.is_false(pickerShown)
+          assert.is_true(callbackCalled)
+          assertFileInProject(newFilePath, { "Helpers" })
+          assertGroupInProject("NewModule")
+        end)
+      end)
+
+      describe("AND guessing is not possible", function()
+        local newFilePath = projectRoot .. "EmptyTarget/NewModule/new_file2.swift"
+        local callbackCalled = false
+
+        before_each(function()
+          manager.add_file(newFilePath, function()
+            callbackCalled = true
+          end, { createGroups = true, guessTarget = true })
+        end)
+
+        it("THEN the target is set based on picker selection", function()
+          assert.is_true(callbackCalled)
+          assert.is_true(pickerShown)
+          assert.are_same({
+            "XcodebuildNvimApp",
+            "XcodebuildNvimAppTests",
+            "XcodebuildNvimAppUITests",
+            "Helpers",
+            "EmptyTarget",
+          }, pickerReceivedItems)
+          assertFileInProject(newFilePath, { "XcodebuildNvimApp" })
+          assertGroupInProject("NewModule")
+        end)
+      end)
+    end)
+
+    describe("WHEN only one target is returned", function()
+      local newFilePath = projectRoot .. "Helpers/NewModule/new_file2.swift"
+      local callbackCalled = false
+      local originalShell = util.shell
+
+      before_each(function()
+        util.shell = function(_)
+          util.shell = originalShell
+          return { "Failure", "Helpers" }
+        end
+        manager.add_file(newFilePath, function()
+          callbackCalled = true
+        end, { createGroups = true, guessTarget = true })
+      end)
+
+      it("THEN the target is set automatically", function()
+        assert.is_false(pickerShown)
+        assert.is_true(callbackCalled)
+        assertFileInProject(newFilePath, { "Helpers" })
+        assertGroupInProject("NewModule")
+      end)
+    end)
+
+    describe("WHEN guessing target is disabled", function()
+      local newFilePath = projectRoot .. "Helpers/Modules/NewModule/new_file2.swift"
+      local callbackCalled = false
+
+      before_each(function()
+        setFilePath(newFilePath)
+        manager.add_file(newFilePath, function()
+          callbackCalled = true
+        end, { createGroups = true, guessTarget = false })
+      end)
+
+      it("THEN the target is set based on picker selection", function()
+        assert.is_true(pickerShown)
+        assert.is_true(callbackCalled)
+        assert.are_same({
+          "XcodebuildNvimApp",
+          "XcodebuildNvimAppTests",
+          "XcodebuildNvimAppUITests",
+          "Helpers",
+          "EmptyTarget",
+        }, pickerReceivedItems)
+        assertFileInProject(newFilePath, { "XcodebuildNvimApp" })
+        assertGroupInProject("NewModule")
+      end)
+    end)
+  end)
+
+  -- New file operations without guessing target
 
   describe("WHEN file does not exist", function()
     local newFilePath = projectRoot .. "XcodebuildNvimApp/Modules/NewModule/new_file.swift"

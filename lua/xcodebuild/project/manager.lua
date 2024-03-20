@@ -95,11 +95,11 @@ local function run_list_targets()
   return run("list_targets")
 end
 
----Runs the `find_target_for_group` action and returns the output.
+---Runs the `list_targets_for_group` action and returns the output.
 ---@param groupPath string
 ---@return string[]
-local function run_find_target_for_group(groupPath)
-  return run("find_target_for_group", { groupPath })
+local function run_list_targets_for_group(groupPath)
+  return run("list_targets_for_group", { groupPath })
 end
 
 ---Gets targets and shows the picker to select them.
@@ -109,13 +109,14 @@ end
 ---
 ---Returns `true` if the picker has been shown, otherwise `false`.
 ---@param title string
----@param opts {autoselect: boolean}|nil
+---@param opts {autoselect: boolean, targets: string[]|nil}|nil
 ---@param callback fun(target: string[])|nil
 ---@return boolean
 local function run_select_targets(title, opts, callback)
-  local targets = run_list_targets()
+  opts = opts or {}
+  local targets = opts.targets or run_list_targets()
 
-  if opts and opts.autoselect and #targets == 1 then
+  if opts.autoselect and #targets == 1 then
     util.call(callback, targets)
     return false
   end
@@ -126,11 +127,21 @@ end
 
 ---Adds file to the selected targets.
 ---The group from {filepath} must exist in the project.
+---
+---If {guessTarget} is `true`, it tries to guess the target for the file.
+---If could not find target, it returns a list of all targets.
 ---@param filepath string
 ---@param targets string[]
-local function run_add_file_to_targets(filepath, targets)
-  local targetsJoined = table.concat(targets, ",")
-  run("add_file", { targetsJoined, filepath })
+---@param guessTarget boolean
+---@param createGroups boolean
+---@return string[]
+local function run_add_file(filepath, targets, guessTarget, createGroups)
+  return run("add_file", {
+    table.concat(targets, ","),
+    filepath,
+    guessTarget and "true" or "false",
+    createGroups and "true" or "false",
+  })
 end
 
 ---Updates the file targets.
@@ -229,7 +240,7 @@ function M.add_file_to_targets(filepath, targets)
     return
   end
 
-  run_add_file_to_targets(filepath, targets)
+  run_add_file(filepath, targets, false, false)
 end
 
 ---Returns all project targets.
@@ -242,8 +253,41 @@ function M.get_project_targets()
   return run_list_targets()
 end
 
+---Shows the target picker for the {filename}.
+---
+---{closeCallback} is called when the picker is dismissed.
+---{callback} is called when selection is confirmed.
+---@param filename string
+---@param targets string[]|nil
+---@param callback function(targets: string[])
+---@param closeCallback function|nil
+local function show_target_picker(filename, targets, callback, closeCallback)
+  local autocmd = vim.api.nvim_create_autocmd("BufWinLeave", {
+    group = vim.api.nvim_create_augroup("project-manager-add-file", { clear = true }),
+    pattern = "*",
+    once = true,
+    callback = function()
+      if vim.bo.filetype == "TelescopePrompt" then
+        util.call(closeCallback)
+      end
+    end,
+  })
+
+  local pickerShown = run_select_targets(
+    "Select Target(s) for " .. filename,
+    { autoselect = true, targets = targets },
+    callback
+  )
+
+  -- The target has been selected automatically, so we can remove the autocmd.
+  if not pickerShown then
+    vim.api.nvim_del_autocmd(autocmd)
+    util.call(closeCallback)
+  end
+end
+
 ---Adds the file to project.
----Asks the user to select the targets.
+---Asks the user to select the targets or tries to guess them.
 ---
 ---If {opts.createGroups} is `true`, all groups from {filepath} will be created if needed.
 ---
@@ -259,56 +303,35 @@ function M.add_file(filepath, callback, opts)
   end
 
   opts = opts or {}
-
   local filename = util.get_filename(filepath)
-  local function addFile(targets)
-    local dir = vim.fs.dirname(filepath)
-    if not dir then
-      notifications.send_error("Could not get the directory of: " .. filepath)
-      return
-    end
 
-    if opts.createGroups then
-      M.add_group(dir, { silent = true })
-    end
+  ---@param targets string[]|nil
+  local function addFileWithTargetPicker(targets)
+    show_target_picker(filename, targets, function(selectedTargets)
+      run_add_file(filepath, selectedTargets, false, true)
+      notifications.send(
+        '"' .. filename .. '" has been added to target(s): ' .. table.concat(selectedTargets, ", ")
+      )
+    end, callback)
+  end
 
-    run_add_file_to_targets(filepath, targets)
-    notifications.send('"' .. filename .. '" has been added to target(s): ' .. table.concat(targets, ", "))
+  local function addFileWithGuessing()
+    local output = run_add_file(filepath, {}, opts.guessTarget, opts.createGroups)
+
+    if output[1] == "Success" then
+      table.remove(output, 1)
+      notifications.send('"' .. filename .. '" has been added to target(s): ' .. table.concat(output, ", "))
+      util.call(callback)
+    elseif output[1] == "Failure" then
+      table.remove(output, 1)
+      addFileWithTargetPicker(output)
+    end
   end
 
   if opts.guessTarget then
-    local targets = run_find_target_for_group(vim.fn.fnamemodify(filepath, ":h"))
-
-    if targets and #targets > 0 then
-      addFile(targets)
-      util.call(callback)
-      return
-    end
-  end
-
-  local autocmd = vim.api.nvim_create_autocmd("BufWinLeave", {
-    group = vim.api.nvim_create_augroup("project-manager-add-file", { clear = true }),
-    pattern = "*",
-    once = true,
-    callback = function()
-      if vim.bo.filetype == "TelescopePrompt" then
-        util.call(callback)
-      end
-    end,
-  })
-
-  local pickerShown = run_select_targets(
-    "Select Target(s) for " .. filename,
-    { autoselect = true },
-    function(targets)
-      addFile(targets)
-    end
-  )
-
-  -- The target has been selected automatically, so we can remove the autocmd.
-  if not pickerShown then
-    vim.api.nvim_del_autocmd(autocmd)
-    util.call(callback)
+    addFileWithGuessing()
+  else
+    addFileWithTargetPicker()
   end
 end
 
@@ -424,20 +447,13 @@ end
 
 ---Adds the group to the project.
 ---@param path string
----@param opts table|nil
----
----* silent (boolean): If true, it doesn't send a notification.
-function M.add_group(path, opts)
+function M.add_group(path)
   if not helpers.validate_project() or not validate_xcodeproj_tool() then
     return
   end
 
-  opts = opts or {}
   run_add_group(path)
-
-  if not opts.silent then
-    notifications.send("Group has been added")
-  end
+  notifications.send("Group has been added")
 end
 
 ---Adds the current group to the project.
@@ -564,7 +580,7 @@ function M.guess_target(groupPath)
     return
   end
 
-  return run_find_target_for_group(groupPath)
+  return run_list_targets_for_group(groupPath)
 end
 
 ---Shows the targets for the current file.
