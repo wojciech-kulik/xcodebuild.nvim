@@ -1815,7 +1815,7 @@ M.get_project_targets()
                                            *xcodebuild.project.manager.add_file*
 M.add_file({filepath}, {callback}, {opts})
   Adds the file to project.
-  Asks the user to select the targets.
+  Asks the user to select the targets or tries to guess them.
 
   If {opts.createGroups} is `true`, all groups from {filepath} will be created if needed.
 
@@ -1880,13 +1880,11 @@ M.create_new_group()
   Asks the user for the group name.
 
 
-M.add_group({path}, {opts})               *xcodebuild.project.manager.add_group*
+M.add_group({path})                       *xcodebuild.project.manager.add_group*
   Adds the group to the project.
 
   Parameters: ~
     {path}  (string)
-    {opts}  (table|nil)
-            * silent (boolean): If true, it doesn't send a notification.
 
 
                                   *xcodebuild.project.manager.add_current_group*

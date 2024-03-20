@@ -190,11 +190,21 @@ def list_targets_for_file(project, file_path)
   end
 end
 
+# @param [Xcodeproj::Project] project
+# @param [String] dir_path
+# @param [Boolean] go_up
+def list_targets_for_group(project, dir_path, go_up = true)
+  find_targets_for_group(project, dir_path, go_up).each do |target|
+    puts target
+  end
+end
+
 # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
 # @param [Xcodeproj::Project] project
 # @param [String] dir_path
 # @param [Boolean] go_up
-def find_target_for_group(project, dir_path, go_up = true)
+# @return [Array<String>]
+def find_targets_for_group(project, dir_path, go_up = true)
   dir_path = dir_path.chomp("/")
   group = find_group_by_absolute_dir_path(project, dir_path, false)
   project_dir = File.dirname(project.path.to_s)
@@ -206,7 +216,7 @@ def find_target_for_group(project, dir_path, go_up = true)
     group = find_group_by_absolute_dir_path(project, dir_path, false)
   end
 
-  exit if group.nil? || group.instance_of?(Xcodeproj::Project::Object::PBXProject)
+  return [] if group.nil? || dir_path == project_dir || group.instance_of?(Xcodeproj::Project::Object::PBXProject)
 
   # First look for Swift files in the current group then in nested groups
   merged_children = group.files + group.recursive_children
@@ -222,13 +232,11 @@ def find_target_for_group(project, dir_path, go_up = true)
     targets = get_targets_for_file(project, child.real_path.to_s)
     next if targets.empty?
 
-    # print targets and exit
-    targets.each { |target| puts target }
-    exit
+    return targets
   end
 
   # Last chance, go up one level and try again
-  find_target_for_group(project, File.dirname(dir_path), false) if go_up
+  find_targets_for_group(project, File.dirname(dir_path), false) if go_up
 end
 
 # @param [Xcodeproj::Project] project
@@ -244,12 +252,39 @@ def get_targets_for_file(project, file_path)
   result
 end
 
+# @param [Xcodeproj::Project] project
+# @param [String] targets
+# @param [String] file_path
+# @param [Boolean] guess_target
+# @param [Boolean] create_dirs
+def add_file(project, targets, file_path, guess_target, create_dirs)
+  if guess_target
+    guessed_targets = find_targets_for_group(project, File.dirname(file_path))
+
+    if guessed_targets.nil? || guessed_targets.empty?
+      puts "Failure"
+      list_targets(project)
+      return
+    end
+
+    targets_joined = guessed_targets.join(",")
+    add_group(project, File.dirname(file_path)) if create_dirs
+    add_file_to_targets(project, targets_joined, file_path)
+
+    puts "Success"
+    guessed_targets.each { |target| puts target }
+  else
+    add_group(project, File.dirname(file_path)) if create_dirs
+    add_file_to_targets(project, targets, file_path)
+  end
+end
+
 # rubocop:disable Metrics/MethodLength, Style/GuardClause
 # @param [Xcodeproj::Project] project
 # @param [String] action
 def handle_action(project, action)
   if action == "add_file"
-    add_file_to_targets(project, ARGV[2], ARGV[3])
+    add_file(project, ARGV[2], ARGV[3], ARGV[4] == "true", ARGV[5] == "true")
     exit
   end
 
@@ -302,8 +337,8 @@ def handle_action(project, action)
     exit
   end
 
-  if action == "find_target_for_group"
-    find_target_for_group(project, ARGV[2])
+  if action == "list_targets_for_group"
+    list_targets_for_group(project, ARGV[2])
     exit
   end
 end
