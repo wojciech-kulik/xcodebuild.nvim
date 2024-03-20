@@ -40,6 +40,7 @@ DAP Integration ································
 Remote Debugger Integration ·········· |xcodebuild.integrations.remote_debugger|
 LSP Integration ·································· |xcodebuild.integrations.lsp|
 nvim-tree Integration ······················ |xcodebuild.integrations.nvim_tree|
+oil.nvim Integration ························ |xcodebuild.integrations.oil-nvim|
 xcode-build-server Integration ···· |xcodebuild.integrations.xcode-build-server|
 Pickers ················································ |xcodebuild.ui.pickers|
 Helpers ··················································· |xcodebuild.helpers|
@@ -3397,6 +3398,32 @@ See:
 M.setup()                              *xcodebuild.integrations.nvim_tree.setup*
   Sets up the integration with `nvim-tree`.
   It subscribes to `nvim-tree` events.
+
+  See: ~
+    |xcodebuild.project-manager|
+
+
+==============================================================================
+oil.nvim Integration                          *xcodebuild.integrations.oil-nvim*
+
+This module is responsible for the integration with `oil.nvim`.
+It listens to `oil.nvim` events and updates the project file accordingly.
+
+The integrations is enabled only if the current working directory
+contains the project configuration (|xcodebuild.project.config|).
+
+You can always disable the integration in the |xcodebuild.config|.
+
+This feature requires `Xcodeproj` to be installed (|xcodebuild.requirements|).
+
+See:
+  |xcodebuild.project-manager|
+  https://github.com/stevearc/oil.nvim
+
+
+M.setup()                               *xcodebuild.integrations.oil-nvim.setup*
+  Sets up the integration with `oil.nvim`.
+  It subscribes to `oil.nvim` events.
 
   See: ~
     |xcodebuild.project-manager|
