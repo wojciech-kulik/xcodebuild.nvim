@@ -41,7 +41,7 @@ in a convenient way.
 Every change in the file tree presented by these plugins will be automatically reflected in the
 Xcode project file.
 
-Additionally, the `Project Manager` will try predicting targets for newly created files based on their location.
+Additionally, the Project Manager will try predicting targets for newly created files based on their location.
 If you prefer to select targets manually, you can always disable it in the configuration using
 `integrations.nvim_tree.guess_target` or `integrations.oil_nvim.guess_target`.
 
@@ -546,8 +546,8 @@ extension will present for you all panels with stack, breakpoints, variables, lo
 
 To configure DAP for development:
 
-- Download codelldb VS Code plugin from: [HERE][codelldb-download] For macOS use `darwin` version.
-  Just unzip `vsix` file and set paths below.
+- Download codelldb VS Code plugin from: [HERE][codelldb-download]. For macOS use `darwin` version.
+- Just unzip `vsix` file and set paths in the configuration below.
 - Install also [nvim-dap-ui] for a nice GUI to debug.
 - Make sure to enable `console` window from `nvim-dap-ui` to see simulator logs.
 
@@ -821,14 +821,9 @@ and run `xcode-build-server config` again.
 - `:h xcodebuild.keys`
 - `:h xcodebuild.tools`
 - `:h xcodebuild.commands`
-- `:h xcodebuild.highlights`
 - `:h xcodebuild.events`
-- `:h xcodebuild.project-manager`
-- `:h xcodebuild.test-explorer`
-- `:h xcodebuild.code-coverage-report`
+- `:h xcodebuild.highlights`
 - `:h xcodebuild.dap`
-- `:h xcodebuild.lualine`
-- `:h xcodebuild.actions`
 
 [nvim-tree]: https://github.com/nvim-tree/nvim-tree.lua
 [oil.nvim]: https://github.com/stevearc/oil.nvim
