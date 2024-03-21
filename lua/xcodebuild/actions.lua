@@ -177,7 +177,6 @@ end
 ---Starts the pickers with scheme selection.
 ---@param callback function|nil
 function M.select_scheme(callback)
-  defer_send("Loading schemes...")
   helpers.cancel_actions()
 
   pickers.select_scheme(function()

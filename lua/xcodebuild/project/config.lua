@@ -133,11 +133,11 @@ function M.configure_project()
           defer_print("Loading test plans...")
           pickers.select_testplan(function()
             defer_print("Xcodebuild configuration has been saved!")
-          end, { close_on_select = true })
+          end, { close_on_select = true, auto_select = true })
 
           M.update_settings()
         end)
-      end)
+      end, { auto_select = true }) -- scheme
     end)
   end)
 end
