@@ -1027,7 +1027,7 @@ XcodeScheme                                  *xcodebuild.core.xcode.XcodeScheme*
 
   Fields: ~
     {name}      (string)
-    {filepath}  (string)
+    {filepath}  (string|nil)
 
 
                                      *xcodebuild.core.xcode.get_targets_filemap*
@@ -1069,14 +1069,16 @@ M.get_schemes({projectCommand}, {callback})
     (number)   job id
 
 
-M.find_schemes({xcodeprojPath})             *xcodebuild.core.xcode.find_schemes*
+                                            *xcodebuild.core.xcode.find_schemes*
+M.find_schemes({xcodeprojPath}, {callback})
   Returns the list of schemes for the given project.
 
   Parameters: ~
     {xcodeprojPath}  (string)
+    {callback}       (fun(schemes:XcodeScheme[]))
 
   Returns: ~
-    (XcodeScheme[])
+    (number|nil)   job id
 
 
                                  *xcodebuild.core.xcode.get_project_information*
@@ -1129,7 +1131,7 @@ M.get_build_settings({platform}, {projectCommand}, {scheme}, {xcodeprojPath}, {c
     {callback}        (fun(settings:XcodeBuildSettings))
 
   Returns: ~
-    (number)   job id
+    (number|nil)   job id
 
 
                                              *xcodebuild.core.xcode.install_app*
@@ -3474,6 +3476,7 @@ PickerOptions                              *xcodebuild.ui.pickers.PickerOptions*
   Fields: ~
     {on_refresh}       (function|nil)
     {multiselect}      (boolean|nil)
+    {auto_select}      (boolean|nil)
     {close_on_select}  (boolean|nil)
 
 

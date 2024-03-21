@@ -7,6 +7,7 @@
 ---@class PickerOptions
 ---@field on_refresh function|nil
 ---@field multiselect boolean|nil
+---@field auto_select boolean|nil
 ---@field close_on_select boolean|nil
 
 local util = require("xcodebuild.util")
@@ -86,8 +87,10 @@ local function start_telescope_spinner()
 end
 
 ---Updates the results of the picker and stops the animation.
-local function update_results(results)
-  if currentJobId == nil then
+---@param results string[]
+---@param force boolean|nil
+local function update_results(results, force)
+  if currentJobId == nil and not force then
     return
   end
 
@@ -273,22 +276,33 @@ function M.select_scheme(callback, opts)
     return
   end
 
-  local schemes = xcode.find_schemes(xcodeproj)
-  local names = util.select(schemes, function(scheme)
-    return scheme.name
-  end)
+  opts = opts or {}
 
-  if util.is_empty(names) then
-    notifications.send_error("No schemes found")
-    return
-  end
-
-  M.show("Select Scheme", names, function(value, _)
-    projectConfig.settings.scheme = value
+  local function selectScheme(scheme)
+    projectConfig.settings.scheme = scheme
     projectConfig.save_settings()
     update_xcode_build_server_config()
-    util.call(callback, value)
+    util.call(callback, scheme)
+  end
+
+  start_telescope_spinner()
+  M.show("Select Scheme", {}, function(value, _)
+    selectScheme(value)
   end, opts)
+
+  currentJobId = xcode.find_schemes(xcodeproj, function(schemes)
+    local names = util.select(schemes, function(scheme)
+      return scheme.name
+    end)
+
+    update_results(names, true)
+
+    if util.is_empty(names) then
+      notifications.send_error("No schemes found")
+    elseif #names == 1 and opts.auto_select then
+      selectScheme(names[1])
+    end
+  end)
 end
 
 ---Shows a picker with the available test plans.
@@ -304,12 +318,24 @@ function M.select_testplan(callback, opts)
     return nil
   end
 
-  start_telescope_spinner()
-  M.show("Select Test Plan", {}, function(value, _)
-    projectConfig.settings.testPlan = value
+  opts = opts or {}
+
+  local function selectTestPlan(testPlan)
+    projectConfig.settings.testPlan = testPlan
     projectConfig.save_settings()
     events.project_settings_updated(projectConfig.settings)
-    util.call(callback, value)
+    util.call(callback, testPlan)
+  end
+
+  local function closePicker()
+    if activePicker and util.is_not_empty(vim.fn.win_findbuf(activePicker.prompt_bufnr)) then
+      telescopeActions.close(activePicker.prompt_bufnr)
+    end
+  end
+
+  start_telescope_spinner()
+  M.show("Select Test Plan", {}, function(value, _)
+    selectTestPlan(value)
   end, opts)
 
   currentJobId = xcode.get_testplans(projectCommand, scheme, function(testPlans)
@@ -318,13 +344,15 @@ function M.select_testplan(callback, opts)
         notifications.send_warning("Could not detect test plans")
       end, 100)
 
-      if activePicker and util.is_not_empty(vim.fn.win_findbuf(activePicker.prompt_bufnr)) then
-        telescopeActions.close(activePicker.prompt_bufnr)
-      end
-
+      closePicker()
       util.call(callback)
     else
       update_results(testPlans)
+
+      if opts.auto_select and testPlans and #testPlans == 1 then
+        selectTestPlan(testPlans[1])
+        closePicker()
+      end
     end
   end)
 
