@@ -321,10 +321,6 @@ end
 ---It also moves the cursor to the last updated test
 ---if `config.cursor_follows_tests` is enabled.
 local function refresh_explorer()
-  if not M.bufnr then
-    return
-  end
-
   local lines = {}
   local highlights = {}
   local row = 1
@@ -361,6 +357,10 @@ local function refresh_explorer()
         add_line(test)
       end
     end
+  end
+
+  if not M.bufnr then
+    return
   end
 
   vim.api.nvim_buf_clear_namespace(M.bufnr, ns, 0, -1)
@@ -729,7 +729,6 @@ function M.update_test_status(testId, status)
 
   if testData then
     update_status(id_to_test[targetId].test, classData.test, testData.test)
-    return
   elseif idComponents[3] and classData then
     -- if we found the class, but the test is not there, insert it.
     -- It happens when using Quick installed via SPM.
