@@ -279,19 +279,19 @@ function M.test_explorer_toggle()
   testExplorer.toggle()
 end
 
----Runs the selected tests.
+---Runs selected tests.
 function M.test_explorer_run_selected_tests()
   testExplorer.run_selected_tests()
 end
 
----Runs the last tests.
+---Runs last executed tests or all if nothing was executed.
 function M.test_explorer_rerun_tests()
   testExplorer.repeat_last_run()
 end
 
 -- Project Management
 
----Returns the project targets.
+---Returns project targets.
 ---@return string[]|nil
 function M.get_project_targets()
   return projectManager.get_project_targets()

@@ -54,6 +54,7 @@
 ---@field row number|nil
 
 local util = require("xcodebuild.util")
+local helpers = require("xcodebuild.helpers")
 local config = require("xcodebuild.core.config").options.test_explorer
 local notifications = require("xcodebuild.broadcasting.notifications")
 local events = require("xcodebuild.broadcasting.events")
@@ -320,7 +321,11 @@ end
 ---Refreshes the test explorer buffer.
 ---It also moves the cursor to the last updated test
 ---if `config.cursor_follows_tests` is enabled.
-local function refresh_explorer()
+---
+---If {dontUpdateBuffer} is true, only data structures will
+---be updated, but the buffer will remain unchanged.
+---@param dontUpdateBuffer boolean|nil
+local function refresh_explorer(dontUpdateBuffer)
   local lines = {}
   local highlights = {}
   local row = 1
@@ -347,6 +352,8 @@ local function refresh_explorer()
     row = row + 1
   end
 
+  ---
+
   for _, target in ipairs(M.report) do
     add_line(target)
 
@@ -359,17 +366,15 @@ local function refresh_explorer()
     end
   end
 
-  if not M.bufnr then
+  if not M.bufnr or dontUpdateBuffer then
     return
   end
 
   vim.api.nvim_buf_clear_namespace(M.bufnr, ns, 0, -1)
-  vim.api.nvim_buf_set_option(M.bufnr, "modifiable", true)
 
-  vim.api.nvim_buf_set_lines(M.bufnr, 0, -1, false, lines)
-
-  vim.api.nvim_buf_set_option(M.bufnr, "modifiable", false)
-  vim.api.nvim_buf_set_option(M.bufnr, "modified", false)
+  helpers.update_readonly_buffer(M.bufnr, function()
+    vim.api.nvim_buf_set_lines(M.bufnr, 0, -1, false, lines)
+  end)
 
   for _, highlight in ipairs(highlights) do
     vim.api.nvim_buf_add_highlight(
@@ -394,18 +399,16 @@ local function animate_status()
 
     local firstVisibleRow = vim.fn.line("w0", winnr)
     local lastVisibleRow = vim.fn.line("w$", winnr)
-    vim.api.nvim_buf_set_option(M.bufnr, "modifiable", true)
 
-    for row = firstVisibleRow, lastVisibleRow do
-      local data = line_to_test[row]
+    helpers.update_readonly_buffer(M.bufnr, function()
+      for row = firstVisibleRow, lastVisibleRow do
+        local data = line_to_test[row]
 
-      if data and data.status == STATUS_RUNNING then
-        update_test_line(data, row)
+        if data and data.status == STATUS_RUNNING then
+          update_test_line(data, row)
+        end
       end
-    end
-
-    vim.api.nvim_buf_set_option(M.bufnr, "modifiable", false)
-    vim.api.nvim_buf_set_option(M.bufnr, "modified", false)
+    end)
 
     currentFrame = currentFrame % 10 + 1
   end, { ["repeat"] = -1 })
@@ -693,25 +696,23 @@ function M.update_test_status(testId, status)
       return
     end
 
-    vim.api.nvim_buf_set_option(M.bufnr, "modifiable", true)
+    helpers.update_readonly_buffer(M.bufnr, function()
+      local moveCursorToRow = nil
+      local toUpdate = {
+        id_to_test[test.id],
+        id_to_test[class.id],
+        id_to_test[target.id],
+      }
 
-    local moveCursorToRow = nil
-    local toUpdate = {
-      id_to_test[test.id],
-      id_to_test[class.id],
-      id_to_test[target.id],
-    }
-
-    for _, data in ipairs(toUpdate) do
-      if data and data.row then
-        moveCursorToRow = moveCursorToRow or data.row
-        update_test_line(data.test, data.row)
+      for _, data in ipairs(toUpdate) do
+        if data and data.row then
+          moveCursorToRow = moveCursorToRow or data.row
+          update_test_line(data.test, data.row)
+        end
       end
-    end
 
-    vim.api.nvim_buf_set_option(M.bufnr, "modifiable", false)
-    vim.api.nvim_buf_set_option(M.bufnr, "modified", false)
-    autoscroll_cursor(moveCursorToRow)
+      autoscroll_cursor(moveCursorToRow)
+    end)
   end
 
   ---
@@ -732,19 +733,26 @@ function M.update_test_status(testId, status)
   elseif idComponents[3] and classData then
     -- if we found the class, but the test is not there, insert it.
     -- It happens when using Quick installed via SPM.
-    table.insert(classData.test.tests, {
+    local test = {
       id = testId,
       kind = KIND_TEST,
       status = status,
       name = idComponents[3],
       filepath = classData.test.filepath,
       hidden = collapsed_ids[targetId] or collapsed_ids[classId] or false,
-    })
+    }
+    table.insert(classData.test.tests, test)
 
-    -- Could be optimized in the future, but it would require to insert a new line
-    -- and update the line_to_test table.
-    refresh_explorer()
-    update_status(id_to_test[targetId].test, classData.test, classData.test.tests[#classData.test.tests])
+    refresh_explorer(true)
+
+    local row = classData.row and (classData.row + #classData.test.tests)
+    if row and not test.hidden then
+      helpers.update_readonly_buffer(M.bufnr, function()
+        vim.api.nvim_buf_set_lines(M.bufnr, row - 1, row - 1, false, { "" })
+      end)
+    end
+
+    update_status(id_to_test[targetId].test, classData.test, test)
   end
 end
 
@@ -763,19 +771,20 @@ function M.jump_to_failed_test(next)
   vim.fn.search("\\[" .. config.failure_sign .. "\\]", next and "W" or "bW")
 end
 
----Repeats the last executed tests.
+---Repeats the last executed tests or runs all tests.
 function M.repeat_last_run()
   if not M.report then
+    notifications.send_error("No tests are loaded. Please run tests first.")
     return
   end
+
+  helpers.cancel_actions()
 
   if util.is_empty(last_run_tests) then
-    notifications.send_error("No tests to repeat")
-    return
+    require("xcodebuild.tests.runner").run_tests(nil, { skipEnumeration = true })
+  else
+    require("xcodebuild.tests.runner").run_tests(last_run_tests, { skipEnumeration = true })
   end
-
-  require("xcodebuild.helpers").cancel_actions()
-  require("xcodebuild.tests.runner").run_tests(last_run_tests, { skipEnumeration = true })
 end
 
 ---Runs the selected tests (in visual-mode).
@@ -894,6 +903,7 @@ function M.load_tests(tests)
 
   M.finish_tests()
   generate_report(tests)
+  refresh_explorer()
 end
 
 ---Sets up the Test Explorer. Loads last report if available.

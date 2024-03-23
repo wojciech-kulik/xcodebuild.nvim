@@ -764,16 +764,16 @@ M.test_explorer_toggle()               *xcodebuild.actions.test_explorer_toggle*
 
                            *xcodebuild.actions.test_explorer_run_selected_tests*
 M.test_explorer_run_selected_tests()
-  Runs the selected tests.
+  Runs selected tests.
 
 
                                   *xcodebuild.actions.test_explorer_rerun_tests*
 M.test_explorer_rerun_tests()
-  Runs the last tests.
+  Runs last executed tests or all if nothing was executed.
 
 
 M.get_project_targets()                 *xcodebuild.actions.get_project_targets*
-  Returns the project targets.
+  Returns project targets.
 
   Returns: ~
     (string[]|nil)
@@ -2721,7 +2721,7 @@ M.jump_to_failed_test({next})
 
                                      *xcodebuild.tests.explorer.repeat_last_run*
 M.repeat_last_run()
-  Repeats the last executed tests.
+  Repeats the last executed tests or runs all tests.
 
 
                                   *xcodebuild.tests.explorer.run_selected_tests*
@@ -3598,6 +3598,16 @@ M.get_major_os_version()               *xcodebuild.helpers.get_major_os_version*
 
   Returns: ~
     (number|nil)
+
+
+                                     *xcodebuild.helpers.update_readonly_buffer*
+M.update_readonly_buffer({bufnr}, {updateFoo})
+  Enables `modifiable` and updates the buffer using {updateFoo}.
+  After the operation, it restores the `modifiable` to `false`.
+
+  Parameters: ~
+    {bufnr}      (number)
+    {updateFoo}  (function)
 
 
 ==============================================================================

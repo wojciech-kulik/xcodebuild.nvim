@@ -90,4 +90,15 @@ function M.get_major_os_version()
   return settings.os and tonumber(vim.split(settings.os, ".", { plain = true })[1]) or nil
 end
 
+---Enables `modifiable` and updates the buffer using {updateFoo}.
+---After the operation, it restores the `modifiable` to `false`.
+---@param bufnr number
+---@param updateFoo function
+function M.update_readonly_buffer(bufnr, updateFoo)
+  vim.api.nvim_buf_set_option(bufnr, "modifiable", true)
+  updateFoo()
+  vim.api.nvim_buf_set_option(bufnr, "modifiable", false)
+  vim.api.nvim_buf_set_option(bufnr, "modified", false)
+end
+
 return M
