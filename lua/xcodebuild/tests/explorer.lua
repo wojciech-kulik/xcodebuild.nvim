@@ -441,6 +441,7 @@ local function setup_buffer()
   vim.api.nvim_buf_set_keymap(M.bufnr, "n", "<tab>", "", { callback = M.toggle_all_classes, nowait = true })
   vim.api.nvim_buf_set_keymap(M.bufnr, "n", "R", "", {
     callback = function()
+      helpers.cancel_actions()
       require("xcodebuild.tests.runner").show_test_explorer(function()
         notifications.send("")
       end)
@@ -828,7 +829,7 @@ function M.run_selected_tests()
   end
 
   if #selectedTests > 0 then
-    require("xcodebuild.helpers").cancel_actions()
+    helpers.cancel_actions()
     require("xcodebuild.tests.runner").run_tests(selectedTests, { skipEnumeration = true })
   else
     notifications.send_error("Tests not found")
