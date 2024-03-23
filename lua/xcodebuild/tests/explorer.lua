@@ -48,6 +48,11 @@
 ---@field classes TestExplorerNode[]|nil
 ---@field tests TestExplorerNode[]|nil
 
+---@private
+---@class IdToTestNode
+---@field test TestExplorerNode
+---@field row number|nil
+
 local util = require("xcodebuild.util")
 local config = require("xcodebuild.core.config").options.test_explorer
 local notifications = require("xcodebuild.broadcasting.notifications")
@@ -61,7 +66,6 @@ local M = {}
 ---It's a list of targets, each target has a list of classes,
 ---and each class has a list of tests.
 ---
-
 ---@type TestExplorerNode[]|nil
 M.report = nil
 
@@ -78,12 +82,14 @@ local KIND_TEST = "test"
 
 local spinnerFrames = { "⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏" }
 local currentFrame = 1
-local last_updated_id = nil
 local last_set_cursor_row = nil
 local line_to_test = {}
 local collapsed_ids = {}
 local ns = vim.api.nvim_create_namespace("xcodebuild-test-explorer")
 local last_run_tests = {}
+
+---@type IdToTestNode[]
+local id_to_test = {}
 
 ---Generates the report for provided tests.
 ---Sets the `M.report` variable.
@@ -256,6 +262,18 @@ local function format_line(line, row)
   end
 end
 
+---Updates the test line with the provided data.
+---@param testData TestExplorerNode
+---@param row number
+local function update_test_line(testData, row)
+  local text, hls = format_line(testData, row)
+  vim.api.nvim_buf_set_lines(M.bufnr, row - 1, row, false, { text })
+
+  for _, hl in ipairs(hls) do
+    vim.api.nvim_buf_add_highlight(M.bufnr, ns, hl.group, row - 1, hl.col_start, hl.col_end)
+  end
+end
+
 ---Gets the aggregated status for the provided children.
 ---@param children TestExplorerNode[]
 ---@return TestExplorerNodeStatus
@@ -310,11 +328,13 @@ local function refresh_explorer()
   local lines = {}
   local highlights = {}
   local row = 1
-  local move_cursor_to_row = nil
 
   line_to_test = {}
+  id_to_test = {}
 
   local add_line = function(data)
+    id_to_test[data.id] = { test = data }
+
     if data.hidden then
       return
     end
@@ -326,11 +346,7 @@ local function refresh_explorer()
       table.insert(highlights, hl)
     end
 
-    if config.cursor_follows_tests and last_updated_id == data.id then
-      move_cursor_to_row = row
-      last_updated_id = nil
-    end
-
+    id_to_test[data.id].row = row
     line_to_test[row] = data
     row = row + 1
   end
@@ -350,24 +366,7 @@ local function refresh_explorer()
   vim.api.nvim_buf_clear_namespace(M.bufnr, ns, 0, -1)
   vim.api.nvim_buf_set_option(M.bufnr, "modifiable", true)
 
-  -- HACK: Neovim nightly has a bug with `nvim_buf_set_lines`
-  --
-  -- This is a temporary workaround.
-  -- Ticket: https://github.com/neovim/neovim/issues/27723
-
-  local isNeovimNightly = vim.fn.has("nvim-0.10.0")
-  if isNeovimNightly then
-    local linesCount = vim.api.nvim_buf_line_count(M.bufnr)
-    if linesCount ~= #lines then
-      vim.api.nvim_buf_set_lines(M.bufnr, 0, -1, false, lines)
-    else
-      for i, line in ipairs(lines) do
-        vim.api.nvim_buf_set_lines(M.bufnr, i - 1, i, false, { line })
-      end
-    end
-  else
-    vim.api.nvim_buf_set_lines(M.bufnr, 0, -1, false, lines)
-  end
+  vim.api.nvim_buf_set_lines(M.bufnr, 0, -1, false, lines)
 
   vim.api.nvim_buf_set_option(M.bufnr, "modifiable", false)
   vim.api.nvim_buf_set_option(M.bufnr, "modified", false)
@@ -382,21 +381,32 @@ local function refresh_explorer()
       highlight.col_end
     )
   end
-
-  if move_cursor_to_row and last_set_cursor_row ~= move_cursor_to_row then
-    local winnr = vim.fn.win_findbuf(M.bufnr)
-    if winnr and winnr[1] then
-      vim.api.nvim_win_set_cursor(winnr[1], { move_cursor_to_row, 0 })
-      last_set_cursor_row = move_cursor_to_row
-    end
-  end
 end
 
----Animates the test status.
+---Animates the status of running tests.
 ---Sets the `M.timer` variable.
 local function animate_status()
   M.timer = vim.fn.timer_start(100, function()
-    refresh_explorer()
+    local winnr = M.bufnr and vim.fn.win_findbuf(M.bufnr)[1]
+    if not winnr then
+      return
+    end
+
+    local firstVisibleRow = vim.fn.line("w0", winnr)
+    local lastVisibleRow = vim.fn.line("w$", winnr)
+    vim.api.nvim_buf_set_option(M.bufnr, "modifiable", true)
+
+    for row = firstVisibleRow, lastVisibleRow do
+      local data = line_to_test[row]
+
+      if data and data.status == STATUS_RUNNING then
+        update_test_line(data, row)
+      end
+    end
+
+    vim.api.nvim_buf_set_option(M.bufnr, "modifiable", false)
+    vim.api.nvim_buf_set_option(M.bufnr, "modified", false)
+
     currentFrame = currentFrame % 10 + 1
   end, { ["repeat"] = -1 })
 end
@@ -475,6 +485,17 @@ local function load_saved_state()
       once = true,
       callback = callback,
     })
+  end
+end
+
+---Autoscrolls the cursor to the provided row.
+---@param row number|nil
+local function autoscroll_cursor(row)
+  local winnr = M.bufnr and vim.fn.win_findbuf(M.bufnr)[1]
+
+  if winnr and config.cursor_follows_tests and row and last_set_cursor_row ~= row then
+    vim.api.nvim_win_set_cursor(winnr, { row, 0 })
+    last_set_cursor_row = row
   end
 end
 
@@ -585,6 +606,18 @@ function M.start_tests(selectedTests)
 
   for _, target in ipairs(M.report) do
     for _, class in ipairs(target.classes) do
+      if
+        not next(class.tests)
+        and (
+          util.is_empty(selectedTests)
+          or util.contains(selectedTests, target.id)
+          or util.contains(selectedTests, class.id)
+        )
+      then
+        target.status = STATUS_RUNNING
+        class.status = STATUS_RUNNING
+      end
+
       for _, test in ipairs(class.tests) do
         if
           util.is_empty(selectedTests)
@@ -602,10 +635,10 @@ function M.start_tests(selectedTests)
     end
   end
 
+  refresh_explorer()
+
   if config.animate_status then
     animate_status()
-  else
-    refresh_explorer()
   end
 end
 
@@ -648,10 +681,6 @@ end
 ---@param testId string
 ---@param status TestExplorerNodeStatus
 function M.update_test_status(testId, status)
-  if not M.report then
-    return
-  end
-
   ---@param target TestExplorerNode
   ---@param class TestExplorerNode
   ---@param test TestExplorerNode
@@ -660,47 +689,63 @@ function M.update_test_status(testId, status)
     class.status = get_aggregated_status(class.tests)
     target.status = get_aggregated_status(target.classes)
 
-    if status == STATUS_PASSED or status == STATUS_FAILED then
-      if test.hidden then
-        last_updated_id = class.hidden and target.id or class.id
-      else
-        last_updated_id = test.id
+    if not M.bufnr then
+      return
+    end
+
+    vim.api.nvim_buf_set_option(M.bufnr, "modifiable", true)
+
+    local moveCursorToRow = nil
+    local toUpdate = {
+      id_to_test[test.id],
+      id_to_test[class.id],
+      id_to_test[target.id],
+    }
+
+    for _, data in ipairs(toUpdate) do
+      if data and data.row then
+        moveCursorToRow = moveCursorToRow or data.row
+        update_test_line(data.test, data.row)
       end
     end
 
-    if not config.animate_status then
-      refresh_explorer()
-    end
+    vim.api.nvim_buf_set_option(M.bufnr, "modifiable", false)
+    vim.api.nvim_buf_set_option(M.bufnr, "modified", false)
+    autoscroll_cursor(moveCursorToRow)
+  end
+
+  ---
+
+  if not M.report then
+    return
   end
 
   local idComponents = vim.split(testId, "/", { plain = true })
+  local targetId = idComponents[1]
   local classId = table.concat({ idComponents[1], idComponents[2] }, "/")
 
-  for _, target in ipairs(M.report) do
-    for _, class in ipairs(target.classes) do
-      for _, t in ipairs(class.tests) do
-        if t.id == testId then
-          update_status(target, class, t)
-          return
-        end
-      end
+  local testData = id_to_test[testId]
+  local classData = id_to_test[classId]
 
-      -- if we found the class, but the test is not there, insert it.
-      -- It happens when using Quick installed via SPM.
-      if classId == class.id and idComponents[3] then
-        table.insert(class.tests, {
-          id = testId,
-          kind = KIND_TEST,
-          status = STATUS_NOT_EXECUTED,
-          name = idComponents[3],
-          filepath = class.filepath,
-          hidden = collapsed_ids[target.id] or collapsed_ids[class.id] or false,
-        })
+  if testData then
+    update_status(id_to_test[targetId].test, classData.test, testData.test)
+    return
+  elseif idComponents[3] and classData then
+    -- if we found the class, but the test is not there, insert it.
+    -- It happens when using Quick installed via SPM.
+    table.insert(classData.test.tests, {
+      id = testId,
+      kind = KIND_TEST,
+      status = status,
+      name = idComponents[3],
+      filepath = classData.test.filepath,
+      hidden = collapsed_ids[targetId] or collapsed_ids[classId] or false,
+    })
 
-        update_status(target, class, class.tests[#class.tests])
-        return
-      end
-    end
+    -- Could be optimized in the future, but it would require to insert a new line
+    -- and update the line_to_test table.
+    refresh_explorer()
+    update_status(id_to_test[targetId].test, classData.test, classData.test.tests[#classData.test.tests])
   end
 end
 
