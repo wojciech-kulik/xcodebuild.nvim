@@ -144,7 +144,7 @@ end
 ---    failure_sign = "✖", -- failed test icon
 ---    show_test_duration = true, -- show each test duration next to its declaration
 ---    show_diagnostics = true, -- add test failures to diagnostics
----    file_pattern = "*Tests.swift", -- test diagnostics will be loaded in files matching this pattern (if available)
+---    file_pattern = { "*Test.swift", "*Tests.swift", "*Spec.swift" }, -- test diagnostics will be loaded in files matching these patterns (if available)
 ---  },
 ---  quickfix = {
 ---    show_errors_on_quickfixlist = true, -- add build/test errors to quickfix list

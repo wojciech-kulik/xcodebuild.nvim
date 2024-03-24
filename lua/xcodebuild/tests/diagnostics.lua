@@ -159,15 +159,16 @@ function M.refresh_all_test_buffers(report)
   end
 
   -- TODO: improve gsub - the conversion from wildcard to regex might not be reliable
-  local filePattern = config.file_pattern
-  local regexPattern = string.gsub(string.gsub(filePattern, "%.", "%%."), "%*", "%.%*")
-  local testBuffers = util.get_bufs_by_matching_name(regexPattern)
+  local filePatterns = type(config.file_pattern) == "string" and { config.file_pattern }
+    or config.file_pattern
 
-  for _, buffer in ipairs(testBuffers or {}) do
-    local testClass = find_test_class(buffer.bufnr, report)
-    if testClass then
-      refresh_buf_diagnostics(buffer.bufnr, testClass, report)
-      refresh_buf_marks(buffer.bufnr, testClass, report.tests)
+  for _, pattern in ipairs(filePatterns) do
+    ---@diagnostic disable-next-line: param-type-mismatch
+    local regexPattern = string.gsub(string.gsub(pattern, "%.", "%%."), "%*", "%.%*")
+    local testBuffers = util.get_bufs_by_matching_name(regexPattern)
+
+    for _, buffer in ipairs(testBuffers or {}) do
+      M.refresh_test_buffer(buffer.bufnr, report)
     end
   end
 end
