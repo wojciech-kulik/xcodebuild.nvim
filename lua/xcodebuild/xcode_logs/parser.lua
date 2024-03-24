@@ -130,6 +130,21 @@ local function flush_test(message)
     lineData.success and "passed" or "failed"
   )
 
+  if lineData.filepath then
+    local report = {
+      tests = tests,
+      testsCount = testsCount,
+      failedTestsCount = failedTestsCount,
+      buildErrors = buildErrors,
+      buildWarnings = buildWarnings,
+      testErrors = testErrors,
+      xcresultFilepath = xcresultFilepath,
+    }
+
+    local diagnostics = require("xcodebuild.tests.diagnostics")
+    diagnostics.refresh_test_buffer_by_name(lineData.filepath, report)
+  end
+
   lastTest = lineData
   lineType = BEGIN
   lineData = {}

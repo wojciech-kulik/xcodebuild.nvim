@@ -9,6 +9,12 @@ local testSearch = require("xcodebuild.tests.search")
 
 local M = {}
 
+local diagnosticsNamespace = vim.api.nvim_create_namespace("xcodebuild-diagnostics")
+local marksNamespace = vim.api.nvim_create_namespace("xcodebuild-marks")
+
+---@type string|nil
+local requestedRefreshForFile
+
 ---Returns the test class key for the given buffer.
 ---@param bufnr number
 ---@param report ParsedReport
@@ -69,8 +75,8 @@ local function refresh_buf_diagnostics(bufnr, testClass, report)
     end
   end
 
-  vim.api.nvim_buf_clear_namespace(bufnr, ns, 0, -1)
-  vim.diagnostic.set(ns, bufnr, diagnostics, {})
+  vim.api.nvim_buf_clear_namespace(bufnr, diagnosticsNamespace, 0, -1)
+  vim.diagnostic.set(diagnosticsNamespace, bufnr, diagnostics, {})
 end
 
 ---Refreshes the marks for the given buffer.
@@ -82,7 +88,6 @@ local function refresh_buf_marks(bufnr, testClass, tests)
     return
   end
 
-  local ns = vim.api.nvim_create_namespace("xcodebuild-marks")
   local bufLines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
   local findTestLine = function(testName)
     for lineNumber, line in ipairs(bufLines) do
@@ -94,7 +99,7 @@ local function refresh_buf_marks(bufnr, testClass, tests)
     return nil
   end
 
-  vim.api.nvim_buf_clear_namespace(bufnr, ns, 0, -1)
+  vim.api.nvim_buf_clear_namespace(bufnr, marksNamespace, 0, -1)
 
   for _, test in ipairs(tests[testClass] or {}) do
     local lineNumber = findTestLine(test.name)
@@ -119,12 +124,20 @@ local function refresh_buf_marks(bufnr, testClass, tests)
     end
 
     if test.filepath and lineNumber then
-      vim.api.nvim_buf_set_extmark(bufnr, ns, lineNumber, 0, {
+      vim.api.nvim_buf_set_extmark(bufnr, marksNamespace, lineNumber, 0, {
         virt_text = { testDuration },
         sign_text = signText,
         sign_hl_group = signHighlight,
       })
     end
+  end
+end
+
+---Clears marks and diagnostics.
+function M.clear()
+  for _, bufnr in ipairs(util.get_buffers()) do
+    vim.api.nvim_buf_clear_namespace(bufnr, marksNamespace, 0, -1)
+    vim.api.nvim_buf_clear_namespace(bufnr, diagnosticsNamespace, 0, -1)
   end
 end
 
@@ -147,7 +160,32 @@ function M.refresh_test_buffer(bufnr, report)
   if testClass then
     refresh_buf_diagnostics(bufnr, testClass, report)
     refresh_buf_marks(bufnr, testClass, report.tests)
+
+---Refreshes the diagnostics and marks for the test buffer with the given name.
+---
+---It implements a debounce mechanism to avoid refreshing
+---the same buffer multiple times.The window is 1 second.
+---
+---Note: this function will affect the buffer after 1 second.
+---To refresh the buffer instantly use `refresh_test_buffer`.
+---
+---@param name string
+---@param report ParsedReport
+function M.refresh_test_buffer_by_name(name, report)
+  if requestedRefreshForFile == name then
+    return
   end
+
+  requestedRefreshForFile = name
+
+  vim.defer_fn(function()
+    requestedRefreshForFile = nil
+
+    local bufnr = util.get_buf_by_name(name)
+    if bufnr and vim.api.nvim_buf_is_loaded(bufnr) then
+      M.refresh_test_buffer(bufnr, report)
+    end
+  end, 1000)
 end
 
 ---Refreshes the diagnostics and marks for all test buffers.

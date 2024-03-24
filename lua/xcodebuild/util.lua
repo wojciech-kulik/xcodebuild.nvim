@@ -41,7 +41,7 @@ function M.is_not_empty(table)
 end
 
 ---Gets all buffers in the current neovim instance.
----If `opts.returnNotLoaded` is true, it will
+---If {opts.returnNotLoaded} is true, it will
 ---return all buffers, including the ones that are not loaded.
 ---@param opts table|nil
 ---
@@ -50,12 +50,12 @@ end
 function M.get_buffers(opts)
   local result = {}
 
-  for i, buf in ipairs(vim.api.nvim_list_bufs()) do
+  for _, buf in ipairs(vim.api.nvim_list_bufs()) do
     if
       (opts or {}).returnNotLoaded == true and vim.api.nvim_buf_is_valid(buf)
       or vim.api.nvim_buf_is_loaded(buf)
     then
-      result[i] = buf
+      table.insert(result, buf)
     end
   end
 
@@ -92,7 +92,7 @@ end
 function M.get_buf_by_filename(filename, opts)
   local allBuffers = M.get_buffers(opts)
 
-  for _, buf in pairs(allBuffers) do
+  for _, buf in ipairs(allBuffers) do
     if string.match(vim.api.nvim_buf_get_name(buf), ".*/([^/]*)$") == filename then
       return buf
     end
@@ -102,6 +102,7 @@ function M.get_buf_by_filename(filename, opts)
 end
 
 ---Gets a buffer by its name.
+---Returns also buffers that are not loaded.
 ---@param name string
 ---@return number|nil
 function M.get_buf_by_name(name)
@@ -115,6 +116,7 @@ function M.get_buf_by_name(name)
 end
 
 ---Gets a buffer by its filetype.
+---Returns also buffers that are not loaded.
 ---@param filetype string
 ---@return number|nil
 function M.get_buf_by_filetype(filetype)
@@ -134,7 +136,7 @@ function M.get_bufs_by_matching_name(pattern)
   local allBuffers = M.get_buffers()
   local result = {}
 
-  for _, buf in pairs(allBuffers) do
+  for _, buf in ipairs(allBuffers) do
     local bufName = vim.api.nvim_buf_get_name(buf)
     if string.find(bufName, pattern) then
       table.insert(result, { bufnr = buf, file = bufName })

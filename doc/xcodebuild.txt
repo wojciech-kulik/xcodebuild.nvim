@@ -2537,6 +2537,10 @@ Test Diagnostics                                  *xcodebuild.tests.diagnostics*
 
 This module is responsible for handling diagnostics and marks for test files.
 
+M.clear()                                   *xcodebuild.tests.diagnostics.clear*
+  Clears marks and diagnostics.
+
+
 M.setup()                                   *xcodebuild.tests.diagnostics.setup*
   Set up highlights for tests.
 
@@ -2551,6 +2555,22 @@ M.refresh_test_buffer({bufnr}, {report})
 
   See: ~
     |xcodebuild.xcode_logs.parser.ParsedReport|
+
+
+                      *xcodebuild.tests.diagnostics.refresh_test_buffer_by_name*
+M.refresh_test_buffer_by_name({name}, {report})
+  Refreshes diagnostics and marks for the test buffer with the given name.
+
+  It implements a debounce mechanism to avoid refreshing
+  the same buffer multiple times.The window is 1 second.
+
+  Note: this function will affect the buffer after 1 second.
+  To refresh the buffer instantly use `refresh_test_buffer`.
+
+
+  Parameters: ~
+    {name}    (string)
+    {report}  (ParsedReport)
 
 
                          *xcodebuild.tests.diagnostics.refresh_all_test_buffers*
@@ -3651,7 +3671,7 @@ M.is_not_empty({table})                           *xcodebuild.util.is_not_empty*
 
 M.get_buffers({opts})                              *xcodebuild.util.get_buffers*
   Gets all buffers in the current neovim instance.
-  If `opts.returnNotLoaded` is true, it will
+  If {opts.returnNotLoaded} is true, it will
   return all buffers, including the ones that are not loaded.
 
   Parameters: ~
@@ -3695,6 +3715,7 @@ M.get_buf_by_filename({filename}, {opts})
 
 M.get_buf_by_name({name})                      *xcodebuild.util.get_buf_by_name*
   Gets a buffer by its name.
+  Returns also buffers that are not loaded.
 
   Parameters: ~
     {name}  (string)
@@ -3705,6 +3726,7 @@ M.get_buf_by_name({name})                      *xcodebuild.util.get_buf_by_name*
 
 M.get_buf_by_filetype({filetype})          *xcodebuild.util.get_buf_by_filetype*
   Gets a buffer by its filetype.
+  Returns also buffers that are not loaded.
 
   Parameters: ~
     {filetype}  (string)

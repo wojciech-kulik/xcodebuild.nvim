@@ -130,6 +130,7 @@ function M.run_tests(testsToRun, opts)
 
   notifications.send_tests_started()
   helpers.clear_state()
+  diagnostics.clear()
 
   local show_finish = function()
     notifications.send_tests_finished(appdata.report, false)
@@ -163,7 +164,7 @@ function M.run_tests(testsToRun, opts)
     local logsParser = require("xcodebuild.xcode_logs.parser")
     appdata.report = logsParser.parse_logs(output)
     notifications.show_tests_progress(appdata.report)
-    diagnostics.refresh_all_test_buffers(appdata.report)
+
     events.tests_status(
       appdata.report.testsCount - appdata.report.failedTestsCount,
       appdata.report.failedTestsCount
