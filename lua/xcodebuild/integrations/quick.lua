@@ -22,7 +22,6 @@ local cachedSwiftParserResult = nil
 ---@field id string test id (matching xcodebuild test name)
 ---@field row number 1-based row number
 
----@private
 ---@class TestTreeNode
 ---@field id string node type
 ---@field testId string|nil test id (matching xcodebuild test name)
@@ -180,6 +179,23 @@ local function make_tree(flatTree)
   }
 end
 
+---Builds a tree of tests based on the given buffer.
+---
+---The result is a tree structure where each node represents a group of tests.
+---
+---The first node is always the root node, it doesn't represent any test group.
+---Iterate through the `children` property to get the top-level test groups.
+---
+---@param bufnr number
+---@return TestTreeNode|nil
+function M.build_quick_test_tree(bufnr)
+  if not M.is_swift_parser_installed() then
+    return nil
+  end
+
+  return make_tree(parse_test_file(bufnr)).tree
+end
+
 ---Returns a list of tests and their locations.
 ---
 ---The result is a table where keys are test ids and values are `QuickTest` objects.
@@ -260,10 +276,15 @@ function M.is_swift_parser_installed()
   end
 
   local parsers = vim.api.nvim_get_runtime_file("parser/*.so", true)
-  local result = vim.tbl_contains(parsers, function(path)
-    local filename = vim.fn.fnamemodify(path, ":t")
-    return filename == "swift.so"
-  end, { predicate = true })
+
+  local result = false
+  for _, parser in ipairs(parsers) do
+    local filename = vim.fn.fnamemodify(parser, ":t")
+    if filename == "swift.so" then
+      result = true
+      break
+    end
+  end
 
   cachedSwiftParserResult = result
 

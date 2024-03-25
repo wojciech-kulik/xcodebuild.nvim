@@ -3477,6 +3477,36 @@ QuickTest                              *xcodebuild.integrations.quick.QuickTest*
     {row}  (number) 1-based row number
 
 
+                                    *xcodebuild.integrations.quick.TestTreeNode*
+TestTreeNode
+
+  Fields: ~
+    {id}        (string) node type
+    {testId}    (string|nil) test id (matching xcodebuild test name)
+    {name}      (string) group name
+    {row}       (number) 0-based row number
+    {endRow}    (number) 0-based row number
+    {parent}    (TestTreeNode|nil)
+    {children}  (TestTreeNode[])
+
+
+                           *xcodebuild.integrations.quick.build_quick_test_tree*
+M.build_quick_test_tree({bufnr})
+  Builds a tree of tests based on the given buffer.
+
+  The result is a tree structure where each node represents a group of tests.
+
+  The first node is always the root node, it doesn't represent any test group.
+  Iterate through the `children` property to get the top-level test groups.
+
+
+  Parameters: ~
+    {bufnr}  (number)
+
+  Returns: ~
+    (TestTreeNode|nil)
+
+
                                 *xcodebuild.integrations.quick.find_quick_tests*
 M.find_quick_tests({bufnr})
   Returns a list of tests and their locations.

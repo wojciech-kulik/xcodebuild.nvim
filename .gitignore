@@ -44,7 +44,7 @@ tools/getsnapshots_src/getsnapshots.xcodeproj/project.xcworkspace/xcshareddata/I
 xcuserdata
 tools/getsnapshots_src/getsnapshots.xcodeproj/xcuserdata
 tools/getsnapshots_src/getsnapshots.xcodeproj/xcshareddata/xcschemes/getsnapshots.xcscheme
-specs/test_data/*.vim
+specs/parser_test_data/*.vim
 doc/tags
 luals-out
 .tests
