@@ -24,7 +24,13 @@ jobs:
           neovim: true
           version: ${{ matrix.nvim-version }}
 
+      - name: Install tree-sitter
+        run: |
+          eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+          brew install tree-sitter
+
       - name: Run tests
         run: |
+          eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
           nvim --version
           make test

@@ -34,7 +34,21 @@ function M.setup()
   vim.env.XDG_CACHE_HOME = M.root(".tests/cache")
 
   M.install("nvim-lua/plenary.nvim")
+  M.install("nvim-treesitter/nvim-treesitter")
+
   vim.cmd([[packadd plenary.nvim]])
+  vim.cmd([[packadd nvim-treesitter]])
+
+  local parserFileExists =
+    vim.loop.fs_stat(M.root(".tests/site/pack/deps/start/nvim-treesitter/parser/swift.so"))
+
+  ---@diagnostic disable-next-line: missing-fields
+  require("nvim-treesitter.configs").setup({})
+
+  if not parserFileExists then
+    print("Installing Swift parser")
+    vim.cmd("TSInstallSync swift")
+  end
 end
 
 M.setup()
