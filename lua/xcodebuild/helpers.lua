@@ -92,9 +92,13 @@ end
 
 ---Enables `modifiable` and updates the buffer using {updateFoo}.
 ---After the operation, it restores the `modifiable` to `false`.
----@param bufnr number
+---@param bufnr number|nil
 ---@param updateFoo function
 function M.update_readonly_buffer(bufnr, updateFoo)
+  if not bufnr then
+    return
+  end
+
   vim.api.nvim_buf_set_option(bufnr, "modifiable", true)
   updateFoo()
   vim.api.nvim_buf_set_option(bufnr, "modifiable", false)

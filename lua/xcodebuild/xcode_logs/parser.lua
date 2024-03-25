@@ -126,10 +126,12 @@ local function flush_test(message)
   end
 
   -- refresh test explorer
-  require("xcodebuild.tests.explorer").update_test_status(
-    lineData.target .. "/" .. lineData.class .. "/" .. lineData.name,
-    lineData.success and "passed" or "failed"
-  )
+  if lineData.target and lineData.class and lineData.name then
+    require("xcodebuild.tests.explorer").update_test_status(
+      lineData.target .. "/" .. lineData.class .. "/" .. lineData.name,
+      lineData.success and "passed" or "failed"
+    )
+  end
 
   -- refresh diagnostics and marks for the test file
   if lineData.filepath then
