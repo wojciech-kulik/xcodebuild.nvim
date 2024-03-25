@@ -6,8 +6,15 @@
 local util = require("xcodebuild.util")
 local config = require("xcodebuild.core.config").options.marks
 local testSearch = require("xcodebuild.tests.search")
+local quick = require("xcodebuild.integrations.quick")
 
 local M = {}
+
+local diagnosticsNamespace = vim.api.nvim_create_namespace("xcodebuild-diagnostics")
+local marksNamespace = vim.api.nvim_create_namespace("xcodebuild-marks")
+
+---@type string|nil
+local requestedRefreshForFile
 
 ---Returns the test class key for the given buffer.
 ---@param bufnr number
@@ -40,16 +47,18 @@ end
 ---@param bufnr number
 ---@param testClass string
 ---@param report ParsedReport
-local function refresh_buf_diagnostics(bufnr, testClass, report)
+---@param quickTests table<string,QuickTest>|nil
+local function refresh_buf_diagnostics(bufnr, testClass, report, quickTests)
   if not report.tests or not config.show_diagnostics then
     return
   end
 
-  local ns = vim.api.nvim_create_namespace("xcodebuild-diagnostics")
   local diagnostics = {}
   local duplicates = {}
 
   for _, test in ipairs(report.tests[testClass] or {}) do
+    test.lineNumber = test.lineNumber or (quickTests and quickTests[test.name] and quickTests[test.name].row)
+
     if
       not test.success
       and test.filepath
@@ -69,20 +78,21 @@ local function refresh_buf_diagnostics(bufnr, testClass, report)
     end
   end
 
-  vim.api.nvim_buf_clear_namespace(bufnr, ns, 0, -1)
-  vim.diagnostic.set(ns, bufnr, diagnostics, {})
+  vim.diagnostic.reset(diagnosticsNamespace, bufnr)
+  vim.api.nvim_buf_clear_namespace(bufnr, diagnosticsNamespace, 0, -1)
+  vim.diagnostic.set(diagnosticsNamespace, bufnr, diagnostics, {})
 end
 
 ---Refreshes the marks for the given buffer.
 ---@param bufnr number
 ---@param testClass string
 ---@param tests ParsedTest[]
-local function refresh_buf_marks(bufnr, testClass, tests)
+---@param quickTests table<string,QuickTest>|nil
+local function refresh_buf_marks(bufnr, testClass, tests, quickTests)
   if not tests or not (config.show_test_duration or config.show_signs) then
     return
   end
 
-  local ns = vim.api.nvim_create_namespace("xcodebuild-marks")
   local bufLines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
   local findTestLine = function(testName)
     for lineNumber, line in ipairs(bufLines) do
@@ -94,10 +104,11 @@ local function refresh_buf_marks(bufnr, testClass, tests)
     return nil
   end
 
-  vim.api.nvim_buf_clear_namespace(bufnr, ns, 0, -1)
+  vim.api.nvim_buf_clear_namespace(bufnr, marksNamespace, 0, -1)
 
   for _, test in ipairs(tests[testClass] or {}) do
     local lineNumber = findTestLine(test.name)
+      or (quickTests and quickTests[test.name] and quickTests[test.name].row - 1)
     local testDuration = nil
     local signText = nil
     local signHighlight = nil
@@ -119,12 +130,98 @@ local function refresh_buf_marks(bufnr, testClass, tests)
     end
 
     if test.filepath and lineNumber then
-      vim.api.nvim_buf_set_extmark(bufnr, ns, lineNumber, 0, {
+      vim.api.nvim_buf_set_extmark(bufnr, marksNamespace, lineNumber, 0, {
         virt_text = { testDuration },
         sign_text = signText,
         sign_hl_group = signHighlight,
       })
     end
+  end
+end
+
+---Refreshes the diagnostics and marks for the given buffer.
+---@param bufnr number
+---@param report ParsedReport
+---@see xcodebuild.xcode_logs.parser.ParsedReport
+function M.refresh_test_buffer(bufnr, report)
+  local testClass = find_test_class(bufnr, report)
+  if testClass then
+    local quickTests
+    if quick.is_enabled() and quick.contains_quick_tests(bufnr) then
+      quickTests = quick.find_quick_tests(bufnr)
+    end
+
+    refresh_buf_diagnostics(bufnr, testClass, report, quickTests)
+    refresh_buf_marks(bufnr, testClass, report.tests, quickTests)
+  end
+end
+
+---Refreshes diagnostics and marks for the test buffer with the given name.
+---
+---It implements a debounce mechanism to avoid refreshing
+---the same buffer multiple times.The window is 1 second.
+---
+---Note: this function will affect the buffer after 1 second.
+---To refresh the buffer instantly use `refresh_test_buffer`.
+---
+---@param name string
+---@param report ParsedReport
+function M.refresh_test_buffer_by_name(name, report)
+  if requestedRefreshForFile == name then
+    return
+  end
+
+  requestedRefreshForFile = name
+
+  vim.defer_fn(function()
+    requestedRefreshForFile = nil
+
+    local bufnr = util.get_buf_by_name(name)
+    if bufnr and vim.api.nvim_buf_is_loaded(bufnr) then
+      M.refresh_test_buffer(bufnr, report)
+    end
+  end, 1000)
+end
+
+---Refreshes diagnostics and marks for all test buffers.
+---@param report ParsedReport
+---@see xcodebuild.xcode_logs.parser.ParsedReport
+function M.refresh_all_test_buffers(report)
+  if util.is_not_empty(report.buildErrors) then
+    return
+  end
+
+  M.clear_marks()
+
+  local filePathToBufnr = {}
+  for _, bufnr in ipairs(util.get_buffers()) do
+    local filepath = vim.api.nvim_buf_get_name(bufnr)
+    filePathToBufnr[filepath] = bufnr
+  end
+
+  for _, testsPerClass in pairs(report.tests) do
+    for _, test in ipairs(testsPerClass) do
+      if test.filepath and filePathToBufnr[test.filepath] then
+        M.refresh_test_buffer(filePathToBufnr[test.filepath], report)
+        break -- all tests within the class are in the same file
+      end
+    end
+  end
+end
+
+---Clears marks and diagnostics.
+function M.clear()
+  for _, bufnr in ipairs(util.get_buffers()) do
+    vim.diagnostic.reset(diagnosticsNamespace, bufnr)
+    vim.api.nvim_buf_clear_namespace(bufnr, marksNamespace, 0, -1)
+    vim.api.nvim_buf_clear_namespace(bufnr, diagnosticsNamespace, 0, -1)
+  end
+end
+
+---Clears marks.
+function M.clear_marks()
+  for _, bufnr in ipairs(util.get_buffers()) do
+    vim.api.nvim_buf_clear_namespace(bufnr, marksNamespace, 0, -1)
   end
 end
 
@@ -136,40 +233,6 @@ function M.setup()
   vim.api.nvim_set_hl(0, "XcodebuildTestSuccessDurationSign", { link = "DiagnosticSignWarn", default = true })
   vim.api.nvim_set_hl(0, "XcodebuildTestFailureDurationSign", { link = "DiagnosticSignError", default = true })
   -- stylua: ignore end
-end
-
----Refreshes the diagnostics and marks for the given buffer.
----@param bufnr number
----@param report ParsedReport
----@see xcodebuild.xcode_logs.parser.ParsedReport
-function M.refresh_test_buffer(bufnr, report)
-  local testClass = find_test_class(bufnr, report)
-  if testClass then
-    refresh_buf_diagnostics(bufnr, testClass, report)
-    refresh_buf_marks(bufnr, testClass, report.tests)
-  end
-end
-
----Refreshes the diagnostics and marks for all test buffers.
----@param report ParsedReport
----@see xcodebuild.xcode_logs.parser.ParsedReport
-function M.refresh_all_test_buffers(report)
-  if util.is_not_empty(report.buildErrors) then
-    return
-  end
-
-  -- TODO: improve gsub - the conversion from wildcard to regex might not be reliable
-  local filePattern = config.file_pattern
-  local regexPattern = string.gsub(string.gsub(filePattern, "%.", "%%."), "%*", "%.%*")
-  local testBuffers = util.get_bufs_by_matching_name(regexPattern)
-
-  for _, buffer in ipairs(testBuffers or {}) do
-    local testClass = find_test_class(buffer.bufnr, report)
-    if testClass then
-      refresh_buf_diagnostics(buffer.bufnr, testClass, report)
-      refresh_buf_marks(buffer.bufnr, testClass, report.tests)
-    end
-  end
 end
 
 return M

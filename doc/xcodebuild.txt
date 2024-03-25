@@ -41,6 +41,7 @@ Remote Debugger Integration ·········· |xcodebuild.integrations.remote
 LSP Integration ·································· |xcodebuild.integrations.lsp|
 nvim-tree Integration ······················ |xcodebuild.integrations.nvim_tree|
 oil.nvim Integration ························ |xcodebuild.integrations.oil-nvim|
+Quick Test Framework Integration ··············· |xcodebuild.integrations.quick|
 xcode-build-server Integration ···· |xcodebuild.integrations.xcode-build-server|
 Pickers ················································ |xcodebuild.ui.pickers|
 Helpers ··················································· |xcodebuild.helpers|
@@ -125,7 +126,6 @@ M.setup({options})                                            *xcodebuild.setup*
         failure_sign = "✖", -- failed test icon
         show_test_duration = true, -- show each test duration next to its declaration
         show_diagnostics = true, -- add test failures to diagnostics
-        file_pattern = "*Tests.swift", -- test diagnostics will be loaded in files matching this pattern (if available)
       },
       quickfix = {
         show_errors_on_quickfixlist = true, -- add build/test errors to quickfix list
@@ -181,6 +181,9 @@ M.setup({options})                                            *xcodebuild.setup*
             return true
           end,
         },
+        quick = { -- integration with Swift test framework: github.com/Quick/Quick
+          enabled = true, -- enable Quick tests support (requires Swift parser for nvim-treesitter)
+        },
       },
       highlights = {
         -- you can override here any highlight group used by this plugin
@@ -213,6 +216,7 @@ Features                                                   *xcodebuild.features*
  - `nvim-dap` integration to let you easily build, run, and debug apps.
  - `nvim-dap-ui` integration to show app logs in the console window.
  - `lualine.nvim` integration to show selected device, test plan,
+ - `Quick` integration to show test results for tests written using `Quick` framework.
    and other project settings.
  - Auto-detection of the target membership for new files.
  - Picker with all available plugin actions.
@@ -250,7 +254,8 @@ Neovim environment
  - `telescope.nvim` to present pickers.
  - `nui.nvim` to present floating code coverage report.
  - `nvim-tree` or `oil.nvim` to visually manage your project files.
- - `nvim-dap` and nvim-dap-ui to debug apps.
+ - `nvim-dap` and `nvim-dap-ui` to debug apps.
+ - `nvim-treesitter` + Swift parser to show test results for tests written using `Quick` framework.
 
 External tools
  - `xcbeautify` to format Xcode logs (you can set a different tool or disable formatting in the config).
@@ -2537,10 +2542,6 @@ Test Diagnostics                                  *xcodebuild.tests.diagnostics*
 
 This module is responsible for handling diagnostics and marks for test files.
 
-M.setup()                                   *xcodebuild.tests.diagnostics.setup*
-  Set up highlights for tests.
-
-
                               *xcodebuild.tests.diagnostics.refresh_test_buffer*
 M.refresh_test_buffer({bufnr}, {report})
   Refreshes the diagnostics and marks for the given buffer.
@@ -2553,15 +2554,43 @@ M.refresh_test_buffer({bufnr}, {report})
     |xcodebuild.xcode_logs.parser.ParsedReport|
 
 
+                      *xcodebuild.tests.diagnostics.refresh_test_buffer_by_name*
+M.refresh_test_buffer_by_name({name}, {report})
+  Refreshes diagnostics and marks for the test buffer with the given name.
+
+  It implements a debounce mechanism to avoid refreshing
+  the same buffer multiple times.The window is 1 second.
+
+  Note: this function will affect the buffer after 1 second.
+  To refresh the buffer instantly use `refresh_test_buffer`.
+
+
+  Parameters: ~
+    {name}    (string)
+    {report}  (ParsedReport)
+
+
                          *xcodebuild.tests.diagnostics.refresh_all_test_buffers*
 M.refresh_all_test_buffers({report})
-  Refreshes the diagnostics and marks for all test buffers.
+  Refreshes diagnostics and marks for all test buffers.
 
   Parameters: ~
     {report}  (ParsedReport)
 
   See: ~
     |xcodebuild.xcode_logs.parser.ParsedReport|
+
+
+M.clear()                                   *xcodebuild.tests.diagnostics.clear*
+  Clears marks and diagnostics.
+
+
+M.clear_marks()                       *xcodebuild.tests.diagnostics.clear_marks*
+  Clears marks.
+
+
+M.setup()                                   *xcodebuild.tests.diagnostics.setup*
+  Set up highlights for tests.
 
 
 ==============================================================================
@@ -3430,6 +3459,72 @@ M.setup()                               *xcodebuild.integrations.oil-nvim.setup*
 
 
 ==============================================================================
+Quick Test Framework Integration                 *xcodebuild.integrations.quick*
+
+This module is responsible for parsing tests written using `Quick` framework.
+
+It provides functions to get a list of `Quick` tests and their locations.
+
+Note: it requires the Swift parser to be installed (using `nvim-treesitter`).
+
+See: https://github.com/Quick/Quick
+
+
+QuickTest                              *xcodebuild.integrations.quick.QuickTest*
+
+  Fields: ~
+    {id}   (string) test id (matching xcodebuild test name)
+    {row}  (number) 1-based row number
+
+
+                                *xcodebuild.integrations.quick.find_quick_tests*
+M.find_quick_tests({bufnr})
+  Returns a list of tests and their locations.
+
+  The result is a table where keys are test ids and values are `QuickTest` objects.
+
+  Each test represents a single test case (e.g. `it` block).
+
+
+  Parameters: ~
+    {bufnr}  (number)
+
+  Returns: ~
+    (table<string,QuickTest>|nil)
+
+
+                            *xcodebuild.integrations.quick.contains_quick_tests*
+M.contains_quick_tests({bufnr})
+  Returns whether the given buffer contains Quick tests.
+
+  It checks if the buffer contains a subclass of `QuickSpec` or
+  if there is `import Quick`.
+
+  Parameters: ~
+    {bufnr}  (number)
+
+  Returns: ~
+    (boolean)
+
+
+                       *xcodebuild.integrations.quick.is_swift_parser_installed*
+M.is_swift_parser_installed()
+  Returns whether the Swift parser is installed.
+
+  It caches the result for future calls.
+
+  Returns: ~
+    (boolean)
+
+
+M.is_enabled()                        *xcodebuild.integrations.quick.is_enabled*
+  Returns whether the Quick integration is enabled.
+
+  Returns: ~
+    (boolean)
+
+
+==============================================================================
 xcode-build-server Integration      *xcodebuild.integrations.xcode-build-server*
 
 This module is responsible for the integration with xcode-build-server.
@@ -3651,7 +3746,7 @@ M.is_not_empty({table})                           *xcodebuild.util.is_not_empty*
 
 M.get_buffers({opts})                              *xcodebuild.util.get_buffers*
   Gets all buffers in the current neovim instance.
-  If `opts.returnNotLoaded` is true, it will
+  If {opts.returnNotLoaded} is true, it will
   return all buffers, including the ones that are not loaded.
 
   Parameters: ~
@@ -3695,6 +3790,7 @@ M.get_buf_by_filename({filename}, {opts})
 
 M.get_buf_by_name({name})                      *xcodebuild.util.get_buf_by_name*
   Gets a buffer by its name.
+  Returns also buffers that are not loaded.
 
   Parameters: ~
     {name}  (string)
@@ -3705,6 +3801,7 @@ M.get_buf_by_name({name})                      *xcodebuild.util.get_buf_by_name*
 
 M.get_buf_by_filetype({filetype})          *xcodebuild.util.get_buf_by_filetype*
   Gets a buffer by its filetype.
+  Returns also buffers that are not loaded.
 
   Parameters: ~
     {filetype}  (string)

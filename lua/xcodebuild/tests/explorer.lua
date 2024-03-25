@@ -582,6 +582,7 @@ function M.open_selected_test()
   end
 
   local filepath = line_to_test[currentRow].filepath
+  local quick = require("xcodebuild.integrations.quick")
 
   if filepath then
     local searchPhrase = line_to_test[currentRow].name
@@ -591,6 +592,20 @@ function M.open_selected_test()
     end
 
     vim.cmd("wincmd p | e " .. filepath)
+
+    if
+      quick.is_enabled()
+      and line_to_test[currentRow].kind == KIND_TEST
+      and quick.contains_quick_tests(0)
+    then
+      local quickTests = quick.find_quick_tests(0)
+      if quickTests and quickTests[searchPhrase] then
+        vim.cmd(tostring(quickTests[searchPhrase].row))
+        vim.cmd("normal! zz")
+        return
+      end
+    end
+
     vim.fn.search(searchPhrase, "")
     vim.cmd("execute 'normal! zt'")
   end

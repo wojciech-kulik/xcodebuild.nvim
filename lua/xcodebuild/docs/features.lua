@@ -18,6 +18,7 @@
 --- - `nvim-dap` integration to let you easily build, run, and debug apps.
 --- - `nvim-dap-ui` integration to show app logs in the console window.
 --- - `lualine.nvim` integration to show selected device, test plan,
+--- - `Quick` integration to show test results for tests written using `Quick` framework.
 ---   and other project settings.
 --- - Auto-detection of the target membership for new files.
 --- - Picker with all available plugin actions.
