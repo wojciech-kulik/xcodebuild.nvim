@@ -7,7 +7,8 @@
 --- - `telescope.nvim` to present pickers.
 --- - `nui.nvim` to present floating code coverage report.
 --- - `nvim-tree` or `oil.nvim` to visually manage your project files.
---- - `nvim-dap` and nvim-dap-ui to debug apps.
+--- - `nvim-dap` and `nvim-dap-ui` to debug apps.
+--- - `nvim-treesitter` + Swift parser to show test results for tests written using `Quick` framework.
 ---
 ---External tools
 --- - `xcbeautify` to format Xcode logs (you can set a different tool or disable formatting in the config).

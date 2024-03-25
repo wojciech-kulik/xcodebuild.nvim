@@ -130,7 +130,7 @@ function M.run_tests(testsToRun, opts)
 
   notifications.send_tests_started()
   helpers.clear_state()
-  diagnostics.clear()
+  diagnostics.clear_marks()
 
   local show_finish = function()
     notifications.send_tests_finished(appdata.report, false)

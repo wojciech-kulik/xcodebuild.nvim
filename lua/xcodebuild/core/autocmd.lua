@@ -41,10 +41,20 @@ function M.setup()
   if config.marks.show_diagnostics or config.marks.show_signs then
     vim.api.nvim_create_autocmd({ "BufReadPost" }, {
       group = autogroup,
-      pattern = config.marks.file_pattern,
+      pattern = "*.swift",
       callback = function(ev)
-        if projectConfig.is_project_configured() then
-          diagnostics.refresh_test_buffer(ev.buf, appdata.report)
+        if projectConfig.is_project_configured() and appdata.report and appdata.report.tests then
+          local filepath = vim.api.nvim_buf_get_name(ev.buf)
+
+          -- refresh diagnostics if the file is in the report
+          for _, testClass in pairs(appdata.report.tests) do
+            for _, test in ipairs(testClass) do
+              if test.filepath == filepath then
+                diagnostics.refresh_test_buffer(ev.buf, appdata.report)
+                break
+              end
+            end
+          end
         end
       end,
     })

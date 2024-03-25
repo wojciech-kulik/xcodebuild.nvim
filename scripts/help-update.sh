@@ -44,6 +44,7 @@ lemmy-help \
 		./lua/xcodebuild/integrations/lsp.lua \
 		./lua/xcodebuild/integrations/nvim-tree.lua \
 		./lua/xcodebuild/integrations/oil-nvim.lua \
+		./lua/xcodebuild/integrations/quick.lua \
 		./lua/xcodebuild/integrations/xcode-build-server.lua \
 		./lua/xcodebuild/ui/pickers.lua \
 		./lua/xcodebuild/helpers.lua \

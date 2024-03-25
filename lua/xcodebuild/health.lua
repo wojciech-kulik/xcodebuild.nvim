@@ -50,7 +50,7 @@ local required_dependencies = {
   },
 }
 
-local required_plugins = {
+local plugins = {
   {
     name = "telescope.nvim",
     lib = "telescope",
@@ -86,6 +86,12 @@ local required_plugins = {
     lib = "dapui",
     optional = true,
     info = "(Optional to present debugger UI)",
+  },
+  {
+    name = "nvim-treesitter",
+    lib = "nvim-treesitter",
+    optional = true,
+    info = "(Optional to present results for tests written using Quick framework)",
   },
 }
 
@@ -148,7 +154,7 @@ local function check_debugger()
 end
 
 local function check_plugins()
-  for _, plugin in ipairs(required_plugins) do
+  for _, plugin in ipairs(plugins) do
     if plugin_installed(plugin.lib) then
       ok(plugin.name .. " installed.")
     else
@@ -311,6 +317,18 @@ local function check_plugin_commit()
   end
 end
 
+local function check_swift_parser()
+  local quick = require("xcodebuild.integrations.quick")
+
+  if quick.is_swift_parser_installed() then
+    ok("nvim-treesitter: Swift parser installed.")
+  else
+    warn(
+      "nvim-treesitter: Swift parser not installed. It is required to present results for tests written using Quick framework."
+    )
+  end
+end
+
 local M = {}
 
 M.check = function()
@@ -320,8 +338,9 @@ M.check = function()
   start("Checking OS")
   check_os()
 
-  start("Checking required plugins")
+  start("Checking plugins")
   check_plugins()
+  check_swift_parser()
 
   start("Checking required dependencies")
   check_xcodebuild_version()

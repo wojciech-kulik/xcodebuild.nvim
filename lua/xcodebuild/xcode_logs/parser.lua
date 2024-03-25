@@ -125,11 +125,13 @@ local function flush_test(message)
     table.insert(tests[key], lineData)
   end
 
+  -- refresh test explorer
   require("xcodebuild.tests.explorer").update_test_status(
     lineData.target .. "/" .. lineData.class .. "/" .. lineData.name,
     lineData.success and "passed" or "failed"
   )
 
+  -- refresh diagnostics and marks for the test file
   if lineData.filepath then
     local report = {
       tests = tests,

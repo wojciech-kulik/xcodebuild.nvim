@@ -27,6 +27,7 @@ It provides all essential actions for development, including building, launching
 - [x] [nvim-dap] integration to let you easily build, run, and debug apps.
 - [x] [nvim-dap-ui] integration to show app logs in the console window.
 - [x] [lualine.nvim] integration to show selected device, test plan, and other project settings.
+- [x] [Quick] integration to show test results for tests written using [Quick] framework.
 - [x] Auto-detection of the target membership for new files.
 - [x] Picker with all available plugin actions.
 - [x] Highly customizable (many config options, auto commands, highlights, and user commands).
@@ -58,6 +59,7 @@ https://github.com/wojciech-kulik/xcodebuild.nvim/assets/3128467/ed7d2d2e-eaa4-4
 - [nui.nvim] to present floating code coverage report.
 - [nvim-tree] or [oil.nvim] to visually manage your project files.
 - [nvim-dap] and [nvim-dap-ui] to debug apps.
+- [nvim-treesitter] + Swift parser to show test results for tests written using [Quick] framework.
 
 ##### External tools
 
@@ -104,6 +106,7 @@ return {
     "MunifTanjim/nui.nvim",
     "nvim-tree/nvim-tree.lua", -- (optional) to manage project files
     "stevearc/oil.nvim", -- (optional) to manage project files
+    "nvim-treesitter/nvim-treesitter", -- (optional) for Quick tests support (required Swift parser)
   },
   config = function()
     require("xcodebuild").setup({
@@ -363,7 +366,6 @@ vim.keymap.set("n", "<leader>xa", "<cmd>XcodebuildCodeActions<cr>", { desc = "Sh
     failure_sign = "✖", -- failed test icon
     show_test_duration = true, -- show each test duration next to its declaration
     show_diagnostics = true, -- add test failures to diagnostics
-    file_pattern = { "*Test.swift", "*Tests.swift", "*Spec.swift" }, -- test diagnostics will be loaded in files matching these patterns (if available)
   },
   quickfix = {
     show_errors_on_quickfixlist = true, -- add build/test errors to quickfix list
@@ -418,6 +420,9 @@ vim.keymap.set("n", "<leader>xa", "<cmd>XcodebuildCodeActions<cr>", { desc = "Sh
         -- it could be useful if you mix Xcode project with SPM for example
         return true
       end,
+    },
+    quick = { -- integration with Swift test framework: github.com/Quick/Quick
+      enabled = true, -- enable Quick tests support (requires Swift parser for nvim-treesitter)
     },
   },
   highlights = {
@@ -829,6 +834,7 @@ and run `xcode-build-server config` again.
 [oil.nvim]: https://github.com/stevearc/oil.nvim
 [nvim-dap]: https://github.com/mfussenegger/nvim-dap
 [nvim-dap-ui]: https://github.com/rcarriga/nvim-dap-ui
+[nvim-treesitter]: https://github.com/nvim-treesitter/nvim-treesitter
 [nui.nvim]: https://github.com/MunifTanjim/nui.nvim
 [telescope.nvim]: https://github.com/nvim-telescope/telescope.nvim
 [neovim]: https://neovim.io
@@ -846,5 +852,6 @@ and run `xcode-build-server config` again.
 [tips-and-tricks]: https://github.com/wojciech-kulik/xcodebuild.nvim/discussions/categories/tips-tricks
 [ios-guide]: https://wojciechkulik.pl/ios/the-complete-guide-to-ios-macos-development-in-neovim
 [ios-dev-starter-nvim]: https://github.com/wojciech-kulik/ios-dev-starter-nvim
-[swift-snapshot-testing]: https://github.com/pointfreeco/swift-snapshot-testing
 [test-file-search]: https://github.com/wojciech-kulik/xcodebuild.nvim/discussions/41
+[swift-snapshot-testing]: https://github.com/pointfreeco/swift-snapshot-testing
+[Quick]: https://github.com/Quick/Quick
