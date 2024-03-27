@@ -3,9 +3,9 @@
 A plugin designed to let you migrate your iOS, iPadOS, and macOS app development to Neovim.
 It provides all essential actions for development, including building, launching, and testing.
 
-![Xcodebuild Testing](./media/testing.png)
-
-![Xcodebuild Debugging](./media/debugging.png)
+<img src="./media/testing.png" style="border-radius: 8px;" alt="xcodebuild.nvim - unit tests" />
+&nbsp;
+<img src="./media/debugging.png" style="border-radius: 8px;" alt="xcodebuild.nvim - debugging" />
 
 &nbsp;
 
@@ -20,13 +20,13 @@ It provides all essential actions for development, including building, launching
 - [x] Buffer integration with test results (code coverage, success & failure marks, duration,
       extra diagnostics).
 - [x] Code coverage report with customizable levels.
-- [x] Browser of failing snapshot tests with a diff preview (if you use [swift-snapshot-testing]).
 - [x] Advanced log parser to detect all errors, warnings, and failing tests.
 - [x] [nvim-tree] and [oil.nvim] integration that automatically reflects all file tree operations
       and updates Xcode project.
 - [x] [nvim-dap] integration to let you easily build, run, and debug apps.
 - [x] [nvim-dap-ui] integration to show app logs in the console window.
 - [x] [lualine.nvim] integration to show selected device, test plan, and other project settings.
+- [x] [swift-snapshot-testing] integration to present diff views for failing snapshot tests.
 - [x] [Quick] integration to show test results for tests written using [Quick] framework.
 - [x] Auto-detection of the target membership for new files.
 - [x] Picker with all available plugin actions.
@@ -659,7 +659,7 @@ This approach works especially well if you are using tmux.
 
 You can also integrate this plugin with [lualine.nvim].
 
-![Xcodebuild Lualine](./media/lualine.png)
+<img src="./media/lualine.png" style="border-radius: 8px;" alt="xcodebuild.nvim - lualine" />
 
 <details>
     <summary>See Lualine configuration</summary>
@@ -703,7 +703,7 @@ Global variables that you can use:
 
 ## 🧪 Code Coverage
 
-![Xcodebuild Code Coverage Report](./media/coverage-report.png)
+<img src="./media/coverage-report.png" style="border-radius: 8px;" alt="xcodebuild.nvim - coverage report" />
 
 <details>
     <summary>See how to configure</summary>
@@ -754,7 +754,7 @@ combining reference, failure, and difference images into one. It works with [swi
 
 Run `:XcodebuildFailingSnapshots` to see the list.
 
-![Xcodebuild Snapshots](./media/snapshots.png)
+<img src="./media/snapshots.png" style="border-radius: 8px;" alt="xcodebuild.nvim - snapshot testing" />
 
 &nbsp;
 

@@ -208,16 +208,15 @@ Features                                                   *xcodebuild.features*
  - Buffer integration with test results
    (code coverage, success & failure marks, duration, extra diagnostics).
  - Code coverage report with customizable levels.
- - Browser of failing snapshot tests with a diff preview (if you use
-   `swift-snapshot-testing`).
  - Advanced log parser to detect all errors, warnings, and failing tests.
  - `nvim-tree` and `oil.nvim` integration that automatically reflects all file tree
    operations and updates Xcode project file.
  - `nvim-dap` integration to let you easily build, run, and debug apps.
  - `nvim-dap-ui` integration to show app logs in the console window.
  - `lualine.nvim` integration to show selected device, test plan,
- - `Quick` integration to show test results for tests written using `Quick` framework.
    and other project settings.
+ - `swift-snapshot-testing` integration to present diff views for failing snapshot tests.
+ - `Quick` integration to show test results for tests written using `Quick` framework.
  - Auto-detection of the target membership for new files.
  - Picker with all available plugin actions.
  - Highly customizable (many config options, auto commands, highlights,
