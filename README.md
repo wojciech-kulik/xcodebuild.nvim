@@ -21,8 +21,8 @@ It provides all essential actions for development, including building, launching
       extra diagnostics).
 - [x] Code coverage report with customizable levels.
 - [x] Advanced log parser to detect all errors, warnings, and failing tests.
-- [x] [nvim-tree] and [oil.nvim] integration that automatically reflects all file tree operations
-      and updates Xcode project.
+- [x] [nvim-tree], [neo-tree], and [oil.nvim] integration that automatically reflects
+      all file tree operations and updates Xcode project.
 - [x] [nvim-dap] integration to let you easily build, run, and debug apps.
 - [x] [nvim-dap-ui] integration to show app logs in the console window.
 - [x] [lualine.nvim] integration to show selected device, test plan, and other project settings.
@@ -36,8 +36,8 @@ It provides all essential actions for development, including building, launching
 
 ## 🌳 File Tree Integration
 
-Xcodebuild.nvim is integrated with [nvim-tree] and [oil.nvim] to let you manage your project and files
-in a convenient way.
+Xcodebuild.nvim is integrated with [nvim-tree], [neo-tree], and [oil.nvim] to let you manage your
+project and files in a convenient way.
 
 Every change in the file tree presented by these plugins will be automatically reflected in the
 Xcode project file.
@@ -57,7 +57,7 @@ https://github.com/wojciech-kulik/xcodebuild.nvim/assets/3128467/ed7d2d2e-eaa4-4
 - [Neovim 0.9.5+][neovim]
 - [telescope.nvim] to present pickers.
 - [nui.nvim] to present floating code coverage report.
-- [nvim-tree] or [oil.nvim] to visually manage your project files.
+- [nvim-tree], [neo-tree], or [oil.nvim] to visually manage your project files.
 - [nvim-dap] and [nvim-dap-ui] to debug apps.
 - [nvim-treesitter] + Swift parser to show test results for tests written using [Quick] framework.
 
@@ -409,6 +409,14 @@ vim.keymap.set("n", "<leader>xa", "<cmd>XcodebuildCodeActions<cr>", { desc = "Sh
     },
     nvim_tree = {
       enabled = true, -- enable updating Xcode project files when using nvim-tree
+      guess_target = true, -- guess target for the new file based on the file path
+      should_update_project = function(path) -- path can lead to directory or file
+        -- it could be useful if you mix Xcode project with SPM for example
+        return true
+      end,
+    },
+    neo_tree = {
+      enabled = true, -- enable updating Xcode project files when using neo-tree.nvim
       guess_target = true, -- guess target for the new file based on the file path
       should_update_project = function(path) -- path can lead to directory or file
         -- it could be useful if you mix Xcode project with SPM for example
@@ -833,6 +841,7 @@ and run `xcode-build-server config` again.
 - `:h xcodebuild.dap`
 
 [nvim-tree]: https://github.com/nvim-tree/nvim-tree.lua
+[neo-tree]: https://github.com/nvim-neo-tree/neo-tree.nvim
 [oil.nvim]: https://github.com/stevearc/oil.nvim
 [nvim-dap]: https://github.com/mfussenegger/nvim-dap
 [nvim-dap-ui]: https://github.com/rcarriga/nvim-dap-ui

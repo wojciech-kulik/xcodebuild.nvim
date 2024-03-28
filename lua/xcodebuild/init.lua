@@ -191,6 +191,14 @@ end
 ---        return true
 ---      end,
 ---    },
+---    neo_tree = {
+---      enabled = true, -- enable updating Xcode project files when using neo-tree.nvim
+---      guess_target = true, -- guess target for the new file based on the file path
+---      should_update_project = function(path) -- path can lead to directory or file
+---        -- it could be useful if you mix Xcode project with SPM for example
+---        return true
+---      end,
+---    },
 ---    oil_nvim = {
 ---      enabled = true, -- enable updating Xcode project files when using oil.nvim
 ---      guess_target = true, -- guess target for the new file based on the file path
@@ -225,6 +233,7 @@ function M.setup(options)
   local diagnostics = require("xcodebuild.tests.diagnostics")
   local nvimTree = require("xcodebuild.integrations.nvim-tree")
   local oilNvim = require("xcodebuild.integrations.oil-nvim")
+  local neoTree = require("xcodebuild.integrations.neo-tree")
 
   autocmd.setup()
   projectConfig.load_settings()
@@ -234,6 +243,7 @@ function M.setup(options)
   testExplorer.setup()
   nvimTree.setup()
   oilNvim.setup()
+  neoTree.setup()
   setupHighlights()
   warnAboutOldConfig()
 

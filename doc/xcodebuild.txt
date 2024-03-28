@@ -39,7 +39,8 @@ Code Coverage Report ························· |xcodebu
 DAP Integration ·································· |xcodebuild.integrations.dap|
 Remote Debugger Integration ·········· |xcodebuild.integrations.remote_debugger|
 LSP Integration ·································· |xcodebuild.integrations.lsp|
-nvim-tree Integration ······················ |xcodebuild.integrations.nvim_tree|
+nvim-tree Integration ······················ |xcodebuild.integrations.nvim-tree|
+neo-tree.nvim Integration ··················· |xcodebuild.integrations.neo-tree|
 oil.nvim Integration ························ |xcodebuild.integrations.oil-nvim|
 Quick Test Framework Integration ··············· |xcodebuild.integrations.quick|
 xcode-build-server Integration ···· |xcodebuild.integrations.xcode-build-server|
@@ -173,6 +174,14 @@ M.setup({options})                                            *xcodebuild.setup*
             return true
           end,
         },
+        neo_tree = {
+          enabled = true, -- enable updating Xcode project files when using neo-tree.nvim
+          guess_target = true, -- guess target for the new file based on the file path
+          should_update_project = function(path) -- path can lead to directory or file
+            -- it could be useful if you mix Xcode project with SPM for example
+            return true
+          end,
+        },
         oil_nvim = {
           enabled = true, -- enable updating Xcode project files when using oil.nvim
           guess_target = true, -- guess target for the new file based on the file path
@@ -209,8 +218,8 @@ Features                                                   *xcodebuild.features*
    (code coverage, success & failure marks, duration, extra diagnostics).
  - Code coverage report with customizable levels.
  - Advanced log parser to detect all errors, warnings, and failing tests.
- - `nvim-tree` and `oil.nvim` integration that automatically reflects all file tree
-   operations and updates Xcode project file.
+ - `nvim-tree`, `neo-tree.nvim`, and `oil.nvim` integration that automatically
+   reflects all file tree operations and updates Xcode project file.
  - `nvim-dap` integration to let you easily build, run, and debug apps.
  - `nvim-dap-ui` integration to show app logs in the console window.
  - `lualine.nvim` integration to show selected device, test plan,
@@ -252,7 +261,7 @@ Neovim environment
  - `Neovim 0.9.5+`
  - `telescope.nvim` to present pickers.
  - `nui.nvim` to present floating code coverage report.
- - `nvim-tree` or `oil.nvim` to visually manage your project files.
+ - `nvim-tree`, `neo-tree.nvim`, or `oil.nvim` to visually manage your project files.
  - `nvim-dap` and `nvim-dap-ui` to debug apps.
  - `nvim-treesitter` + Swift parser to show test results for tests written using `Quick` framework.
 
@@ -3427,12 +3436,12 @@ M.restart_sourcekit_lsp()
 
 
 ==============================================================================
-nvim-tree Integration                        *xcodebuild.integrations.nvim_tree*
+nvim-tree Integration                        *xcodebuild.integrations.nvim-tree*
 
 This module is responsible for the integration with `nvim-tree`.
 It listens to `nvim-tree` events and updates the project file accordingly.
 
-The integrations is enabled only if the current working directory
+The integration is enabled only if the current working directory
 contains the project configuration (|xcodebuild.project.config|).
 
 You can always disable the integration in the |xcodebuild.config|.
@@ -3442,12 +3451,39 @@ This feature requires `Xcodeproj` to be installed (|xcodebuild.requirements|).
 See:
   |xcodebuild.project-manager|
   https://github.com/nvim-tree/nvim-tree.lua
-  https://github.com/wojciech-kulik/xcodebuild.nvim#-nvim-tree-integration
+  https://github.com/wojciech-kulik/xcodebuild.nvim#-file-tree-integration
 
 
-M.setup()                              *xcodebuild.integrations.nvim_tree.setup*
+M.setup()                              *xcodebuild.integrations.nvim-tree.setup*
   Sets up the integration with `nvim-tree`.
   It subscribes to `nvim-tree` events.
+
+  See: ~
+    |xcodebuild.project-manager|
+
+
+==============================================================================
+neo-tree.nvim Integration                     *xcodebuild.integrations.neo-tree*
+
+This module is responsible for the integration with `neo-tree.nvim`.
+It listens to `neo-tree` events and updates the project file accordingly.
+
+The integration is enabled only if the current working directory
+contains the project configuration (|xcodebuild.project.config|).
+
+You can always disable the integration in the |xcodebuild.config|.
+
+This feature requires `Xcodeproj` to be installed (|xcodebuild.requirements|).
+
+See:
+  |xcodebuild.project-manager|
+  https://github.com/nvim-neo-tree/neo-tree.nvim
+  https://github.com/wojciech-kulik/xcodebuild.nvim#-file-tree-integration
+
+
+M.setup()                               *xcodebuild.integrations.neo-tree.setup*
+  Sets up the integration with `neo-tree`.
+  It subscribes to `neo-tree` events.
 
   See: ~
     |xcodebuild.project-manager|
@@ -3459,7 +3495,7 @@ oil.nvim Integration                          *xcodebuild.integrations.oil-nvim*
 This module is responsible for the integration with `oil.nvim`.
 It listens to `oil.nvim` events and updates the project file accordingly.
 
-The integrations is enabled only if the current working directory
+The integration is enabled only if the current working directory
 contains the project configuration (|xcodebuild.project.config|).
 
 You can always disable the integration in the |xcodebuild.config|.
@@ -3469,6 +3505,7 @@ This feature requires `Xcodeproj` to be installed (|xcodebuild.requirements|).
 See:
   |xcodebuild.project-manager|
   https://github.com/stevearc/oil.nvim
+  https://github.com/wojciech-kulik/xcodebuild.nvim#-file-tree-integration
 
 
 M.setup()                               *xcodebuild.integrations.oil-nvim.setup*
