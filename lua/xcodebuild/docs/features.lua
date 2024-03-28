@@ -11,8 +11,8 @@
 ---   (code coverage, success & failure marks, duration, extra diagnostics).
 --- - Code coverage report with customizable levels.
 --- - Advanced log parser to detect all errors, warnings, and failing tests.
---- - `nvim-tree` and `oil.nvim` integration that automatically reflects all file tree
----   operations and updates Xcode project file.
+--- - `nvim-tree`, `neo-tree.nvim`, and `oil.nvim` integration that automatically
+---   reflects all file tree operations and updates Xcode project file.
 --- - `nvim-dap` integration to let you easily build, run, and debug apps.
 --- - `nvim-dap-ui` integration to show app logs in the console window.
 --- - `lualine.nvim` integration to show selected device, test plan,

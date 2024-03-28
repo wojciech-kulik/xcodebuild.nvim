@@ -70,6 +70,12 @@ local plugins = {
     info = "(Optional to visually manage project files)",
   },
   {
+    name = "neo-tree",
+    lib = "neo-tree",
+    optional = true,
+    info = "(Optional to visually manage project files)",
+  },
+  {
     name = "oil.nvim",
     lib = "oil",
     optional = true,

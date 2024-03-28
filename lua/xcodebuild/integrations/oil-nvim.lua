@@ -3,7 +3,7 @@
 ---This module is responsible for the integration with `oil.nvim`.
 ---It listens to `oil.nvim` events and updates the project file accordingly.
 ---
----The integrations is enabled only if the current working directory
+---The integration is enabled only if the current working directory
 ---contains the project configuration (|xcodebuild.project.config|).
 ---
 ---You can always disable the integration in the |xcodebuild.config|.
@@ -13,6 +13,7 @@
 ---See:
 ---  |xcodebuild.project-manager|
 ---  https://github.com/stevearc/oil.nvim
+---  https://github.com/wojciech-kulik/xcodebuild.nvim#-file-tree-integration
 ---
 ---@brief ]]
 

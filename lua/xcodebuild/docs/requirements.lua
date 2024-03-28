@@ -6,7 +6,7 @@
 --- - `Neovim 0.9.5+`
 --- - `telescope.nvim` to present pickers.
 --- - `nui.nvim` to present floating code coverage report.
---- - `nvim-tree` or `oil.nvim` to visually manage your project files.
+--- - `nvim-tree`, `neo-tree.nvim`, or `oil.nvim` to visually manage your project files.
 --- - `nvim-dap` and `nvim-dap-ui` to debug apps.
 --- - `nvim-treesitter` + Swift parser to show test results for tests written using `Quick` framework.
 ---
