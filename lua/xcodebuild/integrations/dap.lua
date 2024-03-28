@@ -250,7 +250,7 @@ end
 
 ---Starts the debugger and runs the current test.
 function M.debug_func_test()
-  actions.run_func_test()
+  actions.run_nearest_test()
   M.attach_debugger_for_tests()
 end
 
@@ -262,7 +262,7 @@ end
 
 ---Starts the debugger and re-runs the failing tests.
 function M.debug_failing_tests()
-  actions.run_failing_tests()
+  actions.rerun_failed_tests()
   M.attach_debugger_for_tests()
 end
 

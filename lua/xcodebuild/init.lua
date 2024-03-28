@@ -249,9 +249,10 @@ function M.setup(options)
   vim.api.nvim_create_user_command("XcodebuildTest", call(actions.run_tests), { nargs = 0 })
   vim.api.nvim_create_user_command("XcodebuildTestTarget", call(actions.run_target_tests), { nargs = 0 })
   vim.api.nvim_create_user_command("XcodebuildTestClass", call(actions.run_class_tests), { nargs = 0 })
-  vim.api.nvim_create_user_command("XcodebuildTestFunc", call(actions.run_func_test), { nargs = 0 })
+  vim.api.nvim_create_user_command("XcodebuildTestNearest", call(actions.run_nearest_test), { nargs = 0 })
   vim.api.nvim_create_user_command("XcodebuildTestSelected", call(actions.run_selected_tests), { nargs = 0 })
-  vim.api.nvim_create_user_command("XcodebuildTestFailing", call(actions.run_failing_tests), { nargs = 0 })
+  vim.api.nvim_create_user_command("XcodebuildTestFailing", call(actions.rerun_failed_tests), { nargs = 0 })
+  vim.api.nvim_create_user_command("XcodebuildTestRepeat", call(actions.repeat_last_test_run), { nargs = 0 })
   vim.api.nvim_create_user_command("XcodebuildFailingSnapshots", call(actions.show_failing_snapshot_tests), { nargs = 0 })
 
   -- Coverage
@@ -303,7 +304,9 @@ function M.setup(options)
   vim.api.nvim_create_user_command("XcodebuildCodeActions", call(actions.show_code_actions), { nargs = 0 })
 
   -- Backward compatibility
-  vim.api.nvim_create_user_command("XcodebuildUninstall", call(actions.uninstall), { nargs = 0 })
+  vim.api.nvim_create_user_command("XcodebuildTestFunc", function()
+    print("xcodebuild.nvim: Use `XcodebuildTestNearest` instead of `XcodebuildTestFunc`")
+  end, { nargs = 0 })
 end
 
 return M

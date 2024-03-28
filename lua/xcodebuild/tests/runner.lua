@@ -28,6 +28,9 @@ local snapshots = require("xcodebuild.tests.snapshots")
 local M = {}
 local CANCELLED_CODE = 143
 
+---@type string[]|nil test ids
+local last_test_run
+
 ---Validates if test plan is set in the project configuration.
 ---Send an error notification if not found.
 ---@return boolean
@@ -128,6 +131,7 @@ function M.run_tests(testsToRun, opts)
     return
   end
 
+  last_test_run = testsToRun
   notifications.send_tests_started()
   helpers.clear_state()
   diagnostics.clear_marks()
@@ -234,6 +238,7 @@ end
 ---@field currentTest boolean|nil
 ---@field selectedTests boolean|nil
 ---@field failingTests boolean|nil
+---@field skipEnumeration boolean|nil
 
 ---Runs only selected tests based on {opts}.
 ---If target is not found for the current buffer,
@@ -294,7 +299,7 @@ function M.run_selected_tests(opts)
     end
 
     if next(testsToRun) then
-      M.run_tests(testsToRun)
+      M.run_tests(testsToRun, { skipEnumeration = opts.skipEnumeration })
     else
       notifications.send_error("Tests not found")
     end
@@ -313,6 +318,13 @@ function M.run_selected_tests(opts)
   else
     start()
   end
+end
+
+---Repeats the last test run.
+---It skips loading tests if they are already loaded.
+function M.repeat_last_test_run()
+  local skipEnumeration = util.is_not_empty(testExplorer.report)
+  M.run_tests(last_test_run, { skipEnumeration = skipEnumeration })
 end
 
 ---Shows a picker with failing snapshot tests.

@@ -46,9 +46,10 @@
 --- | `XcodebuildTest`             | Run tests (whole test plan)               |
 --- | `XcodebuildTestTarget`       | Run test target (where the cursor is)     |
 --- | `XcodebuildTestClass`        | Run test class (where the cursor is)      |
---- | `XcodebuildTestFunc`         | Run test (where the cursor is)            |
+--- | `XcodebuildTestNearest`      | Run test (where the cursor is)            |
 --- | `XcodebuildTestSelected`     | Run selected tests (using visual mode)    |
 --- | `XcodebuildTestFailing`      | Rerun previously failed tests             |
+--- | `XcodebuildTestRepeat`       | Repeat the last test run                  |
 --- | `XcodebuildFailingSnapshots` | Show a picker with failing snapshot tests |
 ---
 ---Code Coverage
