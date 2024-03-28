@@ -354,7 +354,8 @@ Sample key bindings for the plugin.
 
     vim.keymap.set("n", "<leader>xt", "<cmd>XcodebuildTest<cr>", { desc = "Run Tests" })
     vim.keymap.set("v", "<leader>xt", "<cmd>XcodebuildTestSelected<cr>", { desc = "Run Selected Tests" })
-    vim.keymap.set("n", "<leader>xT", "<cmd>XcodebuildTestClass<cr>", { desc = "Run This Test Class" })
+    vim.keymap.set("n", "<leader>xT", "<cmd>XcodebuildTestClass<cr>", { desc = "Run Current Test Class" })
+    vim.keymap.set("n", "<leader>x.", "<cmd>XcodebuildTestRepeat<cr>", { desc = "Repeat Last Test Run" })
 
     vim.keymap.set("n", "<leader>xl", "<cmd>XcodebuildToggleLogs<cr>", { desc = "Toggle Xcodebuild Logs" })
     vim.keymap.set("n", "<leader>xc", "<cmd>XcodebuildToggleCodeCoverage<cr>", { desc = "Toggle Code Coverage" })
@@ -438,9 +439,10 @@ Testing
  | `XcodebuildTest`             | Run tests (whole test plan)               |
  | `XcodebuildTestTarget`       | Run test target (where the cursor is)     |
  | `XcodebuildTestClass`        | Run test class (where the cursor is)      |
- | `XcodebuildTestFunc`         | Run test (where the cursor is)            |
+ | `XcodebuildTestNearest`      | Run test (where the cursor is)            |
  | `XcodebuildTestSelected`     | Run selected tests (using visual mode)    |
  | `XcodebuildTestFailing`      | Rerun previously failed tests             |
+ | `XcodebuildTestRepeat`       | Repeat the last test run                  |
  | `XcodebuildFailingSnapshots` | Show a picker with failing snapshot tests |
 
 Code Coverage
@@ -660,19 +662,24 @@ M.run_target_tests()                       *xcodebuild.actions.run_target_tests*
 
 
 M.run_class_tests()                         *xcodebuild.actions.run_class_tests*
-  Starts tests of the current class.
+  Starts tests from the class under the cursor.
 
 
-M.run_func_test()                             *xcodebuild.actions.run_func_test*
-  Starts test in the current function.
+M.run_nearest_test()                       *xcodebuild.actions.run_nearest_test*
+  Starts the nearest test to the cursor.
+  It searches for the test declaration going up.
 
 
 M.run_selected_tests()                   *xcodebuild.actions.run_selected_tests*
   Starts selected tests.
 
 
-M.run_failing_tests()                     *xcodebuild.actions.run_failing_tests*
+M.rerun_failed_tests()                   *xcodebuild.actions.rerun_failed_tests*
   Starts tests that failed previously.
+
+
+M.repeat_last_test_run()               *xcodebuild.actions.repeat_last_test_run*
+  Repeats the last test run.
 
 
                                 *xcodebuild.actions.show_failing_snapshot_tests*
@@ -851,6 +858,14 @@ M.quickfix_line()                             *xcodebuild.actions.quickfix_line*
 
 M.show_code_actions()                     *xcodebuild.actions.show_code_actions*
   Shows the code actions for the current line.
+
+
+M.run_func_test()                             *xcodebuild.actions.run_func_test*
+  @deprecated use `run_nearest_test` instead
+
+
+M.run_failing_tests()                     *xcodebuild.actions.run_failing_tests*
+  @deprecated use `rerun_failed_tests` instead
 
 
 ==============================================================================
@@ -2870,12 +2885,13 @@ M.run_tests({testsToRun}, {opts})            *xcodebuild.tests.runner.run_tests*
 TestRunnerOptions
 
   Fields: ~
-    {doNotBuild}     (boolean|nil)
-    {currentTarget}  (boolean|nil)
-    {currentClass}   (boolean|nil)
-    {currentTest}    (boolean|nil)
-    {selectedTests}  (boolean|nil)
-    {failingTests}   (boolean|nil)
+    {doNotBuild}       (boolean|nil)
+    {currentTarget}    (boolean|nil)
+    {currentClass}     (boolean|nil)
+    {currentTest}      (boolean|nil)
+    {selectedTests}    (boolean|nil)
+    {failingTests}     (boolean|nil)
+    {skipEnumeration}  (boolean|nil)
 
 
                                     *xcodebuild.tests.runner.run_selected_tests*
@@ -2886,6 +2902,12 @@ M.run_selected_tests({opts})
 
   Parameters: ~
     {opts}  (TestRunnerOptions)
+
+
+                                  *xcodebuild.tests.runner.repeat_last_test_run*
+M.repeat_last_test_run()
+  Repeats the last test run.
+  It skips loading tests if they are already loaded.
 
 
                            *xcodebuild.tests.runner.show_failing_snapshot_tests*

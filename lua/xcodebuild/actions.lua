@@ -134,14 +134,15 @@ function M.run_target_tests()
   testRunner.run_selected_tests({ currentTarget = true })
 end
 
----Starts tests of the current class.
+---Starts tests from the class under the cursor.
 function M.run_class_tests()
   helpers.cancel_actions()
   testRunner.run_selected_tests({ currentClass = true })
 end
 
----Starts test in the current function.
-function M.run_func_test()
+---Starts the nearest test to the cursor.
+---It searches for the test declaration going up.
+function M.run_nearest_test()
   helpers.cancel_actions()
   testRunner.run_selected_tests({ currentTest = true })
 end
@@ -153,9 +154,15 @@ function M.run_selected_tests()
 end
 
 ---Starts tests that failed previously.
-function M.run_failing_tests()
+function M.rerun_failed_tests()
   helpers.cancel_actions()
-  testRunner.run_selected_tests({ failingTests = true })
+  testRunner.run_selected_tests({ failingTests = true, skipEnumeration = true })
+end
+
+---Repeats the last test run.
+function M.repeat_last_test_run()
+  helpers.cancel_actions()
+  testRunner.repeat_last_test_run()
 end
 
 ---Shows a pickers with failing snapshot tests.
@@ -375,6 +382,16 @@ end
 ---Shows the code actions for the current line.
 function M.show_code_actions()
   lsp.code_actions()
+end
+
+---@deprecated use `run_nearest_test` instead
+function M.run_func_test()
+  M.run_nearest_test()
+end
+
+---@deprecated use `rerun_failed_tests` instead
+function M.run_failing_tests()
+  M.rerun_failed_tests()
 end
 
 return M

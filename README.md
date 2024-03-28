@@ -212,9 +212,10 @@ Xcodebuild.nvim comes with the following commands:
 | `XcodebuildTest`             | Run tests (whole test plan)               |
 | `XcodebuildTestTarget`       | Run test target (where the cursor is)     |
 | `XcodebuildTestClass`        | Run test class (where the cursor is)      |
-| `XcodebuildTestFunc`         | Run test (where the cursor is)            |
+| `XcodebuildTestNearest`      | Run test (where the cursor is)            |
 | `XcodebuildTestSelected`     | Run selected tests (using visual mode)    |
 | `XcodebuildTestFailing`      | Rerun previously failed tests             |
+| `XcodebuildTestRepeat`       | Repeat the last test run                  |
 | `XcodebuildFailingSnapshots` | Show a picker with failing snapshot tests |
 
 ### Code Coverage
@@ -262,7 +263,8 @@ vim.keymap.set("n", "<leader>xr", "<cmd>XcodebuildBuildRun<cr>", { desc = "Build
 
 vim.keymap.set("n", "<leader>xt", "<cmd>XcodebuildTest<cr>", { desc = "Run Tests" })
 vim.keymap.set("v", "<leader>xt", "<cmd>XcodebuildTestSelected<cr>", { desc = "Run Selected Tests" })
-vim.keymap.set("n", "<leader>xT", "<cmd>XcodebuildTestClass<cr>", { desc = "Run This Test Class" })
+vim.keymap.set("n", "<leader>xT", "<cmd>XcodebuildTestClass<cr>", { desc = "Run Current Test Class" })
+vim.keymap.set("n", "<leader>x.", "<cmd>XcodebuildTestRepeat<cr>", { desc = "Repeat Last Test Run" })
 
 vim.keymap.set("n", "<leader>xl", "<cmd>XcodebuildToggleLogs<cr>", { desc = "Toggle Xcodebuild Logs" })
 vim.keymap.set("n", "<leader>xc", "<cmd>XcodebuildToggleCodeCoverage<cr>", { desc = "Toggle Code Coverage" })
