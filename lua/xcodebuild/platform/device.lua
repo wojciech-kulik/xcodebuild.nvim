@@ -69,7 +69,7 @@ function M.kill_app(callback)
 
   local settings = projectConfig.settings
 
-  if deviceProxy.is_installed() and settings.platform == constants.Platform.IOS_PHYSICAL_DEVICE then
+  if deviceProxy.is_installed() and constants.is_device(settings.platform) then
     M.currentJobId = deviceProxy.kill_app(settings.productName, callback)
   else
     M.currentJobId = xcode.kill_app(settings.productName, callback)
@@ -112,7 +112,7 @@ function M.boot_simulator(callback)
     return
   end
 
-  if projectConfig.settings.platform == constants.Platform.IOS_PHYSICAL_DEVICE then
+  if constants.is_device(projectConfig.settings.platform) then
     notifications.send_error("Selected device cannot be booted. Please select a simulator.")
     return
   end

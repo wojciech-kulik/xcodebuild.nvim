@@ -2,9 +2,9 @@
 
 ---@mod xcodebuild Introduction
 ---@brief [[
----Xcodebuild.nvim is a plugin designed to let you migrate your iOS, iPadOS,
----and macOS app development to Neovim. It provides all essential actions
----for development, including building, launching, and testing.
+---Xcodebuild.nvim is a plugin designed to let you migrate your app
+---app development from Xcode to Neovim. It provides all essential actions
+---for development including building, debugging, and testing.
 ---
 ---Make sure to check out Tips & Tricks to improve your development in Neovim:
 ---https://github.com/wojciech-kulik/xcodebuild.nvim/discussions/categories/tips-tricks

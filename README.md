@@ -1,7 +1,7 @@
 # 🛠️ xcodebuild.nvim
 
-A plugin designed to let you migrate your iOS, iPadOS, and macOS app development to Neovim.
-It provides all essential actions for development, including building, launching, and testing.
+A plugin designed to let you migrate your app development from Xcode to Neovim.
+It provides all essential actions for development including building, debugging, and testing.
 
 <img src="./media/testing.png" style="border-radius: 8px;" alt="xcodebuild.nvim - unit tests" />
 &nbsp;
@@ -11,7 +11,7 @@ It provides all essential actions for development, including building, launching
 
 ## ✨ Features
 
-- [x] Support for iOS, iPadOS, and macOS apps built using Swift.
+- [x] Support for iOS, iPadOS, watchOS, tvOS, visionOS, and macOS.
 - [x] Project-based configuration.
 - [x] Project Manager to deal with project files without using Xcode.
 - [x] Test Explorer to visually present a tree with all tests and results.
@@ -68,7 +68,7 @@ https://github.com/wojciech-kulik/xcodebuild.nvim/assets/3128467/ed7d2d2e-eaa4-4
 - [Ruby] to use [Xcodeproj] gem.
 - [pymobiledevice3] to debug on physical devices and/or run apps on devices below iOS 17.
 - [xcode-build-server] to make LSP work properly with xcodeproj/xcworkspace.
-- [codelldb] to debug iOS and macOS Swift apps.
+- [codelldb] to debug applications.
 - [Xcode] to build, run, and test apps. Make sure that `xcodebuild` and `xcrun simctl` work correctly.
   Tested with Xcode 15.
 
@@ -135,7 +135,7 @@ make install
 > [!TIP]
 > Make sure to check out [Tips & Tricks][tips-and-tricks]!
 >
-> You will find there a collection of useful tips & tricks for iOS/macOS development in Neovim.
+> You will find there a collection of useful tips & tricks for development in Neovim.
 
 &nbsp;
 
@@ -548,8 +548,8 @@ Below you can find a list of all available auto commands.
 
 ### 📦 Swift Packages Development
 
-This plugin supports only iOS and macOS applications. However, if you develop Swift Package for one of
-those platforms, you can easily use this plugin by creating a sample iOS/macOS project in your root
+This plugin supports only applications. However, if you develop Swift Package for one of
+supported platforms, you can easily use this plugin by creating a sample iOS/macOS project in your root
 directory and by adding your package as a dependency.
 
 &nbsp;
@@ -680,11 +680,20 @@ local function xcodebuild_device()
     return " macOS"
   end
 
-  if vim.g.xcodebuild_os then
-    return " " .. vim.g.xcodebuild_device_name .. " (" .. vim.g.xcodebuild_os .. ")"
+  local deviceIcon = ""
+  if vim.g.xcodebuild_platform:match("watch") then
+    deviceIcon = "􀟤"
+  elseif vim.g.xcodebuild_platform:match("tv") then
+    deviceIcon = "􀡴 "
+  elseif vim.g.xcodebuild_platform:match("vision") then
+    deviceIcon = "􁎖 "
   end
 
-  return " " .. vim.g.xcodebuild_device_name
+  if vim.g.xcodebuild_os then
+    return deviceIcon .. " " .. vim.g.xcodebuild_device_name .. " (" .. vim.g.xcodebuild_os .. ")"
+  end
+
+  return deviceIcon .. " " .. vim.g.xcodebuild_device_name
 end
 
 ------
@@ -702,7 +711,7 @@ Global variables that you can use:
 | ------------------------------ | -------------------------------------------------- |
 | `vim.g.xcodebuild_device_name` | Device name (ex. iPhone 15 Pro)                    |
 | `vim.g.xcodebuild_os`          | OS version (ex. 16.4)                              |
-| `vim.g.xcodebuild_platform`    | Device platform (macOS or iPhone Simulator)        |
+| `vim.g.xcodebuild_platform`    | Device platform (ex. iPhone Simulator)             |
 | `vim.g.xcodebuild_scheme`      | Selected project scheme (ex. MyApp)                |
 | `vim.g.xcodebuild_test_plan`   | Selected Test Plan (ex. MyAppTests)                |
 | `vim.g.xcodebuild_last_status` | Last build/test status (ex. Build Succeeded [15s]) |
@@ -813,7 +822,7 @@ In case of any issues with, you can try manually providing the configuration fil
 }
 ```
 
-- `platform` - `macOS` or `iOS Simulator`
+- `platform` - check out `lua/xcodebuild/core/constants.lua` for available platforms
 - `destination` - simulator ID
 - `projectFile` / `projectCommand` - can be `xcodeproj` or `xcworkspace`, the main project file that you use
 

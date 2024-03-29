@@ -244,7 +244,7 @@ function M.should_use()
   end
 
   local majorVersion = helpers.get_major_os_version()
-  if settings.platform == constants.Platform.IOS_PHYSICAL_DEVICE and majorVersion and majorVersion < 17 then
+  if settings.platform == constants.Platform.IOS_DEVICE and majorVersion and majorVersion < 17 then
     return true
   else
     return false
@@ -325,7 +325,7 @@ function M.get_connected_devices(callback)
             id = device.Identifier,
             name = device.DeviceName,
             os = device.ProductVersion,
-            platform = constants.Platform.IOS_PHYSICAL_DEVICE,
+            platform = constants.Platform.IOS_DEVICE,
           })
         end
       end
