@@ -395,12 +395,7 @@ end
 ---@param callback fun(settings: XcodeBuildSettings)
 ---@return number|nil # job id
 function M.get_build_settings(platform, projectCommand, scheme, xcodeprojPath, callback)
-  local sdk = "iphonesimulator"
-  if platform == constants.Platform.MACOS then
-    sdk = "macosx"
-  elseif platform == constants.Platform.IOS_PHYSICAL_DEVICE then
-    sdk = "iphoneos"
-  end
+  local sdk = constants.get_sdk(platform)
 
   local jobid
   jobid = M.find_schemes(xcodeprojPath, function(schemes)
@@ -489,10 +484,10 @@ end
 ---@param callback function|nil
 ---@return number # job id
 function M.install_app(platform, destination, appPath, callback)
-  if platform == constants.Platform.IOS_PHYSICAL_DEVICE then
-    return M.install_app_on_device(destination, appPath, callback)
-  else
+  if constants.is_simulator(platform) then
     return M.install_app_on_simulator(destination, appPath, callback)
+  else
+    return M.install_app_on_device(destination, appPath, callback)
   end
 end
 
@@ -608,10 +603,10 @@ end
 ---@param callback function|nil
 ---@return number|nil # job id
 function M.launch_app(platform, destination, bundleId, waitForDebugger, callback)
-  if platform == constants.Platform.IOS_PHYSICAL_DEVICE then
-    return M.launch_app_on_device(destination, bundleId, callback)
-  else
+  if constants.is_simulator(platform) then
     return M.launch_app_on_simulator(destination, bundleId, waitForDebugger, callback)
+  else
+    return M.launch_app_on_device(destination, bundleId, callback)
   end
 end
 
@@ -678,10 +673,10 @@ end
 ---@param callback function|nil
 ---@return number # job id
 function M.uninstall_app(platform, destination, bundleId, callback)
-  if platform == constants.Platform.IOS_PHYSICAL_DEVICE then
-    return M.uninstall_app_from_device(destination, bundleId, callback)
-  else
+  if constants.is_simulator(platform) then
     return M.uninstall_app_from_simulator(destination, bundleId, callback)
+  else
+    return M.uninstall_app_from_device(destination, bundleId, callback)
   end
 end
 

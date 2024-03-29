@@ -382,14 +382,13 @@ function M.select_destination(callback, opts)
 
   local refreshDevices = function(connectedDevices)
     currentJobId = xcode.get_destinations(projectCommand, scheme, function(destinations)
-      -- Don't show connected devices if the project is not configured for mobile devices
-      local isForMobileDevices = vim.tbl_contains(destinations, function(destination)
-        return destination.platform == constants.Platform.IOS_SIMULATOR
-          or destination.platform == constants.Platform.IOS_PHYSICAL_DEVICE
-      end, { predicate = true })
+      local availablePlatforms = {}
+      for _, destination in ipairs(destinations) do
+        availablePlatforms[destination.platform] = true
+      end
 
-      if isForMobileDevices then
-        for _, device in ipairs(connectedDevices) do
+      for _, device in ipairs(connectedDevices) do
+        if availablePlatforms[device.platform] then
           table.insert(destinations, 1, device)
         end
       end
@@ -407,12 +406,14 @@ function M.select_destination(callback, opts)
 
       local destinationNames = util.select(filtered, function(table)
         local name = table.name or ""
+        local isDevice = constants.is_device(table.platform)
+        local isSimulator = constants.is_simulator(table.platform)
 
-        if table.platform and table.platform == constants.Platform.IOS_PHYSICAL_DEVICE then
+        if table.platform and isDevice then
           return util.trim(name) .. (table.os and " (" .. table.os .. ")" or "")
         end
 
-        if table.platform and table.platform ~= constants.Platform.IOS_SIMULATOR then
+        if table.platform and not isSimulator then
           name = util.trim(name .. " " .. table.platform)
         end
         if table.platform == constants.Platform.MACOS and table.arch then

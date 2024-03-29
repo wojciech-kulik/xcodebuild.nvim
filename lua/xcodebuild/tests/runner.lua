@@ -155,6 +155,11 @@ function M.run_tests(testsToRun, opts)
       notifications.send_progress("Gathering coverage...")
       local coverage = require("xcodebuild.code_coverage.coverage")
 
+      if not appdata.report.xcresultFilepath then
+        notifications.send_warning("Could not find xcresult file. Code coverage won't be displayed.")
+        return
+      end
+
       coverage.export_coverage(appdata.report.xcresultFilepath, function()
         coverage.refresh_all_buffers()
         process_snapshots()

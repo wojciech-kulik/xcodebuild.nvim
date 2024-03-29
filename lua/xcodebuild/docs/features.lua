@@ -1,6 +1,6 @@
 ---@mod xcodebuild.features Features
 ---@brief [[
---- - Support for iOS, iPadOS, and macOS apps built using Swift.
+--- - Support for iOS, iPadOS, watchOS, tvOS, visionOS, and macOS.
 --- - Project-based configuration.
 --- - Project Manager to deal with project files without using Xcode.
 --- - Test Explorer to visually present a tree with all tests and results.

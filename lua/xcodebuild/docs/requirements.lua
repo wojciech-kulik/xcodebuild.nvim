@@ -16,7 +16,7 @@
 --- - `Ruby` to use `Xcodeproj` gem.
 --- - `pymobiledevice3` to debug on physical devices and/or run apps on devices below iOS 17.
 --- - `xcode-build-server` to make LSP work properly with xcodeproj/xcworkspace.
---- - `codelldb` to debug iOS and macOS Swift apps.
+--- - `codelldb` to debug applications.
 --- - `Xcode` to build, run, and test apps. Make sure that `xcodebuild` and `xcrun simctl` work correctly. Tested with Xcode 15.
 ---
 ---Installation

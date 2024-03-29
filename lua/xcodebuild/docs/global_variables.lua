@@ -10,7 +10,7 @@
 --- | ---------------------------- | -------------------------------------------------- |
 --- | `vim.g.xcodebuild_device_name` | Device name (ex. iPhone 15 Pro)                    |
 --- | `vim.g.xcodebuild_os`          | OS version (ex. 16.4)                              |
---- | `vim.g.xcodebuild_platform`    | Device platform (macOS or iPhone Simulator)        |
+--- | `vim.g.xcodebuild_platform`    | Device platform (ex. iPhone Simulator)             |
 --- | `vim.g.xcodebuild_scheme`      | Selected project scheme (ex. MyApp)                |
 --- | `vim.g.xcodebuild_test_plan`   | Selected Test Plan (ex. MyAppTests)                |
 --- | `vim.g.xcodebuild_last_status` | Last build/test status (ex. Build Succeeded [15s]) |
@@ -23,11 +23,20 @@
 ---        return " macOS"
 ---      end
 ---
----      if vim.g.xcodebuild_os then
----        return " " .. vim.g.xcodebuild_device_name .. " (" .. vim.g.xcodebuild_os .. ")"
+---      local deviceIcon = ""
+---      if vim.g.xcodebuild_platform:match("watch") then
+---        deviceIcon = "􀟤"
+---      elseif vim.g.xcodebuild_platform:match("tv") then
+---        deviceIcon = "􀡴 "
+---      elseif vim.g.xcodebuild_platform:match("vision") then
+---        deviceIcon = "􁎖 "
 ---      end
 ---
----      return " " .. vim.g.xcodebuild_device_name
+---      if vim.g.xcodebuild_os then
+---        return deviceIcon .. " " .. vim.g.xcodebuild_device_name .. " (" .. vim.g.xcodebuild_os .. ")"
+---      end
+---
+---      return deviceIcon .. " " .. vim.g.xcodebuild_device_name
 ---    end
 ---
 ---    ------

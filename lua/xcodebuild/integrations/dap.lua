@@ -92,7 +92,7 @@ end
 ---Builds, installs and runs the project. Also, it starts the debugger.
 ---@param callback function|nil
 function M.build_and_debug(callback)
-  local loadedDap, dap = pcall(require, "dap")
+  local loadedDap, _ = pcall(require, "dap")
   if not loadedDap then
     notifications.send_error("Could not load nvim-dap plugin")
     return
@@ -102,16 +102,12 @@ function M.build_and_debug(callback)
     return
   end
 
-  local isDevice = projectConfig.settings.platform == constants.Platform.IOS_PHYSICAL_DEVICE
   local isMacOS = projectConfig.settings.platform == constants.Platform.MACOS
-  local isSimulator = projectConfig.settings.platform == constants.Platform.IOS_SIMULATOR
+  local isSimulator = constants.is_simulator(projectConfig.settings.platform)
+  local isDevice = constants.is_device(projectConfig.settings.platform)
 
   if isSimulator or isMacOS then
     device.kill_app()
-  end
-
-  if isSimulator then
-    start_dap()
   end
 
   local projectBuilder = require("xcodebuild.project.builder")
@@ -119,14 +115,6 @@ function M.build_and_debug(callback)
   projectBuilder.build_project({}, function(report)
     local success = util.is_empty(report.buildErrors)
     if not success then
-      if dap.session() then
-        dap.terminate()
-      end
-
-      local loadedDapui, dapui = pcall(require, "dapui")
-      if loadedDapui then
-        dapui.close()
-      end
       return
     end
 
@@ -136,7 +124,10 @@ function M.build_and_debug(callback)
         remoteDebugger.start_remote_debugger(callback)
       end)
     else
-      device.run_app(isMacOS, callback)
+      if isSimulator then
+        start_dap()
+      end
+      device.run_app(true, callback)
     end
   end)
 end
@@ -149,8 +140,8 @@ function M.debug_without_build(callback)
     return
   end
 
-  local isDevice = projectConfig.settings.platform == constants.Platform.IOS_PHYSICAL_DEVICE
-  local isSimulator = projectConfig.settings.platform == constants.Platform.IOS_SIMULATOR
+  local isSimulator = constants.is_simulator(projectConfig.settings.platform)
+  local isDevice = constants.is_device(projectConfig.settings.platform)
 
   if isDevice then
     device.install_app(function()
@@ -182,7 +173,7 @@ function M.attach_debugger_for_tests()
     return
   end
 
-  if projectConfig.settings.platform == constants.Platform.IOS_PHYSICAL_DEVICE then
+  if constants.is_device(projectConfig.settings.platform) then
     notifications.send_error(
       "Debugging tests on physical devices is not supported. Please use the simulator."
     )
