@@ -243,8 +243,10 @@ end
 ---@param callback fun(schemes: XcodeScheme[])
 ---@return number|nil # job id
 function M.find_schemes(xcodeprojPath, callback)
-  local schemes = util.shell("find '" .. xcodeprojPath .. "' -name '*.xcscheme' -type file 2>/dev/null")
+  -- TODO: investigate how to detect schemes efficiently
 
+  -- local schemes = util.shell("find '" .. xcodeprojPath .. "' -name '*.xcscheme' -type file 2>/dev/null")
+  --
   ---@type XcodeScheme[]
   local result = {}
   local function returnResult()
@@ -254,26 +256,26 @@ function M.find_schemes(xcodeprojPath, callback)
 
     util.call(callback, result)
   end
-
-  for _, scheme in ipairs(schemes) do
-    local path = vim.trim(scheme)
-    local filename = util.get_filename(path)
-    if path and filename and path ~= "" and filename ~= "" then
-      table.insert(result, { name = filename, filepath = path })
+  --
+  -- for _, scheme in ipairs(schemes) do
+  --   local path = vim.trim(scheme)
+  --   local filename = util.get_filename(path)
+  --   if path and filename and path ~= "" and filename ~= "" then
+  --     table.insert(result, { name = filename, filepath = path })
+  --   end
+  -- end
+  --
+  -- if #result == 0 then
+  return M.get_project_information(xcodeprojPath, function(settings)
+    for _, scheme in ipairs(settings.schemes) do
+      table.insert(result, { name = scheme })
     end
-  end
 
-  if #result == 0 then
-    return M.get_project_information(xcodeprojPath, function(settings)
-      for _, scheme in ipairs(settings.schemes) do
-        table.insert(result, { name = scheme })
-      end
-
-      returnResult()
-    end)
-  else
     returnResult()
-  end
+  end)
+  -- else
+  --   returnResult()
+  -- end
 end
 
 ---Returns the list of project information including schemes, configs, and
