@@ -89,6 +89,18 @@ local function start_dap()
   dap.run(dap.configurations.swift[1])
 end
 
+---Stops the current `nvim-dap` session.
+local function stop_session()
+  local loadedDap, dap = pcall(require, "dap")
+  if not loadedDap then
+    return
+  end
+
+  if dap.session() then
+    dap.terminate()
+  end
+end
+
 ---Builds, installs and runs the project. Also, it starts the debugger.
 ---@param callback function|nil
 function M.build_and_debug(callback)
@@ -101,6 +113,8 @@ function M.build_and_debug(callback)
   if not validate_project() then
     return
   end
+
+  stop_session()
 
   local isMacOS = projectConfig.settings.platform == constants.Platform.MACOS
   local isSimulator = constants.is_simulator(projectConfig.settings.platform)
@@ -139,6 +153,8 @@ function M.debug_without_build(callback)
   if not validate_project() then
     return
   end
+
+  stop_session()
 
   local isSimulator = constants.is_simulator(projectConfig.settings.platform)
   local isDevice = constants.is_device(projectConfig.settings.platform)

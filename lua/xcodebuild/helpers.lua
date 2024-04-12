@@ -26,6 +26,11 @@ end
 
 ---Cancels all running actions from all modules.
 function M.cancel_actions()
+  local success, dap = pcall(require, "dap")
+  if success and dap.session() then
+    dap.terminate()
+  end
+
   cancel(require("xcodebuild.platform.device"))
   cancel(require("xcodebuild.project.builder"))
   cancel(require("xcodebuild.tests.runner"))
