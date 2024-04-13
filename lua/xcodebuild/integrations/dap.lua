@@ -517,6 +517,18 @@ function M.terminate_session()
   end
 end
 
+---Returns a list of actions with names for the `nvim-dap` plugin.
+---@return table<{name:string,action:function}>
+function M.get_actions()
+  return {
+    { name = "Build & Debug", action = M.build_and_debug },
+    { name = "Debug Without Building", action = M.debug_without_build },
+    { name = "Debug Tests", action = M.debug_tests },
+    { name = "Debug Current Test Class", action = M.debug_class_tests },
+    { name = "Clear DAP Console", action = M.clear_console },
+  }
+end
+
 ---Sets up the adapter and configuration for the `nvim-dap` plugin.
 ---{codelldbPath} - path to the `codelldb` binary.
 ---

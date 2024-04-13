@@ -3393,6 +3393,11 @@ M.terminate_session()
   Terminates the debugger session, cancels the current action, and closes the `nvim-dap-ui`.
 
 
+M.get_actions()                        *xcodebuild.integrations.dap.get_actions*
+  Returns a list of actions with names for the `nvim-dap` plugin.
+  @return table<{name:string,action:function}>
+
+
                                              *xcodebuild.integrations.dap.setup*
 M.setup({codelldbPath}, {loadBreakpoints})
   Sets up the adapter and configuration for the `nvim-dap` plugin.
