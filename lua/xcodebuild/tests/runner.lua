@@ -136,6 +136,11 @@ function M.run_tests(testsToRun, opts)
   helpers.clear_state()
   diagnostics.clear_marks()
 
+  local logsParser = require("xcodebuild.xcode_logs.parser")
+  local quickfix = require("xcodebuild.core.quickfix")
+  local logsPanel = require("xcodebuild.xcode_logs.panel")
+  local coverage = require("xcodebuild.code_coverage.coverage")
+
   local show_finish = function()
     notifications.send_tests_finished(appdata.report, false)
   end
@@ -153,7 +158,6 @@ function M.run_tests(testsToRun, opts)
   local process_coverage = function()
     if config.code_coverage.enabled then
       notifications.send_progress("Gathering coverage...")
-      local coverage = require("xcodebuild.code_coverage.coverage")
 
       if not appdata.report.xcresultFilepath then
         notifications.send_warning("Could not find xcresult file. Code coverage won't be displayed.")
@@ -170,7 +174,6 @@ function M.run_tests(testsToRun, opts)
   end
 
   local on_stdout = function(_, output)
-    local logsParser = require("xcodebuild.xcode_logs.parser")
     appdata.report = logsParser.parse_logs(output)
     notifications.show_tests_progress(appdata.report)
 
@@ -190,15 +193,14 @@ function M.run_tests(testsToRun, opts)
         appdata.report.failedTestsCount,
         true
       )
+      logsParser.clear()
+      logsPanel.append_log_lines({ "", "Tests cancelled" }, false)
       return
     end
 
     if config.restore_on_start then
       appdata.write_report(appdata.report)
     end
-
-    local quickfix = require("xcodebuild.core.quickfix")
-    local logsPanel = require("xcodebuild.xcode_logs.panel")
 
     testSearch.load_targets_map()
     quickfix.set(appdata.report)
@@ -219,6 +221,7 @@ function M.run_tests(testsToRun, opts)
   -- Test Explorer also builds for testing
   M.show_test_explorer(function()
     testExplorer.start_tests(testsToRun)
+    logsParser.clear()
 
     M.currentJobId = xcode.run_tests({
       on_exit = on_exit,

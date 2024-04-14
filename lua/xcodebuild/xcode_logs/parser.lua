@@ -513,17 +513,34 @@ end
 ---@param logLines string[] Xcode log lines.
 ---@return ParsedReport
 function M.parse_logs(logLines)
+  local newLines = {}
+  local logsPanel = require("xcodebuild.xcode_logs.panel")
+  if not next(output) then
+    logsPanel.clear()
+  end
+
   for _, line in ipairs(logLines) do
     process_line(line)
   end
 
   if next(output) and next(logLines) then
     output[#output] = output[#output] .. logLines[1]
+    newLines = { output[#output] }
     table.remove(logLines, 1)
   end
 
   for _, line in ipairs(logLines) do
     table.insert(output, line)
+    table.insert(newLines, line)
+  end
+
+  -- skip the last line (it will be joined in the next iteration)
+  if next(newLines) then
+    table.remove(newLines, #newLines)
+  end
+
+  if require("xcodebuild.core.config").options.logs.live_logs then
+    logsPanel.append_log_lines(newLines)
   end
 
   ---@type ParsedReport
