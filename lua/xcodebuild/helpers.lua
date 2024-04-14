@@ -104,10 +104,12 @@ function M.update_readonly_buffer(bufnr, updateFoo)
     return
   end
 
+  vim.api.nvim_buf_set_option(bufnr, "readonly", false)
   vim.api.nvim_buf_set_option(bufnr, "modifiable", true)
   updateFoo()
   vim.api.nvim_buf_set_option(bufnr, "modifiable", false)
   vim.api.nvim_buf_set_option(bufnr, "modified", false)
+  vim.api.nvim_buf_set_option(bufnr, "readonly", true)
 end
 
 return M

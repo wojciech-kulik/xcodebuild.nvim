@@ -14,6 +14,7 @@ local appdata = require("xcodebuild.project.appdata")
 local config = require("xcodebuild.core.config").options.logs
 local testSearch = require("xcodebuild.tests.search")
 local events = require("xcodebuild.broadcasting.events")
+local helpers = require("xcodebuild.helpers")
 
 local M = {}
 
@@ -56,8 +57,14 @@ end
 local function format_logs(lines, callback)
   if config.only_summary then
     callback({})
-  elseif config.logs_formatter and string.len(config.logs_formatter) > 0 then
+  elseif config.logs_formatter and config.logs_formatter ~= "" then
     local logs_filepath = appdata.original_logs_filepath
+
+    if config.logs_formatter:find("xcbeautify") and vim.fn.executable("xcbeautify") == 0 then
+      callback(lines)
+      return
+    end
+
     local command = "cat '" .. logs_filepath .. "' | " .. config.logs_formatter
 
     vim.fn.jobstart(command, {
@@ -78,21 +85,14 @@ local function refresh_logs_content()
     return
   end
 
-  vim.api.nvim_buf_set_option(bufnr, "modifiable", true)
-  vim.api.nvim_buf_set_option(bufnr, "readonly", false)
+  vim.api.nvim_win_call(winnr, function()
+    vim.cmd("silent e!")
+    vim.cmd("normal! G")
+  end)
 
-  util.focus_buffer(bufnr)
-  vim.cmd("silent e!")
-
-  local linesNumber = #vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
-  vim.api.nvim_win_set_cursor(winnr, { linesNumber, 0 })
-
-  if not config.auto_focus then
-    vim.cmd("wincmd p")
+  if config.auto_focus then
+    util.focus_buffer(bufnr)
   end
-
-  vim.api.nvim_buf_set_option(bufnr, "modifiable", false)
-  vim.api.nvim_buf_set_option(bufnr, "readonly", true)
 end
 
 ---Inserts test results into the {prettyOutput}.
@@ -235,6 +235,53 @@ local function open_test_file(tests)
   end
 end
 
+---Clears the logs buffer.
+function M.clear()
+  local bufnr, _ = get_buf_and_win_of_logs()
+  if not bufnr then
+    return
+  end
+
+  helpers.update_readonly_buffer(bufnr, function()
+    vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, {})
+  end)
+end
+
+---Appends {lines} to the logs buffer.
+---@param lines string[]
+---@param format boolean|nil default = true
+function M.append_log_lines(lines, format)
+  local bufnr, winnr = get_buf_and_win_of_logs()
+  if not bufnr then
+    return
+  end
+
+  if format == nil then
+    format = true
+  end
+
+  if config.logs_formatter and config.logs_formatter ~= "" and format then
+    if config.logs_formatter:find("xcbeautify") then
+      if vim.fn.executable("xcbeautify") ~= 0 then
+        lines = vim.fn.systemlist(config.logs_formatter, table.concat(lines, "\n"))
+      end
+    else
+      lines = vim.fn.systemlist(config.logs_formatter, table.concat(lines, "\n"))
+    end
+  end
+
+  helpers.update_readonly_buffer(bufnr, function()
+    local currentBuf = vim.api.nvim_get_current_buf()
+    vim.api.nvim_buf_set_lines(bufnr, -1, -1, false, lines)
+
+    if bufnr ~= currentBuf and winnr then
+      vim.api.nvim_win_call(winnr, function()
+        vim.cmd("normal! G")
+      end)
+    end
+  end)
+end
+
 ---Processes {report} and shows logs in the panel.
 ---It also writes the logs to the file.
 ---{callback} is called after the processing is finished.
@@ -296,7 +343,7 @@ function M.open_logs(scrollToBottom)
     vim.api.nvim_win_set_cursor(0, { #lines, 0 })
   end
 
-  if not config.auto_focus then
+  if not config.auto_focus and winnr == vim.api.nvim_get_current_win() then
     vim.cmd("wincmd p")
   end
 end

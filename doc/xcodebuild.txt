@@ -104,6 +104,7 @@ M.setup({options})                                            *xcodebuild.setup*
         open_command = "silent botright 20split {path}", -- command used to open logs panel. You must use {path} variable to load the log file
         logs_formatter = "xcbeautify --disable-colored-output", -- command used to format logs, you can use "" to skip formatting
         only_summary = false, -- if true logs won't be displayed, just xcodebuild.nvim summary
+        live_logs = true, -- if true logs will be updated in real-time
         show_warnings = true, -- show warnings in logs summary
         notify = function(message, severity) -- function to show notifications from this module (like "Build Failed")
           vim.notify(message, severity)
@@ -1554,6 +1555,19 @@ This module contains the logs panel related functions.
 Key bindings:
  - Press `o` on a failed test in the summary section to jump to the failing location
  - Press `q` to close the panel
+
+
+M.clear()                                    *xcodebuild.xcode_logs.panel.clear*
+  Clears the logs buffer.
+
+
+                                  *xcodebuild.xcode_logs.panel.append_log_lines*
+M.append_log_lines({lines}, {format})
+  Appends {lines} to the logs buffer.
+
+  Parameters: ~
+    {lines}   (string[])
+    {format}  (boolean|nil) default = true
 
 
                                           *xcodebuild.xcode_logs.panel.set_logs*

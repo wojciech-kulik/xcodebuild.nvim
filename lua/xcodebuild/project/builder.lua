@@ -73,6 +73,8 @@ function M.build_project(opts, callback)
     if code == CANCELLED_CODE then
       notifications.send_build_finished(appdata.report, buildId, true)
       events.build_finished(opts.buildForTesting or false, false, true, {})
+      logsParser.clear()
+      logsPanel.append_log_lines({ "", "Build cancelled" }, false)
       return
     end
 
