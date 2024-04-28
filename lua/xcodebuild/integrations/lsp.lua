@@ -44,7 +44,12 @@ end
 
 ---Restarts the `sourcekit-lsp` client.
 function M.restart_sourcekit_lsp()
-  local client = vim.lsp.get_clients({ name = "sourcekit" })[1]
+  local client
+  if vim.fn.has("nvim-0.10") == 1 then
+    client = vim.lsp.get_clients({ name = "sourcekit" })[1]
+  else
+    client = vim.lsp.get_active_clients({ name = "sourcekit" })[1]
+  end
 
   ---@diagnostic disable-next-line: undefined-field
   local clientId = client and client.id
@@ -53,7 +58,14 @@ function M.restart_sourcekit_lsp()
     return
   end
 
-  vim.cmd("LspRestart " .. clientId)
+  if vim.fn.has("nvim-0.10") == 1 then
+    vim.cmd("LspStop " .. clientId)
+    vim.defer_fn(function()
+      vim.cmd("LspStart sourcekit")
+    end, 100)
+  else
+    vim.cmd("LspRestart " .. clientId)
+  end
 end
 
 return M
