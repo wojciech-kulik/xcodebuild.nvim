@@ -44,6 +44,11 @@ end
 
 ---Restarts the `sourcekit-lsp` client.
 function M.restart_sourcekit_lsp()
+  local success, _ = pcall(require, "lspconfig")
+  if not success then
+    return
+  end
+
   local client
   if vim.fn.has("nvim-0.10") == 1 then
     client = vim.lsp.get_clients({ name = "sourcekit" })[1]
@@ -58,14 +63,7 @@ function M.restart_sourcekit_lsp()
     return
   end
 
-  if vim.fn.has("nvim-0.10") == 1 then
-    vim.cmd("LspStop " .. clientId)
-    vim.defer_fn(function()
-      vim.cmd("LspStart sourcekit")
-    end, 100)
-  else
-    vim.cmd("LspRestart " .. clientId)
-  end
+  vim.cmd("LspRestart " .. clientId)
 end
 
 return M
