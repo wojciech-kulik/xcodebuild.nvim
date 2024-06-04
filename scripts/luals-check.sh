@@ -18,21 +18,26 @@ RC=$?
 echo "${OUT}" >&2
 
 if [ $RC -ne 0 ]; then
-	echo "failed with RC=$RC"
-	exit $RC
+  echo "failed with RC=$RC"
+  exit $RC
 fi
 
 # any output is a fail
 case "${OUT}" in
-	*Diagnosis\ complete*)
-		if [ -f "${DIR_OUT}/check.json" ]; then
-			cat "${DIR_OUT}/check.json"
-			exit 1
-		else
-			exit 0
-		fi
-		;;
-	*)
-		exit 1
-		;;
+  *Diagnosis\ complete*)
+    if [ -f "${DIR_OUT}/check.json" ]; then
+      json=$(cat "${DIR_OUT}/check.json")
+      if [ "$json" != "[]" ]; then
+        echo "${json}"
+        exit 1
+      else
+        exit 0
+      fi
+    else
+      exit 0
+    fi
+    ;;
+  *)
+    exit 1
+    ;;
 esac
