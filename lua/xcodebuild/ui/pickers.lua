@@ -282,7 +282,10 @@ function M.select_scheme(callback, opts)
     projectConfig.settings.scheme = scheme
     projectConfig.save_settings()
     update_xcode_build_server_config()
-    util.call(callback, scheme)
+
+    vim.defer_fn(function()
+      util.call(callback, scheme)
+    end, 100)
   end
 
   start_telescope_spinner()
