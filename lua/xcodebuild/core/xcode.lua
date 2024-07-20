@@ -578,6 +578,10 @@ function M.launch_app_on_simulator(destination, bundleId, waitForDebugger, callb
 
   util.call(callback)
 
+  if require("xcodebuild.core.config").options.commands.focus_simulator_on_app_launch then
+    util.shell("open -a Simulator")
+  end
+
   return vim.fn.jobstart(command, {
     stdout_buffered = false,
     stderr_buffered = false,
