@@ -129,6 +129,7 @@ python3 -m pip install -U pymobiledevice3
 To quickly install all required tools you can run:
 
 ```shell
+cd ~/.local/share/nvim/lazy/xcodebuild.nvim
 make install
 ```
 
