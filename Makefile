@@ -33,8 +33,8 @@ test:
 # Installs dependencies for plugin usage
 install:
 	brew update --quiet
-	brew install --quiet xcbeautify xcode-build-server
-	python3 -m pip install -U pymobiledevice3 --quiet
+	brew install --quiet xcbeautify xcode-build-server pipx
+	pipx install pymobiledevice3 --quiet
 	gem install --quiet xcodeproj
 
 # Installs dependencies for development
