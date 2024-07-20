@@ -122,8 +122,9 @@ Install external tools:
 brew install xcode-build-server
 brew install xcbeautify
 brew install ruby
+brew install pipx
 gem install xcodeproj
-python3 -m pip install -U pymobiledevice3
+pipx install pymobiledevice3
 ```
 
 To quickly install all required tools you can run:
