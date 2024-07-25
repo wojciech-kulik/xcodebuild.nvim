@@ -3855,6 +3855,28 @@ M.get_major_os_version()               *xcodebuild.helpers.get_major_os_version*
     (number|nil)
 
 
+                                             *xcodebuild.helpers.set_buf_option*
+M.set_buf_option({bufnr}, {name}, {value})
+  Wraps any nvim_buf_set_option() call to ensure forward compatibility.
+  The function is required because nvim_buf_set_option() was deprecated in nvim-0.10.
+
+  Parameters: ~
+    {bufnr}  (number)
+    {name}   (string)
+    {value}  (any)
+
+
+                                             *xcodebuild.helpers.set_win_option*
+M.set_win_option({winnr}, {name}, {value})
+  Wraps any nvim_win_set_option() call to ensure forward compatibility.
+  The function is required because nvim_win_set_option() was deprecated in nvim-0.10.
+
+  Parameters: ~
+    {winnr}  (number)
+    {name}   (string)
+    {value}  (any)
+
+
                                      *xcodebuild.helpers.update_readonly_buffer*
 M.update_readonly_buffer({bufnr}, {updateFoo})
   Enables `modifiable` and updates the buffer using {updateFoo}.
