@@ -379,16 +379,16 @@ function M.setup_buffer(bufnr)
     vim.api.nvim_win_set_option(win[1], "spell", false)
   end
 
-  helpers.nvim_buf_set_option(bufnr, "modifiable", true, false)
-  helpers.nvim_buf_set_option(bufnr, "readonly", false, false)
+  helpers.nvim_buf_set_option_fwd_comp(bufnr, "modifiable", true)
+  helpers.nvim_buf_set_option_fwd_comp(bufnr, "readonly", false)
 
-  helpers.nvim_buf_set_option(bufnr, "filetype", config.filetype, false)
-  helpers.nvim_buf_set_option(bufnr, "buflisted", false, false)
-  helpers.nvim_buf_set_option(bufnr, "fileencoding", "utf-8", false)
-  helpers.nvim_buf_set_option(bufnr, "modified", false, false)
+  helpers.nvim_buf_set_option_fwd_comp(bufnr, "filetype", config.filetype)
+  helpers.nvim_buf_set_option_fwd_comp(bufnr, "buflisted", false)
+  helpers.nvim_buf_set_option_fwd_comp(bufnr, "fileencoding", "utf-8")
+  helpers.nvim_buf_set_option_fwd_comp(bufnr, "modified", false)
 
-  helpers.nvim_buf_set_option(bufnr, "readonly", true, false)
-  helpers.nvim_buf_set_option(bufnr, "modifiable", false, false)
+  helpers.nvim_buf_set_option_fwd_comp(bufnr, "readonly", true)
+  helpers.nvim_buf_set_option_fwd_comp(bufnr, "modifiable", false)
 
   vim.api.nvim_buf_set_keymap(bufnr, "n", "q", "<cmd>close<cr>", {})
   vim.api.nvim_buf_set_keymap(bufnr, "n", "o", "", {

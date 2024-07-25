@@ -417,20 +417,20 @@ end
 ---Sets up the buffer for the test explorer.
 ---It also sets up the keymaps and the window options.
 local function setup_buffer()
-  helpers.nvim_buf_set_option_fwd_comp(M.bufnr, "modifiable", true, false)
+  helpers.nvim_buf_set_option_fwd_comp(M.bufnr, "modifiable", true)
 
-  helpers.nvim_win_set_option(0, "fillchars", "eob: ", true)
-  helpers.nvim_win_set_option(0, "wrap", false, true)
-  helpers.nvim_win_set_option(0, "number", false, true)
-  helpers.nvim_win_set_option(0, "relativenumber", false, true)
-  helpers.nvim_win_set_option(0, "scl", "no", true)
-  helpers.nvim_win_set_option(0, "spell", false, true)
+  helpers.nvim_win_set_option_fwd_comp(0, "fillchars", "eob: ")
+  helpers.nvim_win_set_option_fwd_comp(0, "wrap", false)
+  helpers.nvim_win_set_option_fwd_comp(0, "number", false)
+  helpers.nvim_win_set_option_fwd_comp(0, "relativenumber", false)
+  helpers.nvim_win_set_option_fwd_comp(0, "scl", "no")
+  helpers.nvim_win_set_option_fwd_comp(0, "spell", false)
 
-  helpers.nvim_buf_set_option(M.bufnr, "filetype", "TestExplorer", false)
-  helpers.nvim_buf_set_option(M.bufnr, "fileencoding", "utf-8", false)
-  helpers.nvim_buf_set_option(M.bufnr, "modified", false, false)
-  helpers.nvim_buf_set_option(M.bufnr, "readonly", false, false)
-  helpers.nvim_buf_set_option(M.bufnr, "modifiable", false, false)
+  helpers.nvim_buf_set_option_fwd_comp(M.bufnr, "filetype", "TestExplorer")
+  helpers.nvim_buf_set_option_fwd_comp(M.bufnr, "fileencoding", "utf-8")
+  helpers.nvim_buf_set_option_fwd_comp(M.bufnr, "modified", false)
+  helpers.nvim_buf_set_option_fwd_comp(M.bufnr, "readonly", false)
+  helpers.nvim_buf_set_option_fwd_comp(M.bufnr, "modifiable", false)
 
   vim.api.nvim_buf_set_keymap(M.bufnr, "n", "q", "<cmd>close<cr>", {})
   vim.api.nvim_buf_set_keymap(M.bufnr, "n", "t", "", { callback = M.run_selected_tests, nowait = true })

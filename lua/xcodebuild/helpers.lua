@@ -95,21 +95,29 @@ function M.get_major_os_version()
   return settings.os and tonumber(vim.split(settings.os, ".", { plain = true })[1]) or nil
 end
 
----Wraps any nvim_buf_set_option() call to ensure backward and forward compatibility.
----The function is required because nvim_buf_set_option was deprecated in nvim-0.10.
----@param bufOrWinID number
+---Wraps any nvim_buf_set_option() call to ensure forward compatibility.
+---The function is required because nvim_buf_set_option() was deprecated in nvim-0.10.
+---@param bufnr number
 ---@param name string
 ---@param value any
----@param win boolean
-function M.nvim_buf_or_win_set_option_fwd_comp(bufOrWinID, name, value, win)
+function M.nvim_buf_set_option_fwd_comp(bufnr, name, value)
   if vim.fn.has("nvim-0.10") == 1 then
-    if win then
-      vim.api.nvim_set_option_value(name, value, { win = bufOrWinID })
-    else
-      vim.api.nvim_set_option_value(name, value, { buf = bufOrWinID })
-    end
+    vim.api.nvim_set_option_value(name, value, { buf = bufnr })
   else
-    vim.api.nvim_buf_set_option(bufOrWinID, name, value)
+    vim.api.nvim_buf_set_option(bufnr, name, value)
+  end
+end
+
+---Wraps any nvim_win_set_option() call to ensure forward compatibility.
+---The function is required because nvim_win_set_option() was deprecated in nvim-0.10.
+---@param winID number
+---@param name string
+---@param value any
+function M.nvim_win_set_option_fwd_comp(winID, name, value)
+  if vim.fn.has("nvim-0.10") == 1 then
+    vim.api.nvim_set_option_value(name, value, { win = winID })
+  else
+    vim.api.nvim_win_set_option(winID, name, value)
   end
 end
 
@@ -122,12 +130,12 @@ function M.update_readonly_buffer(bufnr, updateFoo)
     return
   end
 
-  M.nvim_buf_or_win_set_option_fwd_comp(bufnr, "readonly", false, false)
-  M.nvim_buf_or_win_set_option_fwd_comp(bufnr, "modifiable", true, false)
+  M.nvim_buf_set_option_fwd_comp(bufnr, "readonly", false)
+  M.nvim_buf_set_option_fwd_comp(bufnr, "modifiable", true)
   updateFoo()
-  M.nvim_buf_or_win_set_option_fwd_comp(bufnr, "modifiable", false, false)
-  M.nvim_buf_or_win_set_option_fwd_comp(bufnr, "modified", false, false)
-  M.nvim_buf_or_win_set_option_fwd_comp(bufnr, "readonly", true, false)
+  M.nvim_buf_set_option_fwd_comp(bufnr, "modifiable", false)
+  M.nvim_buf_set_option_fwd_comp(bufnr, "modified", false)
+  M.nvim_buf_set_option_fwd_comp(bufnr, "readonly", true)
 end
 
 return M
