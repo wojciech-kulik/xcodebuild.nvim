@@ -375,8 +375,8 @@ function M.setup_buffer(bufnr)
   local win = vim.fn.win_findbuf(bufnr)
 
   if win and win[1] then
-    vim.api.nvim_win_set_option(win[1], "wrap", false)
-    vim.api.nvim_win_set_option(win[1], "spell", false)
+    helpers.win_set_option(win[1], "wrap", false)
+    helpers.win_set_option(win[1], "spell", false)
   end
 
   helpers.buf_set_option(bufnr, "modifiable", true)
