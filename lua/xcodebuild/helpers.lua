@@ -102,7 +102,7 @@ end
 ---@param value any
 ---@param win boolean
 function M.nvim_buf_or_win_set_option_fwd_comp(bufOrWinID, name, value, win)
-  if vim.fn.has("nvim-0.10") then
+  if vim.fn.has("nvim-0.10") == 1 then
     if win then
       vim.api.nvim_set_option_value(name, value, { win = bufOrWinID })
     else
