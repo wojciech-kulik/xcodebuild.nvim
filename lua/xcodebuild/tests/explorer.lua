@@ -417,20 +417,20 @@ end
 ---Sets up the buffer for the test explorer.
 ---It also sets up the keymaps and the window options.
 local function setup_buffer()
-  vim.api.nvim_buf_set_option(M.bufnr, "modifiable", true)
+  vim.api.nvim_set_option_value("modifiable", true, { buf = M.bufnr })
 
-  vim.api.nvim_win_set_option(0, "fillchars", "eob: ")
-  vim.api.nvim_win_set_option(0, "wrap", false)
-  vim.api.nvim_win_set_option(0, "number", false)
-  vim.api.nvim_win_set_option(0, "relativenumber", false)
-  vim.api.nvim_win_set_option(0, "scl", "no")
-  vim.api.nvim_win_set_option(0, "spell", false)
+  vim.api.nvim_set_option_value("fillchars", "eob: ", { buf = 0 })
+  vim.api.nvim_set_option_value("wrap", false, { buf = 0 })
+  vim.api.nvim_set_option_value("number", false, { buf = 0 })
+  vim.api.nvim_set_option_value("relativenumber", false, { buf = 0 })
+  vim.api.nvim_set_option_value("scl", "no", { buf = 0 })
+  vim.api.nvim_set_option_value("spell", false, { buf = 0 })
 
-  vim.api.nvim_buf_set_option(M.bufnr, "filetype", "TestExplorer")
-  vim.api.nvim_buf_set_option(M.bufnr, "fileencoding", "utf-8")
-  vim.api.nvim_buf_set_option(M.bufnr, "modified", false)
-  vim.api.nvim_buf_set_option(M.bufnr, "readonly", false)
-  vim.api.nvim_buf_set_option(M.bufnr, "modifiable", false)
+  vim.api.nvim_set_option_value("filetype", "TestExplorer", { buf = M.bufnr })
+  vim.api.nvim_set_option_value("fileencoding", "utf-8", { buf = M.bufnr })
+  vim.api.nvim_set_option_value("modified", false, { buf = M.bufnr })
+  vim.api.nvim_set_option_value("readonly", false, { buf = M.bufnr })
+  vim.api.nvim_set_option_value("modifiable", false, { buf = M.bufnr })
 
   vim.api.nvim_buf_set_keymap(M.bufnr, "n", "q", "<cmd>close<cr>", {})
   vim.api.nvim_buf_set_keymap(M.bufnr, "n", "t", "", { callback = M.run_selected_tests, nowait = true })
