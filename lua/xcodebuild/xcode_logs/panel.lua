@@ -379,16 +379,16 @@ function M.setup_buffer(bufnr)
     vim.api.nvim_win_set_option(win[1], "spell", false)
   end
 
-  vim.api.nvim_set_option_value("modifiable", true, { buf = bufnr })
-  vim.api.nvim_set_option_value("readonly", false, { buf = bufnr })
+  helpers.nvim_buf_set_option(bufnr, "modifiable", true, false)
+  helpers.nvim_buf_set_option(bufnr, "readonly", false, false)
 
-  vim.api.nvim_set_option_value("filetype", config.filetype, { buf = bufnr })
-  vim.api.nvim_set_option_value("buflisted", false, { buf = bufnr })
-  vim.api.nvim_set_option_value("fileencoding", "utf-8", { buf = bufnr })
-  vim.api.nvim_set_option_value("modified", false, { buf = bufnr })
+  helpers.nvim_buf_set_option(bufnr, "filetype", config.filetype, false)
+  helpers.nvim_buf_set_option(bufnr, "buflisted", false, false)
+  helpers.nvim_buf_set_option(bufnr, "fileencoding", "utf-8", false)
+  helpers.nvim_buf_set_option(bufnr, "modified", false, false)
 
-  vim.api.nvim_set_option_value("readonly", true, { buf = bufnr })
-  vim.api.nvim_set_option_value("modifiable", false, { buf = bufnr })
+  helpers.nvim_buf_set_option(bufnr, "readonly", true, false)
+  helpers.nvim_buf_set_option(bufnr, "modifiable", false, false)
 
   vim.api.nvim_buf_set_keymap(bufnr, "n", "q", "<cmd>close<cr>", {})
   vim.api.nvim_buf_set_keymap(bufnr, "n", "o", "", {
