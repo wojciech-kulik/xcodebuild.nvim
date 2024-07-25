@@ -100,7 +100,7 @@ end
 ---@param bufnr number
 ---@param name string
 ---@param value any
-function M.nvim_buf_set_option_fwd_comp(bufnr, name, value)
+function M.set_buf_option(bufnr, name, value)
   if vim.fn.has("nvim-0.10") == 1 then
     vim.api.nvim_set_option_value(name, value, { buf = bufnr })
   else
@@ -110,14 +110,14 @@ end
 
 ---Wraps any nvim_win_set_option() call to ensure forward compatibility.
 ---The function is required because nvim_win_set_option() was deprecated in nvim-0.10.
----@param winID number
+---@param winnr number
 ---@param name string
 ---@param value any
-function M.nvim_win_set_option_fwd_comp(winID, name, value)
+function M.set_win_option(winnr, name, value)
   if vim.fn.has("nvim-0.10") == 1 then
-    vim.api.nvim_set_option_value(name, value, { win = winID })
+    vim.api.nvim_set_option_value(name, value, { win = winnr })
   else
-    vim.api.nvim_win_set_option(winID, name, value)
+    vim.api.nvim_win_set_option(winnr, name, value)
   end
 end
 
@@ -130,12 +130,12 @@ function M.update_readonly_buffer(bufnr, updateFoo)
     return
   end
 
-  M.nvim_buf_set_option_fwd_comp(bufnr, "readonly", false)
-  M.nvim_buf_set_option_fwd_comp(bufnr, "modifiable", true)
+  M.buf_set_option(bufnr, "readonly", false)
+  M.buf_set_option(bufnr, "modifiable", true)
   updateFoo()
-  M.nvim_buf_set_option_fwd_comp(bufnr, "modifiable", false)
-  M.nvim_buf_set_option_fwd_comp(bufnr, "modified", false)
-  M.nvim_buf_set_option_fwd_comp(bufnr, "readonly", true)
+  M.buf_set_option(bufnr, "modifiable", false)
+  M.buf_set_option(bufnr, "modified", false)
+  M.buf_set_option(bufnr, "readonly", true)
 end
 
 return M
