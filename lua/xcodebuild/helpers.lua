@@ -100,7 +100,7 @@ end
 ---@param bufnr number
 ---@param name string
 ---@param value any
-function M.set_buf_option(bufnr, name, value)
+function M.buf_set_option(bufnr, name, value)
   if vim.fn.has("nvim-0.10") == 1 then
     vim.api.nvim_set_option_value(name, value, { buf = bufnr })
   else
@@ -113,7 +113,7 @@ end
 ---@param winnr number
 ---@param name string
 ---@param value any
-function M.set_win_option(winnr, name, value)
+function M.win_set_option(winnr, name, value)
   if vim.fn.has("nvim-0.10") == 1 then
     vim.api.nvim_set_option_value(name, value, { win = winnr })
   else
