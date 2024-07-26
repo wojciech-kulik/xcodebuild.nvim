@@ -3855,8 +3855,8 @@ M.get_major_os_version()               *xcodebuild.helpers.get_major_os_version*
     (number|nil)
 
 
-                                             *xcodebuild.helpers.set_buf_option*
-M.set_buf_option({bufnr}, {name}, {value})
+                                             *xcodebuild.helpers.buf_set_option*
+M.buf_set_option({bufnr}, {name}, {value})
   Wraps any nvim_buf_set_option() call to ensure forward compatibility.
   The function is required because nvim_buf_set_option() was deprecated in nvim-0.10.
 
@@ -3866,8 +3866,8 @@ M.set_buf_option({bufnr}, {name}, {value})
     {value}  (any)
 
 
-                                             *xcodebuild.helpers.set_win_option*
-M.set_win_option({winnr}, {name}, {value})
+                                             *xcodebuild.helpers.win_set_option*
+M.win_set_option({winnr}, {name}, {value})
   Wraps any nvim_win_set_option() call to ensure forward compatibility.
   The function is required because nvim_win_set_option() was deprecated in nvim-0.10.
 
