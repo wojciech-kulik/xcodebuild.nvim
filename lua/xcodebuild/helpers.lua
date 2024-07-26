@@ -95,6 +95,32 @@ function M.get_major_os_version()
   return settings.os and tonumber(vim.split(settings.os, ".", { plain = true })[1]) or nil
 end
 
+---Wraps any nvim_buf_set_option() call to ensure forward compatibility.
+---The function is required because nvim_buf_set_option() was deprecated in nvim-0.10.
+---@param bufnr number
+---@param name string
+---@param value any
+function M.buf_set_option(bufnr, name, value)
+  if vim.fn.has("nvim-0.10") == 1 then
+    vim.api.nvim_set_option_value(name, value, { buf = bufnr })
+  else
+    vim.api.nvim_buf_set_option(bufnr, name, value)
+  end
+end
+
+---Wraps any nvim_win_set_option() call to ensure forward compatibility.
+---The function is required because nvim_win_set_option() was deprecated in nvim-0.10.
+---@param winnr number
+---@param name string
+---@param value any
+function M.win_set_option(winnr, name, value)
+  if vim.fn.has("nvim-0.10") == 1 then
+    vim.api.nvim_set_option_value(name, value, { win = winnr })
+  else
+    vim.api.nvim_win_set_option(winnr, name, value)
+  end
+end
+
 ---Enables `modifiable` and updates the buffer using {updateFoo}.
 ---After the operation, it restores the `modifiable` to `false`.
 ---@param bufnr number|nil
@@ -104,12 +130,12 @@ function M.update_readonly_buffer(bufnr, updateFoo)
     return
   end
 
-  vim.api.nvim_buf_set_option(bufnr, "readonly", false)
-  vim.api.nvim_buf_set_option(bufnr, "modifiable", true)
+  M.buf_set_option(bufnr, "readonly", false)
+  M.buf_set_option(bufnr, "modifiable", true)
   updateFoo()
-  vim.api.nvim_buf_set_option(bufnr, "modifiable", false)
-  vim.api.nvim_buf_set_option(bufnr, "modified", false)
-  vim.api.nvim_buf_set_option(bufnr, "readonly", true)
+  M.buf_set_option(bufnr, "modifiable", false)
+  M.buf_set_option(bufnr, "modified", false)
+  M.buf_set_option(bufnr, "readonly", true)
 end
 
 return M

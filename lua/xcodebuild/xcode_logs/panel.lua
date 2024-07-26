@@ -375,20 +375,20 @@ function M.setup_buffer(bufnr)
   local win = vim.fn.win_findbuf(bufnr)
 
   if win and win[1] then
-    vim.api.nvim_win_set_option(win[1], "wrap", false)
-    vim.api.nvim_win_set_option(win[1], "spell", false)
+    helpers.win_set_option(win[1], "wrap", false)
+    helpers.win_set_option(win[1], "spell", false)
   end
 
-  vim.api.nvim_buf_set_option(bufnr, "modifiable", true)
-  vim.api.nvim_buf_set_option(bufnr, "readonly", false)
+  helpers.buf_set_option(bufnr, "modifiable", true)
+  helpers.buf_set_option(bufnr, "readonly", false)
 
-  vim.api.nvim_buf_set_option(bufnr, "filetype", config.filetype)
-  vim.api.nvim_buf_set_option(bufnr, "buflisted", false)
-  vim.api.nvim_buf_set_option(bufnr, "fileencoding", "utf-8")
-  vim.api.nvim_buf_set_option(bufnr, "modified", false)
+  helpers.buf_set_option(bufnr, "filetype", config.filetype)
+  helpers.buf_set_option(bufnr, "buflisted", false)
+  helpers.buf_set_option(bufnr, "fileencoding", "utf-8")
+  helpers.buf_set_option(bufnr, "modified", false)
 
-  vim.api.nvim_buf_set_option(bufnr, "readonly", true)
-  vim.api.nvim_buf_set_option(bufnr, "modifiable", false)
+  helpers.buf_set_option(bufnr, "readonly", true)
+  helpers.buf_set_option(bufnr, "modifiable", false)
 
   vim.api.nvim_buf_set_keymap(bufnr, "n", "q", "<cmd>close<cr>", {})
   vim.api.nvim_buf_set_keymap(bufnr, "n", "o", "", {
