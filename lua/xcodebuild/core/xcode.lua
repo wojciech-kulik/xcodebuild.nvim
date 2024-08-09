@@ -485,7 +485,7 @@ end
 ---@return number # job id
 function M.install_app(platform, destination, appPath, callback)
   if constants.is_simulator(platform) then
-    return M.install_app_on_simulator(destination, appPath, callback)
+    return M.install_app_on_simulator(destination, appPath, false, callback)
   else
     return M.install_app_on_device(destination, appPath, callback)
   end
@@ -512,24 +512,28 @@ end
 ---Installs the application on simulator.
 ---@param destination string
 ---@param appPath string
+---@param retrying boolean|nil
 ---@param callback function|nil
 ---@return number # job id
-function M.install_app_on_simulator(destination, appPath, callback)
+function M.install_app_on_simulator(destination, appPath, retrying, callback)
   local command = "xcrun simctl install '" .. destination .. "' '" .. appPath .. "'"
 
   return vim.fn.jobstart(command, {
     stdout_buffered = true,
     on_exit = function(_, code, _)
       if code ~= 0 then
-        notifications.send_error("Could not install app (code: " .. code .. ")")
         if code == 149 then
-          local retry = function()
-            M.install_app_on_simulator(destination, appPath, callback)
-          end
+          if retrying then
+            util.call(callback)
+          else
+            local retry = function()
+              M.install_app_on_simulator(destination, appPath, retrying, callback)
+            end
 
-          M.boot_simulator(destination, retry, function()
-            notifications.send_warning("Make sure that the simulator is booted")
-          end)
+            M.boot_simulator(destination, retry, function()
+              notifications.send_warning("Make sure that the simulator is booted.")
+            end)
+          end
         end
       else
         util.call(callback)
@@ -623,9 +627,9 @@ end
 ---Boots the simulator and launches the Simulator app if needed.
 ---@param destination string
 ---@param callback function|nil
----@param on_error function|nil
+---@param onError function|nil
 ---@return number # job id
-function M.boot_simulator(destination, callback, on_error)
+function M.boot_simulator(destination, callback, onError)
   local command = "xcrun simctl boot '" .. destination .. "' "
 
   return vim.fn.jobstart(command, {
@@ -633,7 +637,7 @@ function M.boot_simulator(destination, callback, on_error)
     on_exit = function(_, code, _)
       if code ~= 0 then
         notifications.send_error("Could not boot simulator (code: " .. code .. ")")
-        util.call(on_error)
+        util.call(onError)
       else
         local output = util.shell("xcode-select -p")
         if util.is_not_empty(output) then

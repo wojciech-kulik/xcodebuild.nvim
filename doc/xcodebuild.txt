@@ -1244,12 +1244,13 @@ M.install_app_on_device({destination}, {appPath}, {callback})
 
 
                                 *xcodebuild.core.xcode.install_app_on_simulator*
-M.install_app_on_simulator({destination}, {appPath}, {callback})
+M.install_app_on_simulator({destination}, {appPath}, {retrying}, {callback})
   Installs the application on simulator.
 
   Parameters: ~
     {destination}  (string)
     {appPath}      (string)
+    {retrying}     (boolean|nil)
     {callback}     (function|nil)
 
   Returns: ~
@@ -1300,12 +1301,13 @@ M.launch_app({platform}, {destination}, {bundleId}, {waitForDebugger}, {callback
 
 
                                           *xcodebuild.core.xcode.boot_simulator*
-M.boot_simulator({destination}, {callback})
+M.boot_simulator({destination}, {callback}, {onError})
   Boots the simulator and launches the Simulator app if needed.
 
   Parameters: ~
     {destination}  (string)
     {callback}     (function|nil)
+    {onError}      (function|nil)
 
   Returns: ~
     (number)   job id
