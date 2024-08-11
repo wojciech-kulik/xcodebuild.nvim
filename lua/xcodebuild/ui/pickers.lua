@@ -48,17 +48,7 @@ local progressFrames = {
 ---Updates xcode-build-server config if needed.
 local function update_xcode_build_server_config()
   local xcodeBuildServer = require("xcodebuild.integrations.xcode-build-server")
-
-  if not xcodeBuildServer.is_enabled() or not xcodeBuildServer.is_installed() then
-    return
-  end
-
-  local projectCommand = projectConfig.settings.projectCommand
-  local scheme = projectConfig.settings.scheme
-
-  if projectCommand and scheme then
-    xcodeBuildServer.run_config(projectCommand, scheme)
-  end
+  xcodeBuildServer.update_config()
 end
 
 ---Stops the spinner animation.
@@ -523,6 +513,8 @@ function M.show_all_actions()
     "Install Application",
     "Uninstall Application",
     "---------------------------------",
+    "Toggle Bin Validation",
+    "---------------------------------",
     "Clean DerivedData",
     "Open Project in Xcode",
   }
@@ -564,6 +556,10 @@ function M.show_all_actions()
     actions.boot_simulator,
     actions.install_app,
     actions.uninstall_app,
+
+    function() end,
+
+    actions.toggle_bin_validation,
 
     function() end,
 

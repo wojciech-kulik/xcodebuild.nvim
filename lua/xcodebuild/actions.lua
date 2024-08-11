@@ -21,6 +21,7 @@ local projectBuilder = require("xcodebuild.project.builder")
 local projectConfig = require("xcodebuild.project.config")
 local projectManager = require("xcodebuild.project.manager")
 local lsp = require("xcodebuild.integrations.lsp")
+local xcodeBuildServer = require("xcodebuild.integrations.xcode-build-server")
 
 local M = {}
 
@@ -392,6 +393,14 @@ end
 ---@deprecated use `rerun_failed_tests` instead
 function M.run_failing_tests()
   M.rerun_failed_tests()
+end
+
+-- Xcode Build Server
+
+-- Toggles whether --skip-validate-bin flag is passed
+-- to xcode-build-server's config command or not.
+function M.toggle_bin_validation()
+  xcodeBuildServer.toggle_bin_validation()
 end
 
 return M
