@@ -527,7 +527,7 @@ function M.install_app_on_simulator(destination, appPath, retrying, callback)
             util.call(callback)
           else
             local retry = function()
-              M.install_app_on_simulator(destination, appPath, retrying, callback)
+              M.install_app_on_simulator(destination, appPath, true, callback)
             end
 
             M.boot_simulator(destination, retry, function()
