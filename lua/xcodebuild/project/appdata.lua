@@ -37,7 +37,16 @@ local util = require("xcodebuild.util")
 
 local M = {}
 
-M.report = {}
+M.report = {
+  output = {},
+  tests = {},
+  buildErrors = {},
+  buildWarnings = {},
+  testsCount = 0,
+  testErrors = {},
+  failedTestsCount = 0,
+  xcresultFilepath = nil,
+}
 M.appdir = vim.fn.getcwd() .. "/.nvim/xcodebuild"
 M.app_logs_filename = "app_logs.log"
 M.app_logs_filepath = M.appdir .. "/" .. M.app_logs_filename
