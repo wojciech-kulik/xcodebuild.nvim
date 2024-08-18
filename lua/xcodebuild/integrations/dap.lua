@@ -418,7 +418,7 @@ end
 function M.get_codelldb_adapter(codelldbPath, lldbPath, port)
   return {
     type = "server",
-    port = "13000",
+    port = port or "13000",
     executable = {
       command = codelldbPath,
       args = {
