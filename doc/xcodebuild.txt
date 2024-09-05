@@ -888,6 +888,9 @@ M.run_failing_tests()                     *xcodebuild.actions.run_failing_tests*
   @deprecated use `rerun_failed_tests` instead
 
 
+M.toggle_bin_validation()             *xcodebuild.actions.toggle_bin_validation*
+
+
 ==============================================================================
 Constants                                                 *xcodebuild.constants*
 
@@ -1622,20 +1625,21 @@ so the settings can be loaded.
 ProjectSettings
 
   Fields: ~
-    {deviceName}      (string|nil) device name (ex. "iPhone 12")
-    {os}              (string|nil) OS version (ex. "14.5")
-    {platform}        (PlatformId|nil) platform (ex. "iOS")
-    {projectFile}     (string|nil) project file path (ex. "path/to/Project.xcodeproj")
-    {projectCommand}  (string|nil) project command (ex. "-project 'path/to/Project.xcodeproj'" or "-workspace 'path/to/Project.xcworkspace'")
-    {scheme}          (string|nil) scheme name (ex. "MyApp")
-    {destination}     (string|nil) destination (ex. "28B52DAA-BC2F-410B-A5BE-F485A3AFB0BC")
-    {bundleId}        (string|nil) bundle identifier (ex. "com.mycompany.myapp")
-    {appPath}         (string|nil) app path (ex. "path/to/MyApp.app")
-    {productName}     (string|nil) product name (ex. "MyApp")
-    {testPlan}        (string|nil) test plan name (ex. "MyAppTests")
-    {xcodeproj}       (string|nil) xcodeproj file path (ex. "path/to/Project.xcodeproj")
-    {lastBuildTime}   (number|nil) last build time in seconds
-    {showCoverage}    (boolean|nil) if the inline code coverage should be shown
+    {deviceName}       (string|nil) device name (ex. "iPhone 12")
+    {os}               (string|nil) OS version (ex. "14.5")
+    {platform}         (PlatformId|nil) platform (ex. "iOS")
+    {projectFile}      (string|nil) project file path (ex. "path/to/Project.xcodeproj")
+    {projectCommand}   (string|nil) project command (ex. "-project 'path/to/Project.xcodeproj'" or "-workspace 'path/to/Project.xcworkspace'")
+    {scheme}           (string|nil) scheme name (ex. "MyApp")
+    {destination}      (string|nil) destination (ex. "28B52DAA-BC2F-410B-A5BE-F485A3AFB0BC")
+    {bundleId}         (string|nil) bundle identifier (ex. "com.mycompany.myapp")
+    {appPath}          (string|nil) app path (ex. "path/to/MyApp.app")
+    {productName}      (string|nil) product name (ex. "MyApp")
+    {testPlan}         (string|nil) test plan name (ex. "MyAppTests")
+    {xcodeproj}        (string|nil) xcodeproj file path (ex. "path/to/Project.xcodeproj")
+    {lastBuildTime}    (number|nil) last build time in seconds
+    {showCoverage}     (boolean|nil) if the inline code coverage should be shown
+    {skipValidateBin}  (boolean|nil) if xcode-build-server should skip bin validation
 
 
 M.settings                                  *xcodebuild.project.config.settings*
@@ -3708,16 +3712,13 @@ M.is_enabled()
     (boolean)
 
 
-                         *xcodebuild.integrations.xcode-build-server.run_config*
-M.run_config({projectCommand}, {scheme})
-  Calls "config" command of xcode-build-server in order to update buildServer.json file.
+              *xcodebuild.integrations.xcode-build-server.toggle_bin_validation*
+M.toggle_bin_validation()
 
-  Parameters: ~
-    {projectCommand}  (string) either "-project 'path/to/project.xcodeproj'" or "-workspace 'path/to/workspace.xcworkspace'"
-    {scheme}          (string)
 
-  Returns: ~
-    (number)   job id
+                      *xcodebuild.integrations.xcode-build-server.update_config*
+M.update_config()
+  Updates xcode-build-server config if needed.
 
 
 ==============================================================================
