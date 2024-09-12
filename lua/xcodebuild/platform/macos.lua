@@ -5,18 +5,24 @@
 
 local util = require("xcodebuild.util")
 local appdata = require("xcodebuild.project.appdata")
+local notifications = require("xcodebuild.broadcasting.notifications")
 
 local M = {}
 
 ---Simply starts the application on macOS.
 ---@param appPath string
----@param productName string
 ---@param callback function|nil
 ---@return number # job id
-function M.launch_app(appPath, productName, callback)
-  local path = appPath .. "/Contents/MacOS/" .. productName
-  util.call(callback)
-  return vim.fn.jobstart(path, { detach = true })
+function M.launch_app(appPath, callback)
+  return vim.fn.jobstart("open '" .. appPath .. "'", {
+    on_exit = function(_, code)
+      if code == 0 then
+        util.call(callback)
+      else
+        notifications.send_warning("Could not launch app, code: " .. code)
+      end
+    end,
+  })
 end
 
 ---Starts the application on macOS and starts the debugger.
