@@ -1352,23 +1352,26 @@ M.uninstall_app({platform}, {destination}, {bundleId}, {callback})
     (number)   job id
 
 
-M.get_app_pid({productName})                 *xcodebuild.core.xcode.get_app_pid*
+M.get_app_pid({productName}, {platform})     *xcodebuild.core.xcode.get_app_pid*
   Gets the pid of the application.
   Works only with simulator.
 
   Parameters: ~
     {productName}  (string)
+    {platform}     (PlatformId|nil)
 
   Returns: ~
     (number|nil)   pid
 
 
-M.kill_app({productName}, {callback})           *xcodebuild.core.xcode.kill_app*
+                                                *xcodebuild.core.xcode.kill_app*
+M.kill_app({productName}, {platform}, {callback})
   Kills the application.
   Works only with simulator.
 
   Parameters: ~
     {productName}  (string)
+    {platform}     (PlatformId|nil)
     {callback}     (function|nil)
 
 

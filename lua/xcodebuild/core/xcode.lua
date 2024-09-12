@@ -699,9 +699,20 @@ end
 ---Gets the pid of the application.
 ---Works only with simulator.
 ---@param productName string
+---@param platform PlatformId|nil
 ---@return number|nil # pid
-function M.get_app_pid(productName)
-  local pid = util.shell("ps aux | grep '" .. productName .. ".app' | grep -v grep | awk '{ print$2 }'")
+function M.get_app_pid(productName, platform)
+  if platform == constants.Platform.MACOS then
+    local pid = util.shell(
+      "ps aux | grep '" .. productName .. ".app/Contents/MacOS' | grep -v grep | awk '{ print$2 }'"
+    )
+
+    return tonumber(pid and pid[1] or nil)
+  end
+
+  local pid = util.shell(
+    "ps aux | grep '" .. productName .. ".app' | grep -v grep | grep -v 'Contents/MacOS' | awk '{ print$2 }'"
+  )
 
   return tonumber(pid and pid[1] or nil)
 end
@@ -709,10 +720,10 @@ end
 ---Kills the application.
 ---Works only with simulator.
 ---@param productName string
+---@param platform PlatformId|nil
 ---@param callback function|nil
-function M.kill_app(productName, callback)
-  -- TODO: kill on device with iOS 17
-  local pid = M.get_app_pid(productName)
+function M.kill_app(productName, platform, callback)
+  local pid = M.get_app_pid(productName, platform)
 
   if pid then
     util.shell("kill -9 " .. pid)
