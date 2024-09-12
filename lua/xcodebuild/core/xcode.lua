@@ -485,7 +485,7 @@ end
 ---@return number # job id
 function M.install_app(platform, destination, appPath, callback)
   if constants.is_simulator(platform) then
-    return M.install_app_on_simulator(destination, appPath, callback)
+    return M.install_app_on_simulator(destination, appPath, true, callback)
   else
     return M.install_app_on_device(destination, appPath, callback)
   end
@@ -512,21 +512,31 @@ end
 ---Installs the application on simulator.
 ---@param destination string
 ---@param appPath string
+---@param bootIfNeeded boolean|nil
 ---@param callback function|nil
 ---@return number # job id
-function M.install_app_on_simulator(destination, appPath, callback)
+function M.install_app_on_simulator(destination, appPath, bootIfNeeded, callback)
   local command = "xcrun simctl install '" .. destination .. "' '" .. appPath .. "'"
 
   return vim.fn.jobstart(command, {
     stdout_buffered = true,
     on_exit = function(_, code, _)
-      if code ~= 0 then
-        notifications.send_error("Could not install app (code: " .. code .. ")")
-        if code == 149 then
-          notifications.send_warning("Make sure that the simulator is booted")
-        end
-      else
+      if code == 0 then
         util.call(callback)
+      elseif code == 149 and bootIfNeeded then
+        notifications.send("Booting the simulator...")
+
+        M.boot_simulator(destination, function(success)
+          if success then
+            M.install_app_on_simulator(destination, appPath, false, callback)
+          else
+            notifications.send_warning("Make sure that the simulator is booted.")
+          end
+        end)
+      elseif code == 149 then
+        notifications.send_warning("Make sure that the simulator is booted.")
+      else
+        notifications.send_error("Could not install app (code: " .. code .. ")")
       end
     end,
   })
@@ -616,7 +626,7 @@ end
 
 ---Boots the simulator and launches the Simulator app if needed.
 ---@param destination string
----@param callback function|nil
+---@param callback fun(success:boolean)|nil
 ---@return number # job id
 function M.boot_simulator(destination, callback)
   local command = "xcrun simctl boot '" .. destination .. "' "
@@ -624,10 +634,9 @@ function M.boot_simulator(destination, callback)
   return vim.fn.jobstart(command, {
     stdout_buffered = true,
     on_exit = function(_, code, _)
-      if code ~= 0 then
-        notifications.send_error("Could not boot simulator (code: " .. code .. ")")
-      else
+      if code == 0 then
         local output = util.shell("xcode-select -p")
+
         if util.is_not_empty(output) then
           vim.fn.jobstart(output[1] .. "/Applications/Simulator.app/Contents/MacOS/Simulator", {
             detach = true,
@@ -635,7 +644,10 @@ function M.boot_simulator(destination, callback)
           })
         end
 
-        util.call(callback)
+        util.call(callback, true)
+      else
+        notifications.send_error("Could not boot simulator (code: " .. code .. ")")
+        util.call(callback, false)
       end
     end,
   })

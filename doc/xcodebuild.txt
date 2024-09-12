@@ -1244,13 +1244,14 @@ M.install_app_on_device({destination}, {appPath}, {callback})
 
 
                                 *xcodebuild.core.xcode.install_app_on_simulator*
-M.install_app_on_simulator({destination}, {appPath}, {callback})
+M.install_app_on_simulator({destination}, {appPath}, {bootIfNeeded}, {callback})
   Installs the application on simulator.
 
   Parameters: ~
-    {destination}  (string)
-    {appPath}      (string)
-    {callback}     (function|nil)
+    {destination}   (string)
+    {appPath}       (string)
+    {bootIfNeeded}  (boolean|nil)
+    {callback}      (function|nil)
 
   Returns: ~
     (number)   job id
@@ -1305,7 +1306,7 @@ M.boot_simulator({destination}, {callback})
 
   Parameters: ~
     {destination}  (string)
-    {callback}     (function|nil)
+    {callback}     (fun(success:boolean)|nil)
 
   Returns: ~
     (number)   job id

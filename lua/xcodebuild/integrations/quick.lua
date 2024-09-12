@@ -72,24 +72,48 @@ local function parse_test_file(bufnr)
 ]]
   )
 
-  for _, match in quickQueries:iter_matches(root, bufnr) do
-    local capturedNodes = {}
+  if vim.fn.has("nvim-0.11") == 1 then
+    for _, match, _ in quickQueries:iter_matches(root, bufnr) do
+      local capturedNodes = {}
 
-    for i, capture in ipairs(quickQueries.captures) do
-      local currentMatch = match[i]
+      for id, nodes in pairs(match) do
+        local capture = quickQueries.captures[id]
 
-      if currentMatch and capture ~= "quick-func" then
-        local startRow, _, endRow, _ = currentMatch:range()
-        table.insert(capturedNodes, {
-          id = capture,
-          name = not capture:match("definition") and ts.get_node_text(currentMatch, bufnr) or nil,
-          row = startRow,
-          endRow = endRow,
-        })
+        if capture ~= "quick-func" then
+          for _, currentMatch in ipairs(nodes) do
+            local startRow, _, endRow, _ = currentMatch:range()
+            table.insert(capturedNodes, {
+              id = capture,
+              name = not capture:match("definition") and ts.get_node_text(currentMatch, bufnr) or nil,
+              row = startRow,
+              endRow = endRow,
+            })
+          end
+        end
       end
-    end
 
-    table.insert(result, capturedNodes)
+      table.insert(result, capturedNodes)
+    end
+  else
+    for _, match in quickQueries:iter_matches(root, bufnr) do
+      local capturedNodes = {}
+
+      for i, capture in ipairs(quickQueries.captures) do
+        local currentMatch = match[i]
+
+        if currentMatch and capture ~= "quick-func" then
+          local startRow, _, endRow, _ = currentMatch:range()
+          table.insert(capturedNodes, {
+            id = capture,
+            name = not capture:match("definition") and ts.get_node_text(currentMatch, bufnr) or nil,
+            row = startRow,
+            endRow = endRow,
+          })
+        end
+      end
+
+      table.insert(result, capturedNodes)
+    end
   end
 
   return result
