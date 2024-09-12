@@ -40,7 +40,7 @@ local function launch_app(waitForDebugger, callback)
     if waitForDebugger then
       return macos.launch_and_debug(settings.appPath, finished)
     else
-      return macos.launch_app(settings.appPath, settings.productName, finished)
+      return macos.launch_app(settings.appPath, finished)
     end
   end
 
