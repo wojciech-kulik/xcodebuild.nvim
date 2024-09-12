@@ -12,7 +12,7 @@ local function mock(id)
   local testsContent = vim.fn.readfile(cwd .. "/specs/quick_test_data/quick_test_" .. id .. ".swift")
   local text = table.concat(testsContent, "\n")
 
-  vim.treesitter.get_parser = function(_, _)
+  vim.treesitter.get_parser = function(_, _, _)
     local parser = vim.treesitter.get_string_parser(text, "swift")
     return parser
   end
