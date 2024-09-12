@@ -297,7 +297,7 @@ function M.wait_for_pid()
     notifications.send("Attaching debugger...")
     for _ = 1, 10 do
       util.shell("sleep 1")
-      pid = xcode.get_app_pid(productName)
+      pid = xcode.get_app_pid(productName, projectConfig.settings.platform)
 
       if tonumber(pid) then
         break

@@ -33,6 +33,7 @@ local function launch_app(waitForDebugger, callback)
     util.call(callback)
   end
 
+  M.kill_app()
   notifications.send("Launching application...")
 
   if settings.platform == constants.Platform.MACOS then
@@ -41,10 +42,6 @@ local function launch_app(waitForDebugger, callback)
     else
       return macos.launch_app(settings.appPath, settings.productName, finished)
     end
-  end
-
-  if settings.productName then
-    M.kill_app()
   end
 
   if deviceProxy.should_use() then
@@ -69,10 +66,14 @@ function M.kill_app(callback)
 
   local settings = projectConfig.settings
 
+  if not settings.productName then
+    return
+  end
+
   if deviceProxy.is_installed() and constants.is_device(settings.platform) then
     M.currentJobId = deviceProxy.kill_app(settings.productName, callback)
   else
-    M.currentJobId = xcode.kill_app(settings.productName, callback)
+    M.currentJobId = xcode.kill_app(settings.productName, settings.platform, callback)
   end
 end
 
