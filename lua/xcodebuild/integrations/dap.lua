@@ -536,10 +536,11 @@ end
 ---{loadBreakpoints} - if true or nil, sets up an autocmd to load breakpoints when a Swift file is opened.
 ---@param codelldbPath string
 ---@param loadBreakpoints boolean|nil default: true
-function M.setup(codelldbPath, loadBreakpoints)
+---@param lldbPath string|nil default: nil
+function M.setup(codelldbPath, loadBreakpoints, lldbPath)
   local dap = require("dap")
   dap.configurations.swift = M.get_swift_configuration()
-  dap.adapters.codelldb = M.get_codelldb_adapter(codelldbPath)
+  dap.adapters.codelldb = M.get_codelldb_adapter(codelldbPath, lldbPath)
 
   if loadBreakpoints ~= false then
     vim.api.nvim_create_autocmd({ "BufReadPost" }, {
