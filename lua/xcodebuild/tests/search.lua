@@ -41,7 +41,12 @@ local LSPRESULT = {
 ---@return LSPResult
 ---@return string|nil # filepath
 local function lsp_search(targetName, className)
-  local sourcekitClients = vim.lsp.get_active_clients({ name = config.lsp_client })
+  local sourcekitClients
+  if vim.fn.has("nvim-0.10") == 1 then
+    sourcekitClients = vim.lsp.get_clients({ name = config.lsp_client })
+  else
+    sourcekitClients = vim.lsp.get_active_clients({ name = config.lsp_client })
+  end
 
   if util.is_empty(sourcekitClients) then
     vim.wait(30)
@@ -52,6 +57,7 @@ local function lsp_search(targetName, className)
   local bufnr = 0
 
   if vim.bo.filetype ~= "swift" then
+    ---@diagnostic disable-next-line: undefined-field
     local sourcekitId = sourcekitClients[1].id
     bufnr = vim.lsp.get_buffers_by_client_id(sourcekitId)[1] or 0
   end

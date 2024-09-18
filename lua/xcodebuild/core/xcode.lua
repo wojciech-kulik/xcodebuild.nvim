@@ -96,7 +96,7 @@ end
 ---@param xcresultPath string
 ---@param callback fun(coverageId: string|nil)
 local function get_coverage_item_id(xcresultPath, callback)
-  local command = "xcrun xcresulttool get --format json --path '" .. xcresultPath .. "'"
+  local command = "xcrun xcresulttool get --legacy --format json --path '" .. xcresultPath .. "'"
 
   return vim.fn.jobstart(command, {
     stdout_buffered = true,
@@ -764,7 +764,7 @@ function M.export_code_coverage(xcresultPath, outputPath, callback)
       return
     end
 
-    local command = "xcrun xcresulttool export --type directory"
+    local command = "xcrun xcresulttool export --legacy --type directory"
       .. " --id "
       .. itemId
       .. " --path '"
