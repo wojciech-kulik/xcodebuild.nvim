@@ -25,7 +25,6 @@
 ---@field tests_filename string # The name of the tests file.
 ---@field tests_filepath string # The path to the tests file.
 ---@field snapshots_dir string # The path to the snapshots directory.
----@field coverage_filepath string # The path to the coverage file.
 ---@field coverage_report_filepath string # The path to the coverage report file.
 ---@field test_explorer_filepath string # The path to the test explorer file.
 ---@field breakpoints_filepath string # The path to the breakpoints file.
@@ -59,7 +58,6 @@ M.report_filepath = M.appdir .. "/" .. M.report_filename
 M.tests_filename = "tests.json"
 M.tests_filepath = M.appdir .. "/" .. M.tests_filename
 M.snapshots_dir = M.appdir .. "/failing-snapshots"
-M.coverage_filepath = M.appdir .. "/coverage.xccovarchive"
 M.coverage_report_filepath = M.appdir .. "/coverage.json"
 M.test_explorer_filepath = M.appdir .. "/test-explorer.json"
 M.breakpoints_filepath = M.appdir .. "/breakpoints.json"
