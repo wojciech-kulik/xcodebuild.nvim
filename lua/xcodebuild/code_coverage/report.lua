@@ -224,9 +224,9 @@ end
 
 ---Sets up the highlight groups for the code coverage report.
 function M.setup()
-  vim.api.nvim_set_hl(0, "XcodebuildCoverageReportWarning", { link = "DiagnosticWarn", default = true })
-  vim.api.nvim_set_hl(0, "XcodebuildCoverageReportError", { link = "DiagnosticError", default = true })
-  vim.api.nvim_set_hl(0, "XcodebuildCoverageReportOk", { link = "DiagnosticOk", default = true })
+  vim.api.nvim_set_hl(0, "XcodebuildCoverageReportWarning", util.get_hl_without_italic("DiagnosticWarn"))
+  vim.api.nvim_set_hl(0, "XcodebuildCoverageReportError", util.get_hl_without_italic("DiagnosticError"))
+  vim.api.nvim_set_hl(0, "XcodebuildCoverageReportOk", util.get_hl_without_italic("DiagnosticOk"))
 end
 
 return M

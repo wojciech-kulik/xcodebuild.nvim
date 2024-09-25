@@ -8,6 +8,31 @@
 
 local M = {}
 
+---Gets modified highlight without italic.
+---@param name string
+---@return table
+function M.get_hl_without_italic(name)
+  return M.get_modified_hl(name, { italic = false, default = true }) or { link = name, default = true }
+end
+
+---Read highlight and return the modified version.
+---@param name string
+---@param opts table
+---@return table|nil # definition
+function M.get_modified_hl(name, opts)
+  local settings = vim.api.nvim_get_hl(0, { name = name })
+
+  if M.is_empty(settings) then
+    return nil
+  end
+
+  for k, v in pairs(opts) do
+    settings[k] = v
+  end
+
+  return settings
+end
+
 ---Creates a shallow copy of a table.
 ---If the table contains other tables, it will only copy the references.
 ---@param orig any
