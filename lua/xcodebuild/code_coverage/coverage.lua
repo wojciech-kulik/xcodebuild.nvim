@@ -72,7 +72,11 @@ end
 ---Checks if the code coverage report is available.
 ---@return boolean
 function M.is_code_coverage_available()
-  return util.dir_exists(appdata.coverage_filepath)
+  local report = require("xcodebuild.code_coverage.report")
+
+  return appdata.report.xcresultFilepath ~= nil
+    and util.file_exists(appdata.report.xcresultFilepath)
+    and report.is_report_available()
 end
 
 ---Refreshes the code coverage for all buffers matching `file_pattern` from the config.
@@ -122,16 +126,9 @@ function M.export_coverage(xcresultFilepath, callback)
     return
   end
 
-  util.shell("rm -rf '" .. appdata.coverage_filepath .. "'")
   util.shell("rm -rf '" .. appdata.coverage_report_filepath .. "'")
 
-  xcode.export_code_coverage(xcresultFilepath, appdata.coverage_filepath, function()
-    if util.dir_exists(appdata.coverage_filepath) then
-      xcode.export_code_coverage_report(xcresultFilepath, appdata.coverage_report_filepath, callback_if_set)
-    else
-      callback_if_set()
-    end
-  end)
+  xcode.export_code_coverage_report(xcresultFilepath, appdata.coverage_report_filepath, callback_if_set)
 end
 
 ---Toggles the code coverage visibility in all buffers.
@@ -179,7 +176,7 @@ function M.show_coverage(bufnr)
   vim.api.nvim_buf_clear_namespace(bufnr, nsNotCovered, 0, -1)
   table.insert(buffersWithCoverage, bufnr)
 
-  xcode.get_code_coverage(appdata.coverage_filepath, vim.api.nvim_buf_get_name(bufnr), function(lines)
+  xcode.get_code_coverage(appdata.report.xcresultFilepath, vim.api.nvim_buf_get_name(bufnr), function(lines)
     local bracketsCounter = 0
     local isPartial = false
     local lineNumber, count

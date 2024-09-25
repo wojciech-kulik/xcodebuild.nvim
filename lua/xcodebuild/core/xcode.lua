@@ -91,35 +91,6 @@ local function callback_or_error(action, callback)
   end
 end
 
----Gets the coverage item id from the xcresult file.
----It is used to extract code coverage from the xcresult file.
----@param xcresultPath string
----@param callback fun(coverageId: string|nil)
-local function get_coverage_item_id(xcresultPath, callback)
-  local command = "xcrun xcresulttool get --legacy --format json --path '" .. xcresultPath .. "'"
-
-  return vim.fn.jobstart(command, {
-    stdout_buffered = true,
-    on_stdout = function(_, output)
-      local result = vim.fn.json_decode(output)
-      local _, coverageId = pcall(function()
-        local coverage = result["actions"]["_values"][1]["actionResult"]["coverage"]
-        if not coverage["archiveRef"] then
-          return nil
-        end
-        return coverage["archiveRef"]["id"]["_value"]
-      end, nil)
-
-      callback(coverageId)
-    end,
-    on_exit = function(_, code, _)
-      if code ~= 0 then
-        notifications.send_error("Could not export code coverage (code: " .. code .. ")")
-      end
-    end,
-  })
-end
-
 ---Returns a map of targets to list of file paths based on
 ---the `SwiftFileList` files in the build directory.
 ---
@@ -733,12 +704,12 @@ function M.kill_app(productName, platform, callback)
 end
 
 ---Gets the code coverage for the given {filepath}.
----@param archive string
+---@param xctestresultPath string
 ---@param filepath string # file to check
 ---@param callback fun(coverageData: string[])
 ---@return number # job id
-function M.get_code_coverage(archive, filepath, callback)
-  local command = "xcrun xccov view --file '" .. filepath .. "' '" .. archive .. "'"
+function M.get_code_coverage(xctestresultPath, filepath, callback)
+  local command = "xcrun xccov view --archive --file '" .. filepath .. "' '" .. xctestresultPath .. "'"
 
   return vim.fn.jobstart(command, {
     stdout_buffered = true,
@@ -747,42 +718,6 @@ function M.get_code_coverage(archive, filepath, callback)
     end,
     on_exit = function() end,
   })
-end
-
----Exports the code coverage from the given {xcresultPath} to the {outputPath}.
----@param xcresultPath string
----@param outputPath string
----@param callback function|nil
----@return number # job id
-function M.export_code_coverage(xcresultPath, outputPath, callback)
-  return get_coverage_item_id(xcresultPath, function(itemId)
-    if not itemId then
-      notifications.send(
-        "Could not export code coverage. Make sure that code coverage is enabled for your test plan"
-      )
-      util.call(callback)
-      return
-    end
-
-    local command = "xcrun xcresulttool export --legacy --type directory"
-      .. " --id "
-      .. itemId
-      .. " --path '"
-      .. xcresultPath
-      .. "' --output-path '"
-      .. outputPath
-      .. "'"
-
-    vim.fn.jobstart(command, {
-      stdout_buffered = true,
-      on_exit = function(_, code, _)
-        if code ~= 0 then
-          notifications.send_error("Could not export code coverage (code: " .. code .. ")")
-        end
-        util.call(callback)
-      end,
-    })
-  end)
 end
 
 ---Returns the list of tests for the given project.
@@ -839,10 +774,16 @@ end
 ---@param callback function|nil
 ---@return number # job id
 function M.export_code_coverage_report(xcresultPath, outputPath, callback)
-  local command = "xcrun xccov view --report --json '" .. xcresultPath .. "' > '" .. outputPath .. "'"
+  local command = "xcrun xccov view --report --json '" .. xcresultPath .. "'"
 
   return vim.fn.jobstart(command, {
     stdout_buffered = true,
+    on_stdout = function(_, output)
+      if #output == 0 or (#output == 1 and output[1] == "") then
+        return
+      end
+      vim.fn.writefile(output, outputPath)
+    end,
     on_exit = function()
       util.call(callback)
     end,

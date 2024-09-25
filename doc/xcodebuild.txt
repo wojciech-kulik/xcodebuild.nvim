@@ -1376,26 +1376,13 @@ M.kill_app({productName}, {platform}, {callback})
 
 
                                        *xcodebuild.core.xcode.get_code_coverage*
-M.get_code_coverage({archive}, {filepath}, {callback})
+M.get_code_coverage({xctestresultPath}, {filepath}, {callback})
   Gets the code coverage for the given {filepath}.
 
   Parameters: ~
-    {archive}   (string)
-    {filepath}  (string) # file to check
-    {callback}  (fun(coverageData:string[]))
-
-  Returns: ~
-    (number)   job id
-
-
-                                    *xcodebuild.core.xcode.export_code_coverage*
-M.export_code_coverage({xcresultPath}, {outputPath}, {callback})
-  Exports the code coverage from the given {xcresultPath} to the {outputPath}.
-
-  Parameters: ~
-    {xcresultPath}  (string)
-    {outputPath}    (string)
-    {callback}      (function|nil)
+    {xctestresultPath}  (string)
+    {filepath}          (string) # file to check
+    {callback}          (fun(coverageData:string[]))
 
   Returns: ~
     (number)   job id
@@ -1712,7 +1699,6 @@ AppData                                     *xcodebuild.project.appdata.AppData*
     {tests_filename}            (string) # The name of the tests file.
     {tests_filepath}            (string) # The path to the tests file.
     {snapshots_dir}             (string) # The path to the snapshots directory.
-    {coverage_filepath}         (string) # The path to the coverage file.
     {coverage_report_filepath}  (string) # The path to the coverage report file.
     {test_explorer_filepath}    (string) # The path to the test explorer file.
     {breakpoints_filepath}      (string) # The path to the breakpoints file.
