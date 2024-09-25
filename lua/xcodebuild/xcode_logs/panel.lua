@@ -60,7 +60,7 @@ local function format_logs(lines, callback)
   elseif config.logs_formatter and config.logs_formatter ~= "" then
     local logs_filepath = appdata.original_logs_filepath
 
-    if config.logs_formatter:find("xcbeautify") and vim.fn.executable("xcbeautify") == 0 then
+    if vim.startswith(config.logs_formatter, "xcbeautify") and vim.fn.executable("xcbeautify") == 0 then
       callback(lines)
       return
     end
@@ -261,7 +261,7 @@ function M.append_log_lines(lines, format)
   end
 
   if config.logs_formatter and config.logs_formatter ~= "" and format then
-    if config.logs_formatter:find("xcbeautify") then
+    if vim.startswith(config.logs_formatter, "xcbeautify") then
       if vim.fn.executable("xcbeautify") ~= 0 then
         lines = vim.fn.systemlist(config.logs_formatter, table.concat(lines, "\n"))
       end
