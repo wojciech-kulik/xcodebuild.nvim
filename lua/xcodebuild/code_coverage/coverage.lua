@@ -59,9 +59,9 @@ end
 
 ---Sets up the code coverage signs and highlights.
 function M.setup()
-  vim.api.nvim_set_hl(0, "XcodebuildCoverageFullSign", { link = "DiagnosticOk", default = true })
-  vim.api.nvim_set_hl(0, "XcodebuildCoverageNoneSign", { link = "DiagnosticError", default = true })
-  vim.api.nvim_set_hl(0, "XcodebuildCoveragePartialSign", { link = "DiagnosticWarn", default = true })
+  vim.api.nvim_set_hl(0, "XcodebuildCoverageFullSign", util.get_hl_without_italic("DiagnosticOk"))
+  vim.api.nvim_set_hl(0, "XcodebuildCoverageNoneSign", util.get_hl_without_italic("DiagnosticError"))
+  vim.api.nvim_set_hl(0, "XcodebuildCoveragePartialSign", util.get_hl_without_italic("DiagnosticWarn"))
   vim.api.nvim_set_hl(0, "XcodebuildCoverageNotExecutableSign", { link = "Comment", default = true })
   -- XcodebuildCoverageFullNumber, XcodebuildCoveragePartialNumber
   -- XcodebuildCoverageNoneNumber, XcodebuildCoverageNotExecutableNumber

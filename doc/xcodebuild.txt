@@ -3883,6 +3883,27 @@ This module contains general lua helper functions used across the plugin.
 |xcodebuild.util| is for general language utils and |xcodebuild.helpers|
 are for plugin specific utils.
 
+M.get_hl_without_italic({name})          *xcodebuild.util.get_hl_without_italic*
+  Gets modified highlight without italic.
+
+  Parameters: ~
+    {name}  (string)
+
+  Returns: ~
+    (table)
+
+
+M.get_modified_hl({name}, {opts})              *xcodebuild.util.get_modified_hl*
+  Read highlight and return the modified version.
+
+  Parameters: ~
+    {name}  (string)
+    {opts}  (table)
+
+  Returns: ~
+    (table|nil)   definition
+
+
 M.shallow_copy({orig})                            *xcodebuild.util.shallow_copy*
   Creates a shallow copy of a table.
   If the table contains other tables, it will only copy the references.
