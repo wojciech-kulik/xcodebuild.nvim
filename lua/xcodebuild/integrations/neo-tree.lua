@@ -52,9 +52,9 @@ function M.setup()
 
     local isDir = vim.fn.isdirectory(data.destination) == 1
     if isDir then
-      projectManager.move_or_rename_group(data.source, data.destination)
+      projectManager.move_or_rename_group(data.source, data.destination, config.find_xcodeproj)
     else
-      projectManager.move_file(data.source, data.destination)
+      projectManager.move_file(data.source, data.destination, config.find_xcodeproj)
     end
   end
 
@@ -67,12 +67,12 @@ function M.setup()
 
       local isDir = vim.fn.isdirectory(path) == 1
       if isDir then
-        projectManager.add_group(path)
+        projectManager.add_group(path, config.find_xcodeproj)
       else
         projectManager.add_file(path, nil, {
           guessTarget = config.guess_target,
           createGroups = true,
-        })
+        }, config.find_xcodeproj)
       end
     end,
   })
@@ -88,9 +88,9 @@ function M.setup()
       local isDir = extension == ""
 
       if isDir then
-        projectManager.delete_group(path)
+        projectManager.delete_group(path, config.find_xcodeproj)
       else
-        projectManager.delete_file(path)
+        projectManager.delete_file(path, config.find_xcodeproj)
       end
     end,
   })
