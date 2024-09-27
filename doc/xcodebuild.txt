@@ -1971,11 +1971,12 @@ M.create_new_group()
   Asks the user for the group name.
 
 
-M.add_group({path})                       *xcodebuild.project.manager.add_group*
+M.add_group({path}, {find_xcodeproj})     *xcodebuild.project.manager.add_group*
   Adds the group to the project.
 
   Parameters: ~
-    {path}  (string)
+    {path}            (string)
+    {find_xcodeproj}  (boolean)
 
 
                                   *xcodebuild.project.manager.add_current_group*

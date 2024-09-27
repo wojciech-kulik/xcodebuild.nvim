@@ -101,7 +101,7 @@ end
 ---In case of error, it sends an error notification and returns an empty table.
 ---@param action string
 ---@param params string[]|nil
----@param search_for_project boolean
+---@param search_for_project boolean|nil
 ---@return string[]
 local function run(action, params, search_for_project)
   local allParams = ""
@@ -525,12 +525,13 @@ end
 
 ---Adds the group to the project.
 ---@param path string
-function M.add_group(path)
+---@param find_xcodeproj boolean
+function M.add_group(path, find_xcodeproj)
   if not helpers.validate_project() or not validate_xcodeproj_tool() then
     return
   end
 
-  run_add_group(path, false)
+  run_add_group(path, find_xcodeproj)
   notifications.send("Group has been added")
 end
 
