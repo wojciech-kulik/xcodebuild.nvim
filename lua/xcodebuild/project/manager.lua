@@ -315,6 +315,7 @@ end
 ---The group from {filepath} must exist in the project.
 ---@param filepath string
 ---@param targets string[]
+---@param findXcodeproj boolean
 function M.add_file_to_targets(filepath, targets, findXcodeproj)
   if not helpers.validate_project() or not validate_xcodeproj_tool() then
     return
@@ -426,6 +427,7 @@ end
 ---The group from {newFilePath} must exist in the project.
 ---@param oldFilePath string
 ---@param newFilePath string
+---@param findXcodeproj boolean
 function M.move_file(oldFilePath, newFilePath, findXcodeproj)
   if not helpers.validate_project() or not validate_xcodeproj_tool() then
     return
