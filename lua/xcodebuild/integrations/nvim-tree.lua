@@ -68,7 +68,8 @@ function M.setup()
       projectManager.add_file(data.fname, nil, {
         guessTarget = config.guess_target,
         createGroups = true,
-      }, config.find_xcodeproj)
+        findXcodeproj = config.find_xcodeproj,
+      })
     end
   end)
 

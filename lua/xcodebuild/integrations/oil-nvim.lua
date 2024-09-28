@@ -111,7 +111,8 @@ function M.setup()
               end, {
                 guessTarget = config.guess_target,
                 createGroups = true,
-              }, config.find_xcodeproj)
+                findXcodeproj = config.find_xcodeproj,
+              })
             end)
             coroutine.yield()
           end

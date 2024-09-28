@@ -46,14 +46,10 @@ end
 ---Uses the `find` command to search for the first `.xcodeproj` file
 ---in the specified directory and returns its absolute path if found.
 ---
----@param dir string The directory to search in.
----@return string|nil The absolute path to the `.xcodeproj` file, or nil if not found.
-local function find_xcodeproj_file(dir)
-  local function shell_escape(str)
-    return "'" .. string.gsub(str, "'", "'\\''") .. "'"
-  end
-
-  local cmd = "find " .. shell_escape(dir) .. ' -maxdepth 1 -name "*.xcodeproj" -print -quit 2> /dev/null'
+---@param dir string # The directory to search in.
+---@return string|nil # The absolute path to the `.xcodeproj` file, or nil if not found.
+local function findXcodeproj_file(dir)
+  local cmd = "find '" .. dir .. '\' -maxdepth 1 -name "*.xcodeproj" -print -quit 2> /dev/null'
   local result = util.shell(cmd)
   if result and #result > 0 and result[1] ~= "" then
     return result[1]
@@ -65,17 +61,17 @@ end
 ---Traverses up the directory path to find a `.xcodeproj` file.
 ---
 ---Starting from the given path, this function moves up the directory
----hierarchy searching for a `.xcodeproj` file in each directory.
+---hierarchy searching for a `.xcodeproj` file in each directory up to cwd, at which point it stops.
 ---Returns the absolute path to the `.xcodeproj` file if found.
 ---
----@param path string The starting path to begin the search from.
----@return string|nil The absolute path to the `.xcodeproj` file, or nil if not found.
-local function find_xcodeproj_path(path)
+---@param path string # The starting path to begin the search from.
+---@return string|nil # The absolute path to the `.xcodeproj` file, or nil if not found.
+local function findXcodeproj_path(path)
   local dir = path
   local cwd = vim.fn.getcwd()
 
   while dir and dir ~= cwd do
-    local xcodeproj = find_xcodeproj_file(dir)
+    local xcodeproj = findXcodeproj_file(dir)
     if xcodeproj then
       if xcodeproj == projectConfig.settings.xcodeproj then
         return nil
@@ -93,6 +89,28 @@ local function find_xcodeproj_path(path)
   return nil
 end
 
+--- Iterates over the provided parameters, checking if any parameter is a path.
+--- If a path is found, it searches for an `.xcodeproj` file starting from that parameter's path.
+--- Upon finding a `.xcodeproj` file, it inserts the path at the first position of the parameters
+--- list and returns `true`. If no `.xcodeproj` is found, returns `false`.
+---
+---@param table table # The table into which the `.xcodeproj` path is injected.
+---@param params string[] # The list of parameters to search through.
+---@return boolean # Returns true if an `.xcodeproj` path is found and injected; otherwise, false.
+local function inject_relative_xcodeproj(table, params)
+  for _, param in ipairs(params) do
+    if string.find(param, "/") then
+      local xcodeproj_path = findXcodeproj_path(param)
+      if xcodeproj_path then
+        table.insert(params, 1, xcodeproj_path)
+        return true
+      end
+    end
+  end
+
+  return false
+end
+
 ---Runs the `xcodeproj` tool with the provided action and parameters.
 ---
 ---If the output starts with "WARN:", it sends a warning notification and
@@ -101,28 +119,18 @@ end
 ---In case of error, it sends an error notification and returns an empty table.
 ---@param action string
 ---@param params string[]|nil
----@param search_for_project boolean|nil
+---@param searchForProject boolean|nil
 ---@return string[]
-local function run(action, params, search_for_project)
+local function run(action, params, searchForProject)
   local allParams = ""
   local project = projectConfig.settings.xcodeproj
   params = params or {}
-  search_for_project = search_for_project or false
 
-  if not search_for_project then
+  if not searchForProject or not inject_relative_xcodeproj(table, params) then
     table.insert(params, 1, project)
   end
 
   for _, param in ipairs(params) do
-    if search_for_project then
-      if string.find(param, "/") then
-        local xcodeproj_path = find_xcodeproj_path(param)
-        if xcodeproj_path then
-          allParams = " '" .. xcodeproj_path .. "'" .. allParams
-        end
-      end
-    end
-
     allParams = allParams .. " '" .. param .. "'"
   end
 
@@ -200,77 +208,77 @@ end
 ---@param targets string[]
 ---@param guessTarget boolean
 ---@param createGroups boolean
----@param find_xcodeproj boolean
+---@param findXcodeproj boolean
 ---@return string[]
-local function run_add_file(filepath, targets, guessTarget, createGroups, find_xcodeproj)
+local function run_add_file(filepath, targets, guessTarget, createGroups, findXcodeproj)
   return run("add_file", {
     table.concat(targets, ","),
     filepath,
     guessTarget and "true" or "false",
     createGroups and "true" or "false",
-  }, find_xcodeproj)
+  }, findXcodeproj)
 end
 
 ---Updates the file targets.
 ---@param filepath string
 ---@param targets string[]
----@param find_xcodeproj boolean
-local function run_update_file_targets(filepath, targets, find_xcodeproj)
+---@param findXcodeproj boolean
+local function run_update_file_targets(filepath, targets, findXcodeproj)
   local targetsJoined = table.concat(targets, ",")
-  run("update_file_targets", { targetsJoined, filepath }, find_xcodeproj)
+  run("update_file_targets", { targetsJoined, filepath }, findXcodeproj)
 end
 
 ---Deletes the file from the project.
 ---@param filepath string
----@param find_xcodeproj boolean
-local function run_delete_file(filepath, find_xcodeproj)
-  run("delete_file", { filepath }, find_xcodeproj)
+---@param findXcodeproj boolean
+local function run_delete_file(filepath, findXcodeproj)
+  run("delete_file", { filepath }, findXcodeproj)
 end
 
 ---Renames the file.
 ---@param oldPath string
 ---@param newPath string
----@param find_xcodeproj boolean
-local function run_rename_file(oldPath, newPath, find_xcodeproj)
-  run("rename_file", { oldPath, newPath }, find_xcodeproj)
+---@param findXcodeproj boolean
+local function run_rename_file(oldPath, newPath, findXcodeproj)
+  run("rename_file", { oldPath, newPath }, findXcodeproj)
 end
 
 ---Moves the file.
 ---@param oldPath string
 ---@param newPath string
----@param find_xcodeproj boolean
-local function run_move_file(oldPath, newPath, find_xcodeproj)
-  run("move_file", { oldPath, newPath }, find_xcodeproj)
+---@param findXcodeproj boolean
+local function run_move_file(oldPath, newPath, findXcodeproj)
+  run("move_file", { oldPath, newPath }, findXcodeproj)
 end
 
 ---Adds a new group.
 ---@param path string
----@param find_xcodeproj boolean
-local function run_add_group(path, find_xcodeproj)
-  run("add_group", { path }, find_xcodeproj)
+---@param findXcodeproj boolean
+local function run_add_group(path, findXcodeproj)
+  run("add_group", { path }, findXcodeproj)
 end
 
 ---Renames the group.
 ---@param oldPath string
 ---@param newPath string
----@param find_xcodeproj boolean
-local function run_rename_group(oldPath, newPath, find_xcodeproj)
-  run("rename_group", { oldPath, newPath }, find_xcodeproj)
+---@param findXcodeproj boolean
+local function run_rename_group(oldPath, newPath, findXcodeproj)
+  run("rename_group", { oldPath, newPath }, findXcodeproj)
 end
 
 ---Moves the group.
 ---@param oldPath string
 ---@param newPath string
----@param find_xcodeproj boolean
-local function run_move_group(oldPath, newPath, find_xcodeproj)
-  run("move_group", { oldPath, newPath }, find_xcodeproj)
+---@param findXcodeproj boolean
+local function run_move_group(oldPath, newPath, findXcodeproj)
+  run("move_group", { oldPath, newPath }, findXcodeproj)
 end
 
 ---Deletes the group.
 ---@param path string
----@param find_xcodeproj boolean
-local function run_delete_group(path, find_xcodeproj)
-  run("delete_group", { path }, find_xcodeproj)
+---@param findXcodeproj boolean
+local function run_delete_group(path, findXcodeproj)
+  run("delete_group", { path }, findXcodeproj)
 end
 
 ---Deletes the current buffer and loads {path}.
@@ -310,12 +318,12 @@ end
 ---The group from {filepath} must exist in the project.
 ---@param filepath string
 ---@param targets string[]
-function M.add_file_to_targets(filepath, targets, find_xcodeproj)
+function M.add_file_to_targets(filepath, targets, findXcodeproj)
   if not helpers.validate_project() or not validate_xcodeproj_tool() then
     return
   end
 
-  run_add_file(filepath, targets, false, false, find_xcodeproj)
+  run_add_file(filepath, targets, false, false, findXcodeproj)
 end
 
 ---Returns all project targets.
@@ -371,9 +379,8 @@ end
 ---Calls the {callback} after the file has been added to the targets or the user has canceled the action.
 ---@param filepath string
 ---@param callback function|nil
----@param opts {guessTarget: boolean, createGroups: boolean}|nil
----@param find_xcodeproj boolean
-function M.add_file(filepath, callback, opts, find_xcodeproj)
+---@param opts {guessTarget: boolean, createGroups: boolean, findXcodeproj: boolean}|nil
+function M.add_file(filepath, callback, opts)
   if not helpers.validate_project() or not validate_xcodeproj_tool() then
     return
   end
@@ -384,7 +391,7 @@ function M.add_file(filepath, callback, opts, find_xcodeproj)
   ---@param targets string[]|nil
   local function addFileWithTargetPicker(targets)
     show_target_picker(filename, targets, function(selectedTargets)
-      run_add_file(filepath, selectedTargets, false, true, find_xcodeproj)
+      run_add_file(filepath, selectedTargets, false, true, opts.findXcodeproj)
       notifications.send(
         '"' .. filename .. '" has been added to target(s): ' .. table.concat(selectedTargets, ", ")
       )
@@ -392,7 +399,7 @@ function M.add_file(filepath, callback, opts, find_xcodeproj)
   end
 
   local function addFileWithGuessing()
-    local output = run_add_file(filepath, {}, opts.guessTarget, opts.createGroups, find_xcodeproj)
+    local output = run_add_file(filepath, {}, opts.guessTarget, opts.createGroups, opts.findXcodeproj)
 
     if output[1] == "Success" then
       table.remove(output, 1)
@@ -415,19 +422,19 @@ end
 ---Ask the user to select the targets.
 ---All groups will be added to the project if they are not already there.
 function M.add_current_file()
-  M.add_file(vim.fn.expand("%:p"), nil, { createGroups = true, guessTarget = true }, false)
+  M.add_file(vim.fn.expand("%:p"), nil, { createGroups = true, guessTarget = true, findXcodeproj = false })
 end
 
 ---Moves the file to the new path in the project.
 ---The group from {newFilePath} must exist in the project.
 ---@param oldFilePath string
 ---@param newFilePath string
-function M.move_file(oldFilePath, newFilePath, find_xcodeproj)
+function M.move_file(oldFilePath, newFilePath, findXcodeproj)
   if not helpers.validate_project() or not validate_xcodeproj_tool() then
     return
   end
 
-  run_move_file(oldFilePath, newFilePath, find_xcodeproj)
+  run_move_file(oldFilePath, newFilePath, findXcodeproj)
 
   if vim.fs.basename(oldFilePath) == vim.fs.basename(newFilePath) then
     notifications.send("File has been moved")
@@ -439,13 +446,13 @@ end
 ---Renames the file in the project.
 ---@param oldFilePath string
 ---@param newFilePath string
----@param find_xcodeproj boolean
-function M.rename_file(oldFilePath, newFilePath, find_xcodeproj)
+---@param findXcodeproj boolean
+function M.rename_file(oldFilePath, newFilePath, findXcodeproj)
   if not helpers.validate_project() or not validate_xcodeproj_tool() then
     return
   end
 
-  run_rename_file(oldFilePath, newFilePath, find_xcodeproj)
+  run_rename_file(oldFilePath, newFilePath, findXcodeproj)
   notifications.send("File has been renamed")
 end
 
@@ -473,13 +480,13 @@ end
 
 ---Deletes the file from the project.
 ---@param filepath string
----@param find_xcodeproj boolean
-function M.delete_file(filepath, find_xcodeproj)
+---@param findXcodeproj boolean
+function M.delete_file(filepath, findXcodeproj)
   if not helpers.validate_project() or not validate_xcodeproj_tool() then
     return
   end
 
-  run_delete_file(filepath, find_xcodeproj)
+  run_delete_file(filepath, findXcodeproj)
   notifications.send("File has been deleted")
 end
 
@@ -525,13 +532,13 @@ end
 
 ---Adds the group to the project.
 ---@param path string
----@param find_xcodeproj boolean
-function M.add_group(path, find_xcodeproj)
+---@param findXcodeproj boolean
+function M.add_group(path, findXcodeproj)
   if not helpers.validate_project() or not validate_xcodeproj_tool() then
     return
   end
 
-  run_add_group(path, find_xcodeproj)
+  run_add_group(path, findXcodeproj)
   notifications.send("Group has been added")
 end
 
@@ -543,13 +550,13 @@ end
 ---Renames the group in the project.
 ---@param oldGroupPath string
 ---@param newGroupPath string
----@param find_xcodeproj boolean
-function M.rename_group(oldGroupPath, newGroupPath, find_xcodeproj)
+---@param findXcodeproj boolean
+function M.rename_group(oldGroupPath, newGroupPath, findXcodeproj)
   if not helpers.validate_project() or not validate_xcodeproj_tool() then
     return
   end
 
-  run_rename_group(oldGroupPath, newGroupPath, find_xcodeproj)
+  run_rename_group(oldGroupPath, newGroupPath, findXcodeproj)
   notifications.send("Group has been renamed")
 end
 
@@ -584,8 +591,8 @@ end
 ---The parent group of {newGroupPath} must exist.
 ---@param oldGroupPath string
 ---@param newGroupPath string
----@param find_xcodeproj boolean
-function M.move_or_rename_group(oldGroupPath, newGroupPath, find_xcodeproj)
+---@param findXcodeproj boolean
+function M.move_or_rename_group(oldGroupPath, newGroupPath, findXcodeproj)
   if not helpers.validate_project() or not validate_xcodeproj_tool() then
     return
   end
@@ -594,21 +601,21 @@ function M.move_or_rename_group(oldGroupPath, newGroupPath, find_xcodeproj)
   local newDir = vim.fn.fnamemodify(newGroupPath, ":h")
 
   if oldDir ~= newDir then
-    run_move_group(oldGroupPath, newGroupPath, find_xcodeproj)
+    run_move_group(oldGroupPath, newGroupPath, findXcodeproj)
     notifications.send("Group has been moved")
   else
-    run_rename_group(oldGroupPath, newGroupPath, find_xcodeproj)
+    run_rename_group(oldGroupPath, newGroupPath, findXcodeproj)
     notifications.send("Group has been renamed")
   end
 end
 
 ---Deletes the group from the project.
-function M.delete_group(groupPath, find_xcodeproj)
+function M.delete_group(groupPath, findXcodeproj)
   if not helpers.validate_project() or not validate_xcodeproj_tool() then
     return
   end
 
-  run_delete_group(groupPath, find_xcodeproj)
+  run_delete_group(groupPath, findXcodeproj)
   notifications.send("Group has been deleted")
 end
 
