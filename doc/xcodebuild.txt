@@ -1882,13 +1882,14 @@ M.create_new_file()
 
 
                                 *xcodebuild.project.manager.add_file_to_targets*
-M.add_file_to_targets({filepath}, {targets})
+M.add_file_to_targets({filepath}, {targets}, {findXcodeproj})
   Adds the file to the selected targets.
   The group from {filepath} must exist in the project.
 
   Parameters: ~
-    {filepath}  (string)
-    {targets}   (string[])
+    {filepath}       (string)
+    {targets}        (string[])
+    {findXcodeproj}  (boolean)
 
 
                                 *xcodebuild.project.manager.get_project_targets*
@@ -1924,13 +1925,14 @@ M.add_current_file()
 
 
                                           *xcodebuild.project.manager.move_file*
-M.move_file({oldFilePath}, {newFilePath})
+M.move_file({oldFilePath}, {newFilePath}, {findXcodeproj})
   Moves the file to the new path in the project.
   The group from {newFilePath} must exist in the project.
 
   Parameters: ~
-    {oldFilePath}  (string)
-    {newFilePath}  (string)
+    {oldFilePath}    (string)
+    {newFilePath}    (string)
+    {findXcodeproj}  (boolean)
 
 
                                         *xcodebuild.project.manager.rename_file*
