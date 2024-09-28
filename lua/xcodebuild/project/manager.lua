@@ -96,7 +96,7 @@ end
 ---@return boolean # Returns true if an `.xcodeproj` path is found and injected; otherwise, false.
 local function inject_relative_xcodeproj(table, params)
   for _, param in ipairs(params) do
-    if string.find(param, "/") then
+    if vim.startswith(param, "/") then
       local xcodeproj_path = findXcodeproj_path(param)
       if xcodeproj_path then
         table.insert(params, 1, xcodeproj_path)
