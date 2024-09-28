@@ -111,6 +111,7 @@ function M.setup()
               end, {
                 guessTarget = config.guess_target,
                 createGroups = true,
+                findXcodeproj = config.find_xcodeproj,
               })
             end)
             coroutine.yield()
@@ -118,7 +119,7 @@ function M.setup()
 
           if action.type == "create" then
             if action.entry_type == "directory" then
-              projectManager.add_group(path)
+              projectManager.add_group(path, config.find_xcodeproj)
             elseif action.entry_type == "file" then
               addFileAndWaitForTargetSelection(path)
             end
@@ -133,20 +134,20 @@ function M.setup()
             end
           elseif action.type == "delete" then
             if action.entry_type == "directory" then
-              projectManager.delete_group(path)
+              projectManager.delete_group(path, config.find_xcodeproj)
             elseif action.entry_type == "file" then
-              projectManager.delete_file(path)
+              projectManager.delete_file(path, config.find_xcodeproj)
             end
           elseif action.type == "move" then
             if action.entry_type == "directory" then
               local destPath = parseUrl(action.dest_url)
               if destPath then
-                projectManager.move_or_rename_group(path, destPath)
+                projectManager.move_or_rename_group(path, destPath, config.find_xcodeproj)
               end
             elseif action.entry_type == "file" then
               local destPath = parseUrl(action.dest_url)
               if destPath then
-                projectManager.move_file(path, destPath)
+                projectManager.move_file(path, destPath, config.find_xcodeproj)
               end
             end
           end

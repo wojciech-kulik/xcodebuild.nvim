@@ -50,16 +50,16 @@ function M.setup()
     if shouldUpdateProject(data.old_name) then
       local isDir = vim.fn.isdirectory(data.new_name) == 1
       if isDir then
-        projectManager.move_or_rename_group(data.old_name, data.new_name)
+        projectManager.move_or_rename_group(data.old_name, data.new_name, config.find_xcodeproj)
       else
-        projectManager.move_file(data.old_name, data.new_name)
+        projectManager.move_file(data.old_name, data.new_name, config.find_xcodeproj)
       end
     end
   end)
 
   api.events.subscribe(Event.FileRemoved, function(data)
     if shouldUpdateProject(data.fname) then
-      projectManager.delete_file(data.fname)
+      projectManager.delete_file(data.fname, config.find_xcodeproj)
     end
   end)
 
@@ -68,6 +68,7 @@ function M.setup()
       projectManager.add_file(data.fname, nil, {
         guessTarget = config.guess_target,
         createGroups = true,
+        findXcodeproj = config.find_xcodeproj,
       })
     end
   end)
@@ -76,13 +77,13 @@ function M.setup()
     local isDir = vim.fn.isdirectory(data.folder_name) == 1
 
     if shouldUpdateProject(data.folder_name) and isDir then
-      projectManager.add_group(data.folder_name)
+      projectManager.add_group(data.folder_name, config.find_xcodeproj)
     end
   end)
 
   api.events.subscribe(Event.FolderRemoved, function(data)
     if shouldUpdateProject(data.folder_name) then
-      projectManager.delete_group(data.folder_name)
+      projectManager.delete_group(data.folder_name, config.find_xcodeproj)
     end
   end)
 end

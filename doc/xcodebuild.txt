@@ -1882,13 +1882,14 @@ M.create_new_file()
 
 
                                 *xcodebuild.project.manager.add_file_to_targets*
-M.add_file_to_targets({filepath}, {targets})
+M.add_file_to_targets({filepath}, {targets}, {findXcodeproj})
   Adds the file to the selected targets.
   The group from {filepath} must exist in the project.
 
   Parameters: ~
-    {filepath}  (string)
-    {targets}   (string[])
+    {filepath}       (string)
+    {targets}        (string[])
+    {findXcodeproj}  (boolean)
 
 
                                 *xcodebuild.project.manager.get_project_targets*
@@ -1913,7 +1914,7 @@ M.add_file({filepath}, {callback}, {opts})
   Parameters: ~
     {filepath}  (string)
     {callback}  (function|nil)
-    {opts}      ({guessTarget:boolean,createGroups:boolean}|nil)
+    {opts}      ({guessTarget:boolean,createGroups:boolean,findXcodeproj:boolean}|nil)
 
 
                                    *xcodebuild.project.manager.add_current_file*
@@ -1924,22 +1925,24 @@ M.add_current_file()
 
 
                                           *xcodebuild.project.manager.move_file*
-M.move_file({oldFilePath}, {newFilePath})
+M.move_file({oldFilePath}, {newFilePath}, {findXcodeproj})
   Moves the file to the new path in the project.
   The group from {newFilePath} must exist in the project.
 
   Parameters: ~
-    {oldFilePath}  (string)
-    {newFilePath}  (string)
+    {oldFilePath}    (string)
+    {newFilePath}    (string)
+    {findXcodeproj}  (boolean)
 
 
                                         *xcodebuild.project.manager.rename_file*
-M.rename_file({oldFilePath}, {newFilePath})
+M.rename_file({oldFilePath}, {newFilePath}, {findXcodeproj})
   Renames the file in the project.
 
   Parameters: ~
-    {oldFilePath}  (string)
-    {newFilePath}  (string)
+    {oldFilePath}    (string)
+    {newFilePath}    (string)
+    {findXcodeproj}  (boolean)
 
 
                                 *xcodebuild.project.manager.rename_current_file*
@@ -1948,11 +1951,13 @@ M.rename_current_file()
   Asks the user for the new file name.
 
 
-M.delete_file({filepath})               *xcodebuild.project.manager.delete_file*
+                                        *xcodebuild.project.manager.delete_file*
+M.delete_file({filepath}, {findXcodeproj})
   Deletes the file from the project.
 
   Parameters: ~
-    {filepath}  (string)
+    {filepath}       (string)
+    {findXcodeproj}  (boolean)
 
 
                                 *xcodebuild.project.manager.delete_current_file*
@@ -1967,11 +1972,12 @@ M.create_new_group()
   Asks the user for the group name.
 
 
-M.add_group({path})                       *xcodebuild.project.manager.add_group*
+M.add_group({path}, {findXcodeproj})      *xcodebuild.project.manager.add_group*
   Adds the group to the project.
 
   Parameters: ~
-    {path}  (string)
+    {path}           (string)
+    {findXcodeproj}  (boolean)
 
 
                                   *xcodebuild.project.manager.add_current_group*
@@ -1980,12 +1986,13 @@ M.add_current_group()
 
 
                                        *xcodebuild.project.manager.rename_group*
-M.rename_group({oldGroupPath}, {newGroupPath})
+M.rename_group({oldGroupPath}, {newGroupPath}, {findXcodeproj})
   Renames the group in the project.
 
   Parameters: ~
-    {oldGroupPath}  (string)
-    {newGroupPath}  (string)
+    {oldGroupPath}   (string)
+    {newGroupPath}   (string)
+    {findXcodeproj}  (boolean)
 
 
                                *xcodebuild.project.manager.rename_current_group*
@@ -1995,15 +2002,16 @@ M.rename_current_group()
 
 
                                *xcodebuild.project.manager.move_or_rename_group*
-M.move_or_rename_group({oldGroupPath}, {newGroupPath})
+M.move_or_rename_group({oldGroupPath}, {newGroupPath}, {findXcodeproj})
   Moves or renames the group in the project.
   If the parent path is different, it moves the group.
   If the parent path is the same, it renames the group.
   The parent group of {newGroupPath} must exist.
 
   Parameters: ~
-    {oldGroupPath}  (string)
-    {newGroupPath}  (string)
+    {oldGroupPath}   (string)
+    {newGroupPath}   (string)
+    {findXcodeproj}  (boolean)
 
 
 M.delete_group()                       *xcodebuild.project.manager.delete_group*
