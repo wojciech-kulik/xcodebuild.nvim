@@ -70,7 +70,7 @@ local function findXcodeproj_path(path)
   local dir = path
   local cwd = vim.fn.getcwd()
 
-  while dir and dir ~= cwd and dir ~= "/" and dir ~= "" do
+  while dir and dir ~= cwd and dir ~= "/" do
     local xcodeproj = findXcodeproj_file(dir)
     if xcodeproj then
       if xcodeproj == projectConfig.settings.xcodeproj then
@@ -80,10 +80,7 @@ local function findXcodeproj_path(path)
       return xcodeproj
     end
 
-    dir = dir:match("(.*/)[^/]+/?$")
-    if dir and dir:sub(-1) == "/" then
-      dir = dir:sub(1, -2)
-    end
+    dir = vim.fn.fnamemodify(dir, ":h")
   end
 
   return nil
