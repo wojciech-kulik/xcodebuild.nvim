@@ -38,6 +38,12 @@ function M.setup()
     end,
   })
 
+  vim.api.nvim_create_autocmd({ "BufReadPost" }, {
+    group = autogroup,
+    pattern = "*.swiftinterface",
+    command = "set filetype=swift",
+  })
+
   if config.marks.show_diagnostics or config.marks.show_signs then
     vim.api.nvim_create_autocmd({ "BufReadPost" }, {
       group = autogroup,
