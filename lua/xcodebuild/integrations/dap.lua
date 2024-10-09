@@ -540,6 +540,7 @@ function M.setup(codelldbPath, loadBreakpoints)
   local dap = require("dap")
   dap.configurations.swift = M.get_swift_configuration()
   dap.adapters.codelldb = M.get_codelldb_adapter(codelldbPath)
+  dap.defaults.fallback.exception_breakpoints = {}
 
   if loadBreakpoints ~= false then
     vim.api.nvim_create_autocmd({ "BufReadPost" }, {
