@@ -23,6 +23,7 @@
 ---@field xcodeproj string|nil xcodeproj file path (ex. "path/to/Project.xcodeproj")
 ---@field lastBuildTime number|nil last build time in seconds
 ---@field showCoverage boolean|nil if the inline code coverage should be shown
+---@field skipValidateBin boolean|nil if xcode-build-server should skip bin validation 
 
 local M = {}
 
