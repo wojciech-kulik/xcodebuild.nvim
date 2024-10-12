@@ -67,8 +67,8 @@ local M = {}
 ---It's a list of targets, each target has a list of classes,
 ---and each class has a list of tests.
 ---
----@type TestExplorerNode[]|nil
-M.report = nil
+---@type TestExplorerNode[]
+M.report = {}
 
 local STATUS_NOT_EXECUTED = "not_executed"
 local STATUS_PARTIAL_EXECUTION = "partial_execution"
@@ -88,9 +88,53 @@ local line_to_test = {}
 local collapsed_ids = {}
 local ns = vim.api.nvim_create_namespace("xcodebuild-test-explorer")
 local last_run_tests = {}
+local is_notests_message_visible = false
 
 ---@type IdToTestNode[]
 local id_to_test = {}
+
+local function show_notests_message()
+  if not M.bufnr then
+    return
+  end
+
+  helpers.update_readonly_buffer(M.bufnr, function()
+    vim.api.nvim_buf_set_lines(M.bufnr, 0, -1, false, {
+      "",
+      "  No tests found.",
+      "",
+      "  Tests will automatically appear",
+      "  during the first run.",
+      "",
+      "  Press `R` to fetch tests",
+      "  without running them.",
+    })
+  end)
+
+  for i = 4, 8 do
+    vim.api.nvim_buf_add_highlight(M.bufnr, ns, "Comment", i - 1, 0, -1)
+  end
+
+  is_notests_message_visible = true
+end
+
+local function hide_notests_message()
+  if not is_notests_message_visible then
+    return
+  end
+
+  helpers.update_readonly_buffer(M.bufnr, function()
+    vim.api.nvim_buf_set_lines(M.bufnr, 0, -1, false, {})
+  end)
+  vim.api.nvim_buf_clear_namespace(M.bufnr, ns, 0, -1)
+
+  is_notests_message_visible = false
+end
+
+---Saves `M.report` to file.
+local function save_tests()
+  appdata.write_test_explorer_data(M.report)
+end
 
 ---Generates the report for provided tests.
 ---Sets the `M.report` variable.
@@ -160,6 +204,74 @@ local function generate_report(tests)
 
   M.report = targets
   appdata.write_test_explorer_data(M.report)
+end
+
+---Insert test to `M.report`.
+---@param test XcodeTest
+---@param status TestExplorerNodeStatus
+---@return integer # number of inserted nodes
+---@see TestExplorerReport
+local function insert_test(test, status)
+  local target = id_to_test[test.target]
+  local class = id_to_test[test.target .. "/" .. test.class]
+  local testTarget = target and target.test
+  local testClass = class and class.test
+  local insertedNodes = 0
+
+  local testSearch = require("xcodebuild.tests.search")
+  local filepath = testSearch.find_filepath(test.target, test.class)
+
+  if not config.open_expanded then
+    collapsed_ids[test.target .. "/" .. test.class] = true
+  end
+
+  if not testTarget then
+    testTarget = {
+      id = test.target,
+      kind = KIND_TARGET,
+      status = test.enabled and status or STATUS_DISABLED,
+      name = test.target,
+      hidden = false,
+      classes = {},
+    }
+    id_to_test[testTarget.id] = { test = testTarget }
+    table.insert(M.report, testTarget)
+    insertedNodes = insertedNodes + 1
+  end
+
+  if not testClass then
+    testClass = {
+      id = test.target .. "/" .. test.class,
+      kind = KIND_CLASS,
+      status = test.enabled and status or STATUS_DISABLED,
+      name = test.class,
+      filepath = filepath,
+      hidden = collapsed_ids[test.target] or false,
+      tests = {},
+    }
+    id_to_test[testClass.id] = { test = testClass }
+    table.insert(testTarget.classes, testClass)
+    if not testClass.hidden then
+      insertedNodes = insertedNodes + 1
+    end
+  end
+
+  local testToInsert = {
+    id = test.id,
+    kind = KIND_TEST,
+    status = test.enabled and status or STATUS_DISABLED,
+    name = test.name,
+    filepath = filepath,
+    hidden = collapsed_ids[test.target] or collapsed_ids[test.target .. "/" .. test.class] or false,
+  }
+  id_to_test[testToInsert.id] = { test = testToInsert }
+  table.insert(testClass.tests, testToInsert)
+
+  if not testToInsert.hidden then
+    insertedNodes = insertedNodes + 1
+  end
+
+  return insertedNodes
 end
 
 ---Gets the highlight group for the provided status.
@@ -366,7 +478,7 @@ local function refresh_explorer(dontUpdateBuffer)
     end
   end
 
-  if not M.bufnr or dontUpdateBuffer then
+  if not M.bufnr or dontUpdateBuffer or util.is_empty(lines) then
     return
   end
 
@@ -386,6 +498,50 @@ local function refresh_explorer(dontUpdateBuffer)
       highlight.col_end
     )
   end
+end
+
+---Autoscrolls the cursor to the provided row.
+---@param row number|nil
+local function autoscroll_cursor(row)
+  local winnr = M.bufnr and vim.fn.win_findbuf(M.bufnr)[1]
+
+  if winnr and config.cursor_follows_tests and row and last_set_cursor_row ~= row then
+    vim.api.nvim_win_set_cursor(winnr, { row, 0 })
+    last_set_cursor_row = row
+  end
+end
+
+---Updates test status.
+---@param target TestExplorerNode
+---@param class TestExplorerNode
+---@param test TestExplorerNode
+---@param status TestExplorerNodeStatus
+local function update_status(target, class, test, status)
+  test.status = test.status == STATUS_DISABLED and STATUS_DISABLED or status
+  class.status = get_aggregated_status(class.tests)
+  target.status = get_aggregated_status(target.classes)
+
+  if not M.bufnr then
+    return
+  end
+
+  helpers.update_readonly_buffer(M.bufnr, function()
+    local moveCursorToRow = nil
+    local toUpdate = {
+      id_to_test[test.id],
+      id_to_test[class.id],
+      id_to_test[target.id],
+    }
+
+    for _, data in ipairs(toUpdate) do
+      if data and data.row then
+        moveCursorToRow = moveCursorToRow or data.row
+        update_test_line(data.test, data.row)
+      end
+    end
+
+    autoscroll_cursor(moveCursorToRow)
+  end)
 end
 
 ---Animates the status of running tests.
@@ -442,9 +598,7 @@ local function setup_buffer()
   vim.api.nvim_buf_set_keymap(M.bufnr, "n", "R", "", {
     callback = function()
       helpers.cancel_actions()
-      require("xcodebuild.tests.runner").show_test_explorer(function()
-        notifications.send("")
-      end)
+      require("xcodebuild.tests.runner").reload_tests()
     end,
     nowait = true,
   })
@@ -464,9 +618,9 @@ end
 
 ---Loads the saved state of the Test Explorer.
 local function load_saved_state()
-  M.report = appdata.read_test_explorer_data()
+  M.report = appdata.read_test_explorer_data() or {}
 
-  if not M.report then
+  if util.is_empty(M.report) then
     return
   end
 
@@ -489,17 +643,6 @@ local function load_saved_state()
       once = true,
       callback = callback,
     })
-  end
-end
-
----Autoscrolls the cursor to the provided row.
----@param row number|nil
-local function autoscroll_cursor(row)
-  local winnr = M.bufnr and vim.fn.win_findbuf(M.bufnr)[1]
-
-  if winnr and config.cursor_follows_tests and row and last_set_cursor_row ~= row then
-    vim.api.nvim_win_set_cursor(winnr, { row, 0 })
-    last_set_cursor_row = row
   end
 end
 
@@ -616,10 +759,6 @@ end
 ---all enabled tests will be marked as `running`.
 ---@param selectedTests string[]|nil test ids
 function M.start_tests(selectedTests)
-  if not M.report then
-    return
-  end
-
   last_set_cursor_row = nil
   last_run_tests = selectedTests or {}
 
@@ -669,10 +808,6 @@ function M.finish_tests()
     M.timer = nil
   end
 
-  if not M.report then
-    return
-  end
-
   for _, target in ipairs(M.report) do
     for _, class in ipairs(target.classes) do
       for _, test in ipairs(class.tests) do
@@ -692,7 +827,7 @@ function M.finish_tests()
   end
 
   refresh_explorer()
-  appdata.write_test_explorer_data(M.report)
+  save_tests()
 end
 
 ---Updates the status of the test with the provided {testId}.
@@ -700,85 +835,55 @@ end
 ---@param testId string
 ---@param status TestExplorerNodeStatus
 function M.update_test_status(testId, status)
-  ---@param target TestExplorerNode
-  ---@param class TestExplorerNode
-  ---@param test TestExplorerNode
-  local function update_status(target, class, test)
-    test.status = test.status == STATUS_DISABLED and STATUS_DISABLED or status
-    class.status = get_aggregated_status(class.tests)
-    target.status = get_aggregated_status(target.classes)
-
-    if not M.bufnr then
-      return
-    end
-
-    helpers.update_readonly_buffer(M.bufnr, function()
-      local moveCursorToRow = nil
-      local toUpdate = {
-        id_to_test[test.id],
-        id_to_test[class.id],
-        id_to_test[target.id],
-      }
-
-      for _, data in ipairs(toUpdate) do
-        if data and data.row then
-          moveCursorToRow = moveCursorToRow or data.row
-          update_test_line(data.test, data.row)
-        end
-      end
-
-      autoscroll_cursor(moveCursorToRow)
-    end)
-  end
-
-  ---
-
-  if not M.report then
-    return
-  end
-
   local idComponents = vim.split(testId, "/", { plain = true })
   local targetId = idComponents[1]
   local classId = table.concat({ idComponents[1], idComponents[2] }, "/")
-
   local testData = id_to_test[testId]
-  local classData = id_to_test[classId]
+
+  hide_notests_message()
 
   if testData then
-    update_status(id_to_test[targetId].test, classData.test, testData.test)
-  elseif idComponents[3] and classData then
-    -- if we found the class, but the test is not there, insert it.
-    -- It happens when using Quick installed via SPM.
-    local test = {
+    local classData = id_to_test[classId]
+    update_status(id_to_test[targetId].test, classData.test, testData.test, status)
+  else
+    local insertedNodes = insert_test({
       id = testId,
-      kind = KIND_TEST,
-      status = status,
+      target = idComponents[1],
+      class = idComponents[2],
       name = idComponents[3],
-      filepath = classData.test.filepath,
-      hidden = collapsed_ids[targetId] or collapsed_ids[classId] or false,
-    }
-    table.insert(classData.test.tests, test)
+      enabled = true,
+    }, status)
 
     refresh_explorer(true)
 
-    local row = classData.row and (classData.row + #classData.test.tests)
-    if row and not test.hidden then
+    testData = id_to_test[testId]
+    local classData = id_to_test[classId]
+
+    if not M.bufnr then
+      update_status(id_to_test[targetId].test, classData.test, testData.test, status)
+      return
+    end
+
+    -- empty buffer has always 1 line
+    if vim.api.nvim_buf_line_count(M.bufnr) == 1 then
+      insertedNodes = insertedNodes - 1
+    end
+
+    if insertedNodes > 0 then
       helpers.update_readonly_buffer(M.bufnr, function()
-        vim.api.nvim_buf_set_lines(M.bufnr, row - 1, row - 1, false, { "" })
+        for _ = 1, insertedNodes do
+          vim.api.nvim_buf_set_lines(M.bufnr, -1, -1, false, { "" })
+        end
       end)
     end
 
-    update_status(id_to_test[targetId].test, classData.test, test)
+    update_status(id_to_test[targetId].test, classData.test, testData.test, status)
   end
 end
 
 ---Jumps to the next or previous failed test on the list.
 ---@param next boolean
 function M.jump_to_failed_test(next)
-  if not M.report then
-    return
-  end
-
   local winnr = vim.fn.win_findbuf(M.bufnr)
   if not winnr or not winnr[1] then
     return
@@ -789,7 +894,7 @@ end
 
 ---Repeats the last executed tests or runs all tests.
 function M.repeat_last_run()
-  if not M.report then
+  if util.is_empty(M.report) then
     notifications.send_error("No tests are loaded. Please run tests first.")
     return
   end
@@ -797,15 +902,15 @@ function M.repeat_last_run()
   helpers.cancel_actions()
 
   if util.is_empty(last_run_tests) then
-    require("xcodebuild.tests.runner").run_tests(nil, { skipEnumeration = true })
+    require("xcodebuild.tests.runner").run_tests(nil)
   else
-    require("xcodebuild.tests.runner").run_tests(last_run_tests, { skipEnumeration = true })
+    require("xcodebuild.tests.runner").run_tests(last_run_tests)
   end
 end
 
 ---Runs the selected tests (in visual-mode).
 function M.run_selected_tests()
-  if not M.report then
+  if util.is_empty(M.report) then
     return
   end
 
@@ -845,7 +950,7 @@ function M.run_selected_tests()
 
   if #selectedTests > 0 then
     helpers.cancel_actions()
-    require("xcodebuild.tests.runner").run_tests(selectedTests, { skipEnumeration = true })
+    require("xcodebuild.tests.runner").run_tests(selectedTests)
   else
     notifications.send_error("Tests not found")
   end
@@ -883,15 +988,6 @@ function M.show()
     return
   end
 
-  if not M.report then
-    helpers.cancel_actions()
-    require("xcodebuild.tests.runner").show_test_explorer(function()
-      notifications.send("")
-    end, { forceShow = true })
-
-    return
-  end
-
   if not M.bufnr or util.is_empty(vim.fn.win_findbuf(M.bufnr)) then
     if M.load_autocmd then
       vim.api.nvim_del_autocmd(M.load_autocmd)
@@ -909,15 +1005,15 @@ function M.show()
   end
 
   refresh_explorer()
+
+  if util.is_empty(M.report) then
+    show_notests_message()
+  end
 end
 
 ---Loads tests and generates the report.
 ---@param tests XcodeTest[]
 function M.load_tests(tests)
-  if not config.enabled then
-    return
-  end
-
   M.finish_tests()
   generate_report(tests)
   refresh_explorer()
