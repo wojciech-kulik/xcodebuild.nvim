@@ -2782,7 +2782,7 @@ M.report                                      *xcodebuild.tests.explorer.report*
 
 
   Type: ~
-    (TestExplorerNode[]|nil)
+    (TestExplorerNode[])
 
 
                                   *xcodebuild.tests.explorer.toggle_all_classes*
@@ -2919,26 +2919,12 @@ This module contains the functionality to run tests.
 It interacts with multiple modules to build, run, and
 present test results.
 
-                                    *xcodebuild.tests.runner.show_test_explorer*
-M.show_test_explorer({callback}, {opts})
-  Shows the Test Explorer and runs the provided {callback}
-  after tests are loaded.
-
-  It also triggers build for testing if tests are not loaded.
-
-  If Test Explorer is disabled, it only triggers build for testing.
-
-  If {opts.skipEnumeration} is true, it skips the enumeration
-  (used when user runs tests from the Test Explorer).
-  If {opts.forceShow} is true, it forces showing the Test Explorer,
-  even if it's disabled in the configuration.
-
-  Parameters: ~
-    {callback}  (function|nil)
-    {opts}      ({skipEnumeration:boolean|nil,forceShow:boolean|nil}|nil)
+M.reload_tests()                          *xcodebuild.tests.runner.reload_tests*
+  Builds application, enumerates tests, and loads
+  them into the Test Explorer.
 
 
-M.run_tests({testsToRun}, {opts})            *xcodebuild.tests.runner.run_tests*
+M.run_tests({testsToRun})                    *xcodebuild.tests.runner.run_tests*
   Runs the provided {testsToRun} and shows the Test Explorer.
   If {testsToRun} is nil, it runs all tests.
 
@@ -2950,20 +2936,18 @@ M.run_tests({testsToRun}, {opts})            *xcodebuild.tests.runner.run_tests*
 
   Parameters: ~
     {testsToRun}  (string[]|nil) test ids
-    {opts}        ({skipEnumeration:boolean|nil,forceShow:boolean|nil}|nil)
 
 
                                      *xcodebuild.tests.runner.TestRunnerOptions*
 TestRunnerOptions
 
   Fields: ~
-    {doNotBuild}       (boolean|nil)
-    {currentTarget}    (boolean|nil)
-    {currentClass}     (boolean|nil)
-    {currentTest}      (boolean|nil)
-    {selectedTests}    (boolean|nil)
-    {failingTests}     (boolean|nil)
-    {skipEnumeration}  (boolean|nil)
+    {doNotBuild}     (boolean|nil)
+    {currentTarget}  (boolean|nil)
+    {currentClass}   (boolean|nil)
+    {currentTest}    (boolean|nil)
+    {selectedTests}  (boolean|nil)
+    {failingTests}   (boolean|nil)
 
 
                                     *xcodebuild.tests.runner.run_selected_tests*
@@ -2979,7 +2963,6 @@ M.run_selected_tests({opts})
                                   *xcodebuild.tests.runner.repeat_last_test_run*
 M.repeat_last_test_run()
   Repeats the last test run.
-  It skips loading tests if they are already loaded.
 
 
                            *xcodebuild.tests.runner.show_failing_snapshot_tests*

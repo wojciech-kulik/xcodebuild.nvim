@@ -156,7 +156,7 @@ end
 ---Starts tests that failed previously.
 function M.rerun_failed_tests()
   helpers.cancel_actions()
-  testRunner.run_selected_tests({ failingTests = true, skipEnumeration = true })
+  testRunner.run_selected_tests({ failingTests = true })
 end
 
 ---Repeats the last test run.

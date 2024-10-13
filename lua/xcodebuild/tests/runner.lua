@@ -43,49 +43,15 @@ local function validate_testplan()
   return true
 end
 
----Shows the Test Explorer and runs the provided {callback}
----after tests are loaded.
----
----It also triggers build for testing if tests are not loaded.
----
----If Test Explorer is disabled, it only triggers build for testing.
----
----If {opts.skipEnumeration} is true, it skips the enumeration
----(used when user runs tests from the Test Explorer).
----If {opts.forceShow} is true, it forces showing the Test Explorer,
----even if it's disabled in the configuration.
----@param callback function|nil
----@param opts {skipEnumeration: boolean|nil,forceShow: boolean|nil}|nil
-function M.show_test_explorer(callback, opts)
-  opts = opts or {}
-
+---Builds application, enumerates tests, and loads
+---them into the Test Explorer.
+function M.reload_tests()
   local runBuild = function(completion)
     projectBuilder.build_project({ buildForTesting = true, doNotShowSuccess = true }, function(report)
       if util.is_empty(report.buildErrors) then
         util.call(completion)
       end
     end)
-  end
-
-  local show = function()
-    if config.test_explorer.auto_open or opts.forceShow then
-      testExplorer.show()
-    end
-
-    util.call(callback)
-  end
-
-  if not config.test_explorer.enabled then
-    runBuild(callback)
-    return
-  end
-
-  if opts.skipEnumeration then
-    runBuild(function()
-      testExplorer.finish_tests()
-      show()
-    end)
-    return
   end
 
   runBuild(function()
@@ -105,11 +71,11 @@ function M.show_test_explorer(callback, opts)
 
       if util.is_empty(tests) then
         notifications.send_error("Tests not found")
-        util.call(callback)
       else
         testExplorer.load_tests(tests)
-        show()
       end
+
+      notifications.send("")
     end)
   end)
 end
@@ -123,10 +89,7 @@ end
 ---It sets logs, diagnostics, quickfix list, coverage,
 ---snapshot previews, and Test Explorer.
 ---@param testsToRun string[]|nil test ids
----@param opts {skipEnumeration: boolean|nil,forceShow: boolean|nil}|nil
-function M.run_tests(testsToRun, opts)
-  opts = opts or {}
-
+function M.run_tests(testsToRun)
   if not helpers.validate_project() or not validate_testplan() then
     return
   end
@@ -218,8 +181,11 @@ function M.run_tests(testsToRun, opts)
 
   events.tests_started()
 
-  -- Test Explorer also builds for testing
-  M.show_test_explorer(function()
+  projectBuilder.build_project({ buildForTesting = true, doNotShowSuccess = true }, function(report)
+    if not util.is_empty(report.buildErrors) then
+      return
+    end
+
     testExplorer.start_tests(testsToRun)
     logsParser.clear()
 
@@ -236,7 +202,7 @@ function M.run_tests(testsToRun, opts)
       testsToRun = testsToRun,
       extraTestArgs = config.commands.extra_test_args,
     })
-  end, opts)
+  end)
 end
 
 ---@class TestRunnerOptions
@@ -246,7 +212,6 @@ end
 ---@field currentTest boolean|nil
 ---@field selectedTests boolean|nil
 ---@field failingTests boolean|nil
----@field skipEnumeration boolean|nil
 
 ---Runs only selected tests based on {opts}.
 ---If target is not found for the current buffer,
@@ -307,7 +272,7 @@ function M.run_selected_tests(opts)
     end
 
     if next(testsToRun) then
-      M.run_tests(testsToRun, { skipEnumeration = opts.skipEnumeration })
+      M.run_tests(testsToRun)
     else
       notifications.send_error("Tests not found")
     end
@@ -329,10 +294,8 @@ function M.run_selected_tests(opts)
 end
 
 ---Repeats the last test run.
----It skips loading tests if they are already loaded.
 function M.repeat_last_test_run()
-  local skipEnumeration = util.is_not_empty(testExplorer.report)
-  M.run_tests(last_test_run, { skipEnumeration = skipEnumeration })
+  M.run_tests(last_test_run)
 end
 
 ---Shows a picker with failing snapshot tests.
