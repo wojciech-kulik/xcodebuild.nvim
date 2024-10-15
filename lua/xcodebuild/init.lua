@@ -282,6 +282,7 @@ function M.setup(options)
 
   -- Pickers
   vim.api.nvim_create_user_command("XcodebuildSetup", call(actions.configure_project), { nargs = 0 })
+  vim.api.nvim_create_user_command("XcodebuildReloadConfiguration", call(actions.reload_configuration), { nargs = 0 })
   vim.api.nvim_create_user_command("XcodebuildPicker", call(actions.show_picker), { nargs = 0 })
   vim.api.nvim_create_user_command("XcodebuildSelectScheme", call(actions.select_scheme), { nargs = 0 })
   vim.api.nvim_create_user_command("XcodebuildSelectDevice", call(actions.select_device), { nargs = 0 })

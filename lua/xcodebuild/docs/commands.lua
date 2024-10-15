@@ -73,15 +73,16 @@
 ---
 ---Configuration
 ---
---- | Command                  | Description                         |
---- | -------------------------| ----------------------------------- |
---- | `XcodebuildSelectScheme`   | Show scheme picker                  |
---- | `XcodebuildSelectDevice`   | Show device picker                  |
---- | `XcodebuildSelectTestPlan` | Show test plan picker               |
---- | `XcodebuildShowConfig`     | Print current project configuration |
---- | `XcodebuildBootSimulator`  | Boot selected simulator             |
---- | `XcodebuildInstallApp`     | Install application                 |
---- | `XcodebuildUninstallApp`   | Uninstall application               |
+--- | Command                  | Description                                  |
+--- | -------------------------| -------------------------------------------- |
+--- | `XcodebuildSelectScheme`   | Show scheme picker                           |
+--- | `XcodebuildSelectDevice`   | Show device picker                           |
+--- | `XcodebuildSelectTestPlan` | Show test plan picker                        |
+--- | `XcodebuildShowConfig`     | Print current project configuration          |
+--- | `XcodebuildReloadConfig`   | Reload configuration from settings.json file |
+--- | `XcodebuildBootSimulator`  | Boot selected simulator                      |
+--- | `XcodebuildInstallApp`     | Install application                          |
+--- | `XcodebuildUninstallApp`   | Uninstall application                        |
 ---
 ---@brief ]]
 

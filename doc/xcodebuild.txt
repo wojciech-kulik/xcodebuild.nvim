@@ -477,15 +477,16 @@ Test Explorer
 
 Configuration
 
- | Command                  | Description                         |
- | -------------------------| ----------------------------------- |
- | `XcodebuildSelectScheme`   | Show scheme picker                  |
- | `XcodebuildSelectDevice`   | Show device picker                  |
- | `XcodebuildSelectTestPlan` | Show test plan picker               |
- | `XcodebuildShowConfig`     | Print current project configuration |
- | `XcodebuildBootSimulator`  | Boot selected simulator             |
- | `XcodebuildInstallApp`     | Install application                 |
- | `XcodebuildUninstallApp`   | Uninstall application               |
+ | Command                  | Description                                  |
+ | -------------------------| -------------------------------------------- |
+ | `XcodebuildSelectScheme`   | Show scheme picker                           |
+ | `XcodebuildSelectDevice`   | Show device picker                           |
+ | `XcodebuildSelectTestPlan` | Show test plan picker                        |
+ | `XcodebuildShowConfig`     | Print current project configuration          |
+ | `XcodebuildReloadConfig`   | Reload configuration from settings.json file |
+ | `XcodebuildBootSimulator`  | Boot selected simulator                      |
+ | `XcodebuildInstallApp`     | Install application                          |
+ | `XcodebuildUninstallApp`   | Uninstall application                        |
 
 
 ==============================================================================
@@ -632,6 +633,10 @@ M.cancel()                                           *xcodebuild.actions.cancel*
 
 M.configure_project()                     *xcodebuild.actions.configure_project*
   Shows configuration wizard.
+
+
+M.reload_configuration()               *xcodebuild.actions.reload_configuration*
+  Reload configuration from disk
 
 
 M.build({callback})                                   *xcodebuild.actions.build*
@@ -1667,6 +1672,11 @@ M.update_settings({callback})
 
                                    *xcodebuild.project.config.configure_project*
 M.configure_project()
+  Starts configuration wizard to set up the project settings.
+
+
+                                *xcodebuild.project.config.reload_configuration*
+M.reload_configuration()
   Starts configuration wizard to set up the project settings.
 
 
