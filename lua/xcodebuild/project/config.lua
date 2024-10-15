@@ -142,4 +142,11 @@ function M.configure_project()
   end)
 end
 
+---Starts configuration wizard to set up the project settings.
+function M.reload_configuration()
+  M.load_settings()
+  local xcodeBuildServer = require("xcodebuild.integrations.xcode-build-server")
+  xcodeBuildServer.run_config(M.settings.projectCommand, M.settings.scheme)
+end
+
 return M

@@ -82,6 +82,12 @@ function M.configure_project()
   projectConfig.configure_project()
 end
 
+---Reload configuration from disk
+function M.reload_configuration()
+  helpers.cancel_actions()
+  projectConfig.reload_configuration()
+end
+
 ---Builds the project.
 ---@param callback fun(report: ParsedReport)|nil
 function M.build(callback)
