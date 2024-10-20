@@ -277,31 +277,61 @@ local function check_os()
   end
 end
 
-local function check_sudo()
+local function has_sudo_access(path)
+  local util = require("xcodebuild.util")
+  local permissions = util.shell("sudo -l 2>/dev/null")
+
+  for _, line in ipairs(permissions) do
+    if line:match("NOPASSWD.*" .. path) then
+      return true
+    end
+  end
+
+  return false
+end
+
+local function check_remote_debugger_sudo()
   local deviceProxy = require("xcodebuild.platform.device_proxy")
   if not deviceProxy.is_installed() then
     return
   end
 
-  start("Checking passwordless sudo")
+  start("Checking passwordless sudo for remote_debugger")
 
   local config = require("xcodebuild.core.config")
   local appdata = require("xcodebuild.project.appdata")
-  local util = require("xcodebuild.util")
 
-  local path = config.options.commands.remote_debugger or appdata.tool_path(appdata.REMOTE_DEBUGGER_TOOL)
-  local permissions = util.shell("sudo -l 2>/dev/null")
+  local path = config.options.commands.remote_debugger
+      and vim.fn.expand(config.options.commands.remote_debugger)
+    or appdata.tool_path(appdata.REMOTE_DEBUGGER_TOOL)
 
-  for _, line in ipairs(permissions) do
-    if line:match("NOPASSWD.*" .. path) then
-      ok("sudo: configured")
-      return
-    end
+  if has_sudo_access(path) then
+    ok("sudo: configured")
+  else
+    warn("passwordless sudo permission for `remote_debugger` is not configured.")
+    warn("debugging on physical devices with iOS 17+ will not work.")
+    warn("see `:h xcodebuild.ios17` for more information.")
+  end
+end
+
+local function check_xcodebuild_offline_sudo()
+  local xcodebuildOffline = require("xcodebuild.integrations.xcodebuild-offline")
+  local isEnabled = xcodebuildOffline.is_enabled()
+  if not isEnabled then
+    start("Checking xcodebuild_offline tool")
+    warn("tool not enabled - builds might be slower.")
+    warn("see `:h xcodebuild.xcodebuild-offline` for more information.")
+    return
   end
 
-  warn("sudo: passwordless permission for `remote_debugger` is not configured.")
-  warn("debugging on physical devices with iOS 17+ will not work.")
-  warn("see `:h xcodebuild.sudo` for more information.")
+  start("Checking passwordless sudo for xcodebuild_offline")
+
+  if has_sudo_access(xcodebuildOffline.scriptPath) then
+    ok("sudo: configured")
+  else
+    error("passwordless sudo permission for `xcodebuild_offline` is not configured.")
+    error("see `:h xcodebuild.xcodebuild-offline` for more information.")
+  end
 end
 
 local function check_plugin_commit()
@@ -367,7 +397,8 @@ M.check = function()
   start("Checking .nvim/xcodebuild/settings.json")
   check_xcodebuild_settings()
 
-  check_sudo()
+  check_xcodebuild_offline_sudo()
+  check_remote_debugger_sudo()
 end
 
 return M

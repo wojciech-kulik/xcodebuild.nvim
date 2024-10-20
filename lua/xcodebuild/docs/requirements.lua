@@ -33,7 +33,7 @@
 ---<
 ---
 ---To debug on physical devices with iOS 17+ you will need to set up `sudo`,
----see |xcodebuild.sudo| to learn more.
+---see |xcodebuild.ios17| to learn more.
 ---
 ---@brief ]]
 

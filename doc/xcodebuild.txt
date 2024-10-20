@@ -44,6 +44,7 @@ neo-tree.nvim Integration ··················· |xcodebuild.int
 oil.nvim Integration ························ |xcodebuild.integrations.oil-nvim|
 Quick Test Framework Integration ··············· |xcodebuild.integrations.quick|
 xcode-build-server Integration ···· |xcodebuild.integrations.xcode-build-server|
+Xcodebuild Workaround ············· |xcodebuild.integrations.xcodebuild-offline|
 Pickers ················································ |xcodebuild.ui.pickers|
 Helpers ··················································· |xcodebuild.helpers|
 Lua Utils ···················································· |xcodebuild.util|
@@ -165,6 +166,9 @@ M.setup({options})                                            *xcodebuild.setup*
         open_expanded = false,
       },
       integrations = {
+        xcodebuild_offline = {
+          enabled = false, -- improves build time (requires configuration, see `:h xcodebuild.xcodebuild-offline`)
+        },
         xcode_build_server = {
           enabled = true, -- enable calling "xcode-build-server config" when project config changes
         },
@@ -247,7 +251,7 @@ Availability of features
 
 
  🔐 - requires passwordless `sudo` permission to `tools/remote_debugger`
-      script (see |xcodebuild.sudo|).
+      script (see |xcodebuild.ios17|).
 
  🛠️ - available if pymobiledevice3 is installed.
 
@@ -290,7 +294,7 @@ or just:
 <
 
 To debug on physical devices with iOS 17+ you will need to set up `sudo`,
-see |xcodebuild.sudo| to learn more.
+see |xcodebuild.ios17| to learn more.
 
 
 ==============================================================================
@@ -543,8 +547,7 @@ Sample `lualine` integration:
 ==============================================================================
 Debugging On iOS 17+ Device                      *xcodebuild.integrations.ios17*
 
-                                                  *xcodebuild.integrations.sudo*
-                                                               *xcodebuild.sudo*
+                                                              *xcodebuild.ios17*
 Since iOS 17, a new secure connection between Mac and mobile devices is
 required. Xcodebuild.nvim uses `pymobiledevice3` to establish a special
 trusted tunnel that is later used for debugging. However, this operation
@@ -3697,6 +3700,92 @@ M.run_config({projectCommand}, {scheme})
 
   Returns: ~
     (number)   job id
+
+
+==============================================================================
+Xcodebuild Workaround               *xcodebuild.integrations.xcodebuild-offline*
+
+                                                 *xcodebuild.xcodebuild-offline*
+
+This module provides a workaround for the issue with slow `xcodebuild` command.
+
+The issue is caused by the fact that `xcodebuild` tries to connect to the Apple
+servers before building the project, which can take 20 seconds or more.
+Usually, those requests are not necessary, but they slow down each build.
+
+This module provides a workaround by mapping Apple servers to localhost in the
+`/etc/hosts` file during the build. It is a temporary solution and should be
+used with caution.
+
+Keep in mind that disabling access to `developerservices2.apple.com` for
+`xcodebuild` may cause some issues with the build process. It will disable
+things like registering devices, capabilities, and other network-related
+features. Therefore, it's best to use it when you are working just on the
+code and don't need updating project settings.
+
+You can apply this workaround in two ways:
+   1. Manual - by either editing manually `/etc/hosts` and adding
+      `127.0.0.1 developerservices2.apple.com` or by blocking the
+      `developerservices2.apple.com` domain in any network sniffer like
+      Proxyman or Charles Proxy.
+   2. Automatic - more advanced integration that is supported by the plugin.
+      The advantage of this approach is that the Apple server will be blocked
+      only when the `xcodebuild` command (triggered from Neovim) is running.
+      However, it requires a passwordless `sudo` permission for the script.
+
+⚠️ CAUTION
+Giving passwordless `sudo` access to that file, potentially opens a gate for
+malicious software that could modify the file and run some evil code using
+`root` account. The best way to protect that file is to create a local copy,
+change the owner to `root`, and give write permission only to `root`.
+The script below does that automatically.
+
+👉 Enable integration that automatically blocks Apple servers
+
+Update your config with:
+>lua
+    integrations = {
+      xcodebuild_offline = {
+        enabled = true,
+      },
+    }
+<
+
+👉 Run the following command to install & protect the script
+
+>bash
+    DIR="$HOME/Library/xcodebuild.nvim" && \
+    FILE="$DIR/xcodebuild_offline" && \
+    SOURCE="$HOME/.local/share/nvim/lazy/xcodebuild.nvim/tools/xcodebuild_offline" && \
+    ME="$(whoami)" && \
+    mkdir -p "$DIR" && \
+    cp "$SOURCE" "$FILE" && \
+    chmod 755 "$FILE" && \
+    sudo chown root "$FILE" && \
+    sudo bash -c "echo \"$ME ALL = (ALL) NOPASSWD: $FILE\" >> /etc/sudoers"
+<
+
+More details about this issue can be found here:
+https://github.com/wojciech-kulik/xcodebuild.nvim/issues/201#issuecomment-2423828065
+
+
+                         *xcodebuild.integrations.xcodebuild-offline.is_enabled*
+M.is_enabled()
+  Returns whether the `xcodebuild` command should be run in offline mode.
+
+  Returns: ~
+    (boolean)
+
+
+             *xcodebuild.integrations.xcodebuild-offline.wrap_command_if_needed*
+M.wrap_command_if_needed({command})
+  Wraps the `xcodebuild` command with the workaround script if needed.
+
+  Parameters: ~
+    {command}  (string)
+
+  Returns: ~
+    (string)
 
 
 ==============================================================================

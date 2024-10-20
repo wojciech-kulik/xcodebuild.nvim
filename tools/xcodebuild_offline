@@ -1,0 +1,38 @@
+#!/bin/bash
+
+### Author: Rudrank Riyam (github.com/rudrankriyam)
+### Source: https://x.com/rudrankriyam/status/1847734299740811675 (with minor modifications)
+
+# Function to block the domain
+block_domain() {
+  echo "127.0.0.1 developerservices2.apple.com" >>/etc/hosts
+}
+
+# Function to unblock the domain
+unblock_domain() {
+  sed -i '' '/developerservices2\.apple\.com/d' /etc/hosts
+}
+
+# Check if xcodebuild command is provided
+if [ $# -eq 0 ]; then
+  echo "Please provide the xcodebuild command as arguments"
+  exit 1
+fi
+
+# Block the domain
+block_domain
+
+# Unblock the domain on exit (even if killed)
+trap unblock_domain EXIT
+
+# Run xcodebuild with all passed arguments as a "normal" user
+sudo -u $SUDO_USER xcodebuild "$@"
+
+# Capture the exit code of xcodebuild
+BUILD_RESULT=$?
+
+# Unblock the domain
+unblock_domain
+
+# Exit with the same code as xcodebuild
+exit $BUILD_RESULT

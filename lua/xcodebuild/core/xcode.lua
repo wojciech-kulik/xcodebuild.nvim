@@ -64,6 +64,7 @@
 local util = require("xcodebuild.util")
 local notifications = require("xcodebuild.broadcasting.notifications")
 local constants = require("xcodebuild.core.constants")
+local xcodebuildOffline = require("xcodebuild.integrations.xcodebuild-offline")
 
 local M = {}
 local CANCELLED_CODE = 143
@@ -144,6 +145,7 @@ end
 ---@return number # job id
 function M.get_destinations(projectCommand, scheme, callback)
   local command = "xcodebuild -showdestinations " .. projectCommand .. " -scheme '" .. scheme .. "'"
+  command = xcodebuildOffline.wrap_command_if_needed(command)
 
   return vim.fn.jobstart(command, {
     stdout_buffered = true,
@@ -185,6 +187,7 @@ end
 ---@return number # job id
 function M.get_schemes(projectCommand, callback)
   local command = "xcodebuild " .. projectCommand .. " -list"
+  command = xcodebuildOffline.wrap_command_if_needed(command)
 
   return vim.fn.jobstart(command, {
     stdout_buffered = true,
@@ -254,6 +257,7 @@ end
 ---@return number # job id
 function M.get_project_information(xcodeproj, callback)
   local command = "xcodebuild -project '" .. xcodeproj .. "' -list"
+  command = xcodebuildOffline.wrap_command_if_needed(command)
 
   return vim.fn.jobstart(command, {
     stdout_buffered = true,
@@ -304,6 +308,7 @@ end
 ---@return number # job id
 function M.get_testplans(projectCommand, scheme, callback)
   local command = "xcodebuild test " .. projectCommand .. " -scheme '" .. scheme .. "' -showTestPlans"
+  command = xcodebuildOffline.wrap_command_if_needed(command)
 
   return vim.fn.jobstart(command, {
     stdout_buffered = true,
@@ -346,6 +351,7 @@ function M.build_project(opts)
     .. opts.destination
     .. "'"
     .. (string.len(opts.extraBuildArgs) > 0 and " " .. opts.extraBuildArgs or "")
+  command = xcodebuildOffline.wrap_command_if_needed(command)
 
   return vim.fn.jobstart(command, {
     stdout_buffered = false,
@@ -393,6 +399,7 @@ function M.get_build_settings(platform, projectCommand, scheme, xcodeprojPath, c
       .. "' -showBuildSettings"
       .. " -sdk "
       .. sdk
+    command = xcodebuildOffline.wrap_command_if_needed(command)
 
     if config then
       command = command .. " -configuration '" .. config .. "'"
@@ -747,6 +754,7 @@ function M.enumerate_tests(opts, callback)
     .. "' -disableAutomaticPackageResolution -skipPackageUpdates -parallelizeTargets"
     .. " -test-enumeration-style flat"
     .. (string.len(opts.extraTestArgs) > 0 and " " .. opts.extraTestArgs or "")
+  command = xcodebuildOffline.wrap_command_if_needed(command)
 
   return vim.fn.jobstart(command, {
     on_exit = function(_, code, _)
@@ -807,6 +815,7 @@ function M.run_tests(opts)
     .. opts.testPlan
     .. "'"
     .. (string.len(opts.extraTestArgs) > 0 and " " .. opts.extraTestArgs or "")
+  command = xcodebuildOffline.wrap_command_if_needed(command)
 
   if opts.testsToRun then
     for _, test in ipairs(opts.testsToRun) do
