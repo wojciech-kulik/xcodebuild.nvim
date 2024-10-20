@@ -119,10 +119,7 @@ return {
 Install external tools:
 
 ```shell
-brew install xcode-build-server
-brew install xcbeautify
-brew install ruby
-brew install pipx
+brew install xcode-build-server xcbeautify ruby pipx
 gem install xcodeproj
 pipx install pymobiledevice3
 ```
@@ -408,6 +405,9 @@ vim.keymap.set("n", "<leader>xa", "<cmd>XcodebuildCodeActions<cr>", { desc = "Sh
     open_expanded = false,
   },
   integrations = {
+    xcodebuild_offline = {
+      enabled = false, -- improves build time (requires configuration, see `:h xcodebuild.xcodebuild-offline`)
+    },
     xcode_build_server = {
       enabled = false, -- run "xcode-build-server config" when scheme changes
     },

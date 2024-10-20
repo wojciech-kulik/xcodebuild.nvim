@@ -1,6 +1,5 @@
 ---@mod xcodebuild.integrations.ios17 Debugging On iOS 17+ Device
----@tag xcodebuild.integrations.sudo
----@tag xcodebuild.sudo
+---@tag xcodebuild.ios17
 ---@brief [[
 ---Since iOS 17, a new secure connection between Mac and mobile devices is
 ---required. Xcodebuild.nvim uses `pymobiledevice3` to establish a special

@@ -38,7 +38,7 @@
 ---
 ---
 --- 🔐 - requires passwordless `sudo` permission to `tools/remote_debugger`
----      script (see |xcodebuild.sudo|).
+---      script (see |xcodebuild.ios17|).
 ---
 --- 🛠️ - available if pymobiledevice3 is installed.
 ---

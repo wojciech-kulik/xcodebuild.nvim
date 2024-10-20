@@ -102,6 +102,9 @@ local defaults = {
     open_expanded = false,
   },
   integrations = {
+    xcodebuild_offline = {
+      enabled = false, -- improves build time (requires configuration, see `:h xcodebuild.xcodebuild-offline`)
+    },
     xcode_build_server = {
       enabled = true, -- enable calling "xcode-build-server config" when project config changes
     },
