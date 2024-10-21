@@ -13,7 +13,7 @@
 ---See:
 ---  |xcodebuild.project-manager|
 ---  https://github.com/nvim-tree/nvim-tree.lua
----  https://github.com/wojciech-kulik/xcodebuild.nvim#-file-tree-integration
+---  https://github.com/wojciech-kulik/xcodebuild.nvim/wiki/Integrations#-file-tree-integration
 ---
 ---@brief ]]
 

@@ -1,6 +1,8 @@
 ---@mod xcodebuild.integrations.ios17 Debugging On iOS 17+ Device
 ---@tag xcodebuild.ios17
+---@tag xcodebuild.remote-debugger
 ---@brief [[
+---
 ---Since iOS 17, a new secure connection between Mac and mobile devices is
 ---required. Xcodebuild.nvim uses `pymobiledevice3` to establish a special
 ---trusted tunnel that is later used for debugging. However, this operation
@@ -12,37 +14,61 @@
 ---`sudo` (starting a secure tunnel and closing it).
 ---
 ---This allows you to configure passwordless access just for this single
----file and make it work with xcodebuild.nvim. You can even make a local
----copy if you are worried that the content of this file could be changed
----in the future.
+---file and make it work with xcodebuild.nvim.
 ---
----👉 Passwordless access to `remote_debugger`
+---⚠️ CAUTION
+---Giving passwordless `sudo` access to that file, potentially opens a gate for
+---malicious software that could modify the file and run some evil code using
+---`root` account. The best way to protect that file is to create a local copy,
+---change the owner to `root`, and give write permission only to `root`.
+---The same must be applied to the parent directory. The script below
+---automatically secures the file.
 ---
----You can disable password requirement by updating `/etc/sudoers` file.
----Make sure to use the command below, otherwise you may break your `sudo` command:
+---👉 Enable integration
 ---
---->bash
----    sudo visudo -f /etc/sudoers
+---Update your config with:
+--->lua
+---  integrations = {
+---    pymobiledevice = {
+---      enabled = true,
+---    },
+---  }
 ---<
 ---
----Append this line, but first update the path and the username:
+---👉 Run the following command to install & protect the script
 ---
 --->bash
----    YOUR_USERNAME ALL = (ALL) NOPASSWD: /Users/YOUR_USERNAME/.local/share/nvim/lazy/xcodebuild.nvim/tools/remote_debugger
+---  DEST="$HOME/Library/xcodebuild.nvim/remote_debugger" && \
+---    SOURCE="$HOME/.local/share/nvim/lazy/xcodebuild.nvim/tools/remote_debugger" && \
+---    ME="$(whoami)" && \
+---    sudo install -m 755 -o root -D "$SOURCE" "$DEST" && \
+---    sudo bash -c "echo \"$ME ALL = (ALL) NOPASSWD: $DEST\" >> /etc/sudoers"
 ---<
----
----👉 Creating a local copy of `remote_debugger`
----
----If you don't want to configure the passwordless permission to the file
----that could be changed in the future, you can make a local copy of this
----script, set your local path in the config `commands.remote_debugger`,
----and update `/etc/sudoers` accordingly.
----
----Please remember that you will have to update this file manually if it
----changes in the future.
----
 ---
 ---See also: https://github.com/doronz88/pymobiledevice3/blob/master/misc/RemoteXPC.md#trusted-tunnel
+---
+---@brief ]]
+---
+---@tag xcodebuild.remote-debugger-migration
+---@brief [[
+---
+---Previous version of xcodebuild.nvim asked you to give sudo permission to:
+---`$HOME/.local/share/nvim/lazy/xcodebuild.nvim/tools/remote_debugger`
+---
+---Unfortunately, it's not the best solution, because someone could modify
+---that file and run some evil code using `root` account.
+---
+---Therefore, to improve security, please run `sudo visudo -f /etc/sudoers` and
+---remove previously added line with `remote_debugger` path.
+---
+---After that, run the script that is presented above to securely install
+---`pymobiledevice3` integration. See: |xcodebuild.remote-debugger|.
+---
+---The script installed in a new way will be protected and the modification
+---of the file will be allowed only for the `root` user.
+---
+---Please also note that remote debugger config options have been moved to:
+---`integrations.pymobiledevice`.
 ---
 ---@brief ]]
 

@@ -447,7 +447,7 @@ function M.select_destination(callback, opts)
   end
 
   local function getConnectedDevices()
-    if not deviceProxy.is_installed() then
+    if not deviceProxy.is_enabled() then
       return refreshDevices({})
     end
 

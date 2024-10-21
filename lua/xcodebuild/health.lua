@@ -290,27 +290,35 @@ local function has_sudo_access(path)
   return false
 end
 
-local function check_remote_debugger_sudo()
+local function check_remote_debugger()
+  local util = require("xcodebuild.util")
   local deviceProxy = require("xcodebuild.platform.device_proxy")
-  if not deviceProxy.is_installed() then
+  if not deviceProxy.is_enabled() then
     return
   end
 
-  start("Checking passwordless sudo for remote_debugger")
+  start("Checking remote debugger integration (pymobildevice3)")
 
-  local config = require("xcodebuild.core.config")
-  local appdata = require("xcodebuild.project.appdata")
+  if has_sudo_access(".local/share/nvim/lazy/xcodebuild.nvim/tools/remote_debugger") then
+    error(
+      "Deprecated integration detected. Please migrate your installation (see: `:h xcodebuild.remote-debugger-migration`)"
+    )
+  end
 
-  local path = config.options.commands.remote_debugger
-      and vim.fn.expand(config.options.commands.remote_debugger)
-    or appdata.tool_path(appdata.REMOTE_DEBUGGER_TOOL)
+  if util.file_exists(deviceProxy.scriptPath) then
+    ok("`remote_debugger` script installed")
+  else
+    error(
+      "`pymobildevice3` detected, but the `remote_debugger` script is not installed. (see: `:h xcodebuild.remote-debugger`)"
+    )
+  end
 
-  if has_sudo_access(path) then
+  if has_sudo_access(deviceProxy.scriptPath) then
     ok("sudo: configured")
   else
     warn("passwordless sudo permission for `remote_debugger` is not configured.")
     warn("debugging on physical devices with iOS 17+ will not work.")
-    warn("see `:h xcodebuild.ios17` for more information.")
+    warn("see `:h xcodebuild.remote-debugger` for more information.")
   end
 end
 
@@ -397,8 +405,8 @@ M.check = function()
   start("Checking .nvim/xcodebuild/settings.json")
   check_xcodebuild_settings()
 
+  check_remote_debugger()
   check_xcodebuild_offline_sudo()
-  check_remote_debugger_sudo()
 end
 
 return M

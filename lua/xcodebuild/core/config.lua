@@ -26,8 +26,6 @@ local defaults = {
     extra_build_args = "-parallelizeTargets", -- extra arguments for `xcodebuild build`
     extra_test_args = "-parallelizeTargets", -- extra arguments for `xcodebuild test`
     project_search_max_depth = 3, -- maxdepth of xcodeproj/xcworkspace search while using configuration wizard
-    remote_debugger = nil, -- optional path to local copy of remote_debugger (check out README for details)
-    remote_debugger_port = 65123, -- port used by remote debugger (passed to pymobiledevice3)
     focus_simulator_on_app_launch = true, -- focus simulator window when app is launched
   },
   logs = { -- build & test logs
@@ -102,6 +100,10 @@ local defaults = {
     open_expanded = false,
   },
   integrations = {
+    pymobiledevice = {
+      enabled = true, -- enable pymobiledevice integration (requires configuration, see: `:h xcodebuild.remote-debugger`)
+      remote_debugger_port = 65123, -- port used by remote debugger (passed to pymobiledevice3)
+    },
     xcodebuild_offline = {
       enabled = false, -- improves build time (requires configuration, see `:h xcodebuild.xcodebuild-offline`)
     },

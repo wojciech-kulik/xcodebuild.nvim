@@ -90,8 +90,6 @@ M.setup({options})                                            *xcodebuild.setup*
         extra_build_args = "-parallelizeTargets", -- extra arguments for `xcodebuild build`
         extra_test_args = "-parallelizeTargets", -- extra arguments for `xcodebuild test`
         project_search_max_depth = 3, -- maxdepth of xcodeproj/xcworkspace search while using configuration wizard
-        remote_debugger = nil, -- optional path to local copy of remote_debugger (check out README for details)
-        remote_debugger_port = 65123, -- port used by remote debugger (passed to pymobiledevice3)
         focus_simulator_on_app_launch = true, -- focus simulator window when app is launched
       },
       logs = { -- build & test logs
@@ -166,6 +164,10 @@ M.setup({options})                                            *xcodebuild.setup*
         open_expanded = false,
       },
       integrations = {
+        pymobiledevice = {
+          enabled = true, -- enable pymobiledevice integration (requires configuration, see: `:h xcodebuild.remote-debugger`)
+          remote_debugger_port = 65123, -- port used by remote debugger (passed to pymobiledevice3)
+        },
         xcodebuild_offline = {
           enabled = false, -- improves build time (requires configuration, see `:h xcodebuild.xcodebuild-offline`)
         },
@@ -251,7 +253,7 @@ Availability of features
 
 
  🔐 - requires passwordless `sudo` permission to `tools/remote_debugger`
-      script (see |xcodebuild.ios17|).
+      script (see |xcodebuild.remote-debugger|).
 
  🛠️ - available if pymobiledevice3 is installed.
 
@@ -282,15 +284,15 @@ External tools
 
 Installation
 >bash
-    brew install xcode-build-server
-    brew install xcbeautify
-    brew install ruby
-    gem install xcodeproj
-    python3 -m pip install -U pymobiledevice3
+  brew install xcode-build-server xcbeautify ruby pipx
+  gem install xcodeproj
+  pipx install pymobiledevice3
 <
-or just:
+
+To quickly install all required tools you can run:
 >bash
-    make install
+  cd ~/.local/share/nvim/lazy/xcodebuild.nvim
+  make install
 <
 
 To debug on physical devices with iOS 17+ you will need to set up `sudo`,
@@ -548,6 +550,8 @@ Sample `lualine` integration:
 Debugging On iOS 17+ Device                      *xcodebuild.integrations.ios17*
 
                                                               *xcodebuild.ios17*
+                                                    *xcodebuild.remote-debugger*
+
 Since iOS 17, a new secure connection between Mac and mobile devices is
 required. Xcodebuild.nvim uses `pymobiledevice3` to establish a special
 trusted tunnel that is later used for debugging. However, this operation
@@ -559,37 +563,59 @@ be quite annoying. That's why the plugin provides a small script
 `sudo` (starting a secure tunnel and closing it).
 
 This allows you to configure passwordless access just for this single
-file and make it work with xcodebuild.nvim. You can even make a local
-copy if you are worried that the content of this file could be changed
-in the future.
+file and make it work with xcodebuild.nvim.
 
-👉 Passwordless access to `remote_debugger`
+⚠️ CAUTION
+Giving passwordless `sudo` access to that file, potentially opens a gate for
+malicious software that could modify the file and run some evil code using
+`root` account. The best way to protect that file is to create a local copy,
+change the owner to `root`, and give write permission only to `root`.
+The same must be applied to the parent directory. The script below
+automatically secures the file.
 
-You can disable password requirement by updating `/etc/sudoers` file.
-Make sure to use the command below, otherwise you may break your `sudo` command:
+👉 Enable integration
 
->bash
-    sudo visudo -f /etc/sudoers
+Update your config with:
+>lua
+  integrations = {
+    pymobiledevice = {
+      enabled = true,
+    },
+  }
 <
 
-Append this line, but first update the path and the username:
+👉 Run the following command to install & protect the script
 
 >bash
-    YOUR_USERNAME ALL = (ALL) NOPASSWD: /Users/YOUR_USERNAME/.local/share/nvim/lazy/xcodebuild.nvim/tools/remote_debugger
+  DEST="$HOME/Library/xcodebuild.nvim/remote_debugger" && \
+    SOURCE="$HOME/.local/share/nvim/lazy/xcodebuild.nvim/tools/remote_debugger" && \
+    ME="$(whoami)" && \
+    sudo install -m 755 -o root -D "$SOURCE" "$DEST" && \
+    sudo bash -c "echo \"$ME ALL = (ALL) NOPASSWD: $DEST\" >> /etc/sudoers"
 <
-
-👉 Creating a local copy of `remote_debugger`
-
-If you don't want to configure the passwordless permission to the file
-that could be changed in the future, you can make a local copy of this
-script, set your local path in the config `commands.remote_debugger`,
-and update `/etc/sudoers` accordingly.
-
-Please remember that you will have to update this file manually if it
-changes in the future.
-
 
 See also: https://github.com/doronz88/pymobiledevice3/blob/master/misc/RemoteXPC.md#trusted-tunnel
+
+
+                                          *xcodebuild.remote-debugger-migration*
+
+Previous version of xcodebuild.nvim asked you to give sudo permission to:
+`$HOME/.local/share/nvim/lazy/xcodebuild.nvim/tools/remote_debugger`
+
+Unfortunately, it's not the best solution, because someone could modify
+that file and run some evil code using `root` account.
+
+Therefore, to improve security, please run `sudo visudo -f /etc/sudoers` and
+remove previously added line with `remote_debugger` path.
+
+After that, run the script that is presented above to securely install
+`pymobiledevice3` integration. See: |xcodebuild.remote-debugger|.
+
+The script installed in a new way will be protected and the modification
+of the file will be allowed only for the `root` user.
+
+Please also note that remote debugger config options have been moved to:
+`integrations.pymobiledevice`.
 
 
 ==============================================================================
@@ -1707,7 +1733,6 @@ AppData                                     *xcodebuild.project.appdata.AppData*
     {breakpoints_filepath}      (string) # The path to the breakpoints file.
     {GETSNAPSHOTS_TOOL}         (string) # The name of the getsnapshots tool.
     {PROJECT_HELPER_TOOL}       (string) # The name of the project helper tool.
-    {REMOTE_DEBUGGER_TOOL}      (string) # The name of the remote debugger tool.
 
 
 M.tool_path({name})                       *xcodebuild.project.appdata.tool_path*
@@ -2126,8 +2151,8 @@ The tool can be installed by:
 <
 
 See:
-  https://github.com/wojciech-kulik/xcodebuild.nvim#availability-of-features
-  https://github.com/wojciech-kulik/xcodebuild.nvim#-debugging-on-ios-17-device
+  https://github.com/wojciech-kulik/xcodebuild.nvim/wiki/Features#-availability
+  https://github.com/wojciech-kulik/xcodebuild.nvim/wiki/Integrations#-debugging-on-ios-17
   https://github.com/doronz88/pymobiledevice3
 
 Device                                 *xcodebuild.platform.device_proxy.Device*
@@ -2137,6 +2162,14 @@ Device                                 *xcodebuild.platform.device_proxy.Device*
     {name}      (string)
     {os}        (string)
     {platform}  (PlatformId)
+
+
+                                   *xcodebuild.platform.device_proxy.is_enabled*
+M.is_enabled()
+  Checks if the `pymobiledevice` integration is enabled and the tool is installed.
+
+  Returns: ~
+    (boolean)
 
 
                                  *xcodebuild.platform.device_proxy.is_installed*
@@ -2302,7 +2335,7 @@ M.create_secure_tunnel({destination}, {callback})
     {callback}     (fun(rsd:string)|nil)
 
   Returns: ~
-    (number)   job id
+    (number|nil)   job id
 
 
                           *xcodebuild.platform.device_proxy.close_secure_tunnel*
@@ -3505,7 +3538,7 @@ This feature requires `Xcodeproj` to be installed (|xcodebuild.requirements|).
 See:
   |xcodebuild.project-manager|
   https://github.com/nvim-tree/nvim-tree.lua
-  https://github.com/wojciech-kulik/xcodebuild.nvim#-file-tree-integration
+  https://github.com/wojciech-kulik/xcodebuild.nvim/wiki/Integrations#-file-tree-integration
 
 
 M.setup()                              *xcodebuild.integrations.nvim-tree.setup*
@@ -3532,7 +3565,7 @@ This feature requires `Xcodeproj` to be installed (|xcodebuild.requirements|).
 See:
   |xcodebuild.project-manager|
   https://github.com/nvim-neo-tree/neo-tree.nvim
-  https://github.com/wojciech-kulik/xcodebuild.nvim#-file-tree-integration
+  https://github.com/wojciech-kulik/xcodebuild.nvim/wiki/Integrations#-file-tree-integration
 
 
 M.setup()                               *xcodebuild.integrations.neo-tree.setup*
@@ -3559,7 +3592,7 @@ This feature requires `Xcodeproj` to be installed (|xcodebuild.requirements|).
 See:
   |xcodebuild.project-manager|
   https://github.com/stevearc/oil.nvim
-  https://github.com/wojciech-kulik/xcodebuild.nvim#-file-tree-integration
+  https://github.com/wojciech-kulik/xcodebuild.nvim/wiki/Integrations#-file-tree-integration
 
 
 M.setup()                               *xcodebuild.integrations.oil-nvim.setup*
@@ -3723,50 +3756,62 @@ things like registering devices, capabilities, and other network-related
 features. Therefore, it's best to use it when you are working just on the
 code and don't need updating project settings.
 
-You can apply this workaround in two ways:
-   1. Manual - by either editing manually `/etc/hosts` and adding
-      `127.0.0.1 developerservices2.apple.com` or by blocking the
-      `developerservices2.apple.com` domain in any network sniffer like
-      Proxyman or Charles Proxy.
-   2. Automatic - more advanced integration that is supported by the plugin.
-      The advantage of this approach is that the Apple server will be blocked
-      only when the `xcodebuild` command (triggered from Neovim) is running.
-      However, it requires a passwordless `sudo` permission for the script.
+Below you can find three ways to enable the workaround.
+
+1. Manual (script)
+
+Enable workaround:
+>bash
+  sudo bash -c "echo '127.0.0.1 developerservices2.apple.com' >>/etc/hosts"
+<
+
+Disable workaround:
+>bash
+  sudo sed -i '' '/developerservices2\.apple\.com/d' /etc/hosts
+<
+
+2. Manual (network sniffer)
+
+If you use some tool to sniff network traffic like Proxyman or Charles Proxy,
+you can block requests to `https://developerservices2.apple.com/*` and
+automatically return some error like 999 status code. It will prevent
+`xcodebuild` from further calls.
+
+3. Automatic (`xcodebuild.nvim` integration)
+
+In this approach the Apple server will be blocked only when the `xcodebuild`
+command (triggered by the plugin) is running. However, it requires a passwordless
+`sudo` permission for the script.
 
 ⚠️ CAUTION
 Giving passwordless `sudo` access to that file, potentially opens a gate for
 malicious software that could modify the file and run some evil code using
 `root` account. The best way to protect that file is to create a local copy,
-change the owner to `root`, and give write permission only to `root`.
-The same must be applied to the parent directory. The script below does
-everything automatically.
+change the owner to `root`, and give write permission only to `root`. The same
+must be applied to the parent directory. The script below automatically
+secures the file.
 
 👉 Enable integration that automatically blocks Apple servers
 
 Update your config with:
 >lua
-    integrations = {
-      xcodebuild_offline = {
-        enabled = true,
-      },
-    }
+  integrations = {
+    xcodebuild_offline = {
+      enabled = true,
+    },
+  }
 <
 
 👉 Run the following command to install & protect the script
 
 >bash
-    DIR="$HOME/Library/xcodebuild.nvim" && \
-    FILE="$DIR/xcodebuild_offline" && \
+  DEST="$HOME/Library/xcodebuild.nvim/xcodebuild_offline" && \
     SOURCE="$HOME/.local/share/nvim/lazy/xcodebuild.nvim/tools/xcodebuild_offline" && \
     ME="$(whoami)" && \
-    mkdir -p "$DIR" && \
-    cp "$SOURCE" "$FILE" && \
-    chmod 755 "$FILE" && \
-    sudo chown root "$FILE" && \
-    chmod 755 "$DIR" && \
-    sudo chown root "$DIR" && \
-    sudo bash -c "echo \"$ME ALL = (ALL) NOPASSWD: $FILE\" >> /etc/sudoers"
+    sudo install -m 755 -o root -D "$SOURCE" "$DEST" && \
+    sudo bash -c "echo \"$ME ALL = (ALL) NOPASSWD: $DEST\" >> /etc/sudoers"
 <
+
 
 More details about this issue can be found here:
 https://github.com/wojciech-kulik/xcodebuild.nvim/issues/201#issuecomment-2423828065

@@ -6,3 +6,5 @@ if [ "$1" = "kill" ]; then
 elif [ "$1" = "start" ]; then
   pymobiledevice3 remote start-tunnel --no-color --udid $2
 fi
+
+# @version: 1

@@ -18,50 +18,62 @@
 ---features. Therefore, it's best to use it when you are working just on the
 ---code and don't need updating project settings.
 ---
----You can apply this workaround in two ways:
----   1. Manual - by either editing manually `/etc/hosts` and adding
----      `127.0.0.1 developerservices2.apple.com` or by blocking the
----      `developerservices2.apple.com` domain in any network sniffer like
----      Proxyman or Charles Proxy.
----   2. Automatic - more advanced integration that is supported by the plugin.
----      The advantage of this approach is that the Apple server will be blocked
----      only when the `xcodebuild` command (triggered from Neovim) is running.
----      However, it requires a passwordless `sudo` permission for the script.
+---Below you can find three ways to enable the workaround.
+---
+---1. Manual (script)
+---
+---Enable workaround:
+--->bash
+---  sudo bash -c "echo '127.0.0.1 developerservices2.apple.com' >>/etc/hosts"
+---<
+---
+---Disable workaround:
+--->bash
+---  sudo sed -i '' '/developerservices2\.apple\.com/d' /etc/hosts
+---<
+---
+---2. Manual (network sniffer)
+---
+---If you use some tool to sniff network traffic like Proxyman or Charles Proxy,
+---you can block requests to `https://developerservices2.apple.com/*` and
+---automatically return some error like 999 status code. It will prevent
+---`xcodebuild` from further calls.
+---
+---3. Automatic (`xcodebuild.nvim` integration)
+---
+---In this approach the Apple server will be blocked only when the `xcodebuild`
+---command (triggered by the plugin) is running. However, it requires a passwordless
+---`sudo` permission for the script.
 ---
 ---⚠️ CAUTION
 ---Giving passwordless `sudo` access to that file, potentially opens a gate for
 ---malicious software that could modify the file and run some evil code using
 ---`root` account. The best way to protect that file is to create a local copy,
----change the owner to `root`, and give write permission only to `root`.
----The same must be applied to the parent directory. The script below does
----everything automatically.
+---change the owner to `root`, and give write permission only to `root`. The same
+---must be applied to the parent directory. The script below automatically
+---secures the file.
 ---
 ---👉 Enable integration that automatically blocks Apple servers
 ---
 ---Update your config with:
 --->lua
----    integrations = {
----      xcodebuild_offline = {
----        enabled = true,
----      },
----    }
+---  integrations = {
+---    xcodebuild_offline = {
+---      enabled = true,
+---    },
+---  }
 ---<
 ---
 ---👉 Run the following command to install & protect the script
 ---
 --->bash
----    DIR="$HOME/Library/xcodebuild.nvim" && \
----    FILE="$DIR/xcodebuild_offline" && \
+---  DEST="$HOME/Library/xcodebuild.nvim/xcodebuild_offline" && \
 ---    SOURCE="$HOME/.local/share/nvim/lazy/xcodebuild.nvim/tools/xcodebuild_offline" && \
 ---    ME="$(whoami)" && \
----    mkdir -p "$DIR" && \
----    cp "$SOURCE" "$FILE" && \
----    chmod 755 "$FILE" && \
----    sudo chown root "$FILE" && \
----    chmod 755 "$DIR" && \
----    sudo chown root "$DIR" && \
----    sudo bash -c "echo \"$ME ALL = (ALL) NOPASSWD: $FILE\" >> /etc/sudoers"
+---    sudo install -m 755 -o root -D "$SOURCE" "$DEST" && \
+---    sudo bash -c "echo \"$ME ALL = (ALL) NOPASSWD: $DEST\" >> /etc/sudoers"
 ---<
+---
 ---
 ---More details about this issue can be found here:
 ---https://github.com/wojciech-kulik/xcodebuild.nvim/issues/201#issuecomment-2423828065

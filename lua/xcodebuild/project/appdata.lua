@@ -30,7 +30,6 @@
 ---@field breakpoints_filepath string # The path to the breakpoints file.
 ---@field GETSNAPSHOTS_TOOL string # The name of the getsnapshots tool.
 ---@field PROJECT_HELPER_TOOL string # The name of the project helper tool.
----@field REMOTE_DEBUGGER_TOOL string # The name of the remote debugger tool.
 
 local util = require("xcodebuild.util")
 
@@ -64,7 +63,6 @@ M.breakpoints_filepath = M.appdir .. "/breakpoints.json"
 
 M.GETSNAPSHOTS_TOOL = "getsnapshots"
 M.PROJECT_HELPER_TOOL = "project_helper.rb"
-M.REMOTE_DEBUGGER_TOOL = "remote_debugger"
 
 ---Returns the path to the tool with the given {name}.
 ---@param name string
