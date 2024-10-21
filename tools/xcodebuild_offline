@@ -36,3 +36,5 @@ unblock_domain
 
 # Exit with the same code as xcodebuild
 exit $BUILD_RESULT
+
+# @version: 1

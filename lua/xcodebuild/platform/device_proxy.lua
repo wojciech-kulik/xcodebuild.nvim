@@ -16,8 +16,8 @@
 ---<
 ---
 ---See:
----  https://github.com/wojciech-kulik/xcodebuild.nvim#availability-of-features
----  https://github.com/wojciech-kulik/xcodebuild.nvim#-debugging-on-ios-17-device
+---  https://github.com/wojciech-kulik/xcodebuild.nvim/wiki/Features#-availability
+---  https://github.com/wojciech-kulik/xcodebuild.nvim/wiki/Integrations#-debugging-on-ios-17
 ---  https://github.com/doronz88/pymobiledevice3
 ---@brief ]]
 
@@ -25,8 +25,6 @@ local util = require("xcodebuild.util")
 local helpers = require("xcodebuild.helpers")
 local constants = require("xcodebuild.core.constants")
 local notifications = require("xcodebuild.broadcasting.notifications")
-local config = require("xcodebuild.core.config")
-local appdata = require("xcodebuild.project.appdata")
 
 ---@class Device
 ---@field id string
@@ -36,12 +34,23 @@ local appdata = require("xcodebuild.project.appdata")
 
 local M = {}
 
+M.scriptPath = vim.fn.expand("~/Library/xcodebuild.nvim/remote_debugger")
+
 local devices_without_os_version = {}
 
----Returns the path to the wrapper script for `pymobiledevice3` tool.
----@return string
-local function get_tool_path()
-  return config.options.commands.remote_debugger or appdata.tool_path(appdata.REMOTE_DEBUGGER_TOOL)
+---Checks whether the `sudo` command has passwordless access to the given {path}.
+---@param path string
+---@return boolean
+local function check_sudo(path)
+  local permissions = util.shell("sudo -l 2>/dev/null")
+
+  for _, line in ipairs(permissions) do
+    if line:match("NOPASSWD.*" .. path) then
+      return true
+    end
+  end
+
+  return false
 end
 
 ---Returns RSD parameter from the output of the `remote_debugger` tool.
@@ -107,13 +116,7 @@ local function process_remote_debugger_exit()
       notifications.send_error("Device is not connected")
     elseif code == 1 then
       notifications.send_error(
-        "Failed to start remote debugger. Make sure that you added the remote_debugger tool to sudoers file."
-      )
-      notifications.send_error(
-        "You can do this by running `sudo visudo -f /etc/sudoers` and adding the following line:\n"
-          .. vim.fn.expand("$USER")
-          .. " ALL = (ALL) NOPASSWD: "
-          .. get_tool_path()
+        "Failed to start remote debugger. Make sure that you installed the remote_debugger tool. See: `:h xcodebuild.remote-debugger`."
       )
     elseif code ~= 0 and code ~= 143 and code ~= 137 then
       notifications.send_error("Failed to start remote debugger (code: " .. code .. ")")
@@ -203,6 +206,14 @@ local function try_fetching_os_version(id)
   end)
 end
 
+---Checks if the `pymobiledevice` integration is enabled and the tool is installed.
+---@return boolean
+function M.is_enabled()
+  local config = require("xcodebuild.core.config").options.integrations.pymobiledevice
+
+  return config.enabled and M.is_installed()
+end
+
 ---Checks if the `pymobiledevice3` tool is installed.
 ---@return boolean
 function M.is_installed()
@@ -213,6 +224,14 @@ end
 ---If not, it sends an error notification.
 ---@return boolean
 function M.validate_installation()
+  local config = require("xcodebuild.core.config").options.integrations.pymobiledevice
+  if not config.enabled then
+    notifications.send_error(
+      "pymobiledevice integration is disabled. Please enable it in the configuration to debug on physical devices."
+    )
+    return false
+  end
+
   if not M.is_installed() then
     notifications.send_error(
       "pymobiledevice3 tool not found. Please run `python3 -m pip install -U pymobiledevice3` to install it."
@@ -234,7 +253,7 @@ end
 ---This tool should be always used for debugging if it's installed.
 ---@return boolean
 function M.should_use()
-  if not M.is_installed() then
+  if not M.is_enabled() then
     return false
   end
 
@@ -411,9 +430,23 @@ end
 ---Requires passwordless `sudo` for the `remote_debugger` tool.
 ---@param destination string # device id
 ---@param callback fun(rsd: string)|nil
----@return number # job id
+---@return number|nil # job id
 function M.create_secure_tunnel(destination, callback)
-  local cmd = "sudo '" .. get_tool_path() .. "' start " .. destination
+  if check_sudo(".local/share/nvim/lazy/xcodebuild.nvim/tools/remote_debugger") then
+    notifications.send_error(
+      "You are using insecure integration with pymobiledevice3. Please migrate your installation (see: `:h xcodebuild.remote-debugger-migration`)"
+    )
+    return nil
+  end
+
+  if not check_sudo(M.scriptPath) then
+    notifications.send_error(
+      "remote_debugger tool requires passwordless access to the sudo command. (see: `:h xcodebuild.remote-debugger`)"
+    )
+    return nil
+  end
+
+  local cmd = "sudo '" .. M.scriptPath .. "' start " .. destination
 
   return vim.fn.jobstart(cmd, {
     stdout_buffered = false,
@@ -428,7 +461,7 @@ end
 ---
 ---Requires passwordless `sudo` for the `remote_debugger` tool.
 function M.close_secure_tunnel()
-  util.shell("sudo '" .. get_tool_path() .. "' kill 2>/dev/null")
+  util.shell("sudo '" .. M.scriptPath .. "' kill 2>/dev/null")
 end
 
 return M
