@@ -74,6 +74,7 @@ local function mock()
 
   require("xcodebuild.project.config").settings.xcodeproj = projectRoot .. "XcodebuildNvimApp.xcodeproj"
   require("xcodebuild.core.config").options.logs.notify = function(_, _) end
+  require("xcodebuild.core.config").options.project_manager.guess_target = true
 
   require("xcodebuild.ui.pickers").show = function(_, list, callback, _)
     pickerReceivedItems = list
@@ -258,7 +259,7 @@ describe("ensure", function()
         before_each(function()
           manager.add_file(newFilePath, function()
             callbackCalled = true
-          end, { createGroups = true, guessTarget = true })
+          end, { createGroups = true })
         end)
 
         it("THEN the target is correctly guessed and added", function()
@@ -276,7 +277,7 @@ describe("ensure", function()
         before_each(function()
           manager.add_file(newFilePath, function()
             callbackCalled = true
-          end, { createGroups = true, guessTarget = true })
+          end, { createGroups = true })
         end)
 
         it("THEN the target is set based on picker selection", function()
@@ -307,7 +308,7 @@ describe("ensure", function()
         end
         manager.add_file(newFilePath, function()
           callbackCalled = true
-        end, { createGroups = true, guessTarget = true })
+        end, { createGroups = true })
       end)
 
       it("THEN the target is set automatically", function()
@@ -323,10 +324,11 @@ describe("ensure", function()
       local callbackCalled = false
 
       before_each(function()
+        require("xcodebuild.core.config").options.project_manager.guess_target = false
         setFilePath(newFilePath)
         manager.add_file(newFilePath, function()
           callbackCalled = true
-        end, { createGroups = true, guessTarget = false })
+        end, { createGroups = true })
       end)
 
       it("THEN the target is set based on picker selection", function()

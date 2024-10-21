@@ -163,6 +163,14 @@ M.setup({options})                                            *xcodebuild.setup*
         error_coverage_level = 30,
         open_expanded = false,
       },
+      project_manager = {
+        guess_target = true, -- guess target for the new file based on the file path
+        find_xcodeproj = false, -- instead of using configured xcodeproj search for xcodeproj closest to targeted file
+        should_update_project = function(path) -- path can lead to directory or file
+          -- it could be useful if you mix Xcode project with SPM for example
+          return true
+        end,
+      },
       integrations = {
         pymobiledevice = {
           enabled = true, -- enable pymobiledevice integration (requires configuration, see: `:h xcodebuild.remote-debugger`)
@@ -176,27 +184,12 @@ M.setup({options})                                            *xcodebuild.setup*
         },
         nvim_tree = {
           enabled = true, -- enable updating Xcode project files when using nvim-tree
-          guess_target = true, -- guess target for the new file based on the file path
-          should_update_project = function(path) -- path can lead to directory or file
-            -- it could be useful if you mix Xcode project with SPM for example
-            return true
-          end,
         },
         neo_tree = {
           enabled = true, -- enable updating Xcode project files when using neo-tree.nvim
-          guess_target = true, -- guess target for the new file based on the file path
-          should_update_project = function(path) -- path can lead to directory or file
-            -- it could be useful if you mix Xcode project with SPM for example
-            return true
-          end,
         },
         oil_nvim = {
           enabled = true, -- enable updating Xcode project files when using oil.nvim
-          guess_target = true, -- guess target for the new file based on the file path
-          should_update_project = function(path) -- path can lead to directory or file
-            -- it could be useful if you mix Xcode project with SPM for example
-            return true
-          end,
         },
         quick = { -- integration with Swift test framework: github.com/Quick/Quick
           enabled = true, -- enable Quick tests support (requires Swift parser for nvim-treesitter)
@@ -1898,7 +1891,7 @@ All actions send notifications to the user.
 
 Additionally, the `Project Manager` will try predicting targets for newly created files based on their location.
 If you prefer to select targets manually, you can always disable it in the configuration using
-`integrations.nvim_tree.guess_target` or `integrations.oil_nvim.guess_target`.
+`project_manager.guess_target`.
 
 See: https://github.com/CocoaPods/Xcodeproj
 
@@ -1910,14 +1903,13 @@ M.create_new_file()
 
 
                                 *xcodebuild.project.manager.add_file_to_targets*
-M.add_file_to_targets({filepath}, {targets}, {findXcodeproj})
+M.add_file_to_targets({filepath}, {targets})
   Adds the file to the selected targets.
   The group from {filepath} must exist in the project.
 
   Parameters: ~
-    {filepath}       (string)
-    {targets}        (string[])
-    {findXcodeproj}  (boolean)
+    {filepath}  (string)
+    {targets}   (string[])
 
 
                                 *xcodebuild.project.manager.get_project_targets*
@@ -1935,14 +1927,12 @@ M.add_file({filepath}, {callback}, {opts})
 
   If {opts.createGroups} is `true`, all groups from {filepath} will be created if needed.
 
-  If {opts.guessTarget} is `true`, it tries to guess the target for the file.
-
   Calls the {callback} after the file has been added to the targets or the user has canceled the action.
 
   Parameters: ~
     {filepath}  (string)
     {callback}  (function|nil)
-    {opts}      ({guessTarget:boolean,createGroups:boolean,findXcodeproj:boolean}|nil)
+    {opts}      ({createGroups:boolean}|nil)
 
 
                                    *xcodebuild.project.manager.add_current_file*
@@ -1953,24 +1943,22 @@ M.add_current_file()
 
 
                                           *xcodebuild.project.manager.move_file*
-M.move_file({oldFilePath}, {newFilePath}, {findXcodeproj})
+M.move_file({oldFilePath}, {newFilePath})
   Moves the file to the new path in the project.
   The group from {newFilePath} must exist in the project.
 
   Parameters: ~
-    {oldFilePath}    (string)
-    {newFilePath}    (string)
-    {findXcodeproj}  (boolean)
+    {oldFilePath}  (string)
+    {newFilePath}  (string)
 
 
                                         *xcodebuild.project.manager.rename_file*
-M.rename_file({oldFilePath}, {newFilePath}, {findXcodeproj})
+M.rename_file({oldFilePath}, {newFilePath})
   Renames the file in the project.
 
   Parameters: ~
-    {oldFilePath}    (string)
-    {newFilePath}    (string)
-    {findXcodeproj}  (boolean)
+    {oldFilePath}  (string)
+    {newFilePath}  (string)
 
 
                                 *xcodebuild.project.manager.rename_current_file*
@@ -1979,13 +1967,11 @@ M.rename_current_file()
   Asks the user for the new file name.
 
 
-                                        *xcodebuild.project.manager.delete_file*
-M.delete_file({filepath}, {findXcodeproj})
+M.delete_file({filepath})               *xcodebuild.project.manager.delete_file*
   Deletes the file from the project.
 
   Parameters: ~
-    {filepath}       (string)
-    {findXcodeproj}  (boolean)
+    {filepath}  (string)
 
 
                                 *xcodebuild.project.manager.delete_current_file*
@@ -2000,12 +1986,11 @@ M.create_new_group()
   Asks the user for the group name.
 
 
-M.add_group({path}, {findXcodeproj})      *xcodebuild.project.manager.add_group*
+M.add_group({path})                       *xcodebuild.project.manager.add_group*
   Adds the group to the project.
 
   Parameters: ~
-    {path}           (string)
-    {findXcodeproj}  (boolean)
+    {path}  (string)
 
 
                                   *xcodebuild.project.manager.add_current_group*
@@ -2014,13 +1999,12 @@ M.add_current_group()
 
 
                                        *xcodebuild.project.manager.rename_group*
-M.rename_group({oldGroupPath}, {newGroupPath}, {findXcodeproj})
+M.rename_group({oldGroupPath}, {newGroupPath})
   Renames the group in the project.
 
   Parameters: ~
-    {oldGroupPath}   (string)
-    {newGroupPath}   (string)
-    {findXcodeproj}  (boolean)
+    {oldGroupPath}  (string)
+    {newGroupPath}  (string)
 
 
                                *xcodebuild.project.manager.rename_current_group*
@@ -2030,16 +2014,15 @@ M.rename_current_group()
 
 
                                *xcodebuild.project.manager.move_or_rename_group*
-M.move_or_rename_group({oldGroupPath}, {newGroupPath}, {findXcodeproj})
+M.move_or_rename_group({oldGroupPath}, {newGroupPath})
   Moves or renames the group in the project.
   If the parent path is different, it moves the group.
   If the parent path is the same, it renames the group.
   The parent group of {newGroupPath} must exist.
 
   Parameters: ~
-    {oldGroupPath}   (string)
-    {newGroupPath}   (string)
-    {findXcodeproj}  (boolean)
+    {oldGroupPath}  (string)
+    {newGroupPath}  (string)
 
 
 M.delete_group()                       *xcodebuild.project.manager.delete_group*

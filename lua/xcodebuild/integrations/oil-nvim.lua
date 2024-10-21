@@ -64,8 +64,8 @@ end
 ---It subscribes to `oil.nvim` events.
 ---@see xcodebuild.project-manager
 function M.setup()
-  local config = require("xcodebuild.core.config").options.integrations.oil_nvim
-  if not config.enabled then
+  local isEnabled = require("xcodebuild.core.config").options.integrations.oil_nvim.enabled
+  if not isEnabled then
     return
   end
 
@@ -74,6 +74,7 @@ function M.setup()
     return
   end
 
+  local projectManagerConfig = require("xcodebuild.core.config").options.project_manager
   local projectManager = require("xcodebuild.project.manager")
   local projectConfig = require("xcodebuild.project.config")
   local cwd = vim.fn.getcwd()
@@ -83,7 +84,7 @@ function M.setup()
   end
 
   local function shouldUpdateProject(path)
-    return isProjectFile(path) and config.should_update_project(path)
+    return isProjectFile(path) and projectManagerConfig.should_update_project(path)
   end
 
   vim.api.nvim_create_autocmd("User", {
@@ -108,18 +109,14 @@ function M.setup()
             vim.schedule(function()
               projectManager.add_file(atPath, function()
                 coroutine.resume(co, co)
-              end, {
-                guessTarget = config.guess_target,
-                createGroups = true,
-                findXcodeproj = config.find_xcodeproj,
-              })
+              end, { createGroups = true })
             end)
             coroutine.yield()
           end
 
           if action.type == "create" then
             if action.entry_type == "directory" then
-              projectManager.add_group(path, config.find_xcodeproj)
+              projectManager.add_group(path)
             elseif action.entry_type == "file" then
               addFileAndWaitForTargetSelection(path)
             end
@@ -134,20 +131,20 @@ function M.setup()
             end
           elseif action.type == "delete" then
             if action.entry_type == "directory" then
-              projectManager.delete_group(path, config.find_xcodeproj)
+              projectManager.delete_group(path)
             elseif action.entry_type == "file" then
-              projectManager.delete_file(path, config.find_xcodeproj)
+              projectManager.delete_file(path)
             end
           elseif action.type == "move" then
             if action.entry_type == "directory" then
               local destPath = parseUrl(action.dest_url)
               if destPath then
-                projectManager.move_or_rename_group(path, destPath, config.find_xcodeproj)
+                projectManager.move_or_rename_group(path, destPath)
               end
             elseif action.entry_type == "file" then
               local destPath = parseUrl(action.dest_url)
               if destPath then
-                projectManager.move_file(path, destPath, config.find_xcodeproj)
+                projectManager.move_file(path, destPath)
               end
             end
           end

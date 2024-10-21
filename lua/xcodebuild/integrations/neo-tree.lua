@@ -23,8 +23,8 @@ local M = {}
 ---It subscribes to `neo-tree` events.
 ---@see xcodebuild.project-manager
 function M.setup()
-  local config = require("xcodebuild.core.config").options.integrations.neo_tree
-  if not config.enabled then
+  local isEnabled = require("xcodebuild.core.config").options.integrations.neo_tree.enabled
+  if not isEnabled then
     return
   end
 
@@ -33,6 +33,7 @@ function M.setup()
     return
   end
 
+  local projectManagerConfig = require("xcodebuild.core.config").options.project_manager
   local projectManager = require("xcodebuild.project.manager")
   local projectConfig = require("xcodebuild.project.config")
   local cwd = vim.fn.getcwd()
@@ -42,7 +43,7 @@ function M.setup()
   end
 
   local function shouldUpdateProject(path)
-    return isProjectFile(path) and config.should_update_project(path)
+    return isProjectFile(path) and projectManagerConfig.should_update_project(path)
   end
 
   local function moveOrRename(data)
@@ -52,9 +53,9 @@ function M.setup()
 
     local isDir = vim.fn.isdirectory(data.destination) == 1
     if isDir then
-      projectManager.move_or_rename_group(data.source, data.destination, config.find_xcodeproj)
+      projectManager.move_or_rename_group(data.source, data.destination)
     else
-      projectManager.move_file(data.source, data.destination, config.find_xcodeproj)
+      projectManager.move_file(data.source, data.destination)
     end
   end
 
@@ -67,13 +68,9 @@ function M.setup()
 
       local isDir = vim.fn.isdirectory(path) == 1
       if isDir then
-        projectManager.add_group(path, config.find_xcodeproj)
+        projectManager.add_group(path)
       else
-        projectManager.add_file(path, nil, {
-          guessTarget = config.guess_target,
-          createGroups = true,
-          findXcodeproj = config.find_xcodeproj,
-        })
+        projectManager.add_file(path, nil, { createGroups = true })
       end
     end,
   })
@@ -89,9 +86,9 @@ function M.setup()
       local isDir = extension == ""
 
       if isDir then
-        projectManager.delete_group(path, config.find_xcodeproj)
+        projectManager.delete_group(path)
       else
-        projectManager.delete_file(path, config.find_xcodeproj)
+        projectManager.delete_file(path)
       end
     end,
   })

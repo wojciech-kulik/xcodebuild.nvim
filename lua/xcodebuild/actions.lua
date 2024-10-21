@@ -308,7 +308,7 @@ end
 ---@param filepath string
 ---@param targets string[]
 function M.add_file_to_targets(filepath, targets)
-  projectManager.add_file_to_targets(filepath, targets, false)
+  projectManager.add_file_to_targets(filepath, targets)
 end
 
 ---Creates a new file and updates the project.
