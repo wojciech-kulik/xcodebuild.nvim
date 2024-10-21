@@ -21,15 +21,15 @@
 ---
 ---Installation
 --->bash
----    brew install xcode-build-server
----    brew install xcbeautify
----    brew install ruby
----    gem install xcodeproj
----    python3 -m pip install -U pymobiledevice3
+---  brew install xcode-build-server xcbeautify ruby pipx
+---  gem install xcodeproj
+---  pipx install pymobiledevice3
 ---<
----or just:
+---
+---To quickly install all required tools you can run:
 --->bash
----    make install
+---  cd ~/.local/share/nvim/lazy/xcodebuild.nvim
+---  make install
 ---<
 ---
 ---To debug on physical devices with iOS 17+ you will need to set up `sudo`,

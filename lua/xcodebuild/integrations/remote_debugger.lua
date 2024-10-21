@@ -173,7 +173,7 @@ local function start_legacy_server(callback)
 
   M.debug_server_job = deviceProxy.start_server(
     projectConfig.settings.destination,
-    config.options.commands.remote_debugger_port,
+    config.options.integrations.pymobiledevice.remote_debugger_port,
     function(connection_string)
       M.connection_string = connection_string
 

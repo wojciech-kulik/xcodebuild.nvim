@@ -70,7 +70,7 @@ function M.kill_app(callback)
     return
   end
 
-  if deviceProxy.is_installed() and constants.is_device(settings.platform) then
+  if deviceProxy.is_enabled() and constants.is_device(settings.platform) then
     M.currentJobId = deviceProxy.kill_app(settings.productName, callback)
   else
     M.currentJobId = xcode.kill_app(settings.productName, settings.platform, callback)
