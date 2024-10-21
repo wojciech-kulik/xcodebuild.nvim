@@ -323,18 +323,25 @@ local function check_remote_debugger()
 end
 
 local function check_xcodebuild_offline_sudo()
-  local xcodebuildOffline = require("xcodebuild.integrations.xcodebuild-offline")
-  local isEnabled = xcodebuildOffline.is_enabled()
-  if not isEnabled then
+  local util = require("xcodebuild.util")
+  local config = require("xcodebuild.core.config").options.integrations.xcodebuild_offline
+  local path = require("xcodebuild.integrations.xcodebuild-offline").scriptPath
+  if not config.enabled then
     start("Checking xcodebuild_offline tool")
     warn("tool not enabled - builds might be slower.")
     warn("see `:h xcodebuild.xcodebuild-offline` for more information.")
     return
   end
 
-  start("Checking passwordless sudo for xcodebuild_offline")
+  start("Checking xcodebuild-offline integration")
 
-  if has_sudo_access(xcodebuildOffline.scriptPath) then
+  if util.file_exists(path) then
+    ok("`xcodebuild_offline` script installed")
+  else
+    error("`xcodebuild_offline` script is not installed. (see: `:h xcodebuild.xcodebuild-offline`)")
+  end
+
+  if has_sudo_access(path) then
     ok("sudo: configured")
   else
     error("passwordless sudo permission for `xcodebuild_offline` is not configured.")
