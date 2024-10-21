@@ -33,7 +33,8 @@
 ---malicious software that could modify the file and run some evil code using
 ---`root` account. The best way to protect that file is to create a local copy,
 ---change the owner to `root`, and give write permission only to `root`.
----The script below does that automatically.
+---The same must be applied to the parent directory. The script below does
+---everything automatically.
 ---
 ---👉 Enable integration that automatically blocks Apple servers
 ---
@@ -57,6 +58,8 @@
 ---    cp "$SOURCE" "$FILE" && \
 ---    chmod 755 "$FILE" && \
 ---    sudo chown root "$FILE" && \
+---    chmod 755 "$DIR" && \
+---    sudo chown root "$DIR" && \
 ---    sudo bash -c "echo \"$ME ALL = (ALL) NOPASSWD: $FILE\" >> /etc/sudoers"
 ---<
 ---
