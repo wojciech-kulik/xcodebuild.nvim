@@ -132,7 +132,7 @@ end
 ---@return number|nil
 function M.get_buf_by_name(name)
   for _, buf in ipairs(vim.api.nvim_list_bufs()) do
-    if vim.fn.bufname(buf) == name then
+    if vim.api.nvim_buf_get_name(buf) == name then
       return buf
     end
   end
