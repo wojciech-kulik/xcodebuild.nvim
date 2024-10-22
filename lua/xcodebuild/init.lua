@@ -179,6 +179,14 @@ end
 ---    error_coverage_level = 30,
 ---    open_expanded = false,
 ---  },
+---  project_manager = {
+---    guess_target = true, -- guess target for the new file based on the file path
+---    find_xcodeproj = false, -- instead of using configured xcodeproj search for xcodeproj closest to targeted file
+---    should_update_project = function(path) -- path can lead to directory or file
+---      -- it could be useful if you mix Xcode project with SPM for example
+---      return true
+---    end,
+---  },
 ---  integrations = {
 ---    pymobiledevice = {
 ---      enabled = true, -- enable pymobiledevice integration (requires configuration, see: `:h xcodebuild.remote-debugger`)
@@ -192,27 +200,12 @@ end
 ---    },
 ---    nvim_tree = {
 ---      enabled = true, -- enable updating Xcode project files when using nvim-tree
----      guess_target = true, -- guess target for the new file based on the file path
----      should_update_project = function(path) -- path can lead to directory or file
----        -- it could be useful if you mix Xcode project with SPM for example
----        return true
----      end,
 ---    },
 ---    neo_tree = {
 ---      enabled = true, -- enable updating Xcode project files when using neo-tree.nvim
----      guess_target = true, -- guess target for the new file based on the file path
----      should_update_project = function(path) -- path can lead to directory or file
----        -- it could be useful if you mix Xcode project with SPM for example
----        return true
----      end,
 ---    },
 ---    oil_nvim = {
 ---      enabled = true, -- enable updating Xcode project files when using oil.nvim
----      guess_target = true, -- guess target for the new file based on the file path
----      should_update_project = function(path) -- path can lead to directory or file
----        -- it could be useful if you mix Xcode project with SPM for example
----        return true
----      end,
 ---    },
 ---    quick = { -- integration with Swift test framework: github.com/Quick/Quick
 ---      enabled = true, -- enable Quick tests support (requires Swift parser for nvim-treesitter)
