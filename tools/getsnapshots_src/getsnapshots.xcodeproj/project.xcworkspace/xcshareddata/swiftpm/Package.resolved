@@ -1,4 +1,5 @@
 {
+  "originHash" : "4a1b685995fbf359c5f98c1933f4f4e564913e581575af3f5340bd0e73705006",
   "pins" : [
     {
       "identity" : "rainbow",
@@ -14,16 +15,17 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-argument-parser",
       "state" : {
-        "revision" : "8f4d2753f0e4778c76d5f05ad16c74f707390531",
-        "version" : "1.2.3"
+        "revision" : "41982a3656a71c768319979febd796c6fd111d5c",
+        "version" : "1.5.0"
       }
     },
     {
       "identity" : "xcresultkit",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/tylervick/XCResultKit.git",
+      "location" : "https://github.com/davidahouse/XCResultKit.git",
       "state" : {
-        "revision" : "d5462510fc09055594b3cf472e443bee0d130043"
+        "revision" : "4d13c245f374d9af67fb9260cd14a4d58f6c6c82",
+        "version" : "1.2.1"
       }
     },
     {
@@ -32,9 +34,9 @@
       "location" : "https://github.com/wojciech-kulik/XCTestHTMLReport",
       "state" : {
         "branch" : "main",
-        "revision" : "f6bc4b4d2b7e940817d6c9e9413263e26c04cf61"
+        "revision" : "cdaf960e540e43f640c38b32c84d86c7dfa3c5ee"
       }
     }
   ],
-  "version" : 2
+  "version" : 3
 }
