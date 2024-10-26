@@ -200,15 +200,19 @@ function M.select_xcodeproj(callback, opts)
   local maxdepth = config.commands.project_search_max_depth
   local sanitizedFiles = {}
   local filenames = {}
-  local files = util.shell(
-    "find '"
-      .. vim.fn.getcwd()
-      .. "' -maxdepth "
-      .. maxdepth
-      .. " -iname '*.xcodeproj'"
-      .. " -not -path '*/.*'"
-      .. " 2>/dev/null"
-  )
+  local cmd = "find '"
+    .. vim.fn.getcwd()
+    .. "' -maxdepth "
+    .. maxdepth
+    .. " -iname '*.xcodeproj'"
+    .. " -not -path '*/.*'"
+    .. " 2>/dev/null"
+
+  if config.integrations.fd.enabled then
+    cmd = "fd -I '.*\\.xcodeproj' " .. vim.fn.getcwd() .. " --max-depth " .. maxdepth .. " 2> /dev/null"
+  end
+
+  local files = util.shell(cmd)
 
   for _, file in ipairs(files) do
     if util.trim(file) ~= "" then
@@ -233,20 +237,30 @@ function M.select_project(callback, opts)
   local maxdepth = config.commands.project_search_max_depth
   local sanitizedFiles = {}
   local filenames = {}
-  local files = util.shell(
-    "find '"
+  local cmd = "find '"
+    .. vim.fn.getcwd()
+    .. "' \\( -iname '*.xcodeproj' -o -iname '*.xcworkspace' \\)"
+    .. " -not -path '*/.*' -not -path '*xcodeproj/project.xcworkspace'"
+    .. " -maxdepth "
+    .. maxdepth
+    .. " 2>/dev/null"
+  local projectFileRegex = ".*%/([^/]*)$"
+
+  if config.integrations.fd.enabled then
+    cmd = "fd -I '(.*\\.xcodeproj$|.*\\.xcworkspace$)' "
       .. vim.fn.getcwd()
-      .. "' \\( -iname '*.xcodeproj' -o -iname '*.xcworkspace' \\)"
-      .. " -not -path '*/.*' -not -path '*xcodeproj/project.xcworkspace'"
-      .. " -maxdepth "
+      .. " --max-depth "
       .. maxdepth
-      .. " 2>/dev/null"
-  )
+      .. " -E '**/*xcodeproj/project.xcworkspace/' 2> /dev/null"
+    projectFileRegex = ".*%/([^/]*)/$"
+  end
+
+  local files = util.shell(cmd)
 
   for _, file in ipairs(files) do
     if util.trim(file) ~= "" then
       table.insert(sanitizedFiles, file)
-      table.insert(filenames, string.match(file, ".*%/([^/]*)$"))
+      table.insert(filenames, string.match(file, projectFileRegex))
     end
   end
 

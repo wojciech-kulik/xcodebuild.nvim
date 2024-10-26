@@ -72,8 +72,16 @@ end
 ---@return table<string, string[]>
 function M.find_all_swift_files()
   local util = require("xcodebuild.util")
-  local allFiles =
-    util.shell("find '" .. vim.fn.getcwd() .. "' -type f -iname '*.swift' -not -path '*/.*' 2>/dev/null")
+  local config = require("xcodebuild.core.config").options
+
+  local allFiles
+  if config.integrations.fd.enabled then
+    allFiles = util.shell("fd -I '.*\\.swift' " .. vim.fn.getcwd() .. " --type f 2> /dev/null")
+  else
+    allFiles =
+      util.shell("find '" .. vim.fn.getcwd() .. "' -type f -iname '*.swift' -not -path '*/.*' 2>/dev/null")
+  end
+
   local map = {}
 
   for _, filepath in ipairs(allFiles) do

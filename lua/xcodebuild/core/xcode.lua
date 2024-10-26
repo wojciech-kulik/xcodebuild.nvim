@@ -99,6 +99,7 @@ end
 ---@param appPath string
 ---@return TargetMap
 function M.get_targets_filemap(appPath)
+  local config = require("xcodebuild.core.config").options
   if not appPath then
     notifications.send_error("Could not locate build dir. Please run Build.")
     return {}
@@ -117,7 +118,13 @@ function M.get_targets_filemap(appPath)
   end
 
   local targetsFilesMap = {}
-  local fileListFiles = util.shell("find '" .. searchPath .. "' -type f -iname *.SwiftFileList")
+  local cmd = "find '" .. searchPath .. "' -type f -iname *.SwiftFileList"
+
+  if config.integrations.fd.enabled then
+    cmd = "fd -I '.*\\.SwiftFileList' '" .. searchPath .. "' --type f 2> /dev/null"
+  end
+
+  local fileListFiles = util.shell(cmd)
 
   for _, file in ipairs(fileListFiles) do
     if file ~= "" then

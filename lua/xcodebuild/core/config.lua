@@ -112,6 +112,9 @@ local defaults = {
       enabled = true, -- enable pymobiledevice integration (requires configuration, see: `:h xcodebuild.remote-debugger`)
       remote_debugger_port = 65123, -- port used by remote debugger (passed to pymobiledevice3)
     },
+    fd = {
+      enabled = false, -- quicker alternative to "find", install with `brew install fd`
+    },
     xcodebuild_offline = {
       enabled = false, -- improves build time (requires configuration, see `:h xcodebuild.xcodebuild-offline`)
     },
