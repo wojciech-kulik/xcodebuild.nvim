@@ -4154,6 +4154,13 @@ M.shell({cmd})                                           *xcodebuild.util.shell*
     (string[])
 
 
+M.is_fd_installed()                            *xcodebuild.util.is_fd_installed*
+  Checks if fd is installed on the system.
+
+  Returns: ~
+    (boolean)
+
+
 M.merge_array({lhs}, {rhs})                        *xcodebuild.util.merge_array*
   Merges two arrays into a new one.
 

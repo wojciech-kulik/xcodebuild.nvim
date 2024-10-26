@@ -99,7 +99,6 @@ end
 ---@param appPath string
 ---@return TargetMap
 function M.get_targets_filemap(appPath)
-  local config = require("xcodebuild.core.config").options
   if not appPath then
     notifications.send_error("Could not locate build dir. Please run Build.")
     return {}

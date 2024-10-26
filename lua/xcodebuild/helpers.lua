@@ -72,7 +72,6 @@ end
 ---@return table<string, string[]>
 function M.find_all_swift_files()
   local util = require("xcodebuild.util")
-  local config = require("xcodebuild.core.config").options
 
   local allFiles
   if util.is_fd_installed() then
