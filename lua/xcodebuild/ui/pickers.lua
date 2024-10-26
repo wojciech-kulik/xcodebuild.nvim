@@ -487,6 +487,14 @@ function M.select_failing_snapshot_test()
       detach = true,
       on_exit = function() end,
     })
+
+    -- HACK: the preview stays behind the terminal window
+    -- when Neovim is running in tmux.
+    if vim.env.TERM_PROGRAM == "tmux" then
+      vim.defer_fn(function()
+        util.shell("open -a qlmanage 2>/dev/null")
+      end, 100)
+    end
   end)
 end
 
