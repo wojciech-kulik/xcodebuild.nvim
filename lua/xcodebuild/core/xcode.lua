@@ -120,7 +120,7 @@ function M.get_targets_filemap(appPath)
   local targetsFilesMap = {}
   local cmd = "find '" .. searchPath .. "' -type f -iname *.SwiftFileList"
 
-  if config.integrations.fd.enabled then
+  if util.is_fd_installed() then
     cmd = "fd -I '.*\\.SwiftFileList' '" .. searchPath .. "' --type f 2> /dev/null"
   end
 

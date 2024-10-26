@@ -75,7 +75,7 @@ function M.find_all_swift_files()
   local config = require("xcodebuild.core.config").options
 
   local allFiles
-  if config.integrations.fd.enabled then
+  if util.is_fd_installed() then
     allFiles = util.shell("fd -I '.*\\.swift' " .. vim.fn.getcwd() .. " --type f 2> /dev/null")
   else
     allFiles =
