@@ -65,7 +65,6 @@ https://github.com/user-attachments/assets/a2b87eab-5cdc-4fe5-8f96-78bc1a21e924
 &nbsp;
 
 [Wiki]: https://github.com/wojciech-kulik/xcodebuild.nvim/wiki
-[fd]: https://github.com/sharkdp/fd
 [nvim-tree]: https://github.com/nvim-tree/nvim-tree.lua
 [neo-tree]: https://github.com/nvim-neo-tree/neo-tree.nvim
 [oil.nvim]: https://github.com/stevearc/oil.nvim

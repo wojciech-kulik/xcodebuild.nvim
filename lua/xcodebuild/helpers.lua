@@ -78,7 +78,7 @@ function M.find_all_swift_files()
     allFiles = util.shell("fd -I '.*\\.swift$' '" .. vim.fn.getcwd() .. "' --type f 2> /dev/null")
   else
     allFiles =
-      util.shell("find '" .. vim.fn.getcwd() .. "' -type f -iname '*.swift' -not -path '*/.*' 2>/dev/null")
+      util.shell("find '" .. vim.fn.getcwd() .. "' -type d -path '*/.*' -prune -false -o -type f -iname '*.swift' 2>/dev/null")
   end
 
   local map = {}
