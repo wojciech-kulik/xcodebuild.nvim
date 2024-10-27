@@ -64,6 +64,21 @@ https://github.com/user-attachments/assets/a2b87eab-5cdc-4fe5-8f96-78bc1a21e924
 
 &nbsp;
 
+## Sponsors 💛
+
+Big thanks to all the sponsors who support this project 🍻!
+
+### Monthly Sponsors
+<a href="https://github.com/Almaz5200"><img src="https://avatars.githubusercontent.com/u/21291840?s=80&amp;v=4" width="40" height="40" alt="@Almaz5200" title="Almaz5200"></a>
+<a href="https://github.com/joeldrotleff"><img src="https://avatars.githubusercontent.com/u/2484624?s=80&amp;v=4" width="40" height="40" alt="@joeldrotleff" title="joeldrotleff"></a>
+<a href="https://github.com/stephenhuh"><img src="https://avatars.githubusercontent.com/u/6165538?s=52&amp;v=4" width="40" height="40" alt="@stephenhuh" title="stephenhuh"></a>
+<a href="https://github.com/kg8m"><img src="https://avatars.githubusercontent.com/u/694547?s=52&amp;v=4" width="40" height="40" alt="@kg8m" title="kg8m"></a>
+
+### One Time Sponsors
+<a href="https://github.com/kujohn"><img src="https://avatars.githubusercontent.com/u/1356936?s=80&amp;v=4" width="40" height="40" alt="@kujohn" title="kujohn"></a>
+
+&nbsp;
+
 [Wiki]: https://github.com/wojciech-kulik/xcodebuild.nvim/wiki
 [nvim-tree]: https://github.com/nvim-tree/nvim-tree.lua
 [neo-tree]: https://github.com/nvim-neo-tree/neo-tree.nvim
