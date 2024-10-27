@@ -75,7 +75,7 @@ function M.find_all_swift_files()
 
   local allFiles
   if util.is_fd_installed() then
-    allFiles = util.shell("fd -I '.*\\.swift' " .. vim.fn.getcwd() .. " --type f 2> /dev/null")
+    allFiles = util.shell("fd -I '.*\\.swift$' '" .. vim.fn.getcwd() .. "' --type f 2> /dev/null")
   else
     allFiles =
       util.shell("find '" .. vim.fn.getcwd() .. "' -type f -iname '*.swift' -not -path '*/.*' 2>/dev/null")

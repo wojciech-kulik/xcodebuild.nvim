@@ -209,7 +209,7 @@ function M.select_xcodeproj(callback, opts)
     .. " 2>/dev/null"
 
   if util.is_fd_installed() then
-    cmd = "fd -I '.*\\.xcodeproj' " .. vim.fn.getcwd() .. " --max-depth " .. maxdepth .. " 2> /dev/null"
+    cmd = "fd -I '.*\\.xcodeproj$' '" .. vim.fn.getcwd() .. "' --max-depth " .. maxdepth .. " 2> /dev/null"
   end
 
   local files = util.shell(cmd)
@@ -247,9 +247,9 @@ function M.select_project(callback, opts)
   local projectFileRegex = ".*%/([^/]*)$"
 
   if util.is_fd_installed() then
-    cmd = "fd -I '(.*\\.xcodeproj$|.*\\.xcworkspace$)' "
+    cmd = "fd -I '(.*\\.xcodeproj$|.*\\.xcworkspace$)' '"
       .. vim.fn.getcwd()
-      .. " --max-depth "
+      .. "' --max-depth "
       .. maxdepth
       .. " -E '**/*xcodeproj/project.xcworkspace/' 2> /dev/null"
     projectFileRegex = ".*%/([^/]*)/$"
