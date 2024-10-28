@@ -206,6 +206,7 @@ function M.select_xcodeproj(callback, opts)
     .. maxdepth
     .. " -iname '*.xcodeproj' -print"
     .. " 2> /dev/null"
+  local projectFileRegex = ".*%/([^/]*)$"
 
   if util.is_fd_installed() then
     cmd = "fd -I '.*\\.xcodeproj$' '"
@@ -213,14 +214,16 @@ function M.select_xcodeproj(callback, opts)
       .. "' --max-depth "
       .. maxdepth
       .. " --type d 2> /dev/null"
+    projectFileRegex = ".*%/([^/]*)/$"
   end
 
   local files = util.shell(cmd)
 
   for _, file in ipairs(files) do
     if util.trim(file) ~= "" then
-      table.insert(sanitizedFiles, file)
-      table.insert(filenames, string.match(file, ".*%/([^/]*)$"))
+      local trimmedPath = file:gsub("/+$", "")
+      table.insert(sanitizedFiles, trimmedPath)
+      table.insert(filenames, string.match(file, projectFileRegex))
     end
   end
 
@@ -262,7 +265,8 @@ function M.select_project(callback, opts)
 
   for _, file in ipairs(files) do
     if util.trim(file) ~= "" then
-      table.insert(sanitizedFiles, file)
+      local trimmedPath = file:gsub("/+$", "")
+      table.insert(sanitizedFiles, trimmedPath)
       table.insert(filenames, string.match(file, projectFileRegex))
     end
   end
