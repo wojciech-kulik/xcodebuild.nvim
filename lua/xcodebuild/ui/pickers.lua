@@ -254,7 +254,6 @@ function M.select_project(callback, opts)
     projectFileRegex = ".*%/([^/]*)/$"
   end
 
-  vim.notify(cmd)
   local files = util.shell(cmd)
 
   for _, file in ipairs(files) do
