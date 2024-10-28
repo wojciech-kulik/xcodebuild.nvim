@@ -80,7 +80,7 @@ function M.find_all_swift_files()
     allFiles = util.shell(
       "find '"
         .. vim.fn.getcwd()
-        .. "' -type d -path '*/.*' -prune -false -o -type f -iname '*.swift' 2>/dev/null"
+        .. "' -type d -path '*/.*' -prune -o -type f -iname '*.swift' -print 2>/dev/null"
     )
   end
 

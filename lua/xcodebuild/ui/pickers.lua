@@ -202,13 +202,13 @@ function M.select_xcodeproj(callback, opts)
   local filenames = {}
   local cmd = "find '"
     .. vim.fn.getcwd()
-    .. "' -type d -path '*/.*' -prune -false -o -maxdepth "
+    .. "' -type d -path '*/.*' -prune -o -maxdepth "
     .. maxdepth
-    .. " -iname '*.xcodeproj'"
-    .. " 2>/dev/null"
+    .. " -iname '*.xcodeproj' -print"
+    .. " 2> /dev/null"
 
   if util.is_fd_installed() then
-    cmd = "fd -I '.*\\.xcodeproj$' '" .. vim.fn.getcwd() .. "' --max-depth " .. maxdepth .. " 2> /dev/null"
+    cmd = "fd -I '.*\\.xcodeproj$' '" .. vim.fn.getcwd() .. "' --max-depth " .. maxdepth .. " --type d 2> /dev/null"
   end
 
   local files = util.shell(cmd)
