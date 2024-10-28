@@ -208,7 +208,11 @@ function M.select_xcodeproj(callback, opts)
     .. " 2> /dev/null"
 
   if util.is_fd_installed() then
-    cmd = "fd -I '.*\\.xcodeproj$' '" .. vim.fn.getcwd() .. "' --max-depth " .. maxdepth .. " --type d 2> /dev/null"
+    cmd = "fd -I '.*\\.xcodeproj$' '"
+      .. vim.fn.getcwd()
+      .. "' --max-depth "
+      .. maxdepth
+      .. " --type d 2> /dev/null"
   end
 
   local files = util.shell(cmd)
