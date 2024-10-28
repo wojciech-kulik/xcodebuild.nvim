@@ -11,9 +11,7 @@ GEM
     colored2 (3.1.2)
     nanaimo (0.3.0)
     nkf (0.2.0)
-    rexml (3.3.6)
-      strscan
-    strscan (3.1.0)
+    rexml (3.3.9)
     xcodeproj (1.25.0)
       CFPropertyList (>= 2.3.3, < 4.0)
       atomos (~> 0.1.3)
