@@ -200,20 +200,30 @@ function M.select_xcodeproj(callback, opts)
   local maxdepth = config.commands.project_search_max_depth
   local sanitizedFiles = {}
   local filenames = {}
-  local files = util.shell(
-    "find '"
+  local cmd = "find '"
+    .. vim.fn.getcwd()
+    .. "' -type d -path '*/.*' -prune -o -maxdepth "
+    .. maxdepth
+    .. " -iname '*.xcodeproj' -print"
+    .. " 2> /dev/null"
+  local projectFileRegex = ".*%/([^/]*)$"
+
+  if util.is_fd_installed() then
+    cmd = "fd -I '.*\\.xcodeproj$' '"
       .. vim.fn.getcwd()
-      .. "' -maxdepth "
+      .. "' --max-depth "
       .. maxdepth
-      .. " -iname '*.xcodeproj'"
-      .. " -not -path '*/.*'"
-      .. " 2>/dev/null"
-  )
+      .. " --type d 2> /dev/null"
+    projectFileRegex = ".*%/([^/]*)/$"
+  end
+
+  local files = util.shell(cmd)
 
   for _, file in ipairs(files) do
     if util.trim(file) ~= "" then
-      table.insert(sanitizedFiles, file)
-      table.insert(filenames, string.match(file, ".*%/([^/]*)$"))
+      local trimmedPath = file:gsub("/+$", "")
+      table.insert(sanitizedFiles, trimmedPath)
+      table.insert(filenames, string.match(file, projectFileRegex))
     end
   end
 
@@ -233,20 +243,31 @@ function M.select_project(callback, opts)
   local maxdepth = config.commands.project_search_max_depth
   local sanitizedFiles = {}
   local filenames = {}
-  local files = util.shell(
-    "find '"
+  local cmd = "find '"
+    .. vim.fn.getcwd()
+    .. "' -type d \\( -path '*/.*' -o -path '*xcodeproj/project.xcworkspace' \\) -prune -o"
+    .. " \\( -iname '*.xcodeproj' -o -iname '*.xcworkspace' \\)"
+    .. " -maxdepth "
+    .. maxdepth
+    .. " -print 2> /dev/null"
+  local projectFileRegex = ".*%/([^/]*)$"
+
+  if util.is_fd_installed() then
+    cmd = "fd -I '(.*\\.xcodeproj$|.*\\.xcworkspace$)' '"
       .. vim.fn.getcwd()
-      .. "' \\( -iname '*.xcodeproj' -o -iname '*.xcworkspace' \\)"
-      .. " -not -path '*/.*' -not -path '*xcodeproj/project.xcworkspace'"
-      .. " -maxdepth "
+      .. "' --max-depth "
       .. maxdepth
-      .. " 2>/dev/null"
-  )
+      .. " -E '**/*xcodeproj/project.xcworkspace/' 2> /dev/null"
+    projectFileRegex = ".*%/([^/]*)/$"
+  end
+
+  local files = util.shell(cmd)
 
   for _, file in ipairs(files) do
     if util.trim(file) ~= "" then
-      table.insert(sanitizedFiles, file)
-      table.insert(filenames, string.match(file, ".*%/([^/]*)$"))
+      local trimmedPath = file:gsub("/+$", "")
+      table.insert(sanitizedFiles, trimmedPath)
+      table.insert(filenames, string.match(file, projectFileRegex))
     end
   end
 

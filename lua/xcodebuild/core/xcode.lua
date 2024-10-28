@@ -117,7 +117,13 @@ function M.get_targets_filemap(appPath)
   end
 
   local targetsFilesMap = {}
-  local fileListFiles = util.shell("find '" .. searchPath .. "' -type f -iname *.SwiftFileList")
+  local cmd = "find '" .. searchPath .. "' -type f -iname *.SwiftFileList 2> /dev/null"
+
+  if util.is_fd_installed() then
+    cmd = "fd -I '.*\\.SwiftFileList$' '" .. searchPath .. "' --type f 2> /dev/null"
+  end
+
+  local fileListFiles = util.shell(cmd)
 
   for _, file in ipairs(fileListFiles) do
     if file ~= "" then
