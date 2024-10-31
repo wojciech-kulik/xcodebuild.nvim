@@ -75,7 +75,7 @@ end
 ---
 ---@param path string # The starting path to begin the search from.
 ---@return string|nil # The absolute path to the `.xcodeproj` file, or nil if not found.
-local function findXcodeproj_path(path)
+local function find_xcodeproj_path(path)
   local dir = path
   local cwd = vim.fn.getcwd()
 
@@ -106,7 +106,7 @@ end
 local function inject_relative_xcodeproj(table, params)
   for _, param in ipairs(params) do
     if vim.startswith(param, "/") then
-      local xcodeproj_path = findXcodeproj_path(param)
+      local xcodeproj_path = find_xcodeproj_path(param)
       if xcodeproj_path then
         table.insert(params, 1, xcodeproj_path)
         return true
@@ -115,6 +115,19 @@ local function inject_relative_xcodeproj(table, params)
   end
 
   return false
+end
+
+---Finds the first path in the provided parameters.
+---@param params string[]
+---@return string|nil
+local function find_path_in_params(params)
+  for _, param in ipairs(params) do
+    if vim.startswith(param, "/") then
+      return param
+    end
+  end
+
+  return nil
 end
 
 ---Runs the `xcodeproj` tool with the provided action and parameters.
@@ -129,9 +142,15 @@ end
 local function run(action, params)
   local allParams = ""
   local project = projectConfig.settings.xcodeproj
+
+  local path = find_path_in_params(params or {})
+  local customProject = path and config.project_for_path(path)
+
   params = params or {}
 
-  if not config.find_xcodeproj or not inject_relative_xcodeproj(table, params) then
+  if customProject then
+    table.insert(params, 1, customProject)
+  elseif not config.find_xcodeproj or not inject_relative_xcodeproj(table, params) then
     table.insert(params, 1, project)
   end
 
