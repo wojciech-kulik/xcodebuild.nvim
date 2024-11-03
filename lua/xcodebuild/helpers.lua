@@ -38,12 +38,23 @@ end
 
 ---Validates if the project is configured.
 ---It sends an error notification if the project is not configured.
+---@param requiresXcodeproj boolean
 ---@return boolean
-function M.validate_project()
+function M.validate_project(requiresXcodeproj)
   local projectConfig = require("xcodebuild.project.config")
   local notifications = require("xcodebuild.broadcasting.notifications")
 
-  if not projectConfig.is_project_configured() then
+  if requiresXcodeproj and projectConfig.is_spm_configured() then
+    notifications.send_error("This operation is not supported for Swift Package.")
+    return false
+  end
+
+  if requiresXcodeproj and not projectConfig.is_project_configured() then
+    notifications.send_error("The project is missing some details. Please run XcodebuildSetup first.")
+    return false
+  end
+
+  if not projectConfig.is_configured() then
     notifications.send_error("The project is missing some details. Please run XcodebuildSetup first.")
     return false
   end

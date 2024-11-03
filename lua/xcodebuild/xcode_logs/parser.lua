@@ -339,7 +339,9 @@ local function parse_test_error(line)
   -- If file from error doesn't match test file, let's set lineNumber to test declaration line
   local filename = util.get_filename(filepath)
   if filename ~= lineData.filename then
-    lineData.lineNumber = find_test_line(lineData.filepath, lineData.name)
+    if lineData.filepath then
+      lineData.lineNumber = find_test_line(lineData.filepath, lineData.name)
+    end
     flush_test_error(filepath, filename, tonumber(lineNumber))
   else
     lineData.lineNumber = tonumber(lineNumber)

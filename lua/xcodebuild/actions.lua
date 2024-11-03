@@ -45,8 +45,13 @@ end
 
 ---Opens the project in Xcode.
 function M.open_in_xcode()
-  if helpers.validate_project() then
-    vim.fn.system({ "open", projectConfig.settings.projectFile })
+  if helpers.validate_project(false) then
+    vim.fn.system({
+      "open",
+      "-a",
+      "Xcode",
+      projectConfig.settings.projectFile or projectConfig.settings.swiftPackage,
+    })
   end
 end
 
@@ -211,7 +216,7 @@ end
 
 ---Sends a notification with the current project settings.
 function M.show_current_config()
-  if not helpers.validate_project() then
+  if not helpers.validate_project(false) then
     return
   end
 

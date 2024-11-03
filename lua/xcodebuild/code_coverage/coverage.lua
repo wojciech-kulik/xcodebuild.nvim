@@ -135,7 +135,7 @@ end
 ---First, the code coverage must be exported using |export_coverage| function.
 ---@param isVisible boolean|nil
 function M.toggle_code_coverage(isVisible)
-  if not helpers.validate_project() then
+  if not helpers.validate_project(false) then
     return
   elseif not config.enabled then
     notifications.send_error("Code coverage is disabled in xcodebuild.nvim config")

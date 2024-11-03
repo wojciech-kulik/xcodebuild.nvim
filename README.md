@@ -10,6 +10,7 @@ It provides all essential actions for development including building, debugging,
 ## ✨  Features
 
 - [x] Support for iOS, iPadOS, watchOS, tvOS, visionOS, and macOS.
+- [x] Support for Swift Packages (building & testing).
 - [x] Project-based configuration.
 - [x] Project Manager to deal with project files without using Xcode.
 - [x] Test Explorer to visually present a tree with all tests and results.
@@ -43,22 +44,22 @@ integrations, settings, and examples.
 
 ### Testing
 
-xcodebuild.nvim supports code coverage, test explorer, diagnostics, snapshot tests, Quick framework, and more! 
+xcodebuild.nvim supports code coverage, test explorer, diagnostics, snapshot tests, Quick framework, and more!
 
 https://github.com/user-attachments/assets/30da2636-34e1-4940-b1f9-d422ccb7ff46
 
 ### Working With Code
 
 Neovim can be easily integrated with SwiftLint, SwiftFormat, Copilot, and more.
-In the video, you can see basic navigation, diagnostics, formatting, linting, code completion, and of course, 
-launching the app on a simulator. 
+In the video, you can see basic navigation, diagnostics, formatting, linting, code completion, and of course,
+launching the app on a simulator.
 
 https://github.com/user-attachments/assets/2b44ad01-a736-42ba-b5aa-be0ecaea5a29
 
 ### Debugging
 
 The plugin allows you to debug both on simulators and physical devices. You get access to all basic things like breakpoints,
-variables inspection, call stack, lldb, etc. You can even see app logs. 
+variables inspection, call stack, lldb, etc. You can even see app logs.
 
 https://github.com/user-attachments/assets/a2b87eab-5cdc-4fe5-8f96-78bc1a21e924
 
@@ -69,12 +70,14 @@ https://github.com/user-attachments/assets/a2b87eab-5cdc-4fe5-8f96-78bc1a21e924
 Big thanks to all the sponsors who support this project 🍻!
 
 ### Monthly Sponsors
+
 <a href="https://github.com/Almaz5200"><img src="https://avatars.githubusercontent.com/u/21291840" width="40" height="40" alt="@Almaz5200" title="Almaz5200"></a>
 <a href="https://github.com/joeldrotleff"><img src="https://avatars.githubusercontent.com/u/2484624" width="40" height="40" alt="@joeldrotleff" title="joeldrotleff"></a>
 <a href="https://github.com/stephenhuh"><img src="https://avatars.githubusercontent.com/u/6165538" width="40" height="40" alt="@stephenhuh" title="stephenhuh"></a>
 <a href="https://github.com/kg8m"><img src="https://avatars.githubusercontent.com/u/694547" width="40" height="40" alt="@kg8m" title="kg8m"></a>
 
 ### One Time Sponsors
+
 <a href="https://github.com/kujohn"><img src="https://avatars.githubusercontent.com/u/1356936" width="40" height="40" alt="@kujohn" title="kujohn"></a>
 
 &nbsp;

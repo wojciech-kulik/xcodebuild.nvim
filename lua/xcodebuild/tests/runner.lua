@@ -33,9 +33,10 @@ local last_test_run
 
 ---Validates if test plan is set in the project configuration.
 ---Send an error notification if not found.
+---If project is configured for Swift Package, it returns `true`.
 ---@return boolean
 local function validate_testplan()
-  if not projectConfig.settings.testPlan then
+  if not projectConfig.settings.testPlan and not projectConfig.settings.swiftPackage then
     notifications.send_error("Test plan not found. Please run XcodebuildSelectTestPlan")
     return false
   end
@@ -90,7 +91,7 @@ end
 ---snapshot previews, and Test Explorer.
 ---@param testsToRun string[]|nil test ids
 function M.run_tests(testsToRun)
-  if not helpers.validate_project() or not validate_testplan() then
+  if not helpers.validate_project(false) or not validate_testplan() then
     return
   end
 
@@ -195,6 +196,7 @@ function M.run_tests(testsToRun)
       on_stderr = on_stdout,
 
       withoutBuilding = true,
+      workingDirectory = projectConfig.settings.workingDirectory,
       destination = projectConfig.settings.destination,
       projectCommand = projectConfig.settings.projectCommand,
       scheme = projectConfig.settings.scheme,
@@ -218,7 +220,7 @@ end
 ---it additionally triggers build for testing.
 ---@param opts TestRunnerOptions
 function M.run_selected_tests(opts)
-  if not helpers.validate_project() or not validate_testplan() then
+  if not helpers.validate_project(false) or not validate_testplan() then
     return
   end
 
@@ -300,7 +302,7 @@ end
 
 ---Shows a picker with failing snapshot tests.
 function M.show_failing_snapshot_tests()
-  if not helpers.validate_project() then
+  if not helpers.validate_project(false) then
     return
   end
 

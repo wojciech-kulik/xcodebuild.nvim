@@ -190,12 +190,33 @@ end
 ---Sends the project settings.
 ---@param settings ProjectSettings the project settings.
 function M.send_project_settings(settings)
-  M.send([[
+  if settings.swiftPackage then
+    M.send([[
       Project Configuration
 
       - platform: ]] .. settings.platform .. [[
 
-      - project: ]] .. settings.projectFile .. [[
+      - workingDirectory: ]] .. (settings.workingDirectory or "-") .. [[
+
+      - project: ]] .. settings.swiftPackage .. [[
+
+      - scheme: ]] .. settings.scheme .. [[
+
+      - device: ]] .. (settings.deviceName or settings.platform or "-") .. [[
+
+      - osVersion: ]] .. (settings.os or "-") .. [[
+
+      - destination: ]] .. settings.destination .. [[
+    ]])
+  else
+    M.send([[
+      Project Configuration
+
+      - platform: ]] .. settings.platform .. [[
+
+      - workingDirectory: ]] .. (settings.workingDirectory or "-") .. [[
+
+      - project: ]] .. (settings.projectFile or "-") .. [[
 
       - xcodeproj: ]] .. (settings.xcodeproj or "-") .. [[
 
@@ -209,12 +230,13 @@ function M.send_project_settings(settings)
 
       - testPlan: ]] .. (settings.testPlan or "-") .. [[
 
-      - bundleId: ]] .. settings.bundleId .. [[
+      - bundleId: ]] .. (settings.bundleId or "-") .. [[
 
-      - appPath: ]] .. settings.appPath .. [[
+      - productName: ]] .. (settings.productName or "-") .. [[
 
-      - productName: ]] .. settings.productName .. [[
+      - appPath: ]] .. (settings.appPath or "-") .. [[
     ]])
+  end
 end
 
 ---Forwards the notification to the callback from the config.

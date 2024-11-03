@@ -163,7 +163,15 @@ end
 function M.load_targets_map()
   local xcode = require("xcodebuild.core.xcode")
   local projectConfig = require("xcodebuild.project.config")
-  M.targetsFilesMap = xcode.get_targets_filemap(projectConfig.settings.appPath)
+
+  if projectConfig.is_spm_configured() then
+    local derivedDataPath =
+      xcode.find_derived_data_path(projectConfig.settings.scheme, projectConfig.settings.workingDirectory)
+
+    M.targetsFilesMap = derivedDataPath and xcode.get_targets_filemap(derivedDataPath) or {}
+  else
+    M.targetsFilesMap = xcode.get_targets_filemap(projectConfig.settings.appPath)
+  end
 end
 
 ---Returns the test key based on the {target} and {class}.

@@ -25,7 +25,7 @@ local CANCELLED_CODE = 143
 ---@see xcodebuild.platform.device.run_app
 ---@see xcodebuild.project.builder.build_project
 function M.build_and_run_app(waitForDebugger, callback)
-  if not helpers.validate_project() then
+  if not helpers.validate_project(true) then
     return
   end
 
@@ -53,7 +53,7 @@ end
 function M.build_project(opts, callback)
   opts = opts or {}
 
-  if not helpers.validate_project() then
+  if not helpers.validate_project(false) then
     return
   end
 
@@ -114,6 +114,7 @@ function M.build_project(opts, callback)
 
     buildForTesting = opts.buildForTesting,
     clean = opts.clean,
+    workingDirectory = projectConfig.settings.workingDirectory,
     destination = projectConfig.settings.destination,
     projectCommand = projectConfig.settings.projectCommand,
     scheme = projectConfig.settings.scheme,
@@ -124,13 +125,17 @@ end
 ---Cleans the `DerivedData` folder.
 ---It will ask for confirmation before deleting it.
 function M.clean_derived_data()
-  local appPath = projectConfig.settings.appPath
-  if not appPath then
-    notifications.send_error("Could not detect DerivedData. Please build project.")
-    return
+  local derivedDataPath
+
+  if projectConfig.settings.appPath then
+    derivedDataPath = string.match(projectConfig.settings.appPath, "(.+/DerivedData/[^/]+)/.+")
+  else
+    derivedDataPath = require("xcodebuild.core.xcode").find_derived_data_path(
+      projectConfig.settings.scheme,
+      projectConfig.settings.workingDirectory
+    )
   end
 
-  local derivedDataPath = string.match(appPath, "(.+/DerivedData/[^/]+)/.+")
   if not derivedDataPath then
     notifications.send_error("Could not detect DerivedData. Please build project.")
     return

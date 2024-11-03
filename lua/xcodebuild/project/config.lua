@@ -21,6 +21,8 @@
 ---@field productName string|nil product name (ex. "MyApp")
 ---@field testPlan string|nil test plan name (ex. "MyAppTests")
 ---@field xcodeproj string|nil xcodeproj file path (ex. "path/to/Project.xcodeproj")
+---@field swiftPackage string|nil Swift Package file path (ex. "path/to/Package.swift")
+---@field workingDirectory string|nil parent directory of the project file
 ---@field lastBuildTime number|nil last build time in seconds
 ---@field showCoverage boolean|nil if the inline code coverage should be shown
 
@@ -67,7 +69,25 @@ function M.save_settings()
   update_global_variables()
 end
 
----Checks if the project is configured.
+---Checks if SPM project is configured.
+---@return boolean
+function M.is_spm_configured()
+  local settings = M.settings
+
+  if
+    settings.swiftPackage
+    and settings.workingDirectory
+    and settings.platform
+    and settings.scheme
+    and settings.destination
+  then
+    return true
+  else
+    return false
+  end
+end
+
+---Checks if Xcode project is configured.
 ---@return boolean
 function M.is_project_configured()
   local settings = M.settings
@@ -87,6 +107,12 @@ function M.is_project_configured()
   end
 end
 
+---Checks if project is configured.
+---@return boolean
+function M.is_configured()
+  return M.is_project_configured() or M.is_spm_configured()
+end
+
 ---Updates the settings (`appPath`, `productName`, and `bundleId`) based on
 ---the current project.
 ---Calls `xcodebuild` commands to get the build settings.
@@ -94,21 +120,32 @@ end
 ---the settings are updated.
 function M.update_settings(callback)
   local xcode = require("xcodebuild.core.xcode")
-  xcode.get_build_settings(
-    M.settings.platform,
-    M.settings.projectCommand,
-    M.settings.scheme,
-    M.settings.xcodeproj,
-    function(buildSettings)
-      M.settings.appPath = buildSettings.appPath
-      M.settings.productName = buildSettings.productName
-      M.settings.bundleId = buildSettings.bundleId
-      M.save_settings()
-      if callback then
-        callback()
-      end
+
+  if M.settings.swiftPackage then
+    M.settings.appPath = nil
+    M.settings.productName = nil
+    M.settings.bundleId = nil
+    M.save_settings()
+    if callback then
+      callback()
     end
-  )
+  else
+    xcode.get_build_settings(
+      M.settings.platform,
+      M.settings.projectCommand,
+      M.settings.scheme,
+      M.settings.xcodeproj,
+      function(buildSettings)
+        M.settings.appPath = buildSettings.appPath
+        M.settings.productName = buildSettings.productName
+        M.settings.bundleId = buildSettings.bundleId
+        M.save_settings()
+        if callback then
+          callback()
+        end
+      end
+    )
+  end
 end
 
 ---Starts configuration wizard to set up the project settings.
@@ -130,7 +167,10 @@ function M.configure_project()
       pickers.select_scheme(function()
         defer_print("Loading devices...")
         pickers.select_destination(function()
-          defer_print("Loading test plans...")
+          if not require("xcodebuild.project.config").settings.swiftPackage then
+            defer_print("Loading test plans...")
+          end
+
           pickers.select_testplan(function()
             defer_print("Xcodebuild configuration has been saved!")
           end, { close_on_select = true, auto_select = true })
