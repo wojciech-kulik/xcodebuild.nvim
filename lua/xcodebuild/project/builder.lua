@@ -116,7 +116,7 @@ function M.build_project(opts, callback)
     clean = opts.clean,
     workingDirectory = projectConfig.settings.workingDirectory,
     destination = projectConfig.settings.destination,
-    projectCommand = projectConfig.settings.projectCommand,
+    projectFile = projectConfig.settings.projectFile,
     scheme = projectConfig.settings.scheme,
     extraBuildArgs = config.commands.extra_build_args,
   })
@@ -149,7 +149,7 @@ function M.clean_derived_data()
       notifications.send("Deleting: " .. derivedDataPath .. "...")
 
       -- TODO: should clean targets map?
-      vim.fn.jobstart("rm -rf '" .. derivedDataPath .. "'", {
+      vim.fn.jobstart({ "rm", "-rf", derivedDataPath }, {
         on_exit = function(_, code)
           if code == 0 then
             notifications.send("Deleted: " .. derivedDataPath)

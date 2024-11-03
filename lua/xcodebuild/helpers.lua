@@ -86,13 +86,27 @@ function M.find_all_swift_files()
 
   local allFiles
   if util.is_fd_installed() then
-    allFiles = util.shell("fd -I '.*\\.swift$' '" .. vim.fn.getcwd() .. "' --type f 2> /dev/null")
+    -- stylua: ignore
+    allFiles = util.shell({
+      "fd",
+      "-I",
+      ".*\\.swift$",
+      vim.fn.getcwd(),
+      "--type", "f",
+    })
   else
-    allFiles = util.shell(
-      "find '"
-        .. vim.fn.getcwd()
-        .. "' -type d -path '*/.*' -prune -o -type f -iname '*.swift' -print 2>/dev/null"
-    )
+    -- stylua: ignore
+    allFiles = util.shell({
+      "find",
+      vim.fn.getcwd(),
+      "-type", "d",
+      "-path", "*/.*",
+      "-prune",
+      "-o",
+      "-type", "f",
+      "-iname", "*.swift",
+      "-print",
+    })
   end
 
   local map = {}

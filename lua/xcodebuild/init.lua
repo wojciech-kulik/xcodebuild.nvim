@@ -77,7 +77,15 @@ local function warnAboutOldConfig()
     or config.marks.failure_test_duration_hl
   then
     print("xcodebuild.nvim: Code coverage and marks options related to higlights were changed.")
-    print("xcodebuild.nvim: Please see README.md and update your config.")
+    print("xcodebuild.nvim: Please see `:h xcodebuild.config` and update your config.")
+  end
+
+  if
+    type(config.commands.extra_test_args) == "string"
+    or type(config.commands.extra_build_args) == "string"
+  then
+    print("xcodebuild.nvim: `commands.extra_test_args` and `commands.extra_build_args` should be a table.")
+    print("xcodebuild.nvim: Please see `:h xcodebuild.config` and update your config.")
   end
 end
 
@@ -103,8 +111,8 @@ end
 ---  },
 ---  commands = {
 ---    cache_devices = true, -- cache recently loaded devices. Restart Neovim to clean cache.
----    extra_build_args = "-parallelizeTargets", -- extra arguments for `xcodebuild build`
----    extra_test_args = "-parallelizeTargets", -- extra arguments for `xcodebuild test`
+---    extra_build_args = { "-parallelizeTargets" }, -- extra arguments for `xcodebuild build`
+---    extra_test_args = { "-parallelizeTargets" }, -- extra arguments for `xcodebuild test`
 ---    project_search_max_depth = 3, -- maxdepth of xcodeproj/xcworkspace search while using configuration wizard
 ---    focus_simulator_on_app_launch = true, -- focus simulator window when app is launched
 ---  },

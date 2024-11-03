@@ -7,6 +7,7 @@
 ---@brief ]]
 
 local config = require("xcodebuild.core.config").options.integrations.xcode_build_server
+local util = require("xcodebuild.util")
 
 local M = {}
 
@@ -23,11 +24,20 @@ function M.is_enabled()
 end
 
 ---Calls "config" command of xcode-build-server in order to update buildServer.json file.
----@param projectCommand string either "-project 'path/to/project.xcodeproj'" or "-workspace 'path/to/workspace.xcworkspace'"
+---@param projectFile string
 ---@param scheme string
 ---@return number # job id
-function M.run_config(projectCommand, scheme)
-  return vim.fn.jobstart("xcode-build-server config " .. projectCommand .. " -scheme '" .. scheme .. "'", {
+function M.run_config(projectFile, scheme)
+  local command = {
+    "xcode-build-server",
+    "config",
+    util.has_suffix(projectFile, "xcodeproj") and "-project" or "-workspace",
+    projectFile,
+    "-scheme",
+    scheme,
+  }
+
+  return vim.fn.jobstart(command, {
     on_exit = function()
       require("xcodebuild.integrations.lsp").restart_sourcekit_lsp()
     end,

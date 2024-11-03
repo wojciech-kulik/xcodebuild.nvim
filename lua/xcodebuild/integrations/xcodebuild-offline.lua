@@ -91,7 +91,7 @@ M.scriptPath = vim.fn.expand("~/Library/xcodebuild.nvim/xcodebuild_offline")
 ---Checks whether the `sudo` command has passwordless access to the tool.
 ---@return boolean
 local function check_sudo()
-  local permissions = util.shell("sudo -l 2>/dev/null")
+  local permissions = util.shell("sudo -l")
 
   for _, line in ipairs(permissions) do
     if line:match("NOPASSWD.*" .. M.scriptPath) then
@@ -109,8 +109,8 @@ function M.is_enabled()
 end
 
 ---Wraps the `xcodebuild` command with the workaround script if needed.
----@param command string
----@return string
+---@param command string[]
+---@return string[]
 function M.wrap_command_if_needed(command)
   if not M.is_enabled() then
     return command
@@ -121,7 +121,10 @@ function M.wrap_command_if_needed(command)
     error("xcodebuild.nvim: `xcodebuild_offline` requires passwordless access to the sudo command.")
   end
 
-  return "sudo '" .. M.scriptPath .. "' " .. string.gsub(command, "^xcodebuild ", "", 1)
+  table.insert(command, 1, "sudo")
+  command[2] = M.scriptPath
+
+  return command
 end
 
 return M

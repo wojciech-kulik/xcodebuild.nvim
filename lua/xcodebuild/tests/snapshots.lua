@@ -26,9 +26,13 @@ function M.save_failing_snapshots(xcresultFilepath, callback)
 
   local savePath = appdata.snapshots_dir
   local getsnapshotPath = appdata.tool_path(appdata.GETSNAPSHOTS_TOOL)
-  local command = getsnapshotPath .. " '" .. xcresultFilepath .. "' '" .. savePath .. "'"
+  local command = {
+    getsnapshotPath,
+    xcresultFilepath,
+    savePath,
+  }
 
-  util.shell("mkdir -p '" .. savePath .. "'")
+  util.shell({ "mkdir", "-p", savePath })
 
   return vim.fn.jobstart(command, {
     on_exit = function(_, code)
@@ -48,7 +52,7 @@ end
 ---@return string[]
 function M.get_failing_snapshots()
   local snapshots = util.filter(
-    util.shell("find '" .. appdata.snapshots_dir .. "' -type f -iname '*.png' 2>/dev/null"),
+    util.shell({ "find", appdata.snapshots_dir, "-type", "f", "-iname", "*.png" }),
     function(item)
       return item ~= ""
     end
@@ -63,7 +67,7 @@ end
 
 ---Deletes the `failing-snapshots` directory.
 function M.delete_snapshots()
-  util.shell("rm -rf '" .. appdata.snapshots_dir .. "'")
+  util.shell({ "rm", "-rf", appdata.snapshots_dir })
 end
 
 return M

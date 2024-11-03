@@ -194,18 +194,28 @@ function M.get_filename(filepath)
 end
 
 ---Runs a shell command and returns the output as a list of strings.
----@param cmd string
+---@param cmd string|string[]
 ---@return string[]
 function M.shell(cmd)
-  local handle = io.popen(cmd)
+  local result
+  local jobid = vim.fn.jobstart(cmd, {
+    stdout_buffered = true,
+    on_stdout = function(_, data, _)
+      result = data
+    end,
+  })
+  vim.fn.jobwait({ jobid })
 
-  if handle ~= nil then
-    local result = handle:read("*a")
-    handle:close()
-    return vim.split(result, "\n", { plain = true })
-  end
+  return result or {}
+end
 
-  return {}
+---Runs a shell command and asynchronously.
+---@param cmd string|string[]
+---@param callback function|nil
+function M.shellAsync(cmd, callback)
+  vim.fn.jobstart(cmd, {
+    on_exit = callback,
+  })
 end
 
 ---Checks if fd is installed on the system.
@@ -223,6 +233,32 @@ function M.merge_array(lhs, rhs)
   local result = lhs
   for _, val in ipairs(rhs) do
     table.insert(result, val)
+  end
+
+  return result
+end
+
+---Returns a new array without nil values.
+---@param array any[]
+---@return any[]
+function M.skip_nil(array)
+  local result = {}
+  local maxIndex = 0
+
+  for key, _ in pairs(array) do
+    if type(key) == "number" and key > maxIndex then
+      maxIndex = key
+    end
+  end
+
+  if maxIndex == 0 then
+    return result
+  end
+
+  for i = 1, maxIndex do
+    if array[i] then
+      table.insert(result, array[i])
+    end
   end
 
   return result

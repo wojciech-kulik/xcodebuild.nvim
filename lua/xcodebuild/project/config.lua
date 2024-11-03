@@ -13,7 +13,6 @@
 ---@field os string|nil OS version (ex. "14.5")
 ---@field platform PlatformId|nil platform (ex. "iOS")
 ---@field projectFile string|nil project file path (ex. "path/to/Project.xcodeproj")
----@field projectCommand string|nil project command (ex. "-project 'path/to/Project.xcodeproj'" or "-workspace 'path/to/Project.xcworkspace'")
 ---@field scheme string|nil scheme name (ex. "MyApp")
 ---@field destination string|nil destination (ex. "28B52DAA-BC2F-410B-A5BE-F485A3AFB0BC")
 ---@field bundleId string|nil bundle identifier (ex. "com.mycompany.myapp")
@@ -94,7 +93,6 @@ function M.is_project_configured()
   if
     settings.platform
     and settings.projectFile
-    and settings.projectCommand
     and settings.scheme
     and settings.destination
     and settings.bundleId
@@ -132,7 +130,7 @@ function M.update_settings(callback)
   else
     xcode.get_build_settings(
       M.settings.platform,
-      M.settings.projectCommand,
+      M.settings.projectFile,
       M.settings.scheme,
       M.settings.xcodeproj,
       function(buildSettings)
