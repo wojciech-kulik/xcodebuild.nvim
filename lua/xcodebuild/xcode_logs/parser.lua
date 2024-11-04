@@ -106,6 +106,17 @@ local xcresultFilepath = nil
 local swiftFilePattern = "[^%:]+%.swift"
 local xcTestLogPattern = "%s+[%w_]+%[%d+%:%d+%]"
 
+local DEBUG = false
+
+---Prints the message if the DEBUG flag is set to true.
+---@param name string
+---@param value any
+local function debug_print(name, value)
+  if DEBUG then
+    print(name .. ":", vim.inspect(value))
+  end
+end
+
 ---Sends test data to the report results.
 ---
 ---If `message` is not nil, this function will only append the message line
@@ -115,6 +126,8 @@ local xcTestLogPattern = "%s+[%w_]+%[%d+%:%d+%]"
 ---@param message string|nil
 ---@see xcodebuild.tests.explorer
 local function flush_test(message)
+  debug_print("flush_test", lineData)
+
   if message then
     table.insert(lineData.message, message)
   end
@@ -160,6 +173,7 @@ end
 ---without flushing the error.
 ---@param message string|nil
 local function flush_error(message)
+  debug_print("flush_error", lineData)
   if message then
     table.insert(lineData.message, message)
   end
@@ -185,6 +199,8 @@ end
 ---without flushing the warning.
 ---@param message string|nil
 local function flush_warning(message)
+  debug_print("flush_warning", lineData)
+
   if message then
     table.insert(lineData.message, message)
   end
@@ -211,6 +227,8 @@ end
 ---@param filename string
 ---@param lineNumber number|nil
 local function flush_test_error(filepath, filename, lineNumber)
+  debug_print("flush_test_error", lineData)
+
   for _, item in ipairs(testErrors) do
     if
       item.filepath == filepath
@@ -303,6 +321,8 @@ local function parse_build_error(line)
       }
     end
   end
+
+  debug_print("detected_build_error", lineData)
 end
 
 ---@param line string
@@ -346,6 +366,8 @@ local function parse_test_error(line)
   else
     lineData.lineNumber = tonumber(lineNumber)
   end
+
+  debug_print("detected_test_error", lineData)
 end
 
 ---@param line string
@@ -366,6 +388,8 @@ local function parse_warning(line)
     lineData.lineNumber = tonumber(lineNumber) or 0
     lineData.columnNumber = tonumber(columnNumber) or 0
   end
+
+  debug_print("detected_warning", lineData)
 end
 
 ---@param line string
@@ -432,6 +456,8 @@ local function parse_test_started(line)
     class = testClass,
     name = testName,
   }
+
+  debug_print("detected_test_started", lineData)
 end
 
 ---Processes the log line and updates the state machine.
@@ -443,7 +469,7 @@ local function process_line(line)
   -- BEGIN -> TEST_START -> passed -> BEGIN
   -- BEGIN -> TEST_START -> TEST_ERROR -> (failed) -> BEGIN
 
-  if string.find(line, "^Test Case.*started%.") then
+  if string.find(line, "^Test Case.*started") then
     -- build is finished - now it's time to load targets
     if testsCount == 0 then
       testSearch.load_targets_map()
