@@ -279,7 +279,7 @@ end
 ---It asks for the file name and creates it in the current directory.
 ---It also asks the user to select targets.
 function M.create_new_file()
-  if not helpers.validate_project() or not validate_xcodeproj_tool() then
+  if not helpers.validate_project(true) or not validate_xcodeproj_tool() then
     return
   end
 
@@ -307,7 +307,7 @@ end
 ---@param filepath string
 ---@param targets string[]
 function M.add_file_to_targets(filepath, targets)
-  if not helpers.validate_project() or not validate_xcodeproj_tool() then
+  if not helpers.validate_project(true) or not validate_xcodeproj_tool() then
     return
   end
 
@@ -317,7 +317,7 @@ end
 ---Returns all project targets.
 ---@return string[]|nil
 function M.get_project_targets()
-  if not helpers.validate_project() or not validate_xcodeproj_tool() then
+  if not helpers.validate_project(true) or not validate_xcodeproj_tool() then
     return
   end
 
@@ -367,7 +367,7 @@ end
 ---@param callback function|nil
 ---@param opts { createGroups: boolean}|nil
 function M.add_file(filepath, callback, opts)
-  if not helpers.validate_project() or not validate_xcodeproj_tool() then
+  if not helpers.validate_project(true) or not validate_xcodeproj_tool() then
     return
   end
 
@@ -416,7 +416,7 @@ end
 ---@param oldFilePath string
 ---@param newFilePath string
 function M.move_file(oldFilePath, newFilePath)
-  if not helpers.validate_project() or not validate_xcodeproj_tool() then
+  if not helpers.validate_project(true) or not validate_xcodeproj_tool() then
     return
   end
 
@@ -433,7 +433,7 @@ end
 ---@param oldFilePath string
 ---@param newFilePath string
 function M.rename_file(oldFilePath, newFilePath)
-  if not helpers.validate_project() or not validate_xcodeproj_tool() then
+  if not helpers.validate_project(true) or not validate_xcodeproj_tool() then
     return
   end
 
@@ -444,7 +444,7 @@ end
 ---Renames the current file in the project and on disk.
 ---Asks the user for the new file name.
 function M.rename_current_file()
-  if not helpers.validate_project() or not validate_xcodeproj_tool() then
+  if not helpers.validate_project(true) or not validate_xcodeproj_tool() then
     return
   end
 
@@ -466,7 +466,7 @@ end
 ---Deletes the file from the project.
 ---@param filepath string
 function M.delete_file(filepath)
-  if not helpers.validate_project() or not validate_xcodeproj_tool() then
+  if not helpers.validate_project(true) or not validate_xcodeproj_tool() then
     return
   end
 
@@ -477,7 +477,7 @@ end
 ---Deletes the current file from the project and disk.
 ---Asks the user for confirmation.
 function M.delete_current_file()
-  if not helpers.validate_project() or not validate_xcodeproj_tool() then
+  if not helpers.validate_project(true) or not validate_xcodeproj_tool() then
     return
   end
 
@@ -496,7 +496,7 @@ end
 ---Creates a new group in the project and on disk.
 ---Asks the user for the group name.
 function M.create_new_group()
-  if not helpers.validate_project() or not validate_xcodeproj_tool() then
+  if not helpers.validate_project(true) or not validate_xcodeproj_tool() then
     return
   end
 
@@ -517,7 +517,7 @@ end
 ---Adds the group to the project.
 ---@param path string
 function M.add_group(path)
-  if not helpers.validate_project() or not validate_xcodeproj_tool() then
+  if not helpers.validate_project(true) or not validate_xcodeproj_tool() then
     return
   end
 
@@ -534,7 +534,7 @@ end
 ---@param oldGroupPath string
 ---@param newGroupPath string
 function M.rename_group(oldGroupPath, newGroupPath)
-  if not helpers.validate_project() or not validate_xcodeproj_tool() then
+  if not helpers.validate_project(true) or not validate_xcodeproj_tool() then
     return
   end
 
@@ -545,7 +545,7 @@ end
 ---Renames the current group in the project and on disk.
 ---Asks the user for the new group name.
 function M.rename_current_group()
-  if not helpers.validate_project() or not validate_xcodeproj_tool() then
+  if not helpers.validate_project(true) or not validate_xcodeproj_tool() then
     return
   end
 
@@ -574,7 +574,7 @@ end
 ---@param oldGroupPath string
 ---@param newGroupPath string
 function M.move_or_rename_group(oldGroupPath, newGroupPath)
-  if not helpers.validate_project() or not validate_xcodeproj_tool() then
+  if not helpers.validate_project(true) or not validate_xcodeproj_tool() then
     return
   end
 
@@ -592,7 +592,7 @@ end
 
 ---Deletes the group from the project.
 function M.delete_group(groupPath)
-  if not helpers.validate_project() or not validate_xcodeproj_tool() then
+  if not helpers.validate_project(true) or not validate_xcodeproj_tool() then
     return
   end
 
@@ -603,7 +603,7 @@ end
 ---Deletes the current group from the project and disk.
 ---Asks the user for confirmation.
 function M.delete_current_group()
-  if not helpers.validate_project() or not validate_xcodeproj_tool() then
+  if not helpers.validate_project(true) or not validate_xcodeproj_tool() then
     return
   end
 
@@ -622,7 +622,7 @@ end
 ---Updates the file targets in the project.
 ---Asks the user to select the targets.
 function M.update_current_file_targets()
-  if not helpers.validate_project() or not validate_xcodeproj_tool() then
+  if not helpers.validate_project(true) or not validate_xcodeproj_tool() then
     return
   end
 
@@ -645,7 +645,7 @@ end
 ---@param groupPath string
 ---@return string[]|nil
 function M.guess_target(groupPath)
-  if not helpers.validate_project() or not validate_xcodeproj_tool() then
+  if not helpers.validate_project(true) or not validate_xcodeproj_tool() then
     return
   end
 
@@ -654,7 +654,7 @@ end
 
 ---Shows the targets for the current file.
 function M.show_current_file_targets()
-  if not helpers.validate_project() or not validate_xcodeproj_tool() then
+  if not helpers.validate_project(true) or not validate_xcodeproj_tool() then
     return
   end
 
@@ -666,7 +666,7 @@ end
 
 ---Shows the action picker with all available actions.
 function M.show_action_picker()
-  if not helpers.validate_project() or not validate_xcodeproj_tool() then
+  if not helpers.validate_project(true) or not validate_xcodeproj_tool() then
     return
   end
 

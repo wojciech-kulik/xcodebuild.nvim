@@ -108,6 +108,43 @@ local function update_results(results, force)
   end
 end
 
+---Sorts paths by length and then by name.
+---@param paths string[]
+local function sort_paths(paths)
+  table.sort(paths, function(a, b)
+    if #a < #b then
+      return true
+    elseif #a == #b then
+      return a:lower() < b:lower()
+    else
+      return false
+    end
+  end)
+end
+
+---Prepares the picker titles and values for paths from the command output.
+---@param command string
+---@return string[], string[]
+local function get_picker_titles_values(command)
+  local pickerTitles = {}
+  local pickerValues = {}
+  local paths = util.shell(command)
+  sort_paths(paths)
+
+  for _, path in ipairs(paths) do
+    if util.trim(path) ~= "" then
+      local trimmedPath = path:gsub("/+$", "")
+      table.insert(pickerValues, trimmedPath)
+
+      local escapedCwd = vim.fn.getcwd():gsub("(%W)", "%%%1")
+      local relativePath = path:gsub(escapedCwd, ""):gsub("^/+", ""):gsub("/+$", "")
+      table.insert(pickerTitles, relativePath)
+    end
+  end
+
+  return pickerTitles, pickerValues
+end
+
 ---Shows a picker using Telescope.nvim.
 ---@param title string
 ---@param items string[]
@@ -172,10 +209,16 @@ end
 ---Shows a picker with the available `xcodeproj` files
 ---if this is not already set in the project settings.
 ---If the `xcworkspace` is set and there is the corresponding
--- `xcodeproj` file with the same name, it will be selected automatically.
----@param callback fun(xcodeproj: string)|nil
+---`xcodeproj` file with the same name, it will be selected automatically.
+---If the project is configured for Swift Package, it returns `nil`.
+---@param callback fun(xcodeproj: string|nil)|nil
 ---@param opts PickerOptions|nil
 function M.select_xcodeproj_if_needed(callback, opts)
+  if projectConfig.settings.swiftPackage then
+    util.call(callback)
+    return
+  end
+
   if projectConfig.settings.xcodeproj then
     util.call(callback, projectConfig.settings.xcodeproj)
     return
@@ -198,15 +241,12 @@ end
 ---@param opts PickerOptions|nil
 function M.select_xcodeproj(callback, opts)
   local maxdepth = config.commands.project_search_max_depth
-  local sanitizedFiles = {}
-  local filenames = {}
   local cmd = "find '"
     .. vim.fn.getcwd()
     .. "' -type d -path '*/.*' -prune -o -maxdepth "
     .. maxdepth
     .. " -iname '*.xcodeproj' -print"
     .. " 2> /dev/null"
-  local projectFileRegex = ".*%/([^/]*)$"
 
   if util.is_fd_installed() then
     cmd = "fd -I '.*\\.xcodeproj$' '"
@@ -214,21 +254,12 @@ function M.select_xcodeproj(callback, opts)
       .. "' --max-depth "
       .. maxdepth
       .. " --type d 2> /dev/null"
-    projectFileRegex = ".*%/([^/]*)/$"
   end
 
-  local files = util.shell(cmd)
+  local pickerTitles, pickerValues = get_picker_titles_values(cmd)
 
-  for _, file in ipairs(files) do
-    if util.trim(file) ~= "" then
-      local trimmedPath = file:gsub("/+$", "")
-      table.insert(sanitizedFiles, trimmedPath)
-      table.insert(filenames, string.match(file, projectFileRegex))
-    end
-  end
-
-  M.show("Select Project", filenames, function(_, index)
-    local selectedFile = sanitizedFiles[index]
+  M.show("Select Project", pickerTitles, function(_, index)
+    local selectedFile = pickerValues[index]
 
     projectConfig.settings.xcodeproj = selectedFile
     projectConfig.save_settings()
@@ -241,45 +272,46 @@ end
 ---@param opts PickerOptions|nil
 function M.select_project(callback, opts)
   local maxdepth = config.commands.project_search_max_depth
-  local sanitizedFiles = {}
-  local filenames = {}
   local cmd = "find '"
     .. vim.fn.getcwd()
     .. "' -type d \\( -path '*/.*' -o -path '*xcodeproj/project.xcworkspace' \\) -prune -o"
-    .. " \\( -iname '*.xcodeproj' -o -iname '*.xcworkspace' \\)"
+    .. " \\( -iname '*.xcodeproj' -o -iname '*.xcworkspace' -o -iname 'package.swift' \\)"
     .. " -maxdepth "
     .. maxdepth
     .. " -print 2> /dev/null"
-  local projectFileRegex = ".*%/([^/]*)$"
 
   if util.is_fd_installed() then
-    cmd = "fd -I '(.*\\.xcodeproj$|.*\\.xcworkspace$)' '"
+    cmd = "fd -I '(.*\\.xcodeproj$|.*\\.xcworkspace$|Package\\.swift$)' '"
       .. vim.fn.getcwd()
       .. "' --max-depth "
       .. maxdepth
       .. " -E '**/*xcodeproj/project.xcworkspace/' 2> /dev/null"
-    projectFileRegex = ".*%/([^/]*)/$"
   end
 
-  local files = util.shell(cmd)
+  local pickerTitles, pickerValues = get_picker_titles_values(cmd)
 
-  for _, file in ipairs(files) do
-    if util.trim(file) ~= "" then
-      local trimmedPath = file:gsub("/+$", "")
-      table.insert(sanitizedFiles, trimmedPath)
-      table.insert(filenames, string.match(file, projectFileRegex))
+  M.show("Select Main Project File", pickerTitles, function(_, index)
+    local projectFile = pickerValues[index]
+    local isSPM = util.has_suffix(projectFile, "Package.swift")
+
+    projectConfig.settings.workingDirectory = vim.fs.dirname(projectFile)
+
+    if isSPM then
+      projectConfig.settings.swiftPackage = projectFile
+      projectConfig.settings.xcodeproj = nil
+      projectConfig.settings.projectFile = nil
+      projectConfig.settings.projectCommand = nil
+    else
+      local isWorkspace = util.has_suffix(projectFile, "xcworkspace")
+      local isXcodeproj = util.has_suffix(projectFile, "xcodeproj")
+
+      projectConfig.settings.swiftPackage = nil
+      projectConfig.settings.xcodeproj = isXcodeproj and projectFile or nil
+      projectConfig.settings.projectFile = projectFile
+      projectConfig.settings.projectCommand = (isWorkspace and "-workspace '" or "-project '")
+        .. projectFile
+        .. "'"
     end
-  end
-
-  M.show("Select Main Xcworkspace or Xcodeproj", filenames, function(_, index)
-    local projectFile = sanitizedFiles[index]
-    local isWorkspace = util.has_suffix(projectFile, "xcworkspace")
-
-    projectConfig.settings.xcodeproj = not isWorkspace and projectFile or nil
-    projectConfig.settings.projectFile = projectFile
-    projectConfig.settings.projectCommand = (isWorkspace and "-workspace '" or "-project '")
-      .. projectFile
-      .. "'"
 
     projectConfig.save_settings()
     update_xcode_build_server_config()
@@ -292,8 +324,9 @@ end
 ---@param opts PickerOptions|nil
 function M.select_scheme(callback, opts)
   local xcodeproj = projectConfig.settings.xcodeproj
-  if not xcodeproj then
-    notifications.send_error("Xcode project file not set")
+  local workingDirectory = projectConfig.settings.workingDirectory
+  if not xcodeproj and not workingDirectory then
+    notifications.send_error("Project file not set")
     return
   end
 
@@ -314,7 +347,7 @@ function M.select_scheme(callback, opts)
     selectScheme(value)
   end, opts)
 
-  currentJobId = xcode.find_schemes(xcodeproj, function(schemes)
+  currentJobId = xcode.find_schemes(xcodeproj, workingDirectory, function(schemes)
     local names = util.select(schemes, function(scheme)
       return scheme.name
     end)
@@ -334,6 +367,21 @@ end
 ---@param opts PickerOptions|nil
 ---@return number|nil job id
 function M.select_testplan(callback, opts)
+  local function closePicker()
+    if activePicker and util.is_not_empty(vim.fn.win_findbuf(activePicker.prompt_bufnr)) then
+      telescopeActions.close(activePicker.prompt_bufnr)
+    end
+  end
+
+  if projectConfig.settings.swiftPackage then
+    projectConfig.settings.testPlan = nil
+    projectConfig.save_settings()
+    events.project_settings_updated(projectConfig.settings)
+    closePicker()
+    util.call(callback)
+    return nil
+  end
+
   local projectCommand = projectConfig.settings.projectCommand
   local scheme = projectConfig.settings.scheme
 
@@ -349,12 +397,6 @@ function M.select_testplan(callback, opts)
     projectConfig.save_settings()
     events.project_settings_updated(projectConfig.settings)
     util.call(callback, testPlan)
-  end
-
-  local function closePicker()
-    if activePicker and util.is_not_empty(vim.fn.win_findbuf(activePicker.prompt_bufnr)) then
-      telescopeActions.close(activePicker.prompt_bufnr)
-    end
   end
 
   start_telescope_spinner()
@@ -394,18 +436,20 @@ function M.select_destination(callback, opts)
   opts = opts or {}
 
   local projectCommand = projectConfig.settings.projectCommand
+  local swiftPackage = projectConfig.settings.swiftPackage
   local scheme = projectConfig.settings.scheme
+  local workingDirectory = projectConfig.settings.workingDirectory
   local results = cachedDestinations or {}
   local useCache = config.commands.cache_devices
   local hasCachedDevices = useCache and util.is_not_empty(results) and util.is_not_empty(cachedDeviceNames)
 
-  if not projectCommand or not scheme then
+  if not (projectCommand or swiftPackage) or not scheme then
     notifications.send_error("Project command and/or scheme not set")
     return nil
   end
 
   local refreshDevices = function(connectedDevices)
-    currentJobId = xcode.get_destinations(projectCommand, scheme, function(destinations)
+    currentJobId = xcode.get_destinations(projectCommand, scheme, workingDirectory, function(destinations)
       local availablePlatforms = {}
       for _, destination in ipairs(destinations) do
         availablePlatforms[destination.platform] = true
@@ -522,142 +566,27 @@ end
 ---Shows a picker with the available actions.
 ---If the project is not configured, it will show the configuration wizard.
 function M.show_all_actions()
-  local actions = require("xcodebuild.actions")
-  local actionsNames = {
-    "Build Project",
-    "Build Project (Clean Build)",
-    "Build & Run Project",
-    "Build For Testing",
-    "Run Without Building",
-    "Cancel Running Action",
-    "---------------------------------",
-    "Run Current Test Plan (All Tests)",
-    "Run Current Test Target",
-    "Run Current Test Class",
-    "Run Nearest Test",
-    "Rerun Failed Tests",
-    "Repeat Last Test Run",
-    "---------------------------------",
-    "Select Scheme",
-    "Select Device",
-    "Select Test Plan",
-    "---------------------------------",
-    "Toggle Logs",
-    "---------------------------------",
-    "Show Project Manager",
-    "Show Current Configuration",
-    "Show Configuration Wizard",
-    "---------------------------------",
-    "Boot Selected Simulator",
-    "Install Application",
-    "Uninstall Application",
-    "---------------------------------",
-    "Clean DerivedData",
-    "Open Project in Xcode",
-  }
-  local actionsPointers = {
-    actions.build,
-    actions.clean_build,
-    actions.build_and_run,
-    actions.build_for_testing,
-    actions.run,
-    actions.cancel,
+  local pickerActions = require("xcodebuild.ui.picker_actions")
 
-    function() end,
+  if not projectConfig.is_configured() then
+    local actions = require("xcodebuild.actions")
+    local actionsNames = { "Show Configuration Wizard" }
+    local actionsPointers = { actions.configure_project }
 
-    actions.run_tests,
-    actions.run_target_tests,
-    actions.run_class_tests,
-    actions.run_nearest_test,
-    actions.rerun_failed_tests,
-    actions.repeat_last_test_run,
+    M.show("Xcodebuild Actions", actionsNames, function(_, index)
+      local selectSchemeIndex = util.indexOf(actionsNames, "Select Scheme")
 
-    function() end,
-
-    actions.select_scheme,
-    actions.select_device,
-    actions.select_testplan,
-
-    function() end,
-
-    actions.toggle_logs,
-
-    function() end,
-
-    actions.show_project_manager_actions,
-    actions.show_current_config,
-    actions.configure_project,
-
-    function() end,
-
-    actions.boot_simulator,
-    actions.install_app,
-    actions.uninstall_app,
-
-    function() end,
-
-    actions.clean_derived_data,
-    actions.open_in_xcode,
-  }
-
-  if not projectConfig.is_project_configured() then
-    actionsNames = { "Show Configuration Wizard" }
-    actionsPointers = { actions.configure_project }
-  else
-    local loadedDap, dap = pcall(require, "dap")
-    local isDapConfigured = loadedDap
-      and dap.configurations
-      and util.is_not_empty(dap.configurations["swift"])
-    local toggleLogsIndex = util.indexOf(actionsNames, "Toggle Logs") or 16
-
-    if config.prepare_snapshot_test_previews then
-      if util.is_not_empty(snapshots.get_failing_snapshots()) then
-        table.insert(actionsNames, toggleLogsIndex, "Preview Failing Snapshot Tests")
-        table.insert(actionsPointers, toggleLogsIndex, actions.show_failing_snapshot_tests)
-      end
-    end
-
-    if config.code_coverage.enabled then
-      if require("xcodebuild.code_coverage.report").is_report_available() then
-        table.insert(actionsNames, toggleLogsIndex, "Show Code Coverage Report")
-        table.insert(actionsPointers, toggleLogsIndex, actions.show_code_coverage_report)
-        table.insert(actionsNames, toggleLogsIndex + 1, "Toggle Code Coverage")
-        table.insert(actionsPointers, toggleLogsIndex + 1, actions.toggle_code_coverage)
+      if #actionsNames == 1 or index >= selectSchemeIndex then
+        actionsPointers[index]()
       else
-        table.insert(actionsNames, toggleLogsIndex, "Toggle Code Coverage")
-        table.insert(actionsPointers, toggleLogsIndex, actions.toggle_code_coverage)
+        vim.defer_fn(actionsPointers[index], 100)
       end
-    end
-
-    if config.test_explorer.enabled then
-      table.insert(actionsNames, toggleLogsIndex + 1, "Toggle Test Explorer")
-      table.insert(actionsPointers, toggleLogsIndex + 1, actions.test_explorer_toggle)
-    end
-
-    if isDapConfigured then
-      local dapIntegration = require("xcodebuild.integrations.dap")
-      local dapActions = dapIntegration.get_actions()
-      local counter = 7
-
-      table.insert(dapActions, 1, { name = "---------------------------------", action = function() end })
-
-      for _, action in ipairs(dapActions) do
-        table.insert(actionsNames, counter, action.name)
-        table.insert(actionsPointers, counter, action.action)
-        counter = counter + 1
-      end
-    end
+    end, { close_on_select = true })
+  elseif projectConfig.is_project_configured() then
+    pickerActions.show_xcode_project_actions()
+  elseif projectConfig.is_spm_configured() then
+    pickerActions.show_spm_actions()
   end
-
-  M.show("Xcodebuild Actions", actionsNames, function(_, index)
-    local selectSchemeIndex = util.indexOf(actionsNames, "Select Scheme")
-
-    if #actionsNames == 1 or index >= selectSchemeIndex then
-      actionsPointers[index]()
-    else
-      vim.defer_fn(actionsPointers[index], 100)
-    end
-  end, { close_on_select = true })
 end
 
 return M

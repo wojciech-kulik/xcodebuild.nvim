@@ -46,6 +46,7 @@ Quick Test Framework Integration ··············· |xcodebuild.inte
 xcode-build-server Integration ···· |xcodebuild.integrations.xcode-build-server|
 Xcodebuild Workaround ············· |xcodebuild.integrations.xcodebuild-offline|
 Pickers ················································ |xcodebuild.ui.pickers|
+Picker Actions ·································· |xcodebuild.ui.picker_actions|
 Helpers ··················································· |xcodebuild.helpers|
 Lua Utils ···················································· |xcodebuild.util|
 
@@ -1082,30 +1083,32 @@ XcodeProjectInfo                        *xcodebuild.core.xcode.XcodeProjectInfo*
 XcodeBuildOptions                      *xcodebuild.core.xcode.XcodeBuildOptions*
 
   Fields: ~
-    {buildForTesting}  (boolean|nil)
-    {clean}            (boolean|nil)
-    {projectCommand}   (string)
-    {scheme}           (string)
-    {destination}      (string)
-    {extraBuildArgs}   (string|nil)
-    {on_stdout}        (function)
-    {on_stderr}        (fun(_:any,output:string[],_:any))
-    {on_exit}          (fun(_:any,code:number,_:any))
+    {workingDirectory}  (string|nil)
+    {buildForTesting}   (boolean|nil)
+    {clean}             (boolean|nil)
+    {projectCommand}    (string|nil)
+    {scheme}            (string)
+    {destination}       (string)
+    {extraBuildArgs}    (string|nil)
+    {on_stdout}         (function)
+    {on_stderr}         (fun(_:any,output:string[],_:any))
+    {on_exit}           (fun(_:any,code:number,_:any))
 
 
 XcodeTestOptions                        *xcodebuild.core.xcode.XcodeTestOptions*
 
   Fields: ~
-    {withoutBuilding}  (boolean|nil)
-    {projectCommand}   (string)
-    {scheme}           (string)
-    {destination}      (string)
-    {testPlan}         (string)
-    {testsToRun}       (string[]|nil)
-    {extraTestArgs}    (string|nil)
-    {on_stdout}        (function)
-    {on_stderr}        (fun(_:any,output:string[],_:any))
-    {on_exit}          (fun(_:any,code:number,_:any))
+    {workingDirectory}  (string|nil)
+    {withoutBuilding}   (boolean|nil)
+    {projectCommand}    (string|nil)
+    {scheme}            (string)
+    {destination}       (string)
+    {testPlan}          (string|nil)
+    {testsToRun}        (string[]|nil)
+    {extraTestArgs}     (string|nil)
+    {on_stdout}         (function)
+    {on_stderr}         (fun(_:any,output:string[],_:any))
+    {on_exit}           (fun(_:any,code:number,_:any))
 
 
                                    *xcodebuild.core.xcode.XcodeEnumerateOptions*
@@ -1134,65 +1137,81 @@ XcodeScheme                                  *xcodebuild.core.xcode.XcodeScheme*
     {filepath}  (string|nil)
 
 
+                                  *xcodebuild.core.xcode.find_derived_data_path*
+M.find_derived_data_path({productName}, {workingDirectory})
+  Returns derived data path for Swift Package {productName} that matches the {workingDirectory}.
+
+  Parameters: ~
+    {productName}       (string)
+    {workingDirectory}  (string)
+
+  Returns: ~
+    (string|nil)
+
+
                                      *xcodebuild.core.xcode.get_targets_filemap*
-M.get_targets_filemap({appPath})
+M.get_targets_filemap({derivedDataPath})
   Returns a map of targets to list of file paths based on
   the `SwiftFileList` files in the build directory.
 
   If the build directory is not found, it returns an empty map.
 
   Parameters: ~
-    {appPath}  (string)
+    {derivedDataPath}  (string|nil)
 
   Returns: ~
     (TargetMap)
 
 
                                         *xcodebuild.core.xcode.get_destinations*
-M.get_destinations({projectCommand}, {scheme}, {callback})
+M.get_destinations({projectCommand}, {scheme}, {workingDirectory}, {callback})
   Returns the list of devices which match project requirements.
 
   Parameters: ~
-    {projectCommand}  (string)
-    {scheme}          (string)
-    {callback}        (fun(destinations:XcodeDevice[]))
+    {projectCommand}    (string|nil)
+    {scheme}            (string)
+    {workingDirectory}  (string|nil)
+    {callback}          (fun(destinations:XcodeDevice[]))
 
   Returns: ~
     (number)   job id
 
 
                                              *xcodebuild.core.xcode.get_schemes*
-M.get_schemes({projectCommand}, {callback})
+M.get_schemes({projectCommand}, {workingDirectory}, {callback})
   Returns the list of schemes for the given project.
 
   Parameters: ~
-    {projectCommand}  (string)
-    {callback}        (fun(schemes:string[]))
+    {projectCommand}    (string|nil)
+    {workingDirectory}  (string|nil)
+    {callback}          (fun(schemes:string[]))
 
   Returns: ~
     (number)   job id
 
 
                                             *xcodebuild.core.xcode.find_schemes*
-M.find_schemes({xcodeprojPath}, {callback})
+M.find_schemes({xcodeprojPath}, {workingDirectory}, {callback})
   Returns the list of schemes for the given project.
 
   Parameters: ~
-    {xcodeprojPath}  (string)
-    {callback}       (fun(schemes:XcodeScheme[]))
+    {xcodeprojPath}     (string|nil)
+    {workingDirectory}  (string|nil)
+    {callback}          (fun(schemes:XcodeScheme[]))
 
   Returns: ~
     (number|nil)   job id
 
 
                                  *xcodebuild.core.xcode.get_project_information*
-M.get_project_information({xcodeproj}, {callback})
+M.get_project_information({xcodeproj}, {workingDirectory}, {callback})
   Returns the list of project information including schemes, configs, and
   targets for the given {xcodeproj}.
 
   Parameters: ~
-    {xcodeproj}  (string)
-    {callback}   (fun(settings:XcodeProjectInfo))
+    {xcodeproj}         (string|nil)
+    {workingDirectory}  (string|nil)
+    {callback}          (fun(settings:XcodeProjectInfo))
 
   Returns: ~
     (number)   job id
@@ -1635,20 +1654,22 @@ so the settings can be loaded.
 ProjectSettings
 
   Fields: ~
-    {deviceName}      (string|nil) device name (ex. "iPhone 12")
-    {os}              (string|nil) OS version (ex. "14.5")
-    {platform}        (PlatformId|nil) platform (ex. "iOS")
-    {projectFile}     (string|nil) project file path (ex. "path/to/Project.xcodeproj")
-    {projectCommand}  (string|nil) project command (ex. "-project 'path/to/Project.xcodeproj'" or "-workspace 'path/to/Project.xcworkspace'")
-    {scheme}          (string|nil) scheme name (ex. "MyApp")
-    {destination}     (string|nil) destination (ex. "28B52DAA-BC2F-410B-A5BE-F485A3AFB0BC")
-    {bundleId}        (string|nil) bundle identifier (ex. "com.mycompany.myapp")
-    {appPath}         (string|nil) app path (ex. "path/to/MyApp.app")
-    {productName}     (string|nil) product name (ex. "MyApp")
-    {testPlan}        (string|nil) test plan name (ex. "MyAppTests")
-    {xcodeproj}       (string|nil) xcodeproj file path (ex. "path/to/Project.xcodeproj")
-    {lastBuildTime}   (number|nil) last build time in seconds
-    {showCoverage}    (boolean|nil) if the inline code coverage should be shown
+    {deviceName}        (string|nil) device name (ex. "iPhone 12")
+    {os}                (string|nil) OS version (ex. "14.5")
+    {platform}          (PlatformId|nil) platform (ex. "iOS")
+    {projectFile}       (string|nil) project file path (ex. "path/to/Project.xcodeproj")
+    {projectCommand}    (string|nil) project command (ex. "-project 'path/to/Project.xcodeproj'" or "-workspace 'path/to/Project.xcworkspace'")
+    {scheme}            (string|nil) scheme name (ex. "MyApp")
+    {destination}       (string|nil) destination (ex. "28B52DAA-BC2F-410B-A5BE-F485A3AFB0BC")
+    {bundleId}          (string|nil) bundle identifier (ex. "com.mycompany.myapp")
+    {appPath}           (string|nil) app path (ex. "path/to/MyApp.app")
+    {productName}       (string|nil) product name (ex. "MyApp")
+    {testPlan}          (string|nil) test plan name (ex. "MyAppTests")
+    {xcodeproj}         (string|nil) xcodeproj file path (ex. "path/to/Project.xcodeproj")
+    {swiftPackage}      (string|nil) Swift Package file path (ex. "path/to/Package.swift")
+    {workingDirectory}  (string|nil) parent directory of the project file
+    {lastBuildTime}     (number|nil) last build time in seconds
+    {showCoverage}      (boolean|nil) if the inline code coverage should be shown
 
 
 M.settings                                  *xcodebuild.project.config.settings*
@@ -1668,9 +1689,24 @@ M.save_settings()                      *xcodebuild.project.config.save_settings*
   It also updates the global variables with the current settings.
 
 
+                                   *xcodebuild.project.config.is_spm_configured*
+M.is_spm_configured()
+  Checks if SPM project is configured.
+
+  Returns: ~
+    (boolean)
+
+
                                *xcodebuild.project.config.is_project_configured*
 M.is_project_configured()
-  Checks if the project is configured.
+  Checks if Xcode project is configured.
+
+  Returns: ~
+    (boolean)
+
+
+M.is_configured()                      *xcodebuild.project.config.is_configured*
+  Checks if project is configured.
 
   Returns: ~
     (boolean)
@@ -3847,9 +3883,14 @@ M.show({title}, {items}, {callback}, {opts})
 
                               *xcodebuild.ui.pickers.select_xcodeproj_if_needed*
 M.select_xcodeproj_if_needed({callback}, {opts})
+  Shows a picker with the available `xcodeproj` files
+  if this is not already set in the project settings.
+  If the `xcworkspace` is set and there is the corresponding
+  `xcodeproj` file with the same name, it will be selected automatically.
+  If the project is configured for Swift Package, it returns `nil`.
 
   Parameters: ~
-    {callback}  (fun(xcodeproj:string)|nil)
+    {callback}  (fun(xcodeproj:string|nil)|nil)
     {opts}      (PickerOptions|nil)
 
 
@@ -3915,6 +3956,21 @@ M.show_all_actions()                    *xcodebuild.ui.pickers.show_all_actions*
 
 
 ==============================================================================
+Picker Actions                                    *xcodebuild.ui.picker_actions*
+
+This module is responsible for preparing and showing actions for picker based on the project type.
+
+                                 *xcodebuild.ui.picker_actions.show_spm_actions*
+M.show_spm_actions()
+  Shows available actions for Swift Package project.
+
+
+                       *xcodebuild.ui.picker_actions.show_xcode_project_actions*
+M.show_xcode_project_actions()
+  Shows available actions for Xcode project.
+
+
+==============================================================================
 Helpers                                                     *xcodebuild.helpers*
 
 This module contains general helper functions used across the plugin.
@@ -3926,9 +3982,12 @@ M.cancel_actions()                           *xcodebuild.helpers.cancel_actions*
   Cancels all running actions from all modules.
 
 
-M.validate_project()                       *xcodebuild.helpers.validate_project*
+M.validate_project({requiresXcodeproj})    *xcodebuild.helpers.validate_project*
   Validates if the project is configured.
   It sends an error notification if the project is not configured.
+
+  Parameters: ~
+    {requiresXcodeproj}  (boolean)
 
   Returns: ~
     (boolean)

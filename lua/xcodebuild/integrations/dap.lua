@@ -55,18 +55,6 @@ local remoteDebugger = require("xcodebuild.integrations.remote_debugger")
 
 local M = {}
 
----Checks if the project is configured.
----If not, it sends an error notification.
----@return boolean
-local function validate_project()
-  if not projectConfig.is_project_configured() then
-    notifications.send_error("The project is missing some details. Please run XcodebuildSetup first.")
-    return false
-  end
-
-  return true
-end
-
 ---Sets the remote debugger mode based on the OS version.
 local function set_remote_debugger_mode()
   local majorVersion = helpers.get_major_os_version()
@@ -110,7 +98,7 @@ function M.build_and_debug(callback)
     return
   end
 
-  if not validate_project() then
+  if not helpers.validate_project(true) then
     return
   end
 
@@ -150,7 +138,7 @@ end
 ---the project.
 ---@param callback function|nil
 function M.debug_without_build(callback)
-  if not validate_project() then
+  if not helpers.validate_project(true) then
     return
   end
 
@@ -196,7 +184,7 @@ function M.attach_debugger_for_tests()
     return
   end
 
-  if not validate_project() then
+  if not helpers.validate_project(true) then
     return
   end
 

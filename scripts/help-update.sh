@@ -49,6 +49,7 @@ lemmy-help \
   ./lua/xcodebuild/integrations/xcode-build-server.lua \
   ./lua/xcodebuild/integrations/xcodebuild-offline.lua \
   ./lua/xcodebuild/ui/pickers.lua \
+  ./lua/xcodebuild/ui/picker_actions.lua \
   ./lua/xcodebuild/helpers.lua \
   ./lua/xcodebuild/util.lua \
   >doc/xcodebuild.txt

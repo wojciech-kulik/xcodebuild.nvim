@@ -49,7 +49,7 @@ function M.setup()
       group = autogroup,
       pattern = "*.swift",
       callback = function(ev)
-        if projectConfig.is_project_configured() and appdata.report and appdata.report.tests then
+        if projectConfig.is_configured() and appdata.report and appdata.report.tests then
           local filepath = vim.api.nvim_buf_get_name(ev.buf)
 
           -- refresh diagnostics if the file is in the report
