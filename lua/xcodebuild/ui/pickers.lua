@@ -53,11 +53,11 @@ local function update_xcode_build_server_config()
     return
   end
 
-  local projectCommand = projectConfig.settings.projectCommand
+  local projectFile = projectConfig.settings.projectFile
   local scheme = projectConfig.settings.scheme
 
-  if projectCommand and scheme then
-    xcodeBuildServer.run_config(projectCommand, scheme)
+  if projectFile and scheme then
+    xcodeBuildServer.run_config(projectFile, scheme)
   end
 end
 
@@ -123,7 +123,7 @@ local function sort_paths(paths)
 end
 
 ---Prepares the picker titles and values for paths from the command output.
----@param command string
+---@param command string|string[]
 ---@return string[], string[]
 local function get_picker_titles_values(command)
   local pickerTitles = {}
@@ -241,19 +241,28 @@ end
 ---@param opts PickerOptions|nil
 function M.select_xcodeproj(callback, opts)
   local maxdepth = config.commands.project_search_max_depth
-  local cmd = "find '"
-    .. vim.fn.getcwd()
-    .. "' -type d -path '*/.*' -prune -o -maxdepth "
-    .. maxdepth
-    .. " -iname '*.xcodeproj' -print"
-    .. " 2> /dev/null"
+  -- stylua: ignore
+  local cmd = {
+    "find",
+    vim.fn.getcwd(),
+    "-type", "d",
+    "-path", "*/.*", "-prune",
+    "-o",
+    "-maxdepth", tostring(maxdepth),
+    "-iname", "*.xcodeproj",
+    "-print",
+  }
 
   if util.is_fd_installed() then
-    cmd = "fd -I '.*\\.xcodeproj$' '"
-      .. vim.fn.getcwd()
-      .. "' --max-depth "
-      .. maxdepth
-      .. " --type d 2> /dev/null"
+    -- stylua: ignore
+    cmd = {
+      "fd",
+      "-I",
+      ".*\\.xcodeproj$",
+      vim.fn.getcwd(),
+      "--max-depth", tostring(maxdepth),
+      "--type", "d",
+    }
   end
 
   local pickerTitles, pickerValues = get_picker_titles_values(cmd)
@@ -272,20 +281,29 @@ end
 ---@param opts PickerOptions|nil
 function M.select_project(callback, opts)
   local maxdepth = config.commands.project_search_max_depth
-  local cmd = "find '"
-    .. vim.fn.getcwd()
-    .. "' -type d \\( -path '*/.*' -o -path '*xcodeproj/project.xcworkspace' \\) -prune -o"
-    .. " \\( -iname '*.xcodeproj' -o -iname '*.xcworkspace' -o -iname 'package.swift' \\)"
-    .. " -maxdepth "
-    .. maxdepth
-    .. " -print 2> /dev/null"
+  -- stylua: ignore
+  local cmd = {
+    "find",
+    vim.fn.getcwd(),
+    "-type", "d",
+    "(", "-path", "*/.*", "-o", "-path", "*xcodeproj/project.xcworkspace", ")",
+    "-prune",
+    "-o",
+    "(", "-iname", "*.xcodeproj", "-o", "-iname", "*.xcworkspace", "-o", "-iname", "package.swift", ")",
+    "-maxdepth", tostring(maxdepth),
+    "-print"
+  }
 
   if util.is_fd_installed() then
-    cmd = "fd -I '(.*\\.xcodeproj$|.*\\.xcworkspace$|Package\\.swift$)' '"
-      .. vim.fn.getcwd()
-      .. "' --max-depth "
-      .. maxdepth
-      .. " -E '**/*xcodeproj/project.xcworkspace/' 2> /dev/null"
+    -- stylua: ignore
+    cmd = {
+      "fd",
+      "-I",
+      "(.*\\.xcodeproj$|.*\\.xcworkspace$|Package\\.swift$)",
+      vim.fn.getcwd(),
+      "--max-depth", tostring(maxdepth),
+      "-E", "**/*xcodeproj/project.xcworkspace/"
+    }
   end
 
   local pickerTitles, pickerValues = get_picker_titles_values(cmd)
@@ -300,17 +318,12 @@ function M.select_project(callback, opts)
       projectConfig.settings.swiftPackage = projectFile
       projectConfig.settings.xcodeproj = nil
       projectConfig.settings.projectFile = nil
-      projectConfig.settings.projectCommand = nil
     else
-      local isWorkspace = util.has_suffix(projectFile, "xcworkspace")
       local isXcodeproj = util.has_suffix(projectFile, "xcodeproj")
 
       projectConfig.settings.swiftPackage = nil
       projectConfig.settings.xcodeproj = isXcodeproj and projectFile or nil
       projectConfig.settings.projectFile = projectFile
-      projectConfig.settings.projectCommand = (isWorkspace and "-workspace '" or "-project '")
-        .. projectFile
-        .. "'"
     end
 
     projectConfig.save_settings()
@@ -382,11 +395,11 @@ function M.select_testplan(callback, opts)
     return nil
   end
 
-  local projectCommand = projectConfig.settings.projectCommand
+  local projectFile = projectConfig.settings.projectFile
   local scheme = projectConfig.settings.scheme
 
-  if not projectCommand or not scheme then
-    notifications.send_error("Project command and/or scheme not set")
+  if not projectFile or not scheme then
+    notifications.send_error("Project file and/or scheme not set")
     return nil
   end
 
@@ -404,7 +417,7 @@ function M.select_testplan(callback, opts)
     selectTestPlan(value)
   end, opts)
 
-  currentJobId = xcode.get_testplans(projectCommand, scheme, function(testPlans)
+  currentJobId = xcode.get_testplans(projectFile, scheme, function(testPlans)
     if currentJobId and util.is_empty(testPlans) then
       vim.defer_fn(function()
         notifications.send_warning("Could not detect test plans")
@@ -435,7 +448,7 @@ end
 function M.select_destination(callback, opts)
   opts = opts or {}
 
-  local projectCommand = projectConfig.settings.projectCommand
+  local projectFile = projectConfig.settings.projectFile
   local swiftPackage = projectConfig.settings.swiftPackage
   local scheme = projectConfig.settings.scheme
   local workingDirectory = projectConfig.settings.workingDirectory
@@ -443,13 +456,13 @@ function M.select_destination(callback, opts)
   local useCache = config.commands.cache_devices
   local hasCachedDevices = useCache and util.is_not_empty(results) and util.is_not_empty(cachedDeviceNames)
 
-  if not (projectCommand or swiftPackage) or not scheme then
-    notifications.send_error("Project command and/or scheme not set")
+  if not (projectFile or swiftPackage) or not scheme then
+    notifications.send_error("Project file and/or scheme not set")
     return nil
   end
 
   local refreshDevices = function(connectedDevices)
-    currentJobId = xcode.get_destinations(projectCommand, scheme, workingDirectory, function(destinations)
+    currentJobId = xcode.get_destinations(projectFile, scheme, workingDirectory, function(destinations)
       local availablePlatforms = {}
       for _, destination in ipairs(destinations) do
         availablePlatforms[destination.platform] = true
@@ -548,7 +561,7 @@ function M.select_failing_snapshot_test()
 
   require("xcodebuild.ui.pickers").show("Failing Snapshot Tests", filenames, function(_, index)
     local selectedFile = failingSnapshots[index]
-    vim.fn.jobstart("qlmanage -p '" .. selectedFile .. "'", {
+    vim.fn.jobstart({ "qlmanage", "-p", selectedFile }, {
       detach = true,
       on_exit = function() end,
     })
@@ -557,7 +570,7 @@ function M.select_failing_snapshot_test()
     -- when Neovim is running in tmux.
     if vim.env.TERM_PROGRAM == "tmux" then
       vim.defer_fn(function()
-        util.shell("open -a qlmanage 2>/dev/null")
+        util.shell("open -a qlmanage")
       end, 100)
     end
   end)

@@ -26,10 +26,10 @@
 ---@field workingDirectory string|nil
 ---@field buildForTesting boolean|nil
 ---@field clean boolean|nil
----@field projectCommand string|nil
+---@field projectFile string|nil
 ---@field scheme string
 ---@field destination string
----@field extraBuildArgs string|nil
+---@field extraBuildArgs string[]
 ---@field on_stdout function
 ---@field on_stderr fun(_, output: string[], _)
 ---@field on_exit fun(_, code: number, _)
@@ -37,22 +37,23 @@
 ---@class XcodeTestOptions
 ---@field workingDirectory string|nil
 ---@field withoutBuilding boolean|nil
----@field projectCommand string|nil
+---@field projectFile string|nil
 ---@field scheme string
 ---@field destination string
 ---@field testPlan string|nil
 ---@field testsToRun string[]|nil
----@field extraTestArgs string|nil
+---@field extraTestArgs string[]
 ---@field on_stdout function
 ---@field on_stderr fun(_, output: string[], _)
 ---@field on_exit fun(_, code: number, _)
 
 ---@class XcodeEnumerateOptions
----@field projectCommand string
+---@field workingDirectory string|nil
+---@field projectFile string
 ---@field scheme string
 ---@field destination string
 ---@field testPlan string
----@field extraTestArgs string|nil
+---@field extraTestArgs string[]
 
 ---@class XcodeBuildSettings
 ---@field appPath string
@@ -74,9 +75,11 @@ local DEBUG = false
 
 ---@diagnostic disable: unused-local
 ---Prints the message if the DEBUG flag is set to true.
-local function debug_print(...)
+---@param name string
+---@param value any
+local function debug_print(name, value)
   if DEBUG then
-    print(...)
+    print(name .. ":", vim.inspect(value))
   end
 end
 
@@ -103,20 +106,43 @@ local function callback_or_error(action, callback)
   end
 end
 
+---Returns `-project` or `-workspace` based on the project file extension.
+---@param projectFile string|nil
+---@return string|nil
+local function get_project_param(projectFile)
+  if not projectFile then
+    return nil
+  end
+
+  return util.has_suffix(projectFile, "xcodeproj") and "-project" or "-workspace"
+end
+
 ---Returns derived data path for Swift Package {productName} that matches the {workingDirectory}.
 ---@param productName string
 ---@param workingDirectory string
 ---@return string|nil
 function M.find_derived_data_path(productName, workingDirectory)
   local derivedDataDir = vim.fn.expand("~/Library/Developer/Xcode/DerivedData")
-  local cmd = "find '"
-    .. derivedDataDir
-    .. "' -name '"
-    .. productName
-    .. "-*' -maxdepth 1 -type d 2> /dev/null"
+  -- stylua: ignore
+  local cmd = {
+    "find",
+    derivedDataDir,
+    "-name",
+    productName .. "-*",
+    "-maxdepth", "1",
+    "-type", "d",
+  }
 
   if util.is_fd_installed() then
-    cmd = "fd -I '" .. productName .. "\\-.*' '" .. derivedDataDir .. "' --max-depth 1 --type d 2> /dev/null"
+    -- stylua: ignore
+    cmd = {
+      "fd",
+      "-I",
+      productName .. "\\-.*",
+      derivedDataDir,
+      "--max-depth", "1",
+      "--type", "d",
+    }
   end
 
   local dirs = util.shell(cmd)
@@ -124,10 +150,12 @@ function M.find_derived_data_path(productName, workingDirectory)
   for _, dir in ipairs(dirs) do
     if string.find(dir, productName) then
       local trimmedDir = dir:gsub("/+$", "")
-      local checkPathCommand = "/usr/libexec/PlistBuddy -c 'Print WorkspacePath' '"
-        .. trimmedDir
-        .. "/info.plist' 2> /dev/null"
-      local workspacePath = util.shell(checkPathCommand)
+      local workspacePath = util.shell({
+        "/usr/libexec/PlistBuddy",
+        "-c",
+        "Print WorkspacePath",
+        trimmedDir .. "/info.plist",
+      })
 
       if workspacePath and workspacePath[1] == workingDirectory then
         return trimmedDir
@@ -167,10 +195,10 @@ function M.get_targets_filemap(derivedDataPath)
   end
 
   local targetsFilesMap = {}
-  local cmd = "find '" .. searchPath .. "' -type f -iname *.SwiftFileList 2> /dev/null"
+  local cmd = { "find", searchPath, "-type", "f", "-iname", "*.SwiftFileList" }
 
   if util.is_fd_installed() then
-    cmd = "fd -I '.*\\.SwiftFileList$' '" .. searchPath .. "' --type f 2> /dev/null"
+    cmd = { "fd", "-I", ".*\\.SwiftFileList$", searchPath, "--type", "f" }
   end
 
   local fileListFiles = util.shell(cmd)
@@ -195,13 +223,21 @@ function M.get_targets_filemap(derivedDataPath)
 end
 
 ---Returns the list of devices which match project requirements.
----@param projectCommand string|nil
+---@param projectFile string|nil
 ---@param scheme string
 ---@param workingDirectory string|nil
 ---@param callback fun(destinations: XcodeDevice[])
 ---@return number # job id
-function M.get_destinations(projectCommand, scheme, workingDirectory, callback)
-  local command = "xcodebuild -showdestinations " .. (projectCommand or "") .. " -scheme '" .. scheme .. "'"
+function M.get_destinations(projectFile, scheme, workingDirectory, callback)
+  local command = {
+    "xcodebuild",
+    get_project_param(projectFile),
+    projectFile,
+    "-showdestinations",
+    "-scheme",
+    scheme,
+  }
+  command = util.skip_nil(command)
   command = xcodebuildOffline.wrap_command_if_needed(command)
   debug_print("get_destinations", command)
 
@@ -241,12 +277,18 @@ function M.get_destinations(projectCommand, scheme, workingDirectory, callback)
 end
 
 ---Returns the list of schemes for the given project.
----@param projectCommand string|nil
+---@param projectFile string|nil
 ---@param workingDirectory string|nil
 ---@param callback fun(schemes: string[])
 ---@return number # job id
-function M.get_schemes(projectCommand, workingDirectory, callback)
-  local command = "xcodebuild " .. (projectCommand or "") .. " -list"
+function M.get_schemes(projectFile, workingDirectory, callback)
+  local command = {
+    "xcodebuild",
+    get_project_param(projectFile),
+    projectFile,
+    "-list",
+  }
+  command = util.skip_nil(command)
   command = xcodebuildOffline.wrap_command_if_needed(command)
   debug_print("get_schemes", command)
 
@@ -292,7 +334,7 @@ function M.find_schemes(xcodeprojPath, workingDirectory, callback)
   end
 
   if xcodeprojPath then
-    local schemes = util.shell("find '" .. xcodeprojPath .. "' -name '*.xcscheme' -type file 2>/dev/null")
+    local schemes = util.shell({ "find", xcodeprojPath, "-name", "*.xcscheme", "-type", "f" })
 
     for _, scheme in ipairs(schemes) do
       local path = vim.trim(scheme)
@@ -323,8 +365,17 @@ end
 ---@param callback fun(settings: XcodeProjectInfo)
 ---@return number # job id
 function M.get_project_information(xcodeproj, workingDirectory, callback)
-  local project = xcodeproj and " -project '" .. xcodeproj .. "'" or ""
-  local command = "xcodebuild" .. project .. " -list"
+  local command = { "xcodebuild", "-list" }
+
+  if xcodeproj then
+    command = {
+      "xcodebuild",
+      "-project",
+      xcodeproj,
+      "-list",
+    }
+  end
+
   command = xcodebuildOffline.wrap_command_if_needed(command)
   debug_print("get_project_information", command)
 
@@ -372,12 +423,21 @@ function M.get_project_information(xcodeproj, workingDirectory, callback)
 end
 
 ---Returns the list of test plans for the given project.
----@param projectCommand string
+---@param projectFile string
 ---@param scheme string
 ---@param callback fun(testPlans: string[])
 ---@return number # job id
-function M.get_testplans(projectCommand, scheme, callback)
-  local command = "xcodebuild test " .. projectCommand .. " -scheme '" .. scheme .. "' -showTestPlans"
+function M.get_testplans(projectFile, scheme, callback)
+  local command = {
+    "xcodebuild",
+    "test",
+    get_project_param(projectFile),
+    projectFile,
+    "-scheme",
+    scheme,
+    "-showTestPlans",
+  }
+  command = util.skip_nil(command)
   command = xcodebuildOffline.wrap_command_if_needed(command)
   debug_print("get_testplans", command)
 
@@ -408,20 +468,19 @@ end
 ---@param opts XcodeBuildOptions
 ---@return number # job id
 function M.build_project(opts)
-  opts.extraBuildArgs = opts.extraBuildArgs or ""
-
-  -- stylua: ignore
-  local action = opts.buildForTesting and "build-for-testing " or "build "
-  local command = "xcodebuild "
-    .. (opts.clean and "clean " or "")
-    .. action
-    .. (opts.projectCommand or "")
-    .. " -scheme '"
-    .. opts.scheme
-    .. "' -destination 'id="
-    .. opts.destination
-    .. "'"
-    .. (string.len(opts.extraBuildArgs) > 0 and " " .. opts.extraBuildArgs or "")
+  local command = {
+    "xcodebuild",
+    opts.clean and "clean" or nil,
+    opts.buildForTesting and "build-for-testing" or "build",
+    get_project_param(opts.projectFile),
+    opts.projectFile,
+    "-scheme",
+    opts.scheme,
+    "-destination",
+    "id=" .. opts.destination,
+  }
+  command = util.merge_array(command, opts.extraBuildArgs)
+  command = util.skip_nil(command)
   command = xcodebuildOffline.wrap_command_if_needed(command)
   debug_print("build_project", command)
 
@@ -439,12 +498,12 @@ end
 ---
 ---If one of the settings is not found, it will send an error notification.
 ---@param platform string
----@param projectCommand string
+---@param projectFile string
 ---@param scheme string
 ---@param xcodeprojPath string
 ---@param callback fun(settings: XcodeBuildSettings)
 ---@return number|nil # job id
-function M.get_build_settings(platform, projectCommand, scheme, xcodeprojPath, callback)
+function M.get_build_settings(platform, projectFile, scheme, xcodeprojPath, callback)
   local sdk = constants.get_sdk(platform)
 
   local jobid
@@ -465,17 +524,23 @@ function M.get_build_settings(platform, projectCommand, scheme, xcodeprojPath, c
       end
     end
 
-    local command = "xcodebuild build "
-      .. projectCommand
-      .. " -scheme '"
-      .. scheme
-      .. "' -showBuildSettings"
-      .. " -sdk "
-      .. sdk
+    local command = {
+      "xcodebuild",
+      "build",
+      get_project_param(projectFile),
+      projectFile,
+      "-scheme",
+      scheme,
+      "-showBuildSettings",
+      "-sdk",
+      sdk,
+    }
+    command = util.skip_nil(command)
     command = xcodebuildOffline.wrap_command_if_needed(command)
 
     if config then
-      command = command .. " -configuration '" .. config .. "'"
+      table.insert(command, "-configuration")
+      table.insert(command, config)
     end
 
     debug_print("get_build_settings", command)
@@ -553,7 +618,7 @@ function M.install_app_on_device(destination, appPath, callback)
   local appdata = require("xcodebuild.project.appdata")
   appdata.clear_app_logs()
 
-  local command = "xcrun devicectl device install app -d '" .. destination .. "' '" .. appPath .. "'"
+  local command = { "xcrun", "devicectl", "device", "install", "app", "-d", destination, appPath }
   debug_print("install_app_on_device", command)
 
   return vim.fn.jobstart(command, {
@@ -570,7 +635,7 @@ end
 ---@param callback function|nil
 ---@return number # job id
 function M.install_app_on_simulator(destination, appPath, bootIfNeeded, callback)
-  local command = "xcrun simctl install '" .. destination .. "' '" .. appPath .. "'"
+  local command = { "xcrun", "simctl", "install", destination, appPath }
   debug_print("install_app_on_simulator", command)
 
   return vim.fn.jobstart(command, {
@@ -603,10 +668,17 @@ end
 ---@param callback function|nil
 ---@return number # job id
 function M.launch_app_on_device(destination, bundleId, callback)
-  local command = "xcrun devicectl device process launch --terminate-existing -d '"
-    .. destination
-    .. "' "
-    .. bundleId
+  local command = {
+    "xcrun",
+    "devicectl",
+    "device",
+    "process",
+    "launch",
+    "--terminate-existing",
+    "-d",
+    destination,
+    bundleId,
+  }
   debug_print("launch_app_on_device", command)
 
   return vim.fn.jobstart(command, {
@@ -624,12 +696,17 @@ end
 ---@param callback function|nil
 ---@return number # job id
 function M.launch_app_on_simulator(destination, bundleId, waitForDebugger, callback)
-  local command = "xcrun simctl launch --terminate-running-process --console-pty"
-    .. (waitForDebugger and " --wait-for-debugger" or "")
-    .. " '"
-    .. destination
-    .. "' "
-    .. bundleId
+  local command = {
+    "xcrun",
+    "simctl",
+    "launch",
+    "--terminate-running-process",
+    "--console-pty",
+    waitForDebugger and "--wait-for-debugger" or nil,
+    destination,
+    bundleId,
+  }
+  command = util.skip_nil(command)
   debug_print("launch_app_on_simulator", command)
 
   local appdata = require("xcodebuild.project.appdata")
@@ -686,7 +763,7 @@ end
 ---@param callback fun(success:boolean)|nil
 ---@return number # job id
 function M.boot_simulator(destination, callback)
-  local command = "xcrun simctl boot '" .. destination .. "' "
+  local command = { "xcrun", "simctl", "boot", destination }
   debug_print("boot_simulator", command)
 
   return vim.fn.jobstart(command, {
@@ -717,7 +794,7 @@ end
 ---@param callback function|nil
 ---@return number # job id
 function M.uninstall_app_from_simulator(destination, bundleId, callback)
-  local command = "xcrun simctl uninstall '" .. destination .. "' " .. bundleId
+  local command = { "xcrun", "simctl", "uninstall", destination, bundleId }
   debug_print("uninstall_app_from_simulator", command)
 
   return vim.fn.jobstart(command, {
@@ -732,7 +809,7 @@ end
 ---@param callback function|nil
 ---@return number # job id
 function M.uninstall_app_from_device(destination, bundleId, callback)
-  local command = "xcrun devicectl device uninstall app -d  '" .. destination .. "' " .. bundleId
+  local command = { "xcrun", "devicectl", "device", "uninstall", "app", "-d", destination, bundleId }
   debug_print("uninstall_app_from_device", command)
 
   return vim.fn.jobstart(command, {
@@ -786,7 +863,7 @@ function M.kill_app(productName, platform, callback)
   local pid = M.get_app_pid(productName, platform)
 
   if pid then
-    util.shell("kill -9 " .. pid)
+    util.shell({ "kill", "-9", tostring(pid) })
   end
 
   util.call(callback)
@@ -798,7 +875,7 @@ end
 ---@param callback fun(coverageData: string[])
 ---@return number # job id
 function M.get_code_coverage(xctestresultPath, filepath, callback)
-  local command = "xcrun xccov view --archive --file '" .. filepath .. "' '" .. xctestresultPath .. "'"
+  local command = { "xcrun", "xccov", "view", "--archive", "--file", filepath, xctestresultPath }
   debug_print("get_code_coverage", command)
 
   return vim.fn.jobstart(command, {
@@ -817,30 +894,36 @@ end
 function M.enumerate_tests(opts, callback)
   local appdata = require("xcodebuild.project.appdata")
   local outputPath = appdata.tests_filepath
-  local testPlan = opts.testPlan and " -testPlan '" .. opts.testPlan .. "'" or ""
-  util.shell("rm -rf '" .. outputPath .. "'")
+  util.shell({ "rm", "-rf", outputPath })
 
-  opts.extraTestArgs = opts.extraTestArgs or ""
-
-  local command = "xcodebuild test-without-building"
-    .. " -enumerate-tests"
-    .. " -scheme '"
-    .. opts.scheme
-    .. "' -destination 'id="
-    .. opts.destination
-    .. "' "
-    .. (opts.projectCommand or "")
-    .. testPlan
-    .. " -test-enumeration-format json"
-    .. " -test-enumeration-output-path '"
-    .. outputPath
-    .. "' -disableAutomaticPackageResolution -skipPackageUpdates -parallelizeTargets"
-    .. " -test-enumeration-style flat"
-    .. (string.len(opts.extraTestArgs) > 0 and " " .. opts.extraTestArgs or "")
+  local command = {
+    "xcodebuild",
+    "test-without-building",
+    "-enumerate-tests",
+    "-scheme",
+    opts.scheme,
+    "-destination",
+    "id=" .. opts.destination,
+    get_project_param(opts.projectFile),
+    opts.projectFile,
+    opts.testPlan and "-testPlan" or nil,
+    opts.testPlan,
+    "-test-enumeration-format",
+    "json",
+    "-test-enumeration-output-path",
+    outputPath,
+    "-disableAutomaticPackageResolution",
+    "-skipPackageUpdates",
+    "-test-enumeration-style",
+    "flat",
+  }
+  command = util.merge_array(command, opts.extraTestArgs)
+  command = util.skip_nil(command)
   command = xcodebuildOffline.wrap_command_if_needed(command)
   debug_print("enumerate_tests", command)
 
   return vim.fn.jobstart(command, {
+    cwd = opts.workingDirectory,
     on_exit = function(_, code, _)
       if code == CANCELLED_CODE then
         notifications.send_warning("Loading tests cancelled")
@@ -866,7 +949,7 @@ end
 ---@param callback function|nil
 ---@return number # job id
 function M.export_code_coverage_report(xcresultPath, outputPath, callback)
-  local command = "xcrun xccov view --report --json '" .. xcresultPath .. "'"
+  local command = { "xcrun", "xccov", "view", "--report", "--json", xcresultPath }
   debug_print("export_code_coverage_report", command)
 
   return vim.fn.jobstart(command, {
@@ -887,23 +970,26 @@ end
 ---@param opts XcodeTestOptions
 ---@return number # job id
 function M.run_tests(opts)
-  local action = opts.withoutBuilding and "test-without-building" or "test"
-  local testPlan = opts.testPlan and " -testPlan '" .. opts.testPlan .. "'" or ""
-
-  -- stylua: ignore
-  local command = "xcodebuild " .. action .. " -scheme '"
-    .. opts.scheme
-    .. "' -destination 'id="
-    .. opts.destination
-    .. "' "
-    .. (opts.projectCommand or "")
-    .. testPlan
-    .. (string.len(opts.extraTestArgs) > 0 and " " .. opts.extraTestArgs or "")
+  local command = {
+    "xcodebuild",
+    opts.withoutBuilding and "test-without-building" or "test",
+    "-scheme",
+    opts.scheme,
+    "-destination",
+    "id=" .. opts.destination,
+    get_project_param(opts.projectFile),
+    opts.projectFile,
+    opts.testPlan and "-testPlan" or nil,
+    opts.testPlan,
+  }
+  command = util.merge_array(command, opts.extraTestArgs)
+  command = util.skip_nil(command)
   command = xcodebuildOffline.wrap_command_if_needed(command)
 
   if opts.testsToRun then
     for _, test in ipairs(opts.testsToRun) do
-      command = command .. " -only-testing '" .. test .. "'"
+      table.insert(command, "-only-testing")
+      table.insert(command, test)
     end
   end
 

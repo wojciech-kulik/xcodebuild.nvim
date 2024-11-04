@@ -59,8 +59,9 @@ function M.reload_tests()
     notifications.send("Loading Tests...")
 
     M.currentJobId = xcode.enumerate_tests({
+      workingDirectory = projectConfig.settings.workingDirectory,
       destination = projectConfig.settings.destination,
-      projectCommand = projectConfig.settings.projectCommand,
+      projectFile = projectConfig.settings.projectFile,
       scheme = projectConfig.settings.scheme,
       testPlan = projectConfig.settings.testPlan,
       extraTestArgs = config.commands.extra_test_args,
@@ -198,7 +199,7 @@ function M.run_tests(testsToRun)
       withoutBuilding = true,
       workingDirectory = projectConfig.settings.workingDirectory,
       destination = projectConfig.settings.destination,
-      projectCommand = projectConfig.settings.projectCommand,
+      projectFile = projectConfig.settings.projectFile,
       scheme = projectConfig.settings.scheme,
       testPlan = projectConfig.settings.testPlan,
       testsToRun = testsToRun,

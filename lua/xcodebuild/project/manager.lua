@@ -50,7 +50,15 @@ end
 ---@param dir string # The directory to search in.
 ---@return string|nil # The absolute path to the `.xcodeproj` file, or nil if not found.
 local function findXcodeproj_file(dir)
-  local cmd = "find '" .. dir .. '\' -maxdepth 1 -name "*.xcodeproj" -print -quit 2> /dev/null'
+  -- stylua: ignore
+  local cmd = {
+    "find",
+    dir,
+    "-maxdepth", "1",
+    "-name", "*.xcodeproj",
+    "-print",
+    "-quit",
+  }
   local result = util.shell(cmd)
   if result and #result > 0 and result[1] ~= "" then
     return result[1]
@@ -296,7 +304,7 @@ function M.create_new_file()
   end
 
   local fullPath = path .. "/" .. filename
-  vim.fn.system("touch '" .. fullPath .. "'")
+  vim.fn.system({ "touch", fullPath })
   vim.cmd("e " .. fullPath)
 
   M.add_current_file()
@@ -508,7 +516,7 @@ function M.create_new_group()
   end
 
   local groupPath = path .. "/" .. groupName
-  vim.fn.system("mkdir -p '" .. groupPath .. "'")
+  vim.fn.system({ "mkdir", "-p", groupPath })
 
   run_add_group(groupPath)
   notifications.send("Group has been added")
@@ -613,7 +621,7 @@ function M.delete_current_group()
 
   if input == "y" then
     run_delete_group(groupPath)
-    vim.fn.system("rm -rf '" .. groupPath .. "'")
+    vim.fn.system({ "rm", "-rf", groupPath })
     vim.cmd("bd!")
     notifications.send("Group has been deleted")
   end

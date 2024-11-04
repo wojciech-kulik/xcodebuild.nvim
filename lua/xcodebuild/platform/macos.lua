@@ -14,7 +14,7 @@ local M = {}
 ---@param callback function|nil
 ---@return number # job id
 function M.launch_app(appPath, callback)
-  return vim.fn.jobstart("open '" .. appPath .. "'", {
+  return vim.fn.jobstart({ "open", appPath }, {
     on_exit = function(_, code)
       if code == 0 then
         util.call(callback)

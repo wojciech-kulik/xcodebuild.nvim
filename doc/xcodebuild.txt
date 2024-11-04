@@ -88,8 +88,8 @@ M.setup({options})                                            *xcodebuild.setup*
       },
       commands = {
         cache_devices = true, -- cache recently loaded devices. Restart Neovim to clean cache.
-        extra_build_args = "-parallelizeTargets", -- extra arguments for `xcodebuild build`
-        extra_test_args = "-parallelizeTargets", -- extra arguments for `xcodebuild test`
+        extra_build_args = { "-parallelizeTargets" }, -- extra arguments for `xcodebuild build`
+        extra_test_args = { "-parallelizeTargets" }, -- extra arguments for `xcodebuild test`
         project_search_max_depth = 3, -- maxdepth of xcodeproj/xcworkspace search while using configuration wizard
         focus_simulator_on_app_launch = true, -- focus simulator window when app is launched
       },
@@ -210,6 +210,7 @@ M.setup({options})                                            *xcodebuild.setup*
 Features                                                   *xcodebuild.features*
 
  - Support for iOS, iPadOS, watchOS, tvOS, visionOS, and macOS.
+ - Support for Swift Packages (building & testing).
  - Project-based configuration.
  - Project Manager to deal with project files without using Xcode.
  - Test Explorer to visually present a tree with all tests and results.
@@ -1086,10 +1087,10 @@ XcodeBuildOptions                      *xcodebuild.core.xcode.XcodeBuildOptions*
     {workingDirectory}  (string|nil)
     {buildForTesting}   (boolean|nil)
     {clean}             (boolean|nil)
-    {projectCommand}    (string|nil)
+    {projectFile}       (string|nil)
     {scheme}            (string)
     {destination}       (string)
-    {extraBuildArgs}    (string|nil)
+    {extraBuildArgs}    (string[])
     {on_stdout}         (function)
     {on_stderr}         (fun(_:any,output:string[],_:any))
     {on_exit}           (fun(_:any,code:number,_:any))
@@ -1100,12 +1101,12 @@ XcodeTestOptions                        *xcodebuild.core.xcode.XcodeTestOptions*
   Fields: ~
     {workingDirectory}  (string|nil)
     {withoutBuilding}   (boolean|nil)
-    {projectCommand}    (string|nil)
+    {projectFile}       (string|nil)
     {scheme}            (string)
     {destination}       (string)
     {testPlan}          (string|nil)
     {testsToRun}        (string[]|nil)
-    {extraTestArgs}     (string|nil)
+    {extraTestArgs}     (string[])
     {on_stdout}         (function)
     {on_stderr}         (fun(_:any,output:string[],_:any))
     {on_exit}           (fun(_:any,code:number,_:any))
@@ -1115,11 +1116,12 @@ XcodeTestOptions                        *xcodebuild.core.xcode.XcodeTestOptions*
 XcodeEnumerateOptions
 
   Fields: ~
-    {projectCommand}  (string)
-    {scheme}          (string)
-    {destination}     (string)
-    {testPlan}        (string)
-    {extraTestArgs}   (string|nil)
+    {workingDirectory}  (string|nil)
+    {projectFile}       (string)
+    {scheme}            (string)
+    {destination}       (string)
+    {testPlan}          (string)
+    {extraTestArgs}     (string[])
 
 
 XcodeBuildSettings                    *xcodebuild.core.xcode.XcodeBuildSettings*
@@ -1164,11 +1166,11 @@ M.get_targets_filemap({derivedDataPath})
 
 
                                         *xcodebuild.core.xcode.get_destinations*
-M.get_destinations({projectCommand}, {scheme}, {workingDirectory}, {callback})
+M.get_destinations({projectFile}, {scheme}, {workingDirectory}, {callback})
   Returns the list of devices which match project requirements.
 
   Parameters: ~
-    {projectCommand}    (string|nil)
+    {projectFile}       (string|nil)
     {scheme}            (string)
     {workingDirectory}  (string|nil)
     {callback}          (fun(destinations:XcodeDevice[]))
@@ -1178,11 +1180,11 @@ M.get_destinations({projectCommand}, {scheme}, {workingDirectory}, {callback})
 
 
                                              *xcodebuild.core.xcode.get_schemes*
-M.get_schemes({projectCommand}, {workingDirectory}, {callback})
+M.get_schemes({projectFile}, {workingDirectory}, {callback})
   Returns the list of schemes for the given project.
 
   Parameters: ~
-    {projectCommand}    (string|nil)
+    {projectFile}       (string|nil)
     {workingDirectory}  (string|nil)
     {callback}          (fun(schemes:string[]))
 
@@ -1218,13 +1220,13 @@ M.get_project_information({xcodeproj}, {workingDirectory}, {callback})
 
 
                                            *xcodebuild.core.xcode.get_testplans*
-M.get_testplans({projectCommand}, {scheme}, {callback})
+M.get_testplans({projectFile}, {scheme}, {callback})
   Returns the list of test plans for the given project.
 
   Parameters: ~
-    {projectCommand}  (string)
-    {scheme}          (string)
-    {callback}        (fun(testPlans:string[]))
+    {projectFile}  (string)
+    {scheme}       (string)
+    {callback}     (fun(testPlans:string[]))
 
   Returns: ~
     (number)   job id
@@ -1241,17 +1243,17 @@ M.build_project({opts})                    *xcodebuild.core.xcode.build_project*
 
 
                                       *xcodebuild.core.xcode.get_build_settings*
-M.get_build_settings({platform}, {projectCommand}, {scheme}, {xcodeprojPath}, {callback})
+M.get_build_settings({platform}, {projectFile}, {scheme}, {xcodeprojPath}, {callback})
   Returns the build settings for the given project.
 
   If one of the settings is not found, it will send an error notification.
 
   Parameters: ~
-    {platform}        (string)
-    {projectCommand}  (string)
-    {scheme}          (string)
-    {xcodeprojPath}   (string)
-    {callback}        (fun(settings:XcodeBuildSettings))
+    {platform}       (string)
+    {projectFile}    (string)
+    {scheme}         (string)
+    {xcodeprojPath}  (string)
+    {callback}       (fun(settings:XcodeBuildSettings))
 
   Returns: ~
     (number|nil)   job id
@@ -1658,7 +1660,6 @@ ProjectSettings
     {os}                (string|nil) OS version (ex. "14.5")
     {platform}          (PlatformId|nil) platform (ex. "iOS")
     {projectFile}       (string|nil) project file path (ex. "path/to/Project.xcodeproj")
-    {projectCommand}    (string|nil) project command (ex. "-project 'path/to/Project.xcodeproj'" or "-workspace 'path/to/Project.xcworkspace'")
     {scheme}            (string|nil) scheme name (ex. "MyApp")
     {destination}       (string|nil) destination (ex. "28B52DAA-BC2F-410B-A5BE-F485A3AFB0BC")
     {bundleId}          (string|nil) bundle identifier (ex. "com.mycompany.myapp")
@@ -3743,12 +3744,12 @@ M.is_enabled()
 
 
                          *xcodebuild.integrations.xcode-build-server.run_config*
-M.run_config({projectCommand}, {scheme})
+M.run_config({projectFile}, {scheme})
   Calls "config" command of xcode-build-server in order to update buildServer.json file.
 
   Parameters: ~
-    {projectCommand}  (string) either "-project 'path/to/project.xcodeproj'" or "-workspace 'path/to/workspace.xcworkspace'"
-    {scheme}          (string)
+    {projectFile}  (string)
+    {scheme}       (string)
 
   Returns: ~
     (number)   job id
@@ -3849,10 +3850,10 @@ M.wrap_command_if_needed({command})
   Wraps the `xcodebuild` command with the workaround script if needed.
 
   Parameters: ~
-    {command}  (string)
+    {command}  (string[])
 
   Returns: ~
-    (string)
+    (string[])
 
 
 ==============================================================================
@@ -4207,10 +4208,18 @@ M.shell({cmd})                                           *xcodebuild.util.shell*
   Runs a shell command and returns the output as a list of strings.
 
   Parameters: ~
-    {cmd}  (string)
+    {cmd}  (string|string[])
 
   Returns: ~
     (string[])
+
+
+M.shellAsync({cmd}, {callback})                     *xcodebuild.util.shellAsync*
+  Runs a shell command and asynchronously.
+
+  Parameters: ~
+    {cmd}       (string|string[])
+    {callback}  (function|nil)
 
 
 M.is_fd_installed()                            *xcodebuild.util.is_fd_installed*
@@ -4226,6 +4235,16 @@ M.merge_array({lhs}, {rhs})                        *xcodebuild.util.merge_array*
   Parameters: ~
     {lhs}  (any[])
     {rhs}  (any[])
+
+  Returns: ~
+    (any[])
+
+
+M.skip_nil({array})                                   *xcodebuild.util.skip_nil*
+  Returns a new array without nil values.
+
+  Parameters: ~
+    {array}  (any[])
 
   Returns: ~
     (any[])

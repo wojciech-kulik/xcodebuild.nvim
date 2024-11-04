@@ -42,7 +42,7 @@ local devices_without_os_version = {}
 ---@param path string
 ---@return boolean
 local function check_sudo(path)
-  local permissions = util.shell("sudo -l 2>/dev/null")
+  local permissions = util.shell("sudo -l")
 
   for _, line in ipairs(permissions) do
     if line:match("NOPASSWD.*" .. path) then
@@ -276,10 +276,17 @@ end
 ---@param callback function|nil
 ---@return number # job id
 function M.install_app(destination, appPath, callback)
-  local command = "pymobiledevice3 apps install '" .. appPath .. "' --udid " .. destination
+  local command = {
+    "pymobiledevice3",
+    "apps",
+    "install",
+    appPath,
+    "--udid",
+    destination,
+  }
 
   return vim.fn.jobstart(command, {
-    on_exit = callback_or_error("installl", callback),
+    on_exit = callback_or_error("install", callback),
   })
 end
 
@@ -289,10 +296,17 @@ end
 ---@param callback function|nil
 ---@return number # job id
 function M.uninstall_app(destination, bundleId, callback)
-  local command = "pymobiledevice3 apps uninstall " .. bundleId .. " --udid " .. destination
+  local command = {
+    "pymobiledevice3",
+    "apps",
+    "uninstall",
+    bundleId,
+    "--udid",
+    destination,
+  }
 
   return vim.fn.jobstart(command, {
-    on_exit = callback_or_error("uninstalll", callback),
+    on_exit = callback_or_error("uninstall", callback),
   })
 end
 
@@ -302,7 +316,15 @@ end
 ---@param callback function|nil
 ---@return number # job id
 function M.launch_app(destination, bundleId, callback)
-  local command = "pymobiledevice3 developer dvt launch " .. bundleId .. " --udid " .. destination
+  local command = {
+    "pymobiledevice3",
+    "developer",
+    "dvt",
+    "launch",
+    bundleId,
+    "--udid",
+    destination,
+  }
 
   return vim.fn.jobstart(command, {
     on_exit = callback_or_error("launch", callback),
@@ -314,7 +336,13 @@ end
 ---@param callback function|nil
 ---@return number # job id
 function M.kill_app(appName, callback)
-  local command = "pymobiledevice3 developer dvt pkill '" .. appName .. "'"
+  local command = {
+    "pymobiledevice3",
+    "developer",
+    "dvt",
+    "pkill",
+    appName,
+  }
 
   return vim.fn.jobstart(command, {
     on_exit = callback_or_error("kill", callback),
@@ -325,7 +353,13 @@ end
 ---@param callback fun(devices: Device[])|nil
 ---@return number # job id
 function M.get_connected_devices(callback)
-  local cmd = "pymobiledevice3 usbmux list --usb --no-color"
+  local cmd = {
+    "pymobiledevice3",
+    "usbmux",
+    "list",
+    "--usb",
+    "--no-color",
+  }
 
   return vim.fn.jobstart(cmd, {
     stdout_buffered = true,
@@ -359,7 +393,14 @@ end
 ---@param bundleId string
 ---@return string|nil # app path
 function M.find_app_path(destination, bundleId)
-  local apps = util.shell("pymobiledevice3 apps list --no-color --udid " .. destination .. " 2>/dev/null")
+  local apps = util.shell({
+    "pymobiledevice3",
+    "apps",
+    "list",
+    "--no-color",
+    "--udid",
+    destination,
+  })
   local json = vim.fn.json_decode(apps)
   local app = json[bundleId]
 
@@ -374,9 +415,20 @@ end
 ---@param rsd string # rsd parameter
 ---@return string|nil # connection command
 function M.start_secure_server(destination, rsd)
-  local instruction = util.shell(
-    "pymobiledevice3 developer debugserver start-server " .. rsd .. " --no-color" .. " --udid " .. destination
-  )
+  local rsdParams = vim.split(rsd, " ", { plain = true })
+  local command = {
+    "pymobiledevice3",
+    "developer",
+    "debugserver",
+    "start-server",
+  }
+  command = util.merge_array(command, rsdParams)
+  command = util.merge_array(command, {
+    "--no-color",
+    "--udid",
+    destination,
+  })
+  local instruction = util.shell(command)
 
   for _, line in ipairs(instruction) do
     local cmd = string.match(line, "%(lldb%) (process connect .*%d)%s+%<")
@@ -402,11 +454,16 @@ end
 ---@param callback fun(connection_string: string)|nil
 ---@return number # job id
 function M.start_server(destination, port, callback)
-  local cmd = "pymobiledevice3 developer debugserver start-server "
-    .. port
-    .. " --udid "
-    .. destination
-    .. " --no-color"
+  local cmd = {
+    "pymobiledevice3",
+    "developer",
+    "debugserver",
+    "start-server",
+    port,
+    "--udid",
+    destination,
+    "--no-color",
+  }
 
   return vim.fn.jobstart(cmd, {
     stdout_buffered = false,
@@ -446,7 +503,12 @@ function M.create_secure_tunnel(destination, callback)
     return nil
   end
 
-  local cmd = "sudo '" .. M.scriptPath .. "' start " .. destination
+  local cmd = {
+    "sudo",
+    M.scriptPath,
+    "start",
+    destination,
+  }
 
   return vim.fn.jobstart(cmd, {
     stdout_buffered = false,
@@ -461,7 +523,7 @@ end
 ---
 ---Requires passwordless `sudo` for the `remote_debugger` tool.
 function M.close_secure_tunnel()
-  util.shell("sudo '" .. M.scriptPath .. "' kill 2>/dev/null")
+  util.shell({ "sudo", M.scriptPath, "kill" })
 end
 
 return M

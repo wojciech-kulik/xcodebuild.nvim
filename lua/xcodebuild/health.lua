@@ -209,7 +209,7 @@ end
 
 local function check_xcodebuild_version()
   local util = require("xcodebuild.util")
-  local response = util.shell("xcodebuild -version 2>/dev/null")
+  local response = util.shell("xcodebuild -version")
   local majorVersion, minorVersion = response[1]:match("Xcode (%d+)%.(%d+)")
 
   if majorVersion then
@@ -231,7 +231,7 @@ end
 
 local function check_ruby_version()
   local util = require("xcodebuild.util")
-  local response = util.shell("ruby --version 2>/dev/null")
+  local response = util.shell("ruby --version")
   local major, minor, patch = response[1]:match("(%d+)%.(%d+)%.(%d+)")
 
   if major and minor then
@@ -279,7 +279,7 @@ end
 
 local function has_sudo_access(path)
   local util = require("xcodebuild.util")
-  local permissions = util.shell("sudo -l 2>/dev/null")
+  local permissions = util.shell("sudo -l")
 
   for _, line in ipairs(permissions) do
     if line:match("NOPASSWD.*" .. path) then
@@ -353,9 +353,22 @@ local function check_plugin_commit()
   local util = require("xcodebuild.util")
   local pathComponents = vim.split(debug.getinfo(1).source:sub(2), "/", { plain = true })
   local pluginDir = table.concat(pathComponents, "/", 1, #pathComponents - 3)
-  local commit = util.shell("git --git-dir '" .. pluginDir .. "/.git' rev-parse --short HEAD 2>/dev/null")[1]
-  local upstreamCommit =
-    util.shell("git --git-dir '" .. pluginDir .. "/.git' rev-parse --short origin/main 2>/dev/null")[1]
+  local commit = util.shell({
+    "git",
+    "--git-dir",
+    pluginDir .. "/.git",
+    "rev-parse",
+    "--short",
+    "HEAD",
+  })[1]
+  local upstreamCommit = util.shell({
+    "git",
+    "--git-dir",
+    pluginDir .. "/.git",
+    "rev-parse",
+    "--short",
+    "origin/main",
+  })[1]
 
   if commit then
     if upstreamCommit and commit ~= upstreamCommit then

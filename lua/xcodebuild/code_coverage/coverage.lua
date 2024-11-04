@@ -126,9 +126,9 @@ function M.export_coverage(xcresultFilepath, callback)
     return
   end
 
-  util.shell("rm -rf '" .. appdata.coverage_report_filepath .. "'")
-
-  xcode.export_code_coverage_report(xcresultFilepath, appdata.coverage_report_filepath, callback_if_set)
+  util.shellAsync({ "rm", "-rf", appdata.coverage_report_filepath }, function()
+    xcode.export_code_coverage_report(xcresultFilepath, appdata.coverage_report_filepath, callback_if_set)
+  end)
 end
 
 ---Toggles the code coverage visibility in all buffers.
