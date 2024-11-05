@@ -473,6 +473,7 @@ Test Explorer
  | `XcodebuildTestExplorerShow`             | Show Test Explorer             |
  | `XcodebuildTestExplorerHide`             | Hide Test Explorer             |
  | `XcodebuildTestExplorerToggle`           | Toggle Test Explorer           |
+ | `XcodebuildTestExplorerClear`            | Clears Test Explorer           |
  | `XcodebuildTestExplorerRunSelectedTests` | Run Selected Tests             |
  | `XcodebuildTestExplorerRerunTests`       | Re-run recently selected tests |
 
@@ -803,6 +804,10 @@ M.jump_to_next_coverage()             *xcodebuild.actions.jump_to_next_coverage*
                                   *xcodebuild.actions.jump_to_previous_coverage*
 M.jump_to_previous_coverage()
   Jumps to the previous coverage marker.
+
+
+M.test_explorer_clear()                 *xcodebuild.actions.test_explorer_clear*
+  Clears the test explorer.
 
 
 M.test_explorer_show()                   *xcodebuild.actions.test_explorer_show*
@@ -2898,6 +2903,10 @@ M.repeat_last_run()
                                   *xcodebuild.tests.explorer.run_selected_tests*
 M.run_selected_tests()
   Runs the selected tests (in visual-mode).
+
+
+M.clear()                                      *xcodebuild.tests.explorer.clear*
+  Clears the Test Explorer buffer.
 
 
 M.toggle()                                    *xcodebuild.tests.explorer.toggle*

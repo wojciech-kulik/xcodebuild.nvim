@@ -283,6 +283,7 @@ function M.setup(options)
   vim.api.nvim_create_user_command("XcodebuildTestExplorerShow", call(actions.test_explorer_show), { nargs = 0 })
   vim.api.nvim_create_user_command("XcodebuildTestExplorerHide", call(actions.test_explorer_hide), { nargs = 0 })
   vim.api.nvim_create_user_command("XcodebuildTestExplorerToggle", call(actions.test_explorer_toggle), { nargs = 0 })
+  vim.api.nvim_create_user_command("XcodebuildTestExplorerClear", call(actions.test_explorer_clear), { nargs = 0 })
   vim.api.nvim_create_user_command("XcodebuildTestExplorerRunSelectedTests", call(actions.test_explorer_run_selected_tests), { nargs = 0 })
   vim.api.nvim_create_user_command("XcodebuildTestExplorerRerunTests", call(actions.test_explorer_rerun_tests), { nargs = 0 })
 

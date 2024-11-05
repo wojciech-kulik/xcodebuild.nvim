@@ -276,6 +276,12 @@ end
 
 -- Test Explorer
 
+---Clears the test explorer.
+function M.test_explorer_clear()
+  helpers.cancel_actions()
+  testExplorer.clear()
+end
+
 ---Shows the test explorer.
 function M.test_explorer_show()
   testExplorer.show()
