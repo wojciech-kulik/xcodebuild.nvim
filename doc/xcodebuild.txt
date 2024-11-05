@@ -2785,15 +2785,17 @@ and allows the user to run, repeat, and open tests.
 Tests are presented as a tree structure with targets,
 classes, and tests.
 
-Key bindings:
+Key mappings:
  - Press `o` to jump to the test implementation
  - Press `t` to run selected tests
  - Press `T` to re-run recently selected tests
  - Press `R` to reload test list
+ - Press `X` to clear test list
  - Press `[` to jump to the previous failed test
  - Press `]` to jump to the next failed test
  - Press `<cr>` to expand or collapse the current node
  - Press `<tab>` to expand or collapse all classes
+ - Press `g?` to show all key mappings
  - Press `q` to close the Test Explorer
 
 
@@ -2926,6 +2928,10 @@ M.load_tests({tests})                     *xcodebuild.tests.explorer.load_tests*
 
   Parameters: ~
     {tests}  (XcodeTest[])
+
+
+M.show_help()                              *xcodebuild.tests.explorer.show_help*
+  Shows the help with mappings.
 
 
 M.setup()                                      *xcodebuild.tests.explorer.setup*
