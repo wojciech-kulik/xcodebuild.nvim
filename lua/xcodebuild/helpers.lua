@@ -161,7 +161,7 @@ end
 ---@param bufnr number|nil
 ---@param updateFoo function
 function M.update_readonly_buffer(bufnr, updateFoo)
-  if not bufnr then
+  if not bufnr or not vim.api.nvim_buf_is_loaded(bufnr) then
     return
   end
 

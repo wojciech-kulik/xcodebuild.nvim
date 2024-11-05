@@ -36,9 +36,14 @@ local function split(filepath)
 end
 
 ---Returns buffer and window number of the logs buffer.
+---@param returnNotLoaded boolean|nil default = true
 ---@return number|nil, number|nil
-local function get_buf_and_win_of_logs()
-  local bufnr = util.get_buf_by_filename(appdata.build_logs_filename, { returnNotLoaded = true })
+local function get_buf_and_win_of_logs(returnNotLoaded)
+  if returnNotLoaded == nil then
+    returnNotLoaded = true
+  end
+
+  local bufnr = util.get_buf_by_filename(appdata.build_logs_filename, { returnNotLoaded = returnNotLoaded })
 
   if bufnr then
     local winnr = vim.fn.win_findbuf(bufnr)
@@ -237,7 +242,7 @@ end
 
 ---Clears the logs buffer.
 function M.clear()
-  local bufnr, _ = get_buf_and_win_of_logs()
+  local bufnr, _ = get_buf_and_win_of_logs(false)
   if not bufnr then
     return
   end
@@ -251,7 +256,7 @@ end
 ---@param lines string[]
 ---@param format boolean|nil default = true
 function M.append_log_lines(lines, format)
-  local bufnr, winnr = get_buf_and_win_of_logs()
+  local bufnr, winnr = get_buf_and_win_of_logs(false)
   if not bufnr then
     return
   end
