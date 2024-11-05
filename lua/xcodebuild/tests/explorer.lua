@@ -9,15 +9,17 @@
 ---Tests are presented as a tree structure with targets,
 ---classes, and tests.
 ---
----Key bindings:
+---Key mappings:
 --- - Press `o` to jump to the test implementation
 --- - Press `t` to run selected tests
 --- - Press `T` to re-run recently selected tests
 --- - Press `R` to reload test list
+--- - Press `X` to clear test list
 --- - Press `[` to jump to the previous failed test
 --- - Press `]` to jump to the next failed test
 --- - Press `<cr>` to expand or collapse the current node
 --- - Press `<tab>` to expand or collapse all classes
+--- - Press `g?` to show all key mappings
 --- - Press `q` to close the Test Explorer
 ---
 ---@brief ]]
@@ -108,10 +110,12 @@ local function show_notests_message()
       "",
       "  Press `R` to fetch tests",
       "  without running them.",
+      "",
+      "  Press `g?` to see all key mappings.",
     })
   end)
 
-  for i = 4, 8 do
+  for i = 4, 10 do
     vim.api.nvim_buf_add_highlight(M.bufnr, ns, "Comment", i - 1, 0, -1)
   end
 
@@ -589,9 +593,11 @@ local function setup_buffer()
   helpers.buf_set_option(M.bufnr, "modifiable", false)
 
   vim.api.nvim_buf_set_keymap(M.bufnr, "n", "q", "<cmd>close<cr>", {})
+  vim.api.nvim_buf_set_keymap(M.bufnr, "n", "g?", "", { callback = M.show_help, nowait = true })
   vim.api.nvim_buf_set_keymap(M.bufnr, "n", "t", "", { callback = M.run_selected_tests, nowait = true })
   vim.api.nvim_buf_set_keymap(M.bufnr, "v", "t", "", { callback = M.run_selected_tests, nowait = true })
   vim.api.nvim_buf_set_keymap(M.bufnr, "n", "T", "", { callback = M.repeat_last_run, nowait = true })
+  vim.api.nvim_buf_set_keymap(M.bufnr, "n", "X", "", { callback = M.clear, nowait = true })
   vim.api.nvim_buf_set_keymap(M.bufnr, "n", "o", "", { callback = M.open_selected_test, nowait = true })
   vim.api.nvim_buf_set_keymap(M.bufnr, "n", "<cr>", "", { callback = M.toggle_current_node, nowait = true })
   vim.api.nvim_buf_set_keymap(M.bufnr, "n", "<tab>", "", { callback = M.toggle_all_classes, nowait = true })
@@ -1036,6 +1042,63 @@ function M.load_tests(tests)
   M.finish_tests()
   generate_report(tests)
   refresh_explorer()
+end
+
+---Shows the help with mappings.
+function M.show_help()
+  local helper = require("xcodebuild.helpers")
+  local buf = vim.api.nvim_create_buf(false, true)
+
+  vim.api.nvim_buf_set_keymap(buf, "n", "q", "<cmd>q<cr>", { noremap = true, silent = true })
+  vim.api.nvim_buf_set_lines(buf, 0, -1, false, {
+    "Test Explorer Mappings",
+    "",
+    "o  jump to the test implementation",
+    "t  run selected tests",
+    "T  re-run recently selected tests",
+    "R  reload test list",
+    "X  clear test list",
+    "[  jump to the previous failed test",
+    "]  jump to the next failed test",
+    "g? show all key mappings",
+    "q  close the Test Explorer",
+    "",
+    "<cr>  toggle the current node",
+    "<tab> toggle all classes",
+    "",
+    "Press q to close this help",
+  })
+  helper.buf_set_option(buf, "modifiable", false)
+  helper.buf_set_option(buf, "readonly", true)
+
+  vim.api.nvim_create_autocmd("WinLeave", {
+    buffer = buf,
+    once = true,
+    callback = function()
+      vim.cmd("close")
+    end,
+  })
+
+  vim.api.nvim_buf_add_highlight(buf, -1, "XcodebuildTestExplorerTarget", 0, 0, -1)
+  for i = 2, 10 do
+    vim.api.nvim_buf_add_highlight(buf, -1, "XcodebuildTestExplorerTest", i, 0, 2)
+  end
+  vim.api.nvim_buf_add_highlight(buf, -1, "XcodebuildTestExplorerTest", 12, 0, 4)
+  vim.api.nvim_buf_add_highlight(buf, -1, "XcodebuildTestExplorerTest", 13, 0, 5)
+  vim.api.nvim_buf_add_highlight(buf, -1, "XcodebuildTestExplorerTest", 15, 6, 7)
+
+  local width = vim.api.nvim_win_get_width(0)
+  local opts = {
+    style = "minimal",
+    relative = "win",
+    width = math.max(30, math.min(40, width - 4)),
+    height = 16,
+    row = 2,
+    col = 2,
+    border = "rounded",
+  }
+
+  vim.api.nvim_open_win(buf, true, opts)
 end
 
 ---Sets up the Test Explorer. Loads last report if available.
