@@ -956,6 +956,25 @@ function M.run_selected_tests()
   end
 end
 
+---Clears the Test Explorer buffer.
+function M.clear()
+  M.finish_tests()
+  M.report = {}
+  generate_report({})
+
+  if not M.bufnr then
+    return
+  end
+
+  vim.api.nvim_buf_clear_namespace(M.bufnr, ns, 0, -1)
+
+  helpers.update_readonly_buffer(M.bufnr, function()
+    vim.api.nvim_buf_set_lines(M.bufnr, 0, -1, false, {})
+  end)
+
+  show_notests_message()
+end
+
 ---Toggles the Test Explorer window.
 function M.toggle()
   if not M.bufnr then

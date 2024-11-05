@@ -68,6 +68,7 @@
 --- | `XcodebuildTestExplorerShow`             | Show Test Explorer             |
 --- | `XcodebuildTestExplorerHide`             | Hide Test Explorer             |
 --- | `XcodebuildTestExplorerToggle`           | Toggle Test Explorer           |
+--- | `XcodebuildTestExplorerClear`            | Clears Test Explorer           |
 --- | `XcodebuildTestExplorerRunSelectedTests` | Run Selected Tests             |
 --- | `XcodebuildTestExplorerRerunTests`       | Re-run recently selected tests |
 ---
