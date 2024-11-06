@@ -79,6 +79,7 @@ Big thanks to all the sponsors who support this project 🍻!
 ### One Time Sponsors
 
 <a href="https://github.com/kujohn"><img src="https://avatars.githubusercontent.com/u/1356936" width="40" height="40" alt="@kujohn" title="kujohn"></a>
+<a href="https://github.com/iMostfa"><img src="https://avatars.githubusercontent.com/u/2325884" width="40" height="40" alt="@iMostfa" title="iMostfa"></a>
 
 &nbsp;
 
