@@ -194,6 +194,11 @@ end
 ---      -- it could be useful if you mix Xcode project with SPM for example
 ---      return true
 ---    end,
+---    project_for_path = function(path)
+---      -- you can return a different project for the given {path} (could be directory or file)
+---      -- ex.: return "/your/path/to/project.xcodeproj"
+---      return nil
+---    end,
 ---  },
 ---  integrations = {
 ---    pymobiledevice = {

@@ -102,9 +102,18 @@ local defaults = {
   project_manager = {
     guess_target = true, -- guess target for the new file based on the file path
     find_xcodeproj = false, -- instead of using configured xcodeproj search for xcodeproj closest to targeted file
+    ---@param path string
+    ---@return boolean
     should_update_project = function(path) -- path can lead to directory or file
       -- it could be useful if you mix Xcode project with SPM for example
       return true
+    end,
+    ---@param path string
+    ---@return string|nil
+    project_for_path = function(path)
+      -- you can return a different project for the given {path} (could be directory or file)
+      -- ex.: return "/your/path/to/project.xcodeproj"
+      return nil
     end,
   },
   integrations = {
