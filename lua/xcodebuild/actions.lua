@@ -24,20 +24,11 @@ local lsp = require("xcodebuild.integrations.lsp")
 
 local M = {}
 
----Sends a notification with a small delay to fix some glitches.
----@param text string
-local function defer_send(text)
-  vim.defer_fn(function()
-    notifications.send(text)
-  end, 100)
-end
-
 ---Updates the project settings and broadcasts the notification.
+---@param opts {skipIfSamePlatform:boolean} the options table
 ---@param callback function|nil
-local function update_settings(callback)
-  defer_send("Updating project settings...")
-  projectConfig.update_settings(function()
-    notifications.send("Project settings updated")
+local function update_settings(opts, callback)
+  projectConfig.update_settings(opts, function()
     events.project_settings_updated(projectConfig.settings)
     util.call(callback)
   end)
@@ -181,7 +172,7 @@ function M.select_project(callback)
   helpers.cancel_actions()
   pickers.select_project(function()
     pickers.select_xcodeproj_if_needed(function()
-      update_settings(callback)
+      update_settings({}, callback)
     end, { close_on_select = true })
   end, { close_on_select = true })
 end
@@ -192,14 +183,14 @@ function M.select_scheme(callback)
   helpers.cancel_actions()
 
   pickers.select_scheme(function()
-    update_settings(callback)
+    update_settings({}, callback)
   end, { close_on_select = true })
 end
 
 ---Starts the pickers with test plan selection.
 ---@param callback fun(testPlan: string)|nil
 function M.select_testplan(callback)
-  defer_send("Loading test plans...")
+  helpers.defer_send("Loading test plans...")
   helpers.cancel_actions()
   pickers.select_testplan(callback, { close_on_select = true })
 end
@@ -207,10 +198,9 @@ end
 ---Starts the pickers with device selection.
 ---@param callback function|nil
 function M.select_device(callback)
-  defer_send("Loading devices...")
   helpers.cancel_actions()
   pickers.select_destination(function()
-    update_settings(callback)
+    update_settings({ skipIfSamePlatform = true }, callback)
   end, { close_on_select = true })
 end
 
@@ -403,6 +393,84 @@ end
 ---@deprecated use `rerun_failed_tests` instead
 function M.run_failing_tests()
   M.rerun_failed_tests()
+end
+
+-- Switching Devices
+
+local isUpdatingProjectSettings = false
+local debounceTimer = nil
+
+---Debounces the device selection.
+---@param index number
+local function debounce_device_selection(index)
+  if debounceTimer then
+    vim.fn.timer_stop(debounceTimer)
+    debounceTimer = nil
+  end
+
+  projectConfig.set_destination(projectConfig.cached_devices[index])
+
+  debounceTimer = vim.fn.timer_start(1500, function()
+    isUpdatingProjectSettings = true
+    projectConfig.update_settings({ skipIfSamePlatform = true }, function()
+      isUpdatingProjectSettings = false
+      events.project_settings_updated(projectConfig.settings)
+    end)
+  end)
+end
+
+---Returns the index of the current device.
+---@return number|nil
+local function get_current_device_index()
+  local devices = projectConfig.cached_devices
+
+  if util.is_empty(devices) or not projectConfig.settings.destination then
+    return
+  end
+
+  local currentDeviceIndex = util.indexOfPredicate(devices, function(item)
+    return item.id == projectConfig.settings.destination
+  end)
+
+  return currentDeviceIndex
+end
+
+function M.select_next_device()
+  if isUpdatingProjectSettings then
+    return
+  end
+
+  local devices = projectConfig.cached_devices
+  local currentDeviceIndex = get_current_device_index()
+  if not currentDeviceIndex then
+    return
+  end
+
+  local nextDeviceIndex = currentDeviceIndex + 1
+  if nextDeviceIndex > #devices then
+    nextDeviceIndex = 1
+  end
+
+  debounce_device_selection(nextDeviceIndex)
+end
+
+function M.select_previous_device()
+  if isUpdatingProjectSettings then
+    return
+  end
+
+  local devices = projectConfig.cached_devices
+  local currentDeviceIndex = get_current_device_index()
+  if not currentDeviceIndex then
+    return
+  end
+
+  local nextDeviceIndex = currentDeviceIndex - 1
+  if nextDeviceIndex == 0 then
+    nextDeviceIndex = #devices
+  end
+
+  debounce_device_selection(nextDeviceIndex)
 end
 
 return M

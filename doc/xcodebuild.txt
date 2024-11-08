@@ -87,7 +87,6 @@ M.setup({options})                                            *xcodebuild.setup*
         lsp_timeout = 200, -- LSP timeout in milliseconds
       },
       commands = {
-        cache_devices = true, -- cache recently loaded devices. Restart Neovim to clean cache.
         extra_build_args = { "-parallelizeTargets" }, -- extra arguments for `xcodebuild build`
         extra_test_args = { "-parallelizeTargets" }, -- extra arguments for `xcodebuild test`
         project_search_max_depth = 3, -- maxdepth of xcodeproj/xcworkspace search while using configuration wizard
@@ -488,6 +487,8 @@ Configuration
  | -------------------------| ----------------------------------- |
  | `XcodebuildSelectScheme`   | Show scheme picker                  |
  | `XcodebuildSelectDevice`   | Show device picker                  |
+ | `XcodebuildNextDevice`     | Selects next device                 |
+ | `XcodebuildPreviousDevice` | Selects previous device             |
  | `XcodebuildSelectTestPlan` | Show test plan picker               |
  | `XcodebuildShowConfig`     | Print current project configuration |
  | `XcodebuildBootSimulator`  | Boot selected simulator             |
@@ -920,6 +921,13 @@ M.run_func_test()                             *xcodebuild.actions.run_func_test*
 
 M.run_failing_tests()                     *xcodebuild.actions.run_failing_tests*
   @deprecated use `rerun_failed_tests` instead
+
+
+M.select_next_device()                   *xcodebuild.actions.select_next_device*
+
+
+                                     *xcodebuild.actions.select_previous_device*
+M.select_previous_device()
 
 
 ==============================================================================
@@ -1690,6 +1698,13 @@ M.settings                                  *xcodebuild.project.config.settings*
     (ProjectSettings)
 
 
+M.cached_devices                      *xcodebuild.project.config.cached_devices*
+  Cached devices.
+
+  Type: ~
+    (XcodeDevice[])
+
+
 M.load_settings()                      *xcodebuild.project.config.load_settings*
   Loads the settings from the JSON file at `.nvim/xcodebuild/settings.json`.
   It also updates the global variables with the current settings.
@@ -1698,6 +1713,21 @@ M.load_settings()                      *xcodebuild.project.config.load_settings*
 M.save_settings()                      *xcodebuild.project.config.save_settings*
   Saves the settings to the JSON file at `.nvim/xcodebuild/settings.json`.
   It also updates the global variables with the current settings.
+
+
+                                   *xcodebuild.project.config.save_device_cache*
+M.save_device_cache()
+  Saves the device cache to the JSON file at `.nvim/xcodebuild/devices.json`.
+
+
+                                  *xcodebuild.project.config.clear_device_cache*
+M.clear_device_cache()
+  Clears the device cache.
+
+
+                                   *xcodebuild.project.config.load_device_cache*
+M.load_device_cache()
+  Loads the device cache from the JSON file at `.nvim/xcodebuild/devices.json`.
 
 
                                    *xcodebuild.project.config.is_spm_configured*
@@ -1724,14 +1754,23 @@ M.is_configured()                      *xcodebuild.project.config.is_configured*
 
 
                                      *xcodebuild.project.config.update_settings*
-M.update_settings({callback})
+M.update_settings({opts}, {callback})
   Updates the settings (`appPath`, `productName`, and `bundleId`) based on
   the current project.
   Calls `xcodebuild` commands to get the build settings.
 
   Parameters: ~
+    {opts}      ({skipIfSamePlatform:boolean}) the options table
     {callback}  (function|nil) the callback function to be called after
                 the settings are updated.
+
+
+                                     *xcodebuild.project.config.set_destination*
+M.set_destination({destination})
+  Sets the selected destination.
+
+  Parameters: ~
+    {destination}  (XcodeDevice)
 
 
                                    *xcodebuild.project.config.configure_project*
@@ -3882,11 +3921,19 @@ Pickers                                                  *xcodebuild.ui.pickers*
                                                             *xcodebuild.pickers*
 This module is responsible for showing pickers using Telescope.nvim.
 
+Available shortcuts:
+<C-r> - Refresh the picker results
+<M-y> - Move the selected item up
+<M-e> - Move the selected item down
+<M-x> - Remove the selected item
+
+
 PickerOptions                              *xcodebuild.ui.pickers.PickerOptions*
 
   Fields: ~
     {on_refresh}       (function|nil)
     {multiselect}      (boolean|nil)
+    {modifiable}       (boolean|nil)
     {auto_select}      (boolean|nil)
     {close_on_select}  (boolean|nil)
 
@@ -3897,7 +3944,7 @@ M.show({title}, {items}, {callback}, {opts})
 
   Parameters: ~
     {title}     (string)
-    {items}     (string[])
+    {items}     (string[]|XcodeDevice[])
     {callback}  (function|nil)
     {opts}      (PickerOptions|nil)
 
@@ -3952,8 +3999,7 @@ M.select_testplan({callback}, {opts})    *xcodebuild.ui.pickers.select_testplan*
 
 M.select_destination({callback}, {opts})*xcodebuild.ui.pickers.select_destination*
   Shows a picker with the available devices.
-  It returns devices from cache if available and the `cache_devices`
-  option in config is enabled.
+  It returns devices from cache if available.
 
   Parameters: ~
     {callback}  (fun(destination:Device[])|nil)
@@ -3998,6 +4044,13 @@ This module contains general helper functions used across the plugin.
 
 |xcodebuild.util| is for general language utils and |xcodebuild.helpers|
 are for plugin specific utils.
+
+M.defer_send({text})                             *xcodebuild.helpers.defer_send*
+  Sends a notification with a small delay to fix some glitches.
+
+  Parameters: ~
+    {text}  (string)
+
 
 M.cancel_actions()                           *xcodebuild.helpers.cancel_actions*
   Cancels all running actions from all modules.
@@ -4360,6 +4413,18 @@ M.indexOf({array}, {value})                            *xcodebuild.util.indexOf*
   Parameters: ~
     {array}  (any[])
     {value}  (any)
+
+  Returns: ~
+    (number|nil)
+
+
+M.indexOfPredicate({array}, {predicate})      *xcodebuild.util.indexOfPredicate*
+  Finds the index of a value that
+  matches a predicate in an array.
+
+  Parameters: ~
+    {array}      (any[])
+    {predicate}  (fun(value:any):boolean)
 
   Returns: ~
     (number|nil)

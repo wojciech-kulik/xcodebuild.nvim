@@ -31,6 +31,16 @@ local M = {}
 ---@type ProjectSettings
 M.settings = {}
 
+---Cached devices.
+---@type XcodeDevice[]
+M.cached_devices = {}
+
+---Last platform used.
+---@type PlatformId|nil
+local last_platform = nil
+
+local device_cache_filepath = vim.fn.getcwd() .. "/.nvim/xcodebuild/devices.json"
+
 ---Returns the filepath of the settings JSON file based on the
 ---current working directory.
 local function get_filepath()
@@ -56,6 +66,7 @@ function M.load_settings()
 
   if success then
     M.settings = vim.fn.json_decode(content)
+    last_platform = M.settings.platform
     update_global_variables()
   end
 end
@@ -66,6 +77,27 @@ function M.save_settings()
   local json = vim.split(vim.fn.json_encode(M.settings), "\n", { plain = true })
   vim.fn.writefile(json, get_filepath())
   update_global_variables()
+end
+
+---Saves the device cache to the JSON file at `.nvim/xcodebuild/devices.json`.
+function M.save_device_cache()
+  local json = vim.split(vim.fn.json_encode(M.cached_devices), "\n", { plain = true })
+  vim.fn.writefile(json, device_cache_filepath)
+end
+
+---Clears the device cache.
+function M.clear_device_cache()
+  M.cached_devices = {}
+  M.save_device_cache()
+end
+
+---Loads the device cache from the JSON file at `.nvim/xcodebuild/devices.json`.
+function M.load_device_cache()
+  local util = require("xcodebuild.util")
+  local success, content = util.readfile(device_cache_filepath)
+  if success then
+    M.cached_devices = vim.fn.json_decode(content)
+  end
 end
 
 ---Checks if SPM project is configured.
@@ -114,20 +146,30 @@ end
 ---Updates the settings (`appPath`, `productName`, and `bundleId`) based on
 ---the current project.
 ---Calls `xcodebuild` commands to get the build settings.
+---@param opts {skipIfSamePlatform:boolean} the options table
 ---@param callback function|nil the callback function to be called after
 ---the settings are updated.
-function M.update_settings(callback)
+function M.update_settings(opts, callback)
   local xcode = require("xcodebuild.core.xcode")
+  local util = require("xcodebuild.util")
+
+  if opts.skipIfSamePlatform and last_platform and last_platform == M.settings.platform then
+    util.call(callback)
+    return
+  end
 
   if M.settings.swiftPackage then
     M.settings.appPath = nil
     M.settings.productName = nil
     M.settings.bundleId = nil
+    last_platform = nil
     M.save_settings()
-    if callback then
-      callback()
-    end
+    util.call(callback)
   else
+    local helpers = require("xcodebuild.helpers")
+    local notifications = require("xcodebuild.broadcasting.notifications")
+
+    helpers.defer_send("Updating project settings...")
     xcode.get_build_settings(
       M.settings.platform,
       M.settings.projectFile,
@@ -137,13 +179,23 @@ function M.update_settings(callback)
         M.settings.appPath = buildSettings.appPath
         M.settings.productName = buildSettings.productName
         M.settings.bundleId = buildSettings.bundleId
+        last_platform = M.settings.platform
         M.save_settings()
-        if callback then
-          callback()
-        end
+        util.call(callback)
+        notifications.send("Project settings updated")
       end
     )
   end
+end
+
+---Sets the selected destination.
+---@param destination XcodeDevice
+function M.set_destination(destination)
+  M.settings.destination = destination.id
+  M.settings.platform = destination.platform
+  M.settings.deviceName = destination.name
+  M.settings.os = destination.os
+  M.save_settings()
 end
 
 ---Starts configuration wizard to set up the project settings.
@@ -164,6 +216,7 @@ function M.configure_project()
     pickers.select_xcodeproj_if_needed(function()
       pickers.select_scheme(function()
         defer_print("Loading devices...")
+        M.clear_device_cache()
         pickers.select_destination(function()
           if not require("xcodebuild.project.config").settings.swiftPackage then
             defer_print("Loading test plans...")
@@ -173,7 +226,7 @@ function M.configure_project()
             defer_print("Xcodebuild configuration has been saved!")
           end, { close_on_select = true, auto_select = true })
 
-          M.update_settings()
+          M.update_settings({})
         end)
       end, { auto_select = true }) -- scheme
     end)
