@@ -90,9 +90,10 @@ function M.is_device_cache_valid()
   local pluginConfig = require("xcodebuild.core.config")
 
   if M.device_cache and M.device_cache.devices and #M.device_cache.devices > 0 then
+    local projectFile = M.settings.projectFile or M.settings.swiftPackage
     if
       pluginConfig.options.commands.keep_device_cache
-      or (M.device_cache.scheme == M.settings.scheme and M.device_cache.projectFile == M.settings.projectFile)
+      or (M.device_cache.scheme == M.settings.scheme and M.device_cache.projectFile == projectFile)
     then
       return true
     end
@@ -106,7 +107,7 @@ end
 function M.update_device_cache(devices)
   M.device_cache = {
     scheme = M.settings.scheme,
-    projectFile = M.settings.projectFile,
+    projectFile = M.settings.projectFile or M.settings.swiftPackage,
     devices = devices,
   }
   M.save_device_cache()
