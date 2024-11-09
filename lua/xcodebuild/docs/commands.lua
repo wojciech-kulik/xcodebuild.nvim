@@ -78,6 +78,8 @@
 --- | -------------------------| ----------------------------------- |
 --- | `XcodebuildSelectScheme`   | Show scheme picker                  |
 --- | `XcodebuildSelectDevice`   | Show device picker                  |
+--- | `XcodebuildNextDevice`     | Selects next device                 |
+--- | `XcodebuildPreviousDevice` | Selects previous device             |
 --- | `XcodebuildSelectTestPlan` | Show test plan picker               |
 --- | `XcodebuildShowConfig`     | Print current project configuration |
 --- | `XcodebuildBootSimulator`  | Boot selected simulator             |

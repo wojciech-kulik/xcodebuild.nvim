@@ -110,7 +110,6 @@ end
 ---    lsp_timeout = 200, -- LSP timeout in milliseconds
 ---  },
 ---  commands = {
----    cache_devices = true, -- cache recently loaded devices. Restart Neovim to clean cache.
 ---    extra_build_args = { "-parallelizeTargets" }, -- extra arguments for `xcodebuild build`
 ---    extra_test_args = { "-parallelizeTargets" }, -- extra arguments for `xcodebuild test`
 ---    project_search_max_depth = 3, -- maxdepth of xcodeproj/xcworkspace search while using configuration wizard
@@ -250,6 +249,7 @@ function M.setup(options)
 
   autocmd.setup()
   projectConfig.load_settings()
+  projectConfig.load_device_cache()
   diagnostics.setup()
   coverage.setup()
   coverageReport.setup()
@@ -298,6 +298,8 @@ function M.setup(options)
   vim.api.nvim_create_user_command("XcodebuildSelectScheme", call(actions.select_scheme), { nargs = 0 })
   vim.api.nvim_create_user_command("XcodebuildSelectDevice", call(actions.select_device), { nargs = 0 })
   vim.api.nvim_create_user_command("XcodebuildSelectTestPlan", call(actions.select_testplan), { nargs = 0 })
+  vim.api.nvim_create_user_command("XcodebuildNextDevice", call(actions.select_next_device), { nargs = 0 })
+  vim.api.nvim_create_user_command("XcodebuildPreviousDevice", call(actions.select_previous_device), { nargs = 0 })
 
   -- Logs
   vim.api.nvim_create_user_command("XcodebuildToggleLogs", call(actions.toggle_logs), { nargs = 0 })

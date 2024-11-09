@@ -371,6 +371,21 @@ function M.indexOf(array, value)
   return nil
 end
 
+---Finds the index of a value that
+---matches a predicate in an array.
+---@param array any[]
+---@param predicate fun(value: any): boolean
+---@return number|nil
+function M.indexOfPredicate(array, predicate)
+  for i, v in ipairs(array) do
+    if predicate(v) then
+      return i
+    end
+  end
+
+  return nil
+end
+
 ---Reads file content and returns it as a list of lines.
 ---If the file does not exist, it will return false and an empty list.
 ---@param filepath string

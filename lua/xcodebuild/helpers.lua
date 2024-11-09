@@ -24,6 +24,14 @@ local function cancel(source)
   end
 end
 
+---Sends a notification with a small delay to fix some glitches.
+---@param text string
+function M.defer_send(text)
+  vim.defer_fn(function()
+    require("xcodebuild.broadcasting.notifications").send(text)
+  end, 100)
+end
+
 ---Cancels all running actions from all modules.
 function M.cancel_actions()
   local success, dap = pcall(require, "dap")
