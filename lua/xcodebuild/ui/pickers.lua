@@ -607,6 +607,7 @@ function M.select_destination(callback, opts)
 
   if projectConfig.is_device_cache_valid() then
     results = projectConfig.device_cache.devices or {}
+    projectConfig.update_device_cache(results)
   end
 
   local hasCachedDevices = util.is_not_empty(results)
