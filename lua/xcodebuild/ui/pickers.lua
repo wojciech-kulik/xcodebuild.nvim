@@ -239,7 +239,7 @@ local function set_picker_actions(bufnr)
       end
 
       swap_entries(entries, index, index - 1)
-      swap_entries(projectConfig.cached_devices, index, index - 1)
+      swap_entries(projectConfig.device_cache.devices, index, index - 1)
       projectConfig.save_device_cache()
       update_results(entries, true)
 
@@ -266,7 +266,7 @@ local function set_picker_actions(bufnr)
       end
 
       swap_entries(entries, index, index + 1)
-      swap_entries(projectConfig.cached_devices, index, index + 1)
+      swap_entries(projectConfig.device_cache.devices, index, index + 1)
       projectConfig.save_device_cache()
       update_results(entries, true)
 
@@ -281,11 +281,11 @@ local function set_picker_actions(bufnr)
   vim.keymap.set({ "n", "i" }, "<M-d>", function()
     if activePicker and actionState.get_selected_entry() then
       activePicker:delete_selection(function(selection)
-        local index = util.indexOfPredicate(projectConfig.cached_devices, function(device)
+        local index = util.indexOfPredicate(projectConfig.device_cache.devices, function(device)
           return device.id == selection.value.id
         end)
 
-        table.remove(projectConfig.cached_devices, index)
+        table.remove(projectConfig.device_cache.devices, index)
         projectConfig.save_device_cache()
       end)
     end
@@ -603,7 +603,12 @@ function M.select_destination(callback, opts)
   local swiftPackage = projectConfig.settings.swiftPackage
   local scheme = projectConfig.settings.scheme
   local workingDirectory = projectConfig.settings.workingDirectory
-  local results = projectConfig.cached_devices or {}
+  local results = {}
+
+  if projectConfig.is_device_cache_valid() then
+    results = projectConfig.device_cache.devices or {}
+  end
+
   local hasCachedDevices = util.is_not_empty(results)
 
   if not (projectFile or swiftPackage) or not scheme then
@@ -635,9 +640,7 @@ function M.select_destination(callback, opts)
         return false
       end)
 
-      projectConfig.cached_devices = filtered
-      projectConfig.save_device_cache()
-
+      projectConfig.update_device_cache(filtered)
       results = filtered
       update_results(results)
     end)

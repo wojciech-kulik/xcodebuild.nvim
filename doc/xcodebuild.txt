@@ -91,6 +91,7 @@ M.setup({options})                                            *xcodebuild.setup*
         extra_test_args = { "-parallelizeTargets" }, -- extra arguments for `xcodebuild test`
         project_search_max_depth = 3, -- maxdepth of xcodeproj/xcworkspace search while using configuration wizard
         focus_simulator_on_app_launch = true, -- focus simulator window when app is launched
+        keep_device_cache = false, -- keep device cache even if scheme or project file changes
       },
       logs = { -- build & test logs
         auto_open_on_success_tests = false, -- open logs when tests succeeded
@@ -1691,6 +1692,14 @@ ProjectSettings
     {showCoverage}      (boolean|nil) if the inline code coverage should be shown
 
 
+DeviceCache                              *xcodebuild.project.config.DeviceCache*
+
+  Fields: ~
+    {scheme}       (string|nil)
+    {projectFile}  (string|nil)
+    {devices}      (XcodeDevice[]|nil)
+
+
 M.settings                                  *xcodebuild.project.config.settings*
   Current project settings.
 
@@ -1698,11 +1707,11 @@ M.settings                                  *xcodebuild.project.config.settings*
     (ProjectSettings)
 
 
-M.cached_devices                      *xcodebuild.project.config.cached_devices*
+M.device_cache                          *xcodebuild.project.config.device_cache*
   Cached devices.
 
   Type: ~
-    (XcodeDevice[])
+    (DeviceCache|nil)
 
 
 M.load_settings()                      *xcodebuild.project.config.load_settings*
@@ -1715,14 +1724,25 @@ M.save_settings()                      *xcodebuild.project.config.save_settings*
   It also updates the global variables with the current settings.
 
 
+                               *xcodebuild.project.config.is_device_cache_valid*
+M.is_device_cache_valid()
+  Checks if device cache is valid.
+
+  Returns: ~
+    (boolean)
+
+
+                                 *xcodebuild.project.config.update_device_cache*
+M.update_device_cache({devices})
+  Updates the device cache.
+
+  Parameters: ~
+    {devices}  (XcodeDevice[])
+
+
                                    *xcodebuild.project.config.save_device_cache*
 M.save_device_cache()
   Saves the device cache to the JSON file at `.nvim/xcodebuild/devices.json`.
-
-
-                                  *xcodebuild.project.config.clear_device_cache*
-M.clear_device_cache()
-  Clears the device cache.
 
 
                                    *xcodebuild.project.config.load_device_cache*

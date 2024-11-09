@@ -25,6 +25,11 @@
 ---@field lastBuildTime number|nil last build time in seconds
 ---@field showCoverage boolean|nil if the inline code coverage should be shown
 
+---@class DeviceCache
+---@field scheme string|nil
+---@field projectFile string|nil
+---@field devices XcodeDevice[]|nil
+
 local M = {}
 
 ---Current project settings.
@@ -32,10 +37,10 @@ local M = {}
 M.settings = {}
 
 ---Cached devices.
----@type XcodeDevice[]
-M.cached_devices = {}
+---@type DeviceCache|nil
+M.device_cache = nil
 
----Last platform used.
+---Last selected platform.
 ---@type PlatformId|nil
 local last_platform = nil
 
@@ -79,16 +84,38 @@ function M.save_settings()
   update_global_variables()
 end
 
----Saves the device cache to the JSON file at `.nvim/xcodebuild/devices.json`.
-function M.save_device_cache()
-  local json = vim.split(vim.fn.json_encode(M.cached_devices), "\n", { plain = true })
-  vim.fn.writefile(json, device_cache_filepath)
+---Checks if device cache is valid.
+---@return boolean
+function M.is_device_cache_valid()
+  local pluginConfig = require("xcodebuild.core.config")
+
+  if M.device_cache and M.device_cache.devices and #M.device_cache.devices > 0 then
+    if
+      pluginConfig.options.commands.keep_device_cache
+      or (M.device_cache.scheme == M.settings.scheme and M.device_cache.projectFile == M.settings.projectFile)
+    then
+      return true
+    end
+  end
+
+  return false
 end
 
----Clears the device cache.
-function M.clear_device_cache()
-  M.cached_devices = {}
+---Updates the device cache.
+---@param devices XcodeDevice[]
+function M.update_device_cache(devices)
+  M.device_cache = {
+    scheme = M.settings.scheme,
+    projectFile = M.settings.projectFile,
+    devices = devices,
+  }
   M.save_device_cache()
+end
+
+---Saves the device cache to the JSON file at `.nvim/xcodebuild/devices.json`.
+function M.save_device_cache()
+  local json = vim.split(vim.fn.json_encode(M.device_cache), "\n", { plain = true })
+  vim.fn.writefile(json, device_cache_filepath)
 end
 
 ---Loads the device cache from the JSON file at `.nvim/xcodebuild/devices.json`.
@@ -96,7 +123,7 @@ function M.load_device_cache()
   local util = require("xcodebuild.util")
   local success, content = util.readfile(device_cache_filepath)
   if success then
-    M.cached_devices = vim.fn.json_decode(content)
+    M.device_cache = vim.fn.json_decode(content)
   end
 end
 
@@ -162,8 +189,8 @@ function M.update_settings(opts, callback)
     M.settings.appPath = nil
     M.settings.productName = nil
     M.settings.bundleId = nil
-    last_platform = nil
     M.save_settings()
+    last_platform = nil
     util.call(callback)
   else
     local helpers = require("xcodebuild.helpers")
@@ -179,8 +206,8 @@ function M.update_settings(opts, callback)
         M.settings.appPath = buildSettings.appPath
         M.settings.productName = buildSettings.productName
         M.settings.bundleId = buildSettings.bundleId
-        last_platform = M.settings.platform
         M.save_settings()
+        last_platform = M.settings.platform
         util.call(callback)
         notifications.send("Project settings updated")
       end
@@ -216,7 +243,6 @@ function M.configure_project()
     pickers.select_xcodeproj_if_needed(function()
       pickers.select_scheme(function()
         defer_print("Loading devices...")
-        M.clear_device_cache()
         pickers.select_destination(function()
           if not require("xcodebuild.project.config").settings.swiftPackage then
             defer_print("Loading test plans...")

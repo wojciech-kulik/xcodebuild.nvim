@@ -408,7 +408,7 @@ local function debounce_device_selection(index)
     debounceTimer = nil
   end
 
-  projectConfig.set_destination(projectConfig.cached_devices[index])
+  projectConfig.set_destination(projectConfig.device_cache.devices[index])
 
   debounceTimer = vim.fn.timer_start(1500, function()
     isUpdatingProjectSettings = true
@@ -422,7 +422,7 @@ end
 ---Returns the index of the current device.
 ---@return number|nil
 local function get_current_device_index()
-  local devices = projectConfig.cached_devices
+  local devices = projectConfig.device_cache.devices or {}
 
   if util.is_empty(devices) or not projectConfig.settings.destination then
     return
@@ -440,7 +440,7 @@ function M.select_next_device()
     return
   end
 
-  local devices = projectConfig.cached_devices
+  local devices = projectConfig.device_cache.devices or {}
   local currentDeviceIndex = get_current_device_index()
   if not currentDeviceIndex then
     return
@@ -459,7 +459,7 @@ function M.select_previous_device()
     return
   end
 
-  local devices = projectConfig.cached_devices
+  local devices = projectConfig.device_cache.devices or {}
   local currentDeviceIndex = get_current_device_index()
   if not currentDeviceIndex then
     return
