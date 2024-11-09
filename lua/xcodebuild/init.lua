@@ -114,6 +114,7 @@ end
 ---    extra_test_args = { "-parallelizeTargets" }, -- extra arguments for `xcodebuild test`
 ---    project_search_max_depth = 3, -- maxdepth of xcodeproj/xcworkspace search while using configuration wizard
 ---    focus_simulator_on_app_launch = true, -- focus simulator window when app is launched
+---    keep_device_cache = false, -- keep device cache even if scheme or project file changes
 ---  },
 ---  logs = { -- build & test logs
 ---    auto_open_on_success_tests = false, -- open logs when tests succeeded
