@@ -1,0 +1,72 @@
+
+Command line invocation:
+    /Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild test-without-building -scheme TestingProject -destination id=631E09AF-4B1B-4FBE-A265-4CAC233AEB8E -project /Users/john/Desktop/TestingProject/TestingProject.xcodeproj -testPlan TestingProject -parallelizeTargets
+
+User defaults from command line:
+    IDEPackageSupportUseBuiltinSCM = YES
+
+2024-11-09 22:02:46.203 xcodebuild[64695:246570]  DVTProvisioningProfileManager: Failed to load profile "/Users/john/Library/MobileDevice/Provisioning Profiles/backup" (Error Domain=DVTProvisioningProfileSourceErrorDomain Code=0 "No provisioning profile provider found for profile "/Users/john/Library/MobileDevice/Provisioning Profiles/backup"." UserInfo={NSLocalizedDescription=No provisioning profile provider found for profile "/Users/john/Library/MobileDevice/Provisioning Profiles/backup".})
+--- xcodebuild: WARNING: Using the first of multiple matching destinations:
+{ platform:iOS Simulator, id:631E09AF-4B1B-4FBE-A265-4CAC233AEB8E, OS:18.1, name:iPhone 16 Pro }
+{ platform:iOS Simulator, id:631E09AF-4B1B-4FBE-A265-4CAC233AEB8E, OS:18.1, name:iPhone 16 Pro }
+2024-11-09 22:03:06.405113+0100 TestingProject[65053:249385] [general] NSBundle file:///Users/john/Library/Developer/CoreSimulator/Devices/631E09AF-4B1B-4FBE-A265-4CAC233AEB8E/data/Containers/Bundle/Application/190CC02C-245D-42B2-8600-945D12E892E1/TestingProject.app/PlugIns/TestingProjectTests.xctest/ principal class is nil because all fallbacks have failed
+2024-11-09 22:03:06.907187+0100 TestingProject[65053:249588] [General] Failed to send CA Event for app launch measurements for ca_event_type: 0 event_name: com.apple.app_launch_measurement.FirstFramePresentationMetric
+2024-11-09 22:03:06.984447+0100 TestingProject[65053:249595] [General] Failed to send CA Event for app launch measurements for ca_event_type: 1 event_name: com.apple.app_launch_measurement.ExtendedLaunchMetrics
+Test Suite 'All tests' started at 2024-11-09 22:03:07.405.
+Test Suite 'All tests' passed at 2024-11-09 22:03:07.406.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+◇ Test run started.
+↳ Testing Library Version: 102 (arm64-apple-ios13.0-simulator)
+◇ Suite TestingProjectTests started.
+◇ Test example() started.
+✔ Test example() passed after 0.001 seconds.
+◇ Test example2() started.
+✘ Test example2() recorded an issue at TestingProjectTests.swift:18:9: Expectation failed: 1 == 2
+✘ Test example2() failed after 0.001 seconds with 1 issue.
+◇ Test example3() started.
+TestingProjectTests/TestingProjectTests.swift:24: Fatal error: Unexpectedly found nil while unwrapping an Optional value
+2024-11-09 22:03:07.409054+0100 TestingProject[65053:249595] TestingProjectTests/TestingProjectTests.swift:24: Fatal error: Unexpectedly found nil while unwrapping an Optional value
+2024-11-09 22:03:13.964630+0100 TestingProject[65199:250141] [general] NSBundle file:///Users/john/Library/Developer/CoreSimulator/Devices/631E09AF-4B1B-4FBE-A265-4CAC233AEB8E/data/Containers/Bundle/Application/190CC02C-245D-42B2-8600-945D12E892E1/TestingProject.app/PlugIns/TestingProjectTests.xctest/ principal class is nil because all fallbacks have failed
+
+Restarting after unexpected exit, crash, or test timeout; summary will include totals from previous launches.
+
+Test Suite 'Selected tests' started at 2024-11-09 22:03:14.346.
+Test Suite 'Selected tests' passed at 2024-11-09 22:03:14.346.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+◇ Test run started.
+↳ Testing Library Version: 102 (arm64-apple-ios13.0-simulator)
+◇ Suite TestingProjectTests started.
+◇ Test example3() started.
+TestingProjectTests/TestingProjectTests.swift:24: Fatal error: Unexpectedly found nil while unwrapping an Optional value
+2024-11-09 22:03:14.347055+0100 TestingProject[65199:250206] TestingProjectTests/TestingProjectTests.swift:24: Fatal error: Unexpectedly found nil while unwrapping an Optional value
+2024-11-09 22:03:15.160065+0100 TestingProject[65214:250262] [general] NSBundle file:///Users/john/Library/Developer/CoreSimulator/Devices/631E09AF-4B1B-4FBE-A265-4CAC233AEB8E/data/Containers/Bundle/Application/190CC02C-245D-42B2-8600-945D12E892E1/TestingProject.app/PlugIns/TestingProjectTests.xctest/ principal class is nil because all fallbacks have failed
+2024-11-09 22:03:15.465717+0100 TestingProject[65214:250302] [General] Failed to send CA Event for app launch measurements for ca_event_type: 0 event_name: com.apple.app_launch_measurement.FirstFramePresentationMetric
+
+Restarting after unexpected exit, crash, or test timeout; summary will include totals from previous launches.
+
+Test Suite 'Selected tests' started at 2024-11-09 22:03:15.507.
+Test Suite 'Selected tests' passed at 2024-11-09 22:03:15.508.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+◇ Test run started.
+↳ Testing Library Version: 102 (arm64-apple-ios13.0-simulator)
+◇ Suite TestingProjectTests started.
+◇ Test example3() started.
+TestingProjectTests/TestingProjectTests.swift:24: Fatal error: Unexpectedly found nil while unwrapping an Optional value
+2024-11-09 22:03:15.508596+0100 TestingProject[65214:250298] TestingProjectTests/TestingProjectTests.swift:24: Fatal error: Unexpectedly found nil while unwrapping an Optional value
+2024-11-09 22:03:31.547 xcodebuild[64695:246498] [MT] IDETestOperationsObserverDebug: 45.199 elapsed -- Testing started completed.
+2024-11-09 22:03:31.547 xcodebuild[64695:246498] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
+2024-11-09 22:03:31.547 xcodebuild[64695:246498] [MT] IDETestOperationsObserverDebug: 45.199 sec, +45.199 sec -- end
+
+Test session results, code coverage, and logs:
+	/Users/john/Library/Developer/Xcode/DerivedData/TestingProject-fmylfawrjlvpwjdoavwinbcexoxe/Logs/Test/Test-TestingProject-2024.11.09_22-02-46-+0100.xcresult
+
+Testing failed:
+	Run test suite TestingProjectTests encountered an error (Exceeded max restart count of 2. (Underlying Error: Crash: TestingProject (65214) TestingProjectTests.example3()))
+
+Failing tests:
+	TestingProjectTests.example2()
+
+** TEST EXECUTE FAILED **
+
+Testing started
+

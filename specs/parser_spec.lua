@@ -35,6 +35,10 @@ local mockSwiftFiles = function()
       ["Some_TestTests"] = {
         "/Users/john/repo/something/Tests/SomeFile3.swift",
       },
+      ["TestingProjectTests"] = {
+        "/Users/john/repo/something/Tests/TestingProjectTests.swift",
+        "/Users/john/repo/something/Tests/HeckelAlgorithmSwiftTestingTests.swift",
+      },
     }
   end
 end
@@ -248,6 +252,46 @@ describe("ENSURE parse_logs", function()
   describe("WHEN the project is newly created with tests", function()
     it("THEN should parse test results", function()
       local expectedResult, result = runTestCase(16)
+      assert.are.same(expectedResult, result)
+    end)
+  end)
+
+  --
+  -- SwiftTesting + XCTest
+  --
+  describe("WHEN the project contains XCTests and SwiftTesting", function()
+    it("THEN should parse test results", function()
+      local expectedResult, result = runTestCase(18)
+      assert.are.same(expectedResult, result)
+    end)
+  end)
+
+  --
+  -- SwiftTesting + XCTest + parallel tests
+  --
+  describe("WHEN the project contains XCTests and SwiftTesting and runs parallel tests", function()
+    it("THEN should parse test results", function()
+      local expectedResult, result = runTestCase(20)
+      assert.are.same(expectedResult, result)
+    end)
+  end)
+
+  --
+  -- SwiftTesting
+  --
+  describe("WHEN the project contains SwiftTesting and errors", function()
+    it("THEN should parse test results", function()
+      local expectedResult, result = runTestCase(19)
+      assert.are.same(expectedResult, result)
+    end)
+  end)
+
+  --
+  -- SwiftTesting + parallel tests
+  --
+  describe("WHEN the project contains SwiftTesting and errors and runs parallel tests", function()
+    it("THEN should parse test results", function()
+      local expectedResult, result = runTestCase(21)
       assert.are.same(expectedResult, result)
     end)
   end)

@@ -1,0 +1,32 @@
+{
+  buildErrors = {},
+  buildWarnings = {},
+  failedTestsCount = 2,
+  output = {},
+  testErrors = {},
+  tests = {
+    TestingProjectTests = { {
+        class = "TestingProjectTests",
+        name = "example",
+        success = true,
+        testResult = "passed",
+        time = "0.000 seconds"
+      }, {
+        class = "TestingProjectTests",
+        message = { "Failed" },
+        name = "example2",
+        success = false,
+        testResult = "failed",
+        time = "0.002 seconds"
+      }, {
+        class = "TestingProjectTests",
+        message = { "Failed" },
+        name = "example3",
+        success = false,
+        testResult = "failed",
+        time = "0.002 seconds"
+      } }
+  },
+  testsCount = 3,
+  xcresultFilepath = "/Users/john/Library/Developer/Xcode/DerivedData/TestingProject-fmylfawrjlvpwjdoavwinbcexoxe/Logs/Test/Test-TestingProject-2024.11.10_02-40-21-+0100.xcresult"
+}

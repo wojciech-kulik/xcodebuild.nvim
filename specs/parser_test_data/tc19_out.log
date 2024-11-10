@@ -1,0 +1,39 @@
+{
+  buildErrors = {},
+  buildWarnings = {},
+  failedTestsCount = 4,
+  output = {},
+  testErrors = {},
+  tests = {
+    TestingProjectTests = { {
+        class = "TestingProjectTests",
+        name = "example",
+        success = true,
+        target = "SwiftTesting",
+        testResult = "passed",
+        time = "0.001 seconds"
+      }, {
+        class = "TestingProjectTests",
+        filename = "TestingProjectTests.swift",
+        filepath = "/Users/john/repo/something/Tests/TestingProjectTests.swift",
+        lineNumber = 18,
+        message = { "Expectation failed: 1 == 2" },
+        name = "example2",
+        success = false,
+        target = "SwiftTesting",
+        testResult = "failed",
+        time = "0.001 seconds"
+      }, {
+        class = "TestingProjectTests",
+        filepath = "TestingProjectTests/TestingProjectTests.swift",
+        lineNumber = 24,
+        message = { "Unexpectedly found nil while unwrapping an Optional value" },
+        name = "example3",
+        success = false,
+        target = "SwiftTesting",
+        testResult = "failed"
+      } }
+  },
+  testsCount = 5,
+  xcresultFilepath = "/Users/john/Library/Developer/Xcode/DerivedData/TestingProject-fmylfawrjlvpwjdoavwinbcexoxe/Logs/Test/Test-TestingProject-2024.11.09_22-02-46-+0100.xcresult"
+}

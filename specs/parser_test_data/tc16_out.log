@@ -52,33 +52,6 @@
         target = "Some_TestUITestsLaunchTests",
         testResult = "passed",
         time = "2.134 seconds"
-      }, {
-        class = "Some_TestUITestsLaunchTests",
-        filename = "SomeFile1",
-        filepath = "/Users/john/repo/something/Tests/SomeFile1.swift",
-        name = "testLaunch",
-        success = true,
-        target = "Some_TestUITestsLaunchTests",
-        testResult = "passed",
-        time = "3.506 seconds"
-      }, {
-        class = "Some_TestUITestsLaunchTests",
-        filename = "SomeFile1",
-        filepath = "/Users/john/repo/something/Tests/SomeFile1.swift",
-        name = "testLaunch",
-        success = true,
-        target = "Some_TestUITestsLaunchTests",
-        testResult = "passed",
-        time = "3.768 seconds"
-      }, {
-        class = "Some_TestUITestsLaunchTests",
-        filename = "SomeFile1",
-        filepath = "/Users/john/repo/something/Tests/SomeFile1.swift",
-        name = "testLaunch",
-        success = true,
-        target = "Some_TestUITestsLaunchTests",
-        testResult = "passed",
-        time = "3.251 seconds"
       } }
   },
   testsCount = 8,

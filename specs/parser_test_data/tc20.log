@@ -1,0 +1,44 @@
+Command line invocation:
+    /Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild test-without-building -scheme SwiftTestingTest -destination id=631E09AF-4B1B-4FBE-A265-4CAC233AEB8E -project /Users/john/Desktop/SwiftTesting/SwiftTestingTest/SwiftTestingTest.xcodeproj -testPlan SwiftTestingTest -parallelizeTargets
+
+User defaults from command line:
+    IDEPackageSupportUseBuiltinSCM = YES
+
+2024-11-10 01:57:09.066 xcodebuild[60524:1351037]  DVTProvisioningProfileManager: Failed to load profile "/Users/john/Library/MobileDevice/Provisioning Profiles/backup" (Error Domain=DVTProvisioningProfileSourceErrorDomain Code=0 "No provisioning profile provider found for profile "/Users/john/Library/MobileDevice/Provisioning Profiles/backup"." UserInfo={NSLocalizedDescription=No provisioning profile provider found for profile "/Users/john/Library/MobileDevice/Provisioning Profiles/backup".})
+--- xcodebuild: WARNING: Using the first of multiple matching destinations:
+{ platform:iOS Simulator, id:631E09AF-4B1B-4FBE-A265-4CAC233AEB8E, OS:18.1, name:iPhone 16 Pro }
+{ platform:iOS Simulator, id:631E09AF-4B1B-4FBE-A265-4CAC233AEB8E, OS:18.1, name:iPhone 16 Pro }
+2024-11-10 01:57:43.554 xcodebuild[60524:1351033] [MT] IDETestOperationsObserverDebug: 34.359 elapsed -- Testing started completed.
+2024-11-10 01:57:43.554 xcodebuild[60524:1351033] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
+2024-11-10 01:57:43.554 xcodebuild[60524:1351033] [MT] IDETestOperationsObserverDebug: 34.359 sec, +34.359 sec -- end
+
+Test session results, code coverage, and logs:
+	/Users/john/Library/Developer/Xcode/DerivedData/SwiftTestingTest-efmhndylextndpeeveiubnbazqdp/Logs/Test/Test-SwiftTestingTest-2024.11.10_01-57-09-+0100.xcresult
+
+Failing tests:
+	HeckelAlgorithmSwiftTestingTests.unconditionalFail()
+
+** TEST EXECUTE FAILED **
+
+Testing started
+Test suite 'HeckelAlgorithmTests' started on 'Clone 1 of iPhone 16 Pro - SwiftTestingTest (60915)'
+Test case 'HeckelAlgorithmTests.testAlgorithmShouldReturnDeleteAndInsertWhenNewArrayHasReplacedItemAtOneIndex()' passed on 'Clone 1 of iPhone 16 Pro - SwiftTestingTest (60915)' (0.001 seconds)
+Test case 'HeckelAlgorithmTests.testAlgorithmShouldReturnDeletesFirstInResultArray()' passed on 'Clone 1 of iPhone 16 Pro - SwiftTestingTest (60915)' (0.001 seconds)
+Test case 'HeckelAlgorithmTests.testAlgorithmShouldReturnEmptyResultWhenOldAndNewArraysAreEmpty()' passed on 'Clone 1 of iPhone 16 Pro - SwiftTestingTest (60915)' (0.000 seconds)
+Test case 'HeckelAlgorithmTests.testAlgorithmShouldReturnEmptyResultWhenOldAndNewArraysAreEqual()' passed on 'Clone 1 of iPhone 16 Pro - SwiftTestingTest (60915)' (0.004 seconds)
+Test case 'HeckelAlgorithmTests.testAlgorithmShouldReturnInsertAndDeleteWhenNewArrayHasChangedItemAtOneIndexIdentifiedByAllPools()' passed on 'Clone 1 of iPhone 16 Pro - SwiftTestingTest (60915)' (0.001 seconds)
+Test case 'HeckelAlgorithmTests.testAlgorithmShouldReturnOneInsertAndOneDeleteWhenNewArrayContainsNewOneElementAndOneElementIsRemoved()' passed on 'Clone 1 of iPhone 16 Pro - SwiftTestingTest (60915)' (0.000 seconds)
+Test case 'HeckelAlgorithmTests.testAlgorithmShouldReturnOneInsertWhenNewArrayContainsOneNewElement()' passed on 'Clone 1 of iPhone 16 Pro - SwiftTestingTest (60915)' (0.023 seconds)
+Test case 'HeckelAlgorithmTests.testAlgorithmShouldReturnOnlyDeletesWhenOldArrayContainsItemsAndNewArrayIsEmpty()' passed on 'Clone 1 of iPhone 16 Pro - SwiftTestingTest (60915)' (0.001 seconds)
+Test case 'HeckelAlgorithmTests.testAlgorithmShouldReturnOnlyInsertsWhenOldArrayIsEmptyAndNewArrayContainsItems()' passed on 'Clone 1 of iPhone 16 Pro - SwiftTestingTest (60915)' (0.001 seconds)
+Test case 'HeckelAlgorithmTests.testAlgorithmShouldReturnReplaceWhenNewArrayHasChangedItemAtOneIndexAndItemsAreIdenifiedById()' passed on 'Clone 1 of iPhone 16 Pro - SwiftTestingTest (60915)' (0.005 seconds)
+Test case 'HeckelAlgorithmTests.testAlgorithmShouldReturnTwoMovesWhenNewArrayHasSwitchedTwoItems()' passed on 'Clone 1 of iPhone 16 Pro - SwiftTestingTest (60915)' (0.001 seconds)
+Test suite 'HeckelAlgorithmSwiftTestingTests' started on 'Clone 1 of iPhone 16 Pro - SwiftTestingTest (60915)'
+Test case 'optional()' passed on 'Clone 1 of iPhone 16 Pro - SwiftTestingTest (60915)' (0.000 seconds)
+Test case 'HeckelAlgorithmSwiftTestingTests/testAlgorithmShouldReturnOnlyDeletesWhenOldArrayContainsItemsAndNewArrayIsEmpty()' passed on 'Clone 1 of iPhone 16 Pro - SwiftTestingTest (60915)' (0.000 seconds)
+Test case 'HeckelAlgorithmSwiftTestingTests/optional()' passed on 'Clone 1 of iPhone 16 Pro - SwiftTestingTest (60915)' (0.000 seconds)
+Test case 'HeckelAlgorithmSwiftTestingTests/diff_ShouldReturnEmptyResult_WhenOldAndNewArraysAreEmpty()' passed on 'Clone 1 of iPhone 16 Pro - SwiftTestingTest (60915)' (0.000 seconds)
+Test case 'HeckelAlgorithmSwiftTestingTests/async()' passed on 'Clone 1 of iPhone 16 Pro - SwiftTestingTest (60915)' (0.004 seconds)
+Test case 'HeckelAlgorithmSwiftTestingTests/testAlgorithmShouldReturnTwoMovesWhenNewArrayHasSwitchedTwoItems()' passed on 'Clone 1 of iPhone 16 Pro - SwiftTestingTest (60915)' (0.004 seconds)
+Test case 'HeckelAlgorithmSwiftTestingTests/unconditionalFail()' failed on 'Clone 1 of iPhone 16 Pro - SwiftTestingTest (60915)' (0.004 seconds)
+

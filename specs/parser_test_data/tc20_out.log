@@ -1,0 +1,123 @@
+{
+  buildErrors = {},
+  buildWarnings = {},
+  failedTestsCount = 1,
+  output = {},
+  testErrors = {},
+  tests = {
+    HeckelAlgorithmSwiftTestingTests = { {
+        class = "HeckelAlgorithmSwiftTestingTests",
+        name = "testAlgorithmShouldReturnOnlyDeletesWhenOldArrayContainsItemsAndNewArrayIsEmpty",
+        success = true,
+        testResult = "passed",
+        time = "0.000 seconds"
+      }, {
+        class = "HeckelAlgorithmSwiftTestingTests",
+        name = "optional",
+        success = true,
+        testResult = "passed",
+        time = "0.000 seconds"
+      }, {
+        class = "HeckelAlgorithmSwiftTestingTests",
+        name = "diff_ShouldReturnEmptyResult_WhenOldAndNewArraysAreEmpty",
+        success = true,
+        testResult = "passed",
+        time = "0.000 seconds"
+      }, {
+        class = "HeckelAlgorithmSwiftTestingTests",
+        name = "async",
+        success = true,
+        testResult = "passed",
+        time = "0.004 seconds"
+      }, {
+        class = "HeckelAlgorithmSwiftTestingTests",
+        name = "testAlgorithmShouldReturnTwoMovesWhenNewArrayHasSwitchedTwoItems",
+        success = true,
+        testResult = "passed",
+        time = "0.004 seconds"
+      }, {
+        class = "HeckelAlgorithmSwiftTestingTests",
+        message = { "Failed" },
+        name = "unconditionalFail",
+        success = false,
+        testResult = "failed",
+        time = "0.004 seconds"
+      } },
+    HeckelAlgorithmTests = { {
+        class = "HeckelAlgorithmTests",
+        name = "testAlgorithmShouldReturnDeleteAndInsertWhenNewArrayHasReplacedItemAtOneIndex",
+        success = true,
+        testResult = "passed",
+        time = "0.001 seconds"
+      }, {
+        class = "HeckelAlgorithmTests",
+        name = "testAlgorithmShouldReturnDeletesFirstInResultArray",
+        success = true,
+        testResult = "passed",
+        time = "0.001 seconds"
+      }, {
+        class = "HeckelAlgorithmTests",
+        name = "testAlgorithmShouldReturnEmptyResultWhenOldAndNewArraysAreEmpty",
+        success = true,
+        testResult = "passed",
+        time = "0.000 seconds"
+      }, {
+        class = "HeckelAlgorithmTests",
+        name = "testAlgorithmShouldReturnEmptyResultWhenOldAndNewArraysAreEqual",
+        success = true,
+        testResult = "passed",
+        time = "0.004 seconds"
+      }, {
+        class = "HeckelAlgorithmTests",
+        name = "testAlgorithmShouldReturnInsertAndDeleteWhenNewArrayHasChangedItemAtOneIndexIdentifiedByAllPools",
+        success = true,
+        testResult = "passed",
+        time = "0.001 seconds"
+      }, {
+        class = "HeckelAlgorithmTests",
+        name = "testAlgorithmShouldReturnOneInsertAndOneDeleteWhenNewArrayContainsNewOneElementAndOneElementIsRemoved",
+        success = true,
+        testResult = "passed",
+        time = "0.000 seconds"
+      }, {
+        class = "HeckelAlgorithmTests",
+        name = "testAlgorithmShouldReturnOneInsertWhenNewArrayContainsOneNewElement",
+        success = true,
+        testResult = "passed",
+        time = "0.023 seconds"
+      }, {
+        class = "HeckelAlgorithmTests",
+        name = "testAlgorithmShouldReturnOnlyDeletesWhenOldArrayContainsItemsAndNewArrayIsEmpty",
+        success = true,
+        testResult = "passed",
+        time = "0.001 seconds"
+      }, {
+        class = "HeckelAlgorithmTests",
+        name = "testAlgorithmShouldReturnOnlyInsertsWhenOldArrayIsEmptyAndNewArrayContainsItems",
+        success = true,
+        testResult = "passed",
+        time = "0.001 seconds"
+      }, {
+        class = "HeckelAlgorithmTests",
+        name = "testAlgorithmShouldReturnReplaceWhenNewArrayHasChangedItemAtOneIndexAndItemsAreIdenifiedById",
+        success = true,
+        testResult = "passed",
+        time = "0.005 seconds"
+      }, {
+        class = "HeckelAlgorithmTests",
+        name = "testAlgorithmShouldReturnTwoMovesWhenNewArrayHasSwitchedTwoItems",
+        success = true,
+        testResult = "passed",
+        time = "0.001 seconds"
+      } },
+    _Global = { {
+        class = "_Global",
+        name = "optional",
+        success = true,
+        testResult = "passed",
+        time = "0.000 seconds"
+      } }
+  },
+  testsCount = 18,
+  xcresultFilepath = "/Users/john/Library/Developer/Xcode/DerivedData/SwiftTestingTest-efmhndylextndpeeveiubnbazqdp/Logs/Test/Test-SwiftTestingTest-2024.11.10_01-57-09-+0100.xcresult"
+}
