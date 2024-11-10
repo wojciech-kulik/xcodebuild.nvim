@@ -33,10 +33,20 @@ local function find_test_class(bufnr, report)
 
   -- if not try finding the name in the source code
   local lines = vim.api.nvim_buf_get_lines(bufnr, 1, -1, false)
-  for _, line in ipairs(lines) do
+  for index, line in ipairs(lines) do
     local class = string.match(line, "class ([^:%s]+)%s*%:?")
-    if class then
+    local previousLine = (index > 1 and lines[index - 1]) or ""
+    if not string.find(line, "@Suite") and not string.find(previousLine, "@Suite") and class then
       return testSearch.get_test_key_for_file(filepath, class)
+    end
+  end
+
+  -- if not then maybe it's SwiftTesting, so just find a test with that filepath
+  for key, tests in pairs(report.tests) do
+    for _, test in ipairs(tests) do
+      if test.filepath == filepath then
+        return key
+      end
     end
   end
 

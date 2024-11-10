@@ -234,6 +234,7 @@ Features                                                   *xcodebuild.features*
    and other project settings.
  - `swift-snapshot-testing` integration to present diff views for failing snapshot tests.
  - `Quick` integration to show test results for tests written using `Quick` framework.
+ - `Swift Testing` integration to show test results for tests written using `Swift Testing` framework.
  - Auto-detection of the target membership for new files.
  - Picker with all available plugin actions.
  - Highly customizable (many config options, auto commands, highlights,
@@ -3186,6 +3187,17 @@ M.find_filepath({targetName}, {className})
   Parameters: ~
     {targetName}  (string)
     {className}   (string)
+
+  Returns: ~
+    (string|nil)   filepath
+
+
+                             *xcodebuild.tests.search.find_filepath_by_filename*
+M.find_filepath_by_filename({filename})
+  Finds the file path based on the {filename}.
+
+  Parameters: ~
+    {filename}  (string|nil)
 
   Returns: ~
     (string|nil)   filepath

@@ -1,0 +1,77 @@
+Command line invocation:
+    /Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild test-without-building -scheme SwiftTestingTest -destination id=631E09AF-4B1B-4FBE-A265-4CAC233AEB8E -project /Users/john/Desktop/SwiftTesting/SwiftTestingTest/SwiftTestingTest.xcodeproj -testPlan SwiftTestingTest -parallelizeTargets
+
+User defaults from command line:
+    IDEPackageSupportUseBuiltinSCM = YES
+
+2024-11-10 01:41:29.123 xcodebuild[21632:1200575]  DVTProvisioningProfileManager: Failed to load profile "/Users/john/Library/MobileDevice/Provisioning Profiles/backup" (Error Domain=DVTProvisioningProfileSourceErrorDomain Code=0 "No provisioning profile provider found for profile "/Users/john/Library/MobileDevice/Provisioning Profiles/backup"." UserInfo={NSLocalizedDescription=No provisioning profile provider found for profile "/Users/john/Library/MobileDevice/Provisioning Profiles/backup".})
+--- xcodebuild: WARNING: Using the first of multiple matching destinations:
+{ platform:iOS Simulator, id:631E09AF-4B1B-4FBE-A265-4CAC233AEB8E, OS:18.1, name:iPhone 16 Pro }
+{ platform:iOS Simulator, id:631E09AF-4B1B-4FBE-A265-4CAC233AEB8E, OS:18.1, name:iPhone 16 Pro }
+Test Suite 'All tests' started at 2024-11-10 01:41:30.711.
+Test Suite 'SwiftTestingTestTests.xctest' started at 2024-11-10 01:41:30.711.
+Test Suite 'HeckelAlgorithmTests' started at 2024-11-10 01:41:30.712.
+Test Case '-[SwiftTestingTestTests.HeckelAlgorithmTests testAlgorithmShouldReturnDeleteAndInsertWhenNewArrayHasReplacedItemAtOneIndex]' started.
+Test Case '-[SwiftTestingTestTests.HeckelAlgorithmTests testAlgorithmShouldReturnDeleteAndInsertWhenNewArrayHasReplacedItemAtOneIndex]' passed (0.001 seconds).
+Test Case '-[SwiftTestingTestTests.HeckelAlgorithmTests testAlgorithmShouldReturnDeletesFirstInResultArray]' started.
+Test Case '-[SwiftTestingTestTests.HeckelAlgorithmTests testAlgorithmShouldReturnDeletesFirstInResultArray]' passed (0.001 seconds).
+Test Case '-[SwiftTestingTestTests.HeckelAlgorithmTests testAlgorithmShouldReturnEmptyResultWhenOldAndNewArraysAreEmpty]' started.
+Test Case '-[SwiftTestingTestTests.HeckelAlgorithmTests testAlgorithmShouldReturnEmptyResultWhenOldAndNewArraysAreEmpty]' passed (0.000 seconds).
+Test Case '-[SwiftTestingTestTests.HeckelAlgorithmTests testAlgorithmShouldReturnEmptyResultWhenOldAndNewArraysAreEqual]' started.
+Test Case '-[SwiftTestingTestTests.HeckelAlgorithmTests testAlgorithmShouldReturnEmptyResultWhenOldAndNewArraysAreEqual]' passed (0.001 seconds).
+Test Case '-[SwiftTestingTestTests.HeckelAlgorithmTests testAlgorithmShouldReturnInsertAndDeleteWhenNewArrayHasChangedItemAtOneIndexIdentifiedByAllPools]' started.
+Test Case '-[SwiftTestingTestTests.HeckelAlgorithmTests testAlgorithmShouldReturnInsertAndDeleteWhenNewArrayHasChangedItemAtOneIndexIdentifiedByAllPools]' passed (0.001 seconds).
+Test Case '-[SwiftTestingTestTests.HeckelAlgorithmTests testAlgorithmShouldReturnOneInsertAndOneDeleteWhenNewArrayContainsNewOneElementAndOneElementIsRemoved]' started.
+Test Case '-[SwiftTestingTestTests.HeckelAlgorithmTests testAlgorithmShouldReturnOneInsertAndOneDeleteWhenNewArrayContainsNewOneElementAndOneElementIsRemoved]' passed (0.001 seconds).
+Test Case '-[SwiftTestingTestTests.HeckelAlgorithmTests testAlgorithmShouldReturnOneInsertWhenNewArrayContainsOneNewElement]' started.
+Test Case '-[SwiftTestingTestTests.HeckelAlgorithmTests testAlgorithmShouldReturnOneInsertWhenNewArrayContainsOneNewElement]' passed (0.001 seconds).
+Test Case '-[SwiftTestingTestTests.HeckelAlgorithmTests testAlgorithmShouldReturnOnlyDeletesWhenOldArrayContainsItemsAndNewArrayIsEmpty]' started.
+Test Case '-[SwiftTestingTestTests.HeckelAlgorithmTests testAlgorithmShouldReturnOnlyDeletesWhenOldArrayContainsItemsAndNewArrayIsEmpty]' passed (0.001 seconds).
+Test Case '-[SwiftTestingTestTests.HeckelAlgorithmTests testAlgorithmShouldReturnOnlyInsertsWhenOldArrayIsEmptyAndNewArrayContainsItems]' started.
+Test Case '-[SwiftTestingTestTests.HeckelAlgorithmTests testAlgorithmShouldReturnOnlyInsertsWhenOldArrayIsEmptyAndNewArrayContainsItems]' passed (0.000 seconds).
+Test Case '-[SwiftTestingTestTests.HeckelAlgorithmTests testAlgorithmShouldReturnReplaceWhenNewArrayHasChangedItemAtOneIndexAndItemsAreIdenifiedById]' started.
+Test Case '-[SwiftTestingTestTests.HeckelAlgorithmTests testAlgorithmShouldReturnReplaceWhenNewArrayHasChangedItemAtOneIndexAndItemsAreIdenifiedById]' passed (0.000 seconds).
+Test Case '-[SwiftTestingTestTests.HeckelAlgorithmTests testAlgorithmShouldReturnTwoMovesWhenNewArrayHasSwitchedTwoItems]' started.
+Test Case '-[SwiftTestingTestTests.HeckelAlgorithmTests testAlgorithmShouldReturnTwoMovesWhenNewArrayHasSwitchedTwoItems]' passed (0.001 seconds).
+Test Suite 'HeckelAlgorithmTests' passed at 2024-11-10 01:41:30.731.
+	 Executed 11 tests, with 0 failures (0 unexpected) in 0.007 (0.020) seconds
+Test Suite 'SwiftTestingTestTests.xctest' passed at 2024-11-10 01:41:30.732.
+	 Executed 11 tests, with 0 failures (0 unexpected) in 0.007 (0.020) seconds
+Test Suite 'All tests' passed at 2024-11-10 01:41:30.732.
+	 Executed 11 tests, with 0 failures (0 unexpected) in 0.007 (0.021) seconds
+◇ Test run started.
+↳ Testing Library Version: 102 (arm64-apple-ios13.0-simulator)
+◇ Test optional() started.
+✔ Test optional() passed after 0.001 seconds.
+◇ Suite "Algorithm tests" started.
+◇ Test optional() started.
+✔ Test optional() passed after 0.001 seconds.
+◇ Test unconditionalFail() started.
+✘ Test unconditionalFail() recorded an issue at HeckelAlgorithmSwiftTestingTests.swift:38:25: Issue recorded
+↳ This test should fail
+✘ Test unconditionalFail() failed after 0.001 seconds with 1 issue.
+↳ // XCTFail()
+◇ Test async() started.
+✔ Test async() passed after 0.001 seconds.
+◇ Test "Diff empty arrays" started.
+✔ Test "Diff empty arrays" passed after 0.001 seconds.
+◇ Test testAlgorithmShouldReturnTwoMovesWhenNewArrayHasSwitchedTwoItems() started.
+✔ Test testAlgorithmShouldReturnTwoMovesWhenNewArrayHasSwitchedTwoItems() passed after 0.001 seconds.
+◇ Test testAlgorithmShouldReturnOnlyDeletesWhenOldArrayContainsItemsAndNewArrayIsEmpty() started.
+✔ Test testAlgorithmShouldReturnOnlyDeletesWhenOldArrayContainsItemsAndNewArrayIsEmpty() passed after 0.001 seconds.
+✘ Suite "Algorithm tests" failed after 0.004 seconds with 1 issue.
+✘ Test run with 7 tests failed after 0.004 seconds with 1 issue.
+2024-11-10 01:41:43.652 xcodebuild[21632:1200497] [MT] IDETestOperationsObserverDebug: 14.408 elapsed -- Testing started completed.
+2024-11-10 01:41:43.652 xcodebuild[21632:1200497] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
+2024-11-10 01:41:43.652 xcodebuild[21632:1200497] [MT] IDETestOperationsObserverDebug: 14.408 sec, +14.408 sec -- end
+
+Test session results, code coverage, and logs:
+	/Users/john/Library/Developer/Xcode/DerivedData/SwiftTestingTest-efmhndylextndpeeveiubnbazqdp/Logs/Test/Test-SwiftTestingTest-2024.11.10_01-41-29-+0100.xcresult
+
+Failing tests:
+	HeckelAlgorithmSwiftTestingTests.unconditionalFail()
+
+** TEST EXECUTE FAILED **
+
+Testing started
+

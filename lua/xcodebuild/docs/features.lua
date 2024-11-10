@@ -20,6 +20,7 @@
 ---   and other project settings.
 --- - `swift-snapshot-testing` integration to present diff views for failing snapshot tests.
 --- - `Quick` integration to show test results for tests written using `Quick` framework.
+--- - `Swift Testing` integration to show test results for tests written using `Swift Testing` framework.
 --- - Auto-detection of the target membership for new files.
 --- - Picker with all available plugin actions.
 --- - Highly customizable (many config options, auto commands, highlights,

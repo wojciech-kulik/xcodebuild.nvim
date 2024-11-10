@@ -259,4 +259,21 @@ function M.find_filepath(targetName, className)
   return result
 end
 
+---Finds the file path based on the {filename}.
+---@param filename string|nil
+---@return string|nil # filepath
+function M.find_filepath_by_filename(filename)
+  if filename and not string.find(filename, "/") then
+    for _, paths in pairs(M.targetsFilesMap) do
+      for _, path in ipairs(paths) do
+        if vim.endswith(path, filename) then
+          return path
+        end
+      end
+    end
+  end
+
+  return nil
+end
+
 return M

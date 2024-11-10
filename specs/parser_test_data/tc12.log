@@ -1,6 +1,6 @@
 Command line invocation:
     
-/Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild test -scheme ShortcutRecorderCrash -destination id=00006000-000C58DC1ED8801E -workspace /Users/wkulik/Desktop/ShortcutRecorderCrash/ShortcutRecorderCrash.xcworkspace -testPlan NewTestPlan
+/Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild test -scheme ShortcutRecorderCrash -destination id=00006000-000C58DC1ED8801E -workspace /Users/john/Desktop/ShortcutRecorderCrash/ShortcutRecorderCrash.xcworkspace -testPlan NewTestPlan
 
 User defaults from command line:
     IDEPackageSupportUseBuiltinSCM = YES
@@ -237,36 +237,36 @@ CreateBuildDescription
 
 
 
-ClangStatCache /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang-stat-cache /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk /Users/wkulik/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/macosx14.0-23A334-4a76ee93ef69e462914ffe9883de22b8.sdkstatcache
-    cd /Users/wkulik/Desktop/ShortcutRecorderCrash
-    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang-stat-cache /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk -o /Users/wkulik/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/macosx14.0-23A334-4a76ee93ef69e462914ffe9883de22b8.sdkstatcache
+ClangStatCache /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang-stat-cache /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk /Users/john/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/macosx14.0-23A334-4a76ee93ef69e462914ffe9883de22b8.sdkstatcache
+    cd /Users/john/Desktop/ShortcutRecorderCrash
+    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang-stat-cache /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk -o /Users/john/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/macosx14.0-23A334-4a76ee93ef69e462914ffe9883de22b8.sdkstatcache
 
 
 
-CodeSign /Users/wkulik/Library/Developer/Xcode/DerivedData/ShortcutRecorderCrash-godwnktrdenglibwmfrosntqktad/Build/Products/Debug/ShortcutRecorderCrash.app (in target 'ShortcutRecorderCrash' from project 'ShortcutRecorderCrash')
-    cd /Users/wkulik/Desktop/ShortcutRecorderCrash
+CodeSign /Users/john/Library/Developer/Xcode/DerivedData/ShortcutRecorderCrash-godwnktrdenglibwmfrosntqktad/Build/Products/Debug/ShortcutRecorderCrash.app (in target 'ShortcutRecorderCrash' from project 'ShortcutRecorderCrash')
+    cd /Users/john/Desktop/ShortcutRecorderCrash
     
     Signing Identity:     "Apple Development: Wojciech Kulik (9R542QC882)"
     
-    /usr/bin/codesign --force --sign 340D0D2EF2E3E4376537163FCDC3B39F72AB4D39 -o runtime --entitlements /Users/wkulik/Library/Developer/Xcode/DerivedData/ShortcutRecorderCrash-godwnktrdenglibwmfrosntqktad/Build/Intermediates.noindex/ShortcutRecorderCrash.build/Debug/ShortcutRecorderCrash.build/ShortcutRecorderCrash.app.xcent --timestamp\=none --generate-entitlement-der /Users/wkulik/Library/Developer/Xcode/DerivedData/ShortcutRecorderCrash-godwnktrdenglibwmfrosntqktad/Build/Products/Debug/ShortcutRecorderCrash.app
+    /usr/bin/codesign --force --sign 340D0D2EF2E3E4376537163FCDC3B39F72AB4D39 -o runtime --entitlements /Users/john/Library/Developer/Xcode/DerivedData/ShortcutRecorderCrash-godwnktrdenglibwmfrosntqktad/Build/Intermediates.noindex/ShortcutRecorderCrash.build/Debug/ShortcutRecorderCrash.build/ShortcutRecorderCrash.app.xcent --timestamp\=none --generate-entitlement-der /Users/john/Library/Developer/Xcode/DerivedData/ShortcutRecorderCrash-godwnktrdenglibwmfrosntqktad/Build/Products/Debug/ShortcutRecorderCrash.app
 
-/Users/wkulik/Library/Developer/Xcode/DerivedData/ShortcutRecorderCrash-godwnktrdenglibwmfrosntqktad/Build/Products/Debug/ShortcutRecorderCrash.app: replacing existing signature
-
-
-Validate /Users/wkulik/Library/Developer/Xcode/DerivedData/ShortcutRecorderCrash-godwnktrdenglibwmfrosntqktad/Build/Products/Debug/ShortcutRecorderCrash.app (in target 'ShortcutRecorderCrash' from project 'ShortcutRecorderCrash')
-    cd /Users/wkulik/Desktop/ShortcutRecorderCrash
-    builtin-validationUtility /Users/wkulik/Library/Developer/Xcode/DerivedData/ShortcutRecorderCrash-godwnktrdenglibwmfrosntqktad/Build/Products/Debug/ShortcutRecorderCrash.app -no-validate-extension
+/Users/john/Library/Developer/Xcode/DerivedData/ShortcutRecorderCrash-godwnktrdenglibwmfrosntqktad/Build/Products/Debug/ShortcutRecorderCrash.app: replacing existing signature
 
 
-RegisterWithLaunchServices /Users/wkulik/Library/Developer/Xcode/DerivedData/ShortcutRecorderCrash-godwnktrdenglibwmfrosntqktad/Build/Products/Debug/ShortcutRecorderCrash.app (in target 'ShortcutRecorderCrash' from project 'ShortcutRecorderCrash')
-    cd /Users/wkulik/Desktop/ShortcutRecorderCrash
-    /System/Library/Frameworks/CoreServices.framework/Versions/Current/Frameworks/LaunchServices.framework/Versions/Current/Support/lsregister -f -R -trusted /Users/wkulik/Library/Developer/Xcode/DerivedData/ShortcutRecorderCrash-godwnktrdenglibwmfrosntqktad/Build/Products/Debug/ShortcutRecorderCrash.app
+Validate /Users/john/Library/Developer/Xcode/DerivedData/ShortcutRecorderCrash-godwnktrdenglibwmfrosntqktad/Build/Products/Debug/ShortcutRecorderCrash.app (in target 'ShortcutRecorderCrash' from project 'ShortcutRecorderCrash')
+    cd /Users/john/Desktop/ShortcutRecorderCrash
+    builtin-validationUtility /Users/john/Library/Developer/Xcode/DerivedData/ShortcutRecorderCrash-godwnktrdenglibwmfrosntqktad/Build/Products/Debug/ShortcutRecorderCrash.app -no-validate-extension
+
+
+RegisterWithLaunchServices /Users/john/Library/Developer/Xcode/DerivedData/ShortcutRecorderCrash-godwnktrdenglibwmfrosntqktad/Build/Products/Debug/ShortcutRecorderCrash.app (in target 'ShortcutRecorderCrash' from project 'ShortcutRecorderCrash')
+    cd /Users/john/Desktop/ShortcutRecorderCrash
+    /System/Library/Frameworks/CoreServices.framework/Versions/Current/Frameworks/LaunchServices.framework/Versions/Current/Support/lsregister -f -R -trusted /Users/john/Library/Developer/Xcode/DerivedData/ShortcutRecorderCrash-godwnktrdenglibwmfrosntqktad/Build/Products/Debug/ShortcutRecorderCrash.app
 
 
 
-/Users/wkulik/Desktop/ShortcutRecorderCrash/Pods/Pods.xcodeproj: warning: The macOS deployment target 'MACOSX_DEPLOYMENT_TARGET' is set to 10.11, but the range of supported deployment target versions is 10.13 to 14.0.99. (in target 'ShortcutRecorder' from project 'Pods')
+/Users/john/Desktop/ShortcutRecorderCrash/Pods/Pods.xcodeproj: warning: The macOS deployment target 'MACOSX_DEPLOYMENT_TARGET' is set to 10.11, but the range of supported deployment target versions is 10.13 to 14.0.99. (in target 'ShortcutRecorder' from project 'Pods')
 
-2023-11-02 00:32:58.817637+0100 ShortcutRecorderCrash[36985:15008257] ApplePersistenceIgnoreState: Existing state will not be touched. New state will be written to /Users/wkulik/Library/Containers/pl.wojciechkulik.ShortcutRecorderCrash/Data/tmp/pl.wojciechkulik.ShortcutRecorderCrash.savedState
+2023-11-02 00:32:58.817637+0100 ShortcutRecorderCrash[36985:15008257] ApplePersistenceIgnoreState: Existing state will not be touched. New state will be written to /Users/john/Library/Containers/pl.wojciechkulik.ShortcutRecorderCrash/Data/tmp/pl.wojciechkulik.ShortcutRecorderCrash.savedState
 
 Test Suite 'All tests' started at 2023-11-02 00:32:58.919.
 
@@ -277,7 +277,7 @@ Test Case '-[ShortcutRecorderCrashTests.ShortcutRecorderCrashTests testExample]'
 Test Case '-[ShortcutRecorderCrashTests.ShortcutRecorderCrashTests testExample]' passed (0.001 seconds).
 Test Case '-[ShortcutRecorderCrashTests.ShortcutRecorderCrashTests testPerformanceExample]' started.
 
-/Users/wkulik/Desktop/ShortcutRecorderCrash/ShortcutRecorderCrashTests/ShortcutRecorderCrashTests.swift:30: Test Case '-[ShortcutRecorderCrashTests.ShortcutRecorderCrashTests testPerformanceExample]' measured [Time, seconds] average: 0.000, relative standard deviation: 175.758%, values: [0.000147, 0.000016, 0.000010, 0.000009, 0.000009, 0.000009, 0.000009, 0.000009, 0.000008, 0.000009], performanceMetricID:com.apple.XCTPerformanceMetric_WallClockTime, baselineName: "", baselineAverage: , polarity: prefers smaller, maxPercentRegression: 10.000%, maxPercentRelativeStandardDeviation: 10.000%, maxRegression: 0.100, maxStandardDeviation: 0.100
+/Users/john/Desktop/ShortcutRecorderCrash/ShortcutRecorderCrashTests/ShortcutRecorderCrashTests.swift:30: Test Case '-[ShortcutRecorderCrashTests.ShortcutRecorderCrashTests testPerformanceExample]' measured [Time, seconds] average: 0.000, relative standard deviation: 175.758%, values: [0.000147, 0.000016, 0.000010, 0.000009, 0.000009, 0.000009, 0.000009, 0.000009, 0.000008, 0.000009], performanceMetricID:com.apple.XCTPerformanceMetric_WallClockTime, baselineName: "", baselineAverage: , polarity: prefers smaller, maxPercentRegression: 10.000%, maxPercentRelativeStandardDeviation: 10.000%, maxRegression: 0.100, maxStandardDeviation: 0.100
 
 Test Case '-[ShortcutRecorderCrashTests.ShortcutRecorderCrashTests testPerformanceExample]' passed (0.535 seconds).
 Test Suite 'ShortcutRecorderCrashTests' passed at 2023-11-02 00:32:59.456.
@@ -296,7 +296,7 @@ Test Suite 'All tests' passed at 2023-11-02 00:32:59.456.
 
 
 Test session results, code coverage, and logs:
-	/Users/wkulik/Library/Developer/Xcode/DerivedData/ShortcutRecorderCrash-godwnktrdenglibwmfrosntqktad/Logs/Test/Test-ShortcutRecorderCrash-2023.11.02_00-32-53-+0100.xcresult
+	/Users/john/Library/Developer/Xcode/DerivedData/ShortcutRecorderCrash-godwnktrdenglibwmfrosntqktad/Logs/Test/Test-ShortcutRecorderCrash-2023.11.02_00-32-53-+0100.xcresult
 
 
 ** TEST SUCCEEDED ** [6.206 sec]

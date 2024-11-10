@@ -87,5 +87,5 @@
       } }
   },
   testsCount = 8,
-  xcresultFilepath = "/Users/wkulik/Library/Developer/Xcode/DerivedData/ShortcutRecorderCrash-godwnktrdenglibwmfrosntqktad/Logs/Test/Test-ShortcutRecorderCrash-2023.11.02_01-25-25-+0100.xcresult"
+  xcresultFilepath = "/Users/john/Library/Developer/Xcode/DerivedData/ShortcutRecorderCrash-godwnktrdenglibwmfrosntqktad/Logs/Test/Test-ShortcutRecorderCrash-2023.11.02_01-25-25-+0100.xcresult"
 }

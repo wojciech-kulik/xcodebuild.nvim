@@ -96,6 +96,14 @@ local function insert_test_errors(list, testErrors)
           break
         end
       end
+    else
+      -- SwiftTesting entry contains the real path
+      table.insert(list, {
+        filename = error.filepath,
+        lnum = error.lineNumber,
+        text = error.message[1],
+        type = "E",
+      })
     end
   end
 end
