@@ -27,6 +27,7 @@ It provides all essential actions for development including building, debugging,
 - [x] [lualine.nvim] integration to show selected device, test plan, and other project settings.
 - [x] [swift-snapshot-testing] integration to present diff views for failing snapshot tests.
 - [x] [Quick] integration to show test results for tests written using [Quick] framework.
+- [x] [Swift Testing] integration to show test results for tests written using [Swift Testing] framework.
 - [x] Auto-detection of the target membership for new files.
 - [x] Picker with all available plugin actions.
 - [x] Highly customizable (many config options, auto commands, highlights, and user commands).
@@ -93,3 +94,4 @@ Big thanks to all the sponsors who support this project 🍻!
 [swift-snapshot-testing]: https://github.com/pointfreeco/swift-snapshot-testing
 [Quick]: https://github.com/Quick/Quick
 [lualine.nvim]: https://github.com/nvim-lualine/lualine.nvim
+[Swift Testing]: https://developer.apple.com/xcode/swift-testing/
