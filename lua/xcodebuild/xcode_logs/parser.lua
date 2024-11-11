@@ -21,6 +21,7 @@
 ---@field lineNumber number|nil
 ---@field time string|nil The formatted time it took to run the test.
 ---@field message string[]|nil The error message if the test failed.
+---@field swiftTestingId string|nil The id of the test in SwiftTesting.
 
 ---@class ParsedBuildError
 ---@field filepath string
@@ -72,10 +73,12 @@
 ---It will be injected into LSP diagnostics and
 ---quickfix list.
 ---@field testErrors ParsedTestError[]
+---@field usesSwiftTesting boolean|nil
 ---@field xcresultFilepath string|nil The path to the xcresult file.
 
 local M = {}
 
+local constants = require("xcodebuild.core.constants")
 local util = require("xcodebuild.util")
 local testSearch = require("xcodebuild.tests.search")
 
@@ -101,6 +104,7 @@ local output = {}
 local buildErrors = {}
 local buildWarnings = {}
 local testErrors = {}
+local usesSwiftTesting = false
 local xcresultFilepath = nil
 
 -- patterns
@@ -137,7 +141,12 @@ local function flush_test(message)
   if lineData.target and lineData.class and lineData.name then
     require("xcodebuild.tests.explorer").update_test_status(
       lineData.target .. "/" .. lineData.class .. "/" .. lineData.name,
-      lineData.success and "passed" or "failed"
+      lineData.success and "passed" or "failed",
+      {
+        filepath = lineData.filepath,
+        lineNumber = lineData.lineNumber,
+        swiftTestingId = lineData.swiftTestingId,
+      }
     )
   end
 
@@ -301,6 +310,8 @@ local function find_test_line(filepath, testName)
 
   for lineNumber, line in ipairs(lines) do
     if string.find(line, "func " .. testName .. "%(") then
+      return lineNumber
+    elseif string.find(line, '@Test("' .. testName .. '"', nil, true) then
       return lineNumber
     end
   end
@@ -474,7 +485,7 @@ local function parse_test_finished(line)
     if not testClass and not testName then
       testName, testResult, time = string.match(line, "^Test case %'(%g+)%(.*%' (%w+) .* %(([^%)]*)%)$")
       if testName and testResult then
-        testClass = "_Global"
+        testClass = constants.SwiftTestingGlobal
       end
     end
 
@@ -507,8 +518,8 @@ end
 local function parse_test_started(line)
   local target, testClass, testName = string.match(line, "^Test Case .*.%-%[([%w_]+)%.([%w_]+) (%g+)%]")
   if not testName then
-    target = "SwiftTesting"
-    testClass = testSuite or "_Global"
+    target = constants.SwiftTestingTarget
+    testClass = testSuite or constants.SwiftTestingGlobal
     testName = string.match(line, '^[^%w]+ Test "([^"]+)"') or string.match(line, "^[^%w]+ Test (%g+)%(%)")
   end
 
@@ -539,7 +550,7 @@ local function process_line(line)
   -- BEGIN -> TEST_START -> TEST_ERROR -> (failed) -> BEGIN
 
   if string.find(line, "◇ Test run started") then
-    -- do nothing
+    usesSwiftTesting = true
     return
   elseif string.find(line, '◇ Suite "[^"]+" started') then
     testSuite = string.match(line, '◇ Suite "(.+)" started')
@@ -614,6 +625,7 @@ function M.clear()
   buildErrors = {}
   buildWarnings = {}
   testErrors = {}
+  usesSwiftTesting = false
   xcresultFilepath = nil
 end
 
@@ -667,6 +679,7 @@ function M.parse_logs(logLines)
     buildErrors = buildErrors,
     buildWarnings = buildWarnings,
     testErrors = testErrors,
+    usesSwiftTesting = usesSwiftTesting,
     xcresultFilepath = xcresultFilepath,
   }
 end

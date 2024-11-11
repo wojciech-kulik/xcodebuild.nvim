@@ -23,5 +23,6 @@
   output = {},
   testErrors = {},
   tests = {},
-  testsCount = 0
+  testsCount = 0,
+  usesSwiftTesting = false
 }

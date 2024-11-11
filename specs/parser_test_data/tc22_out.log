@@ -7,7 +7,7 @@
   tests = {
     ["Algorithm tests"] = { {
         class = "Algorithm tests",
-        name = "optional",
+        name = "optional2",
         success = true,
         target = "SwiftTesting",
         testResult = "passed",
@@ -16,7 +16,7 @@
         class = "Algorithm tests",
         filename = "HeckelAlgorithmSwiftTestingTests.swift",
         filepath = "/Users/john/repo/something/Tests/HeckelAlgorithmSwiftTestingTests.swift",
-        lineNumber = 38,
+        lineNumber = 39,
         message = { "Issue recorded", "↳ This test should fail" },
         name = "unconditionalFail",
         success = false,
@@ -58,7 +58,7 @@
         success = true,
         target = "SwiftTestingTestTests",
         testResult = "passed",
-        time = "0.001 seconds"
+        time = "0.002 seconds"
       }, {
         class = "HeckelAlgorithmTests",
         name = "testAlgorithmShouldReturnDeletesFirstInResultArray",
@@ -72,7 +72,7 @@
         success = true,
         target = "SwiftTestingTestTests",
         testResult = "passed",
-        time = "0.000 seconds"
+        time = "0.001 seconds"
       }, {
         class = "HeckelAlgorithmTests",
         name = "testAlgorithmShouldReturnEmptyResultWhenOldAndNewArraysAreEqual",
@@ -121,7 +121,7 @@
         success = true,
         target = "SwiftTestingTestTests",
         testResult = "passed",
-        time = "0.000 seconds"
+        time = "0.001 seconds"
       }, {
         class = "HeckelAlgorithmTests",
         name = "testAlgorithmShouldReturnTwoMovesWhenNewArrayHasSwitchedTwoItems",
@@ -130,7 +130,74 @@
         testResult = "passed",
         time = "0.001 seconds"
       } },
+    ["Some tests"] = { {
+        class = "Some tests",
+        name = "Test 1",
+        success = true,
+        target = "SwiftTesting",
+        testResult = "passed",
+        time = "0.001 seconds"
+      }, {
+        class = "Some tests",
+        name = "test2",
+        success = true,
+        target = "SwiftTesting",
+        testResult = "passed",
+        time = "0.001 seconds"
+      }, {
+        class = "Some tests",
+        filename = "SomeTests.swift",
+        name = "Test 3",
+        success = false,
+        target = "SwiftTesting",
+        testResult = "failed",
+        time = "0.001 seconds"
+      } },
+    ["Super Tests!!!"] = { {
+        class = "Super Tests!!!",
+        name = "example",
+        success = true,
+        target = "SwiftTesting",
+        testResult = "passed",
+        time = "0.001 seconds"
+      }, {
+        class = "Super Tests!!!",
+        name = "superExample",
+        success = true,
+        target = "SwiftTesting",
+        testResult = "passed",
+        time = "0.001 seconds"
+      }, {
+        class = "Super Tests!!!",
+        name = "My name",
+        success = true,
+        target = "SwiftTesting",
+        testResult = "passed",
+        time = "0.001 seconds"
+      }, {
+        class = "Super Tests!!!",
+        filename = "SuperTests.swift",
+        name = "someFailingTest",
+        success = false,
+        target = "SwiftTesting",
+        testResult = "failed",
+        time = "0.016 seconds"
+      } },
     _Global = { {
+        class = "_Global",
+        name = "someGlobalTest",
+        success = true,
+        target = "SwiftTesting",
+        testResult = "passed",
+        time = "0.001 seconds"
+      }, {
+        class = "_Global",
+        name = "extraGlobalTest",
+        success = true,
+        target = "SwiftTesting",
+        testResult = "passed",
+        time = "0.001 seconds"
+      }, {
         class = "_Global",
         name = "optional",
         success = true,
@@ -139,7 +206,7 @@
         time = "0.001 seconds"
       } }
   },
-  testsCount = 18,
+  testsCount = 27,
   usesSwiftTesting = true,
-  xcresultFilepath = "/Users/john/Library/Developer/Xcode/DerivedData/SwiftTestingTest-efmhndylextndpeeveiubnbazqdp/Logs/Test/Test-SwiftTestingTest-2024.11.10_01-41-29-+0100.xcresult"
+  xcresultFilepath = "/Users/john/Library/Developer/Xcode/DerivedData/SwiftTestingTest-efmhndylextndpeeveiubnbazqdp/Logs/Test/Test-SwiftTestingTest-2024.11.11_23-19-06-+0100.xcresult"
 }

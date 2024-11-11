@@ -986,6 +986,13 @@ function M.run_tests(opts)
   command = util.skip_nil(command)
   command = xcodebuildOffline.wrap_command_if_needed(command)
 
+  -- Disable parallel testing for Swift Packages
+  -- There are issues with the logs order.
+  if not opts.projectFile then
+    table.insert(command, "-parallel-testing-enabled")
+    table.insert(command, "NO")
+  end
+
   if opts.testsToRun then
     for _, test in ipairs(opts.testsToRun) do
       table.insert(command, "-only-testing")

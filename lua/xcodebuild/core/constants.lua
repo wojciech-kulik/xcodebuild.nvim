@@ -48,6 +48,9 @@ M.Platform = {
   MACOS = "macOS",
 }
 
+M.SwiftTestingTarget = "SwiftTesting"
+M.SwiftTestingGlobal = "_Global"
+
 ---Returns the SDK name for the given platform.
 ---@param platform PlatformId
 ---@return string

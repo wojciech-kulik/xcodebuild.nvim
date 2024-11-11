@@ -18,5 +18,6 @@
   testErrors = {},
   tests = {},
   testsCount = 0,
+  usesSwiftTesting = false,
   xcresultFilepath = "/Users/john/Library/Developer/Xcode/DerivedData/CalendarAppDemo-gpxsuartkqsliqafuudvbkhotrhj/Logs/Test/Test-CalendarAppDemo-2023.10.31_18-49-34-+0100.xcresult"
 }

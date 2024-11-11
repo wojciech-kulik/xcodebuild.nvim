@@ -42,11 +42,13 @@
 
 ---@class TestExplorerNode
 ---@field id string
+---@field swiftTestingId string|nil
 ---@field kind TestExplorerNodeKind
 ---@field status TestExplorerNodeStatus
 ---@field name string
 ---@field hidden boolean
 ---@field filepath string|nil
+---@field lineNumber number|nil
 ---@field classes TestExplorerNode[]|nil
 ---@field tests TestExplorerNode[]|nil
 
@@ -61,6 +63,7 @@ local config = require("xcodebuild.core.config").options.test_explorer
 local notifications = require("xcodebuild.broadcasting.notifications")
 local events = require("xcodebuild.broadcasting.events")
 local appdata = require("xcodebuild.project.appdata")
+local constants = require("xcodebuild.core.constants")
 
 local M = {}
 
@@ -83,17 +86,38 @@ local KIND_TARGET = "target"
 local KIND_CLASS = "class"
 local KIND_TEST = "test"
 
+local ns = vim.api.nvim_create_namespace("xcodebuild-test-explorer")
 local spinnerFrames = { "⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏" }
 local currentFrame = 1
 local last_set_cursor_row = nil
-local line_to_test = {}
 local collapsed_ids = {}
-local ns = vim.api.nvim_create_namespace("xcodebuild-test-explorer")
 local last_run_tests = {}
 local is_notests_message_visible = false
 
+---@type table<number, TestExplorerNode>
+local line_to_test = {}
+
 ---@type IdToTestNode[]
 local id_to_test = {}
+
+---@param text string|nil
+---@param number number|nil
+---@return string|nil
+local function take_testid_components(text, number)
+  if not text then
+    return nil
+  end
+
+  local components = vim.split(text, "/", { plain = true })
+  local missingComponents = 3 - #components
+  number = number - missingComponents
+
+  if number < 1 then
+    return nil
+  end
+
+  return table.concat(components, "/", 1, number)
+end
 
 local function show_notests_message()
   if not M.bufnr then
@@ -106,7 +130,7 @@ local function show_notests_message()
       "  No tests found.",
       "",
       "  Tests will automatically appear",
-      "  during the first run.",
+      "  during a test run.",
       "",
       "  Press `R` to fetch tests",
       "  without running them.",
@@ -213,9 +237,10 @@ end
 ---Insert test to `M.report`.
 ---@param test XcodeTest
 ---@param status TestExplorerNodeStatus
+---@param opts {filepath:string|nil,lineNumber:number|nil,swiftTestingId:string|nil}
 ---@return integer # number of inserted nodes
 ---@see TestExplorerReport
-local function insert_test(test, status)
+local function insert_test(test, status, opts)
   local target = id_to_test[test.target]
   local class = id_to_test[test.target .. "/" .. test.class]
   local testTarget = target and target.test
@@ -223,7 +248,7 @@ local function insert_test(test, status)
   local insertedNodes = 0
 
   local testSearch = require("xcodebuild.tests.search")
-  local filepath = testSearch.find_filepath(test.target, test.class)
+  local filepath = opts.filepath or testSearch.find_filepath(test.target, test.class)
 
   if not config.open_expanded then
     collapsed_ids[test.target .. "/" .. test.class] = true
@@ -232,6 +257,7 @@ local function insert_test(test, status)
   if not testTarget then
     testTarget = {
       id = test.target,
+      swiftTestingId = take_testid_components(opts.swiftTestingId, 1),
       kind = KIND_TARGET,
       status = test.enabled and status or STATUS_DISABLED,
       name = test.target,
@@ -246,6 +272,7 @@ local function insert_test(test, status)
   if not testClass then
     testClass = {
       id = test.target .. "/" .. test.class,
+      swiftTestingId = take_testid_components(opts.swiftTestingId, 2),
       kind = KIND_CLASS,
       status = test.enabled and status or STATUS_DISABLED,
       name = test.class,
@@ -262,10 +289,12 @@ local function insert_test(test, status)
 
   local testToInsert = {
     id = test.id,
+    swiftTestingId = opts.swiftTestingId,
     kind = KIND_TEST,
     status = test.enabled and status or STATUS_DISABLED,
     name = test.name,
     filepath = filepath,
+    lineNumber = opts.lineNumber,
     hidden = collapsed_ids[test.target] or collapsed_ids[test.target .. "/" .. test.class] or false,
   }
   id_to_test[testToInsert.id] = { test = testToInsert }
@@ -449,6 +478,7 @@ local function refresh_explorer(dontUpdateBuffer)
   line_to_test = {}
   id_to_test = {}
 
+  ---@param data TestExplorerNode
   local add_line = function(data)
     id_to_test[data.id] = { test = data }
 
@@ -755,7 +785,12 @@ function M.open_selected_test()
       end
     end
 
-    vim.fn.search(searchPhrase, "")
+    if line_to_test[currentRow].lineNumber then
+      vim.cmd(tostring(line_to_test[currentRow].lineNumber))
+    else
+      vim.fn.search(searchPhrase, "")
+    end
+
     vim.cmd("execute 'normal! zt'")
   end
 end
@@ -840,7 +875,8 @@ end
 ---It also updates parent nodes.
 ---@param testId string
 ---@param status TestExplorerNodeStatus
-function M.update_test_status(testId, status)
+---@param opts {filepath:string|nil,lineNumber:number|nil,swiftTestingId:string|nil}
+function M.update_test_status(testId, status, opts)
   local idComponents = vim.split(testId, "/", { plain = true })
   local targetId = idComponents[1]
   local classId = table.concat({ idComponents[1], idComponents[2] }, "/")
@@ -858,9 +894,10 @@ function M.update_test_status(testId, status)
       class = idComponents[2],
       name = idComponents[3],
       enabled = true,
-    }, status)
+    }, status, opts)
 
-    refresh_explorer(true)
+    local dontReload = idComponents[1] ~= constants.SwiftTestingTarget
+    refresh_explorer(dontReload)
 
     testData = id_to_test[testId]
     local classData = id_to_test[classId]
@@ -944,7 +981,7 @@ function M.run_selected_tests()
       elseif (test.kind == KIND_TEST or test.kind == KIND_CLASS) and lastKind == KIND_TARGET then
         -- skip tests and classes if target is already added
       else
-        table.insert(selectedTests, test.id)
+        table.insert(selectedTests, test.swiftTestingId or test.id)
         lastKind = test.kind
       end
     end

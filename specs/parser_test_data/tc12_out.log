@@ -26,5 +26,6 @@
       } }
   },
   testsCount = 2,
+  usesSwiftTesting = false,
   xcresultFilepath = "/Users/john/Library/Developer/Xcode/DerivedData/ShortcutRecorderCrash-godwnktrdenglibwmfrosntqktad/Logs/Test/Test-ShortcutRecorderCrash-2023.11.02_00-32-53-+0100.xcresult"
 }

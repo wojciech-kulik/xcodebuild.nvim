@@ -295,4 +295,14 @@ describe("ENSURE parse_logs", function()
       assert.are.same(expectedResult, result)
     end)
   end)
+
+  --
+  -- SwiftTesting + multiple targets
+  --
+  describe("WHEN the project contains SwiftTesting in multiple targets", function()
+    it("THEN should parse test results", function()
+      local expectedResult, result = runTestCase(22)
+      assert.are.same(expectedResult, result)
+    end)
+  end)
 end)
