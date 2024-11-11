@@ -17,11 +17,12 @@
 --- - `pymobiledevice3` to debug on physical devices and/or run apps on devices below iOS 17.
 --- - `xcode-build-server` to make LSP work properly with xcodeproj/xcworkspace.
 --- - `codelldb` to debug applications.
+--- - `ripgrep` to find matching test files while using Swift Testing framework.
 --- - `Xcode` to build, run, and test apps. Make sure that `xcodebuild` and `xcrun simctl` work correctly. Tested with Xcode 15.
 ---
 ---Installation
 --->bash
----  brew install xcode-build-server xcbeautify ruby pipx
+---  brew install xcode-build-server xcbeautify ruby pipx rg
 ---  gem install xcodeproj
 ---  pipx install pymobiledevice3
 ---<

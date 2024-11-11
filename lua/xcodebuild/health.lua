@@ -25,14 +25,14 @@ local optional_dependencies = {
     url = "https://github.com/cpisciotta/xcbeautify",
     message = "Required to nicely format Xcode logs.",
   },
+  {
+    binary = "rg",
+    url = "https://github.com/BurntSushi/ripgrep",
+    message = "Required to detect test files while using Swift Testing framework.",
+  },
 }
 
 local required_dependencies = {
-  -- {
-  --   binary = "codelldb",
-  --   url = "https://github.com/vadimcn/codelldb",
-  --   message = "Required to debug iOS and macOS apps.",
-  -- },
   {
     binary = "xcodebuild",
     url = "https://developer.apple.com/xcode/",

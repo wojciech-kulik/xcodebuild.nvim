@@ -119,5 +119,6 @@
       } }
   },
   testsCount = 18,
+  usesSwiftTesting = false,
   xcresultFilepath = "/Users/john/Library/Developer/Xcode/DerivedData/SwiftTestingTest-efmhndylextndpeeveiubnbazqdp/Logs/Test/Test-SwiftTestingTest-2024.11.10_01-57-09-+0100.xcresult"
 }

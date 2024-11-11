@@ -29,6 +29,15 @@ local function insert_test_if_correct(tests, testId, enabled)
       name = nil
     end
 
+    if name == nil and class then
+      name = class
+      class = require("xcodebuild.core.constants").SwiftTestingGlobal
+    end
+
+    if vim.endswith(name, "()") then
+      name = string.sub(name, 1, -3)
+    end
+
     table.insert(tests, {
       id = testId,
       target = target,

@@ -44,6 +44,48 @@ local function validate_testplan()
   return true
 end
 
+---Fixes the test report and updates the Test Explorer.
+local function fix_test_report()
+  local xcresultParser = require("xcodebuild.tests.xcresult_parser")
+  local explorerConfig = require("xcodebuild.core.config").options.test_explorer
+
+  if appdata.report and xcresultParser.fill_xcresult_data(appdata.report) then
+    testExplorer.clear()
+    testExplorer.start_tests()
+    local testsToUpdate = {}
+    local backup = explorerConfig.cursor_follows_tests
+
+    for _, tests in pairs(appdata.report.tests) do
+      for _, test in ipairs(tests) do
+        table.insert(testsToUpdate, {
+          id = test.target .. "/" .. test.class .. "/" .. test.name,
+          status = test.success and "passed" or "failed",
+          filepath = test.filepath,
+          lineNumber = test.lineNumber,
+          swiftTestingId = test.swiftTestingId,
+        })
+      end
+    end
+
+    table.sort(testsToUpdate, function(a, b)
+      return a.id:lower() < b.id:lower()
+    end)
+
+    explorerConfig.cursor_follows_tests = false
+
+    for _, test in ipairs(testsToUpdate) do
+      testExplorer.update_test_status(test.id, test.status, {
+        filepath = test.filepath,
+        lineNumber = test.lineNumber,
+        swiftTestingId = test.swiftTestingId,
+      })
+    end
+
+    testExplorer.finish_tests()
+    explorerConfig.cursor_follows_tests = backup
+  end
+end
+
 ---Builds application, enumerates tests, and loads
 ---them into the Test Explorer.
 function M.reload_tests()
@@ -163,6 +205,10 @@ function M.run_tests(testsToRun)
       return
     end
 
+    notifications.send_progress("Processing logs...")
+
+    fix_test_report()
+
     if config.restore_on_start then
       appdata.write_report(appdata.report)
     end
@@ -170,8 +216,6 @@ function M.run_tests(testsToRun)
     testSearch.load_targets_map()
     quickfix.set(appdata.report)
     diagnostics.refresh_all_test_buffers(appdata.report)
-
-    notifications.send_progress("Processing logs...")
     logsPanel.set_logs(appdata.report, true, process_coverage)
 
     events.tests_finished(
@@ -183,9 +227,18 @@ function M.run_tests(testsToRun)
 
   events.tests_started()
 
+  local usesSwiftTesting = appdata.report and appdata.report.usesSwiftTesting
+
   projectBuilder.build_project({ buildForTesting = true, doNotShowSuccess = true }, function(report)
     if not util.is_empty(report.buildErrors) then
       return
+    end
+
+    --- We need to clear Test Explorer because post processed Swift Testing tests
+    --- don't match the ones produced in logs.
+    --- Just let them appear while running and fix the list after the run.
+    if usesSwiftTesting then
+      testExplorer.clear()
     end
 
     testExplorer.start_tests(testsToRun)

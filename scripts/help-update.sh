@@ -37,6 +37,7 @@ lemmy-help \
   ./lua/xcodebuild/tests/runner.lua \
   ./lua/xcodebuild/tests/search.lua \
   ./lua/xcodebuild/tests/snapshots.lua \
+  ./lua/xcodebuild/tests/xcresult_parser.lua \
   ./lua/xcodebuild/code_coverage/coverage.lua \
   ./lua/xcodebuild/code_coverage/report.lua \
   ./lua/xcodebuild/integrations/dap.lua \

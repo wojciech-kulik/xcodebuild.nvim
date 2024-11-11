@@ -108,6 +108,8 @@ local function refresh_buf_marks(bufnr, testClass, tests, quickTests)
     for lineNumber, line in ipairs(bufLines) do
       if string.find(line, "func " .. testName .. "%(") then
         return lineNumber - 1
+      elseif string.find(line, '@Test("' .. testName .. '"', nil, true) then
+        return lineNumber - 1
       end
     end
 
