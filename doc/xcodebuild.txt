@@ -4034,7 +4034,7 @@ M.select_xcodeproj({callback}, {opts})  *xcodebuild.ui.pickers.select_xcodeproj*
 
 
 M.select_project({callback}, {opts})      *xcodebuild.ui.pickers.select_project*
-  Shows a picker with `xcworkspace` and `xcodeproj` files.
+  Shows a picker with `xcworkspace`, `xcodeproj`, and `Package.swift` files.
 
   Parameters: ~
     {callback}  (fun(projectFile:string)|nil)
