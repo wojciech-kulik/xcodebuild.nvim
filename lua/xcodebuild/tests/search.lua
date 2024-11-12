@@ -77,9 +77,11 @@ local function lsp_search(targetName, className)
     return LSPRESULT.TIMEOUT, nil
   end
 
+  --- kind 5 - class, 23 - struct
+  --- all types: https://github.com/swiftlang/sourcekit-lsp/blob/main/Sources/LanguageServerProtocol/SupportTypes/SymbolKind.swift
   if lspResult and lspResult[1] and lspResult[1].result then
     for _, result in ipairs(lspResult[1].result) do
-      if result.kind == 5 and result.name == className then
+      if (result.kind == 5 or result.kind == 23) and result.name == className then
         local filepath = (result.location.uri:gsub("file://", ""))
 
         if
