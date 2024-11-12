@@ -521,6 +521,7 @@ local function parse_test_started(line)
     target = constants.SwiftTestingTarget
     testClass = testSuite or constants.SwiftTestingGlobal
     testName = string.match(line, '^[^%w]+ Test "([^"]+)"') or string.match(line, "^[^%w]+ Test (%g+)%(%)")
+    testName = testName and testName:gsub("/", " ")
   end
 
   local filepath = testClass and testSearch.find_filepath(target, testClass)
@@ -550,10 +551,16 @@ local function process_line(line)
   -- BEGIN -> TEST_START -> TEST_ERROR -> (failed) -> BEGIN
 
   if string.find(line, "◇ Test run started") then
+    if not usesSwiftTesting then
+      --- We need to clear Test Explorer because post processed Swift Testing tests
+      --- don't match the ones produced in logs.
+      --- Just let them appear while running and fix the list after the run.
+      require("xcodebuild.tests.explorer").clear(false)
+    end
     usesSwiftTesting = true
-    return
   elseif string.find(line, '◇ Suite "[^"]+" started') then
     testSuite = string.match(line, '◇ Suite "(.+)" started')
+    testSuite = testSuite and testSuite:gsub("/", " ")
   elseif string.find(line, "◇ Suite .+ started") then
     testSuite = string.match(line, "◇ Suite (.+) started")
   elseif string.find(line, "^[^%w]+ Suite ") then

@@ -3,8 +3,9 @@
 ---This module is responsible for processing `xcresult` file
 ---and filling the report with the test data.
 ---
----When running tests using Swift Testing framework some information
----like target name are missing. This module fills the missing data.
+---Normally, processing logs from `xcodebuild` is enough to get
+---the test data. However, when running tests using Swift Testing
+---framework, some details like target name are missing.
 ---
 ---@brief ]]
 
@@ -24,7 +25,7 @@ local constants = require("xcodebuild.core.constants")
 ---@field parent XcTestNode|nil
 
 ---@private
----@class Xcresult
+---@class XcresultOutput
 ---@field testNodes XcTestNode[]
 
 local nodeType = {
@@ -37,26 +38,11 @@ local nodeType = {
 
 local M = {}
 
----@param suite string
----@param node XcTestNode
----@return XcTestNode|nil
-local function find_suite(suite, node)
-  if node.nodeType == nodeType.testSuite and node.name == suite then
-    return node
-  end
+---@type table<string, string>
+local ripgrepCache = {}
 
-  if node.children then
-    for _, child in ipairs(node.children) do
-      local resultNode = find_suite(suite, child)
-      if resultNode then
-        return resultNode
-      end
-    end
-  end
-
-  return nil
-end
-
+---Fills the parent property for all children
+---for easier navigation.
 ---@param node XcTestNode
 local function fill_parent(node)
   if node.children then
@@ -66,56 +52,6 @@ local function fill_parent(node)
     end
   end
 end
-
----@param testName string
----@param node XcTestNode
----@return XcTestNode|nil
-local function find_test(testName, node)
-  if node.children then
-    for _, child in ipairs(node.children) do
-      local childName = child.name and child.name:gsub("%(%)", "") or ""
-      if child.nodeType == nodeType.testCase and childName == testName then
-        return child
-      end
-    end
-  end
-
-  return nil
-end
-
----@param testName string
----@param node XcTestNode
----@return XcTestNode|nil
-local function find_global_test(testName, node)
-  local nodeName = node.name and node.name:gsub("%(%)", "") or ""
-
-  if
-    node.nodeType == nodeType.testCase
-    and nodeName == testName
-    and node.parent.nodeType == nodeType.testBundle
-  then
-    return node
-  end
-
-  -- skip testSuite and testCase nodes because they can't contain global tests
-  if node.nodeType == nodeType.testSuite or node.nodeType == nodeType.testCase then
-    return nil
-  end
-
-  if node.children then
-    for _, child in ipairs(node.children) do
-      local result = find_global_test(testName, child)
-      if result then
-        return result
-      end
-    end
-  end
-
-  return nil
-end
-
----@type table<string, string>
-local ripgrepCache = {}
 
 ---Finds the filepath using `ripgrep` for the given {suiteName}.
 ---@param suiteName string
@@ -155,86 +91,194 @@ local function find_filepath_using_ripgrep(suiteName)
   return nil
 end
 
----Updates {reportTests} array.
----@param reportTests ParsedTest[]
----@param testsNode XcTestNode
----@param targetName string
-local function fix_tests(reportTests, testsNode, targetName)
-  for testIndex, test in ipairs(reportTests) do
-    local xcTest = find_test(test.name, testsNode)
+---Fixes the test id by adding the target id if it's missing.
+---@param testId string|nil
+---@param targetId string
+---@return string|nil
+local function fix_test_id(testId, targetId)
+  if not testId then
+    return nil
+  end
 
-    -- fix target name
-    reportTests[testIndex].target = targetName
+  local fixedTestId = testId:gsub("%(%)", "")
 
-    -- fix swiftTestingId
-    if xcTest and xcTest.nodeIdentifier then
-      local _, count = xcTest.nodeIdentifier:gsub("/", "")
-      if count == 1 then
-        reportTests[testIndex].swiftTestingId = targetName .. "/" .. xcTest.nodeIdentifier
-      else
-        reportTests[testIndex].swiftTestingId = xcTest.nodeIdentifier
-      end
-    else
-      reportTests[testIndex].swiftTestingId = nil
-    end
-
-    -- fix filepath using ripgrep
-    if not reportTests[testIndex].filepath and reportTests[testIndex].class then
-      local filepath = testSearch.find_filepath(targetName, reportTests[testIndex].class)
-        or find_filepath_using_ripgrep(reportTests[testIndex].class)
-
-      reportTests[testIndex].filepath = filepath
-      reportTests[testIndex].filename = filepath and util.get_filename(filepath)
-    end
+  local _, count = fixedTestId:gsub("/", "")
+  if count < 2 then
+    return targetId .. "/" .. fixedTestId
+  else
+    return fixedTestId
   end
 end
 
----Updates {newReportTests} array.
----@param globalTests ParsedTest[]
----@param newReportTests table<string, ParsedTest[]>
----@param testsNode XcTestNode
-local function fix_global_tests(globalTests, newReportTests, testsNode)
-  for _, test in ipairs(globalTests or {}) do
-    local testNode = find_global_test(test.name, testsNode)
-    if not testNode then
-      goto continue
-    end
-
-    local targetName = testNode.parent
-        and testNode.parent.nodeType == nodeType.testBundle
-        and testNode.parent.name
-      or constants.SwiftTestingTarget
-
-    -- fix swiftTestingId
-    if testNode.nodeIdentifier then
-      local _, count = testNode.nodeIdentifier:gsub("/", "")
-      if count == 1 then
-        test.swiftTestingId = targetName .. "/" .. testNode.nodeIdentifier
-      else
-        test.swiftTestingId = testNode.nodeIdentifier
-      end
-    else
-      test.swiftTestingId = nil
-    end
-
-    -- fix target
-    test.target = targetName
-
-    -- insert
-    local key = targetName .. ":" .. constants.SwiftTestingGlobal
-    if not newReportTests[key] then
-      newReportTests[key] = {}
-    end
-    table.insert(newReportTests[key], test)
-
-    ::continue::
+---Finds the filepath for the given {target} and {suiteId}.
+---As a fallback, it uses the `suiteName` to find the filepath using `ripgrep`.
+---@param target string
+---@param suiteId string
+---@param suiteName string
+---@return string|nil
+local function find_filepath(target, suiteId, suiteName)
+  if target == constants.SwiftTestingTarget or suiteName == constants.SwiftTestingGlobal then
+    return nil
   end
+
+  return testSearch.find_filepath(target, suiteId) or find_filepath_using_ripgrep(suiteName)
+end
+
+---Returns the first match line number or nil.
+---@param filepath string
+---@param testName string|nil
+---@return number|nil
+local function find_test_line(filepath, testName)
+  if not testName then
+    return nil
+  end
+
+  local success, lines = util.readfile(filepath)
+  if not success then
+    return nil
+  end
+
+  for lineNumber, line in ipairs(lines) do
+    if string.find(line, "func " .. testName .. "%(") then
+      return lineNumber
+    elseif string.find(line, '@Test("' .. testName .. '"', nil, true) then
+      return lineNumber
+    end
+  end
+
+  return nil
+end
+
+---Parses the error message and returns the message, filepath, and line number.
+---@param message string|nil
+---@return {message:string,filepath:string|nil,lineNumber:number|nil}|nil
+local function extract_error(message)
+  if not message then
+    return nil
+  end
+
+  local filename, lineNumber, error = message:match("(.+)%:(%d+)%: (.*)")
+  if not error then
+    return { message = message }
+  end
+
+  return {
+    message = error,
+    filepath = filename and testSearch.find_filepath_by_filename(filename),
+    lineNumber = lineNumber and tonumber(lineNumber),
+  }
+end
+
+---Extracts the suite id from the test id.
+---@param testId string|nil
+---@return string|nil
+local function extract_suite_id(testId)
+  local parts = vim.split(testId or "", "/")
+
+  if #parts == 3 then
+    return parts[2]
+  elseif #parts == 2 then
+    return parts[1]
+  else
+    return nil
+  end
+end
+
+---@param testNode XcTestNode
+---@param targetId string|nil
+---@return string, ParsedTest
+local function parse_test(testNode, targetId)
+  local suiteName = testNode.parent
+      and testNode.parent.nodeType == nodeType.testSuite
+      and testNode.parent.name
+    or constants.SwiftTestingGlobal
+
+  local suiteId = extract_suite_id(testNode.nodeIdentifier) or constants.SwiftTestingGlobal
+  local targetIdUnwrapped = targetId or constants.SwiftTestingTarget
+  local filepath = find_filepath(targetIdUnwrapped, suiteId, suiteName)
+  local filename = filepath and util.get_filename(filepath)
+  local testId = fix_test_id(testNode.nodeIdentifier, targetIdUnwrapped)
+  local lineNumber = filepath and find_test_line(filepath, testNode.name)
+
+  ---@type ParsedTest
+  local test = {
+    filepath = filepath,
+    filename = filename,
+    lineNumber = lineNumber,
+    swiftTestingId = testId,
+    target = targetIdUnwrapped,
+    class = suiteName:gsub("/", " "),
+    name = testNode.name and testNode.name:gsub("%(%)", ""):gsub("/", " "),
+    testResult = testNode.result == "Passed" and "passed" or "failed",
+    success = testNode.result == "Passed",
+    time = testNode.duration and testNode.duration:gsub("s", " seconds"):gsub(",", "."),
+  }
+
+  for _, child in ipairs(testNode.children or {}) do
+    if child.nodeType == nodeType.failureMessage then
+      local error = extract_error(child.name)
+      if error then
+        test.filepath = test.filepath or error.filepath
+        test.filename = test.filepath and util.get_filename(test.filepath)
+
+        if error.filepath == test.filepath then
+          test.lineNumber = error.lineNumber or test.lineNumber or 1
+        end
+
+        if not test.message then
+          test.message = {}
+        end
+        table.insert(test.message, error.message)
+      end
+    end
+  end
+
+  local key = targetIdUnwrapped .. ":" .. suiteName
+  return key, test
+end
+
+---@param node XcTestNode
+---@param targetName string|nil
+---@return table<string, ParsedTest[]>
+local function get_tests(node, targetName)
+  local tests = {}
+
+  if node.nodeType == nodeType.testCase then
+    local key, test = parse_test(node, targetName)
+    if not tests[key] then
+      tests[key] = {}
+    end
+
+    table.insert(tests[key], test)
+    return tests
+  end
+
+  if node.nodeType == nodeType.testSuite and node.name == "System Failures" then
+    return tests
+  end
+
+  if node.nodeType == nodeType.testBundle then
+    targetName = node.name
+  end
+
+  for _, child in ipairs(node.children or {}) do
+    local childTests = get_tests(child, targetName)
+
+    for key, value in pairs(childTests) do
+      if not tests[key] then
+        tests[key] = {}
+      end
+
+      for _, test in ipairs(value) do
+        table.insert(tests[key], test)
+      end
+    end
+  end
+
+  return tests
 end
 
 ---Fills the report with the data from the `xcresult` file.
----
----Fixes target name and filepath.
----It also adds the {swiftTestingId} to the test.
 ---@param report ParsedReport
 ---@return boolean true if the report was updated, false otherwise.
 function M.fill_xcresult_data(report)
@@ -256,58 +300,18 @@ function M.fill_xcresult_data(report)
     return false
   end
 
-  ---@type Xcresult|nil
-  local xcresult = vim.fn.json_decode(output)
-  if not xcresult or util.is_empty(xcresult.testNodes) then
+  ---@type XcresultOutput|nil
+  local outputDecoded = vim.fn.json_decode(output)
+  if not outputDecoded or util.is_empty(outputDecoded.testNodes) then
     return false
   end
 
-  for _, node in ipairs(xcresult.testNodes) do
+  for _, node in ipairs(outputDecoded.testNodes) do
     fill_parent(node)
   end
 
-  ---@type table<string, ParsedTest[]>
-  local newReportTests = {}
   ripgrepCache = {}
-
-  fix_global_tests(
-    report.tests[constants.SwiftTestingTarget .. ":" .. constants.SwiftTestingGlobal],
-    newReportTests,
-    xcresult.testNodes[1]
-  )
-
-  for key, reportTests in pairs(report.tests) do
-    local target, suite = string.match(key, "([^:]+):([^:]+)")
-    if target ~= constants.SwiftTestingTarget then
-      newReportTests[key] = reportTests
-      goto continue
-    end
-
-    if suite == constants.SwiftTestingGlobal then
-      goto continue
-    end
-
-    local suiteNode = find_suite(suite, xcresult.testNodes[1])
-    if not suiteNode then
-      newReportTests[key] = reportTests
-      goto continue
-    end
-
-    local targetName = suiteNode.parent
-        and suiteNode.parent.nodeType == nodeType.testBundle
-        and suiteNode.parent.name
-      or constants.SwiftTestingTarget
-
-    newReportTests[targetName .. ":" .. suiteNode.name] = reportTests
-
-    if targetName and targetName ~= constants.SwiftTestingTarget then
-      fix_tests(reportTests, suiteNode, targetName)
-    end
-
-    ::continue::
-  end
-
-  report.tests = newReportTests
+  report.tests = get_tests(outputDecoded.testNodes[1])
 
   return true
 end
