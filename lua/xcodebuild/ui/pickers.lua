@@ -428,7 +428,7 @@ function M.select_xcodeproj(callback, opts)
   end, opts)
 end
 
----Shows a picker with `xcworkspace` and `xcodeproj` files.
+---Shows a picker with `xcworkspace`, `xcodeproj`, and `Package.swift` files.
 ---@param callback fun(projectFile: string)|nil
 ---@param opts PickerOptions|nil
 function M.select_project(callback, opts)
@@ -451,7 +451,7 @@ function M.select_project(callback, opts)
     cmd = {
       "fd",
       "-I",
-      "(.*\\.xcodeproj$|.*\\.xcworkspace$|Package\\.swift$)",
+      "(.*\\.xcodeproj$|.*\\.xcworkspace$|^Package\\.swift$)",
       vim.fn.getcwd(),
       "--max-depth", tostring(maxdepth),
       "-E", "**/*xcodeproj/project.xcworkspace/"
@@ -462,7 +462,7 @@ function M.select_project(callback, opts)
 
   M.show("Select Main Project File", pickerTitles, function(_, index)
     local projectFile = pickerValues[index]
-    local isSPM = util.has_suffix(projectFile, "Package.swift")
+    local isSPM = util.has_suffix(projectFile, ".swift")
 
     projectConfig.settings.workingDirectory = vim.fs.dirname(projectFile)
 
