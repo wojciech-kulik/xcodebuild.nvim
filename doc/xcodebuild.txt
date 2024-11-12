@@ -2979,8 +2979,11 @@ M.run_selected_tests()
   Runs the selected tests (in visual-mode).
 
 
-M.clear()                                      *xcodebuild.tests.explorer.clear*
+M.clear({showInfoMessage})                     *xcodebuild.tests.explorer.clear*
   Clears the Test Explorer buffer.
+
+  Parameters: ~
+    {showInfoMessage}  (boolean|nil) default: true
 
 
 M.toggle()                                    *xcodebuild.tests.explorer.toggle*
@@ -3250,16 +3253,14 @@ Xcresult File Parser                          *xcodebuild.tests.xcresult_parser*
 This module is responsible for processing `xcresult` file
 and filling the report with the test data.
 
-When running tests using Swift Testing framework some information
-like target name are missing. This module fills the missing data.
+Normally, processing logs from `xcodebuild` is enough to get
+the test data. However, when running tests using Swift Testing
+framework, some details like target name are missing.
 
 
                            *xcodebuild.tests.xcresult_parser.fill_xcresult_data*
 M.fill_xcresult_data({report})
   Fills the report with the data from the `xcresult` file.
-
-  Fixes target name and filepath.
-  It also adds the {swiftTestingId} to the test.
 
   Parameters: ~
     {report}  (ParsedReport)

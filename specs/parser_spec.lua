@@ -12,6 +12,7 @@ local mockSwiftFiles = function()
   require("xcodebuild.util").shell = function()
     return filetree
   end
+  require("xcodebuild.tests.explorer").clear = function() end
 
   vim.fn.getcwd = function()
     return "/Users/john/repositories/calendar-app-ios"

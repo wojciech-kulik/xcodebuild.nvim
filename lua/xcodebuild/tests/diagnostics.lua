@@ -7,6 +7,7 @@ local util = require("xcodebuild.util")
 local config = require("xcodebuild.core.config").options.marks
 local testSearch = require("xcodebuild.tests.search")
 local quick = require("xcodebuild.integrations.quick")
+local constants = require("xcodebuild.core.constants")
 
 local M = {}
 
@@ -44,7 +45,7 @@ local function find_test_class(bufnr, report)
   -- if not then maybe it's SwiftTesting, so just find a test with that filepath
   for key, tests in pairs(report.tests) do
     for _, test in ipairs(tests) do
-      if test.filepath == filepath then
+      if test.filepath == filepath and test.class ~= constants.SwiftTestingGlobal then
         return key
       end
     end
@@ -109,6 +110,8 @@ local function refresh_buf_marks(bufnr, testClass, tests, quickTests)
       if string.find(line, "func " .. testName .. "%(") then
         return lineNumber - 1
       elseif string.find(line, '@Test("' .. testName .. '"', nil, true) then
+        return lineNumber - 1
+      elseif string.find(line:gsub("/", " "), '@Test("' .. testName .. '"', nil, true) then
         return lineNumber - 1
       end
     end

@@ -1000,7 +1000,8 @@ function M.run_selected_tests()
 end
 
 ---Clears the Test Explorer buffer.
-function M.clear()
+---@param showInfoMessage boolean|nil default: true
+function M.clear(showInfoMessage)
   M.finish_tests()
   M.report = {}
   generate_report({})
@@ -1015,7 +1016,9 @@ function M.clear()
     vim.api.nvim_buf_set_lines(M.bufnr, 0, -1, false, {})
   end)
 
-  show_notests_message()
+  if showInfoMessage == nil or showInfoMessage then
+    show_notests_message()
+  end
 end
 
 ---Toggles the Test Explorer window.

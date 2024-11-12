@@ -227,18 +227,9 @@ function M.run_tests(testsToRun)
 
   events.tests_started()
 
-  local usesSwiftTesting = appdata.report and appdata.report.usesSwiftTesting
-
   projectBuilder.build_project({ buildForTesting = true, doNotShowSuccess = true }, function(report)
     if not util.is_empty(report.buildErrors) then
       return
-    end
-
-    --- We need to clear Test Explorer because post processed Swift Testing tests
-    --- don't match the ones produced in logs.
-    --- Just let them appear while running and fix the list after the run.
-    if usesSwiftTesting then
-      testExplorer.clear()
     end
 
     testExplorer.start_tests(testsToRun)
