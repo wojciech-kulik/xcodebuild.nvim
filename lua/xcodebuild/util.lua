@@ -221,8 +221,7 @@ end
 ---Checks if fd is installed on the system.
 ---@return boolean
 function M.is_fd_installed()
-  local output = M.shell("which fd")
-  return #output > 0 and output[1] ~= ""
+  return vim.fn.executable("fd") ~= 0
 end
 
 ---Merges two arrays into a new one.
