@@ -30,6 +30,11 @@ local optional_dependencies = {
     url = "https://github.com/BurntSushi/ripgrep",
     message = "Required to detect test files while using Swift Testing framework.",
   },
+  {
+    binary = "fd",
+    url = "https://github.com/sharkdp/fd",
+    message = "Improves performance when searching for files.",
+  },
 }
 
 local required_dependencies = {
