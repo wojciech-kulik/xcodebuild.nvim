@@ -575,6 +575,8 @@ function M.select_testplan(callback, opts)
         notifications.send_warning("Could not detect test plans")
       end, 100)
 
+      projectConfig.settings.testPlan = nil
+      projectConfig.save_settings()
       closePicker()
       util.call(callback)
     else
