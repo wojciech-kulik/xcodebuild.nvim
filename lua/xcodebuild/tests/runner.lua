@@ -31,19 +31,6 @@ local CANCELLED_CODE = 143
 ---@type string[]|nil test ids
 local last_test_run
 
----Validates if test plan is set in the project configuration.
----Send an error notification if not found.
----If project is configured for Swift Package, it returns `true`.
----@return boolean
-local function validate_testplan()
-  if not projectConfig.settings.testPlan and not projectConfig.settings.swiftPackage then
-    notifications.send_error("Test plan not found. Please run XcodebuildSelectTestPlan")
-    return false
-  end
-
-  return true
-end
-
 ---Fixes the test report and updates the Test Explorer.
 local function fix_test_report()
   local xcresultParser = require("xcodebuild.tests.xcresult_parser")
@@ -134,7 +121,7 @@ end
 ---snapshot previews, and Test Explorer.
 ---@param testsToRun string[]|nil test ids
 function M.run_tests(testsToRun)
-  if not helpers.validate_project(false) or not validate_testplan() then
+  if not helpers.validate_project(false) then
     return
   end
 
@@ -265,7 +252,7 @@ end
 ---it additionally triggers build for testing.
 ---@param opts TestRunnerOptions
 function M.run_selected_tests(opts)
-  if not helpers.validate_project(false) or not validate_testplan() then
+  if not helpers.validate_project(false) then
     return
   end
 
