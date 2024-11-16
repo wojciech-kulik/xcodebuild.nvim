@@ -12,24 +12,8 @@ project = Xcodeproj::Project.open(ARGV[1])
 # @param [Boolean] exit_on_not_found
 # @return [Xcodeproj::Project::Object::PBXGroup?]
 def find_group_by_absolute_file_path(project, path, exit_on_not_found = true)
-  groups = project.groups.lazy.filter_map do |group|
-    relative_path = path.sub("#{group.real_path}/", "")
-    relative_dir = File.dirname(relative_path)
-
-    if group.real_path.to_s == File.dirname(path)
-      return group
-    end
-
-    group.find_subpath(relative_dir)
-  end
-
-  if groups.first.nil? && exit_on_not_found
-    group_name = File.dirname(path)
-    puts "WARN: xcodebuild.nvim: Could not find \"#{group_name}\" group in the project."
-    exit
-  end
-
-  groups.first
+  dir = File.dirname(path)
+  find_group_by_absolute_dir_path(project, dir, exit_on_not_found)
 end
 
 # @param [Xcodeproj::Project] project
@@ -37,23 +21,28 @@ end
 # @param [Boolean] exit_on_not_found
 # @return [Xcodeproj::Project::Object::PBXGroup?]
 def find_group_by_absolute_dir_path(project, path, exit_on_not_found = true)
-  groups = project.groups.lazy.filter_map do |group|
-    relative_dir = path.sub("#{group.real_path}/", "")
+  main_group_path = project.main_group.real_path.to_s
 
-    if group.real_path.to_s == path
-      return group
-    end
-
-    group.find_subpath(relative_dir)
+  is_pods = main_group_path.end_with? "/Pods"
+  if is_pods
+    main_group_path = main_group_path.sub("/Pods", "")
   end
 
-  if groups.first.nil? && exit_on_not_found
+  relative_path = path.sub("#{main_group_path}/", "")
+
+  if is_pods && !relative_path.start_with?("/")
+    relative_path = "Development Pods/#{relative_path}"
+  end
+
+  result = project[relative_path]
+
+  if result.nil? && exit_on_not_found
     group_name = File.basename(path)
     puts "WARN: xcodebuild.nvim: Could not find \"#{group_name}\" group in the project."
     exit
   end
 
-  groups.first
+  result
 end
 
 # @param [Xcodeproj::Project] project
