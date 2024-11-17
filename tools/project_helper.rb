@@ -1,11 +1,51 @@
 # frozen_string_literal: true
 
 require "xcodeproj"
+require "json"
 
 action = ARGV[0]
+project_path = ARGV[1]
 
 # @type [Xcodeproj::Project]
-project = Xcodeproj::Project.open(ARGV[1])
+project = Xcodeproj::Project.open(project_path)
+
+# @type [String]
+$pods_cache = []
+
+# @param [String] project_path
+# @return [Array<String>]
+def find_dev_pod_paths(project_path)
+  return $pods_cache unless $pods_cache.empty?
+
+  podfile_path = File.join(File.dirname(File.dirname(project_path).to_s), "Podfile")
+
+  return [] unless File.exist?(podfile_path)
+
+  podfile_json = `pod ipc podfile-json "#{podfile_path}"`
+  podfile = JSON.parse(podfile_json)
+
+  paths = []
+  podfile["target_definitions"].each do |target|
+    target["children"].each do |child|
+      child["dependencies"].each do |dependency|
+        next unless dependency.is_a?(Hash)
+
+        dependency.each_value do |value|
+          next unless value.is_a?(Array)
+
+          value.each do |item|
+            if item.is_a?(Hash) && item["path"]
+              paths << item["path"].chomp("/")
+            end
+          end
+        end
+      end
+    end
+  end
+
+  $pods_cache = paths.uniq
+  $pods_cache
+end
 
 # @param [Xcodeproj::Project] project
 # @param [String] path
@@ -31,6 +71,12 @@ def find_group_by_absolute_dir_path(project, path, exit_on_not_found = true)
   relative_path = path.sub("#{main_group_path}/", "")
 
   if is_pods && !relative_path.start_with?("/")
+    find_dev_pod_paths(project.path.to_s).each do |path|
+      next unless path.include?("/")
+
+      pod_basepath = "#{File.dirname(path)}/"
+      relative_path = relative_path.sub(pod_basepath, "")
+    end
     relative_path = "Development Pods/#{relative_path}"
   end
 
