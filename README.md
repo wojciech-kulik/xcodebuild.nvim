@@ -76,6 +76,7 @@ Big thanks to all the sponsors who support this project 🍻!
 <a href="https://github.com/joeldrotleff"><img src="https://avatars.githubusercontent.com/u/2484624" width="40" height="40" alt="@joeldrotleff" title="joeldrotleff"></a>
 <a href="https://github.com/stephenhuh"><img src="https://avatars.githubusercontent.com/u/6165538" width="40" height="40" alt="@stephenhuh" title="stephenhuh"></a>
 <a href="https://github.com/kg8m"><img src="https://avatars.githubusercontent.com/u/694547" width="40" height="40" alt="@kg8m" title="kg8m"></a>
+<a href="https://github.com/m-housh"><img src="https://avatars.githubusercontent.com/u/9305678" width="40" height="40" alt="@m-housh" title="m-housh"></a>
 
 ### One Time Sponsors
 
