@@ -1,0 +1,91 @@
+{
+  buildErrors = {},
+  buildWarnings = {},
+  failedTestsCount = 1,
+  output = {},
+  testErrors = {},
+  tests = {
+    IntegrationTests = { {
+        class = "IntegrationTests",
+        name = "testConnectionServiceShutdown",
+        success = true,
+        target = "IntegrationTests",
+        testResult = "passed",
+        time = "0.737 seconds"
+      }, {
+        class = "IntegrationTests",
+        name = "testListeningResumesAfterDisconnectThenReconnect",
+        success = true,
+        target = "IntegrationTests",
+        testResult = "passed",
+        time = "0.343 seconds"
+      }, {
+        class = "IntegrationTests",
+        name = "testABCConnectionStream",
+        success = true,
+        target = "IntegrationTests",
+        testResult = "passed",
+        time = "0.723 seconds"
+      } },
+    _Global = { {
+        class = "_Global",
+        name = "checkParseABCVersion",
+        success = true,
+        target = "SwiftTesting",
+        testResult = "passed",
+        time = "0.001 seconds"
+      }, {
+        class = "_Global",
+        name = "logLevelFromEnvVars",
+        success = true,
+        target = "SwiftTesting",
+        testResult = "passed",
+        time = "0.025 seconds"
+      }, {
+        class = "_Global",
+        name = "testBundleUrl",
+        success = true,
+        target = "SwiftTesting",
+        testResult = "passed",
+        time = "0.001 seconds"
+      }, {
+        class = "_Global",
+        filename = "CliClientTests.swift",
+        filepath = "/Users/john/repo/something/Tests/CliClientTests.swift",
+        lineNumber = 59,
+        message = { 'fileCouldNotBeRead("test.env", Unicode (UTF-8))' },
+        name = "checkMakeEnvVars",
+        success = false,
+        target = "SwiftTesting",
+        testResult = "failed"
+      }, {
+        class = "_Global",
+        filename = "CliClientTests.swift",
+        filepath = "/Users/john/repo/something/Tests/CliClientTests.swift",
+        lineNumber = 59,
+        message = { 'Error Domain=NSCocoaErrorDomain Code=260 "The file “test-env.json” couldn’t be opened because there is no such file." UserInfo={NSFilePath=/private/tmp/test-env.json, NSURL=test-env.json -- file:///private/tmp/, NSUnderlyingError=0x60000117da40 {Error Domain=NSPOSIXErrorDomain Code=2 "No such file or directory"}}' },
+        name = "checkMakeEnvVars",
+        success = false,
+        target = "SwiftTesting",
+        testResult = "failed",
+        time = "0.011 seconds"
+      }, {
+        class = "_Global",
+        name = "checkFileTypeParsing",
+        success = true,
+        target = "SwiftTesting",
+        testResult = "passed",
+        time = "0.001 seconds"
+      }, {
+        class = "_Global",
+        name = "checkLiveProcessInfo",
+        success = true,
+        target = "SwiftTesting",
+        testResult = "passed",
+        time = "0.001 seconds"
+      } }
+  },
+  testsCount = 9,
+  usesSwiftTesting = true,
+  xcresultFilepath = "/Users/john/Library/Developer/Xcode/DerivedData/swift-abc-xyz-bywkwkxxljnetgclhnoieiwigiwm/Logs/Test/Test-xyz-controller-Package-2024.11.18_11-59-10--0500.xcresult"
+}

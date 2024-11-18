@@ -157,7 +157,7 @@ local function extract_error(message)
     return nil
   end
 
-  local filename, lineNumber, error = message:match("(.+)%:(%d+)%: (.*)")
+  local filename, lineNumber, error = message:match("(.+):(%d+): (.*)")
   if not error then
     return { message = message }
   end

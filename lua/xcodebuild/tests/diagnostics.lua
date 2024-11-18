@@ -35,7 +35,7 @@ local function find_test_class(bufnr, report)
   -- if not try finding the name in the source code
   local lines = vim.api.nvim_buf_get_lines(bufnr, 1, -1, false)
   for index, line in ipairs(lines) do
-    local class = string.match(line, "class ([^:%s]+)%s*%:?")
+    local class = string.match(line, "class ([^:%s]+)%s*:?")
     local previousLine = (index > 1 and lines[index - 1]) or ""
     if not string.find(line, "@Suite") and not string.find(previousLine, "@Suite") and class then
       return testSearch.get_test_key_for_file(filepath, class)
