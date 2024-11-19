@@ -61,6 +61,7 @@ M.coverage_report_filepath = M.appdir .. "/coverage.json"
 M.test_explorer_filepath = M.appdir .. "/test-explorer.json"
 M.breakpoints_filepath = M.appdir .. "/breakpoints.json"
 M.env_vars_filepath = M.appdir .. "/env.txt"
+M.run_args_filepath = M.appdir .. "/run_args.txt"
 
 M.GETSNAPSHOTS_TOOL = "getsnapshots"
 M.PROJECT_HELPER_TOOL = "project_helper.rb"
@@ -78,6 +79,7 @@ function M.create_app_dir()
   util.shell("mkdir -p .nvim/xcodebuild")
 end
 
+---Initializes the `.nvim/xcodebuild/env.txt` file.
 function M.initialize_env_vars()
   local path = M.env_vars_filepath
 
@@ -95,6 +97,51 @@ function M.initialize_env_vars()
       "",
     }, path)
   end
+end
+
+---Initializes the `.nvim/xcodebuild/run_args.txt` file.
+function M.initialize_run_args()
+  local path = M.run_args_filepath
+
+  if not util.file_exists(path) then
+    vim.fn.writefile({
+      "# Run Arguments",
+      "#",
+      "# Add your run arguments here.",
+      "# Each line should be a separate argument.",
+      "#",
+      "# Example:",
+      "#",
+      "# -FIRDebugEnabled",
+      "",
+      "",
+    }, path)
+  end
+end
+
+---Reads the run arguments from disk.
+---@return string[]|nil
+function M.read_run_args()
+  local path = M.run_args_filepath
+
+  if not util.file_exists(path) then
+    return nil
+  end
+
+  local success, lines = pcall(vim.fn.readfile, path)
+  if not success then
+    return nil
+  end
+
+  local filteredLines = vim.tbl_filter(function(line)
+    return not vim.startswith(line, "#") and vim.trim(line) ~= ""
+  end, lines)
+
+  if vim.tbl_isempty(filteredLines) then
+    return nil
+  end
+
+  return filteredLines
 end
 
 ---Reads the environment variables from disk.

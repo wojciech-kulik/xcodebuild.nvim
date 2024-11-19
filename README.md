@@ -16,6 +16,7 @@ It provides all essential actions for development including building, debugging,
 - [x] Test Explorer to visually present a tree with all tests and results.
 - [x] Built using official command line tools like `xcodebuild` and `xcrun simctl`.
 - [x] Actions to build, run, debug, and test apps on simulators and physical devices.
+- [x] Environment variables and run arguments management.
 - [x] Buffer integration with test results (code coverage, success & failure marks, duration,
       extra diagnostics).
 - [x] Code coverage report with customizable levels.
