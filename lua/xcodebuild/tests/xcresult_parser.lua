@@ -318,7 +318,7 @@ function M.fill_xcresult_data(report)
 
   for _, tests in pairs(report.tests) do
     for _, test in ipairs(tests) do
-      report.failedTestsCount = report.failedTestsCount + (test.success and 1 or 0)
+      report.failedTestsCount = report.failedTestsCount + (test.success and 0 or 1)
       report.testsCount = report.testsCount + 1
     end
   end
