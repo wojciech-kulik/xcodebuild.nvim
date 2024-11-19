@@ -321,6 +321,7 @@ function M.setup(options)
   vim.api.nvim_create_user_command("XcodebuildShowCurrentFileTargets", call(actions.show_current_file_targets), { nargs = 0 })
 
   -- Other
+  vim.api.nvim_create_user_command("XcodebuildEditEnvVars", call(actions.edit_env_vars), { nargs = 0 })
   vim.api.nvim_create_user_command("XcodebuildShowConfig", call(actions.show_current_config), { nargs = 0 })
   vim.api.nvim_create_user_command("XcodebuildBootSimulator", call(actions.boot_simulator), { nargs = 0 })
   vim.api.nvim_create_user_command("XcodebuildCleanDerivedData", call(actions.clean_derived_data), { nargs = 0 })

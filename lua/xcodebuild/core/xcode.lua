@@ -681,7 +681,15 @@ function M.launch_app_on_device(destination, bundleId, callback)
   }
   debug_print("launch_app_on_device", command)
 
+  local appdata = require("xcodebuild.project.appdata")
+  local env = nil
+  for key, value in pairs(appdata.read_env_vars() or {}) do
+    env = env or {}
+    env["DEVICECTL_CHILD_" .. key] = value
+  end
+
   return vim.fn.jobstart(command, {
+    env = env,
     stderr_buffered = true,
     on_stderr = show_stderr_output,
     on_exit = callback_or_error("launch", callback),
@@ -726,7 +734,14 @@ function M.launch_app_on_simulator(destination, bundleId, waitForDebugger, callb
     util.shell("open -a Simulator")
   end
 
+  local env = nil
+  for key, value in pairs(appdata.read_env_vars() or {}) do
+    env = env or {}
+    env["SIMCTL_CHILD_" .. key] = value
+  end
+
   return vim.fn.jobstart(command, {
+    env = env,
     stdout_buffered = false,
     stderr_buffered = false,
     detach = true,

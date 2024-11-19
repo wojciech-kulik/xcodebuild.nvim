@@ -60,6 +60,7 @@ M.snapshots_dir = M.appdir .. "/failing-snapshots"
 M.coverage_report_filepath = M.appdir .. "/coverage.json"
 M.test_explorer_filepath = M.appdir .. "/test-explorer.json"
 M.breakpoints_filepath = M.appdir .. "/breakpoints.json"
+M.env_vars_filepath = M.appdir .. "/env.txt"
 
 M.GETSNAPSHOTS_TOOL = "getsnapshots"
 M.PROJECT_HELPER_TOOL = "project_helper.rb"
@@ -75,6 +76,59 @@ end
 ---Creates the `.nvim/xcodebuild` folder if it doesn't exist.
 function M.create_app_dir()
   util.shell("mkdir -p .nvim/xcodebuild")
+end
+
+function M.initialize_env_vars()
+  local path = M.env_vars_filepath
+
+  if not util.file_exists(path) then
+    vim.fn.writefile({
+      "# Environment Variables",
+      "#",
+      "# Add your environment variables here.",
+      "# Each line should be in the format of `KEY=VALUE`.",
+      "#",
+      "# Example:",
+      "#",
+      "# OS_ACTIVITY_MODE=disable",
+      "",
+      "",
+    }, path)
+  end
+end
+
+---Reads the environment variables from disk.
+---@return table<string,string>|nil
+function M.read_env_vars()
+  local path = M.env_vars_filepath
+
+  if not util.file_exists(path) then
+    return nil
+  end
+
+  local success, lines = pcall(vim.fn.readfile, path)
+  if not success then
+    return nil
+  end
+
+  local filteredLines = vim.tbl_filter(function(line)
+    return not vim.startswith(line, "#") and vim.trim(line) ~= ""
+  end, lines)
+
+  local result = {}
+
+  for _, line in ipairs(filteredLines) do
+    local parts = vim.split(line, "=", { plain = true })
+    if #parts == 2 then
+      result[parts[1]] = parts[2]
+    end
+  end
+
+  if vim.tbl_isempty(result) then
+    return nil
+  end
+
+  return result
 end
 
 ---Reads the original Xcode logs.

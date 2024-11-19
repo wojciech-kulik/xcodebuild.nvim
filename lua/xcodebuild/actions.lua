@@ -20,6 +20,7 @@ local testRunner = require("xcodebuild.tests.runner")
 local projectBuilder = require("xcodebuild.project.builder")
 local projectConfig = require("xcodebuild.project.config")
 local projectManager = require("xcodebuild.project.manager")
+local appdata = require("xcodebuild.project.appdata")
 local lsp = require("xcodebuild.integrations.lsp")
 
 local M = {}
@@ -109,6 +110,12 @@ end
 ---Cleans the derived data.
 function M.clean_derived_data()
   projectBuilder.clean_derived_data()
+end
+
+---Opens `env.txt` file in a new tab.
+function M.edit_env_vars()
+  appdata.initialize_env_vars()
+  vim.cmd("tabedit " .. appdata.env_vars_filepath)
 end
 
 ---Launches the app.

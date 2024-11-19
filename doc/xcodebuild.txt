@@ -495,6 +495,7 @@ Configuration
  | `XcodebuildPreviousDevice` | Selects previous device             |
  | `XcodebuildSelectTestPlan` | Show test plan picker               |
  | `XcodebuildShowConfig`     | Print current project configuration |
+ | `XcodebuildEditEnvVars`    | Edit environment variables          |
  | `XcodebuildBootSimulator`  | Boot selected simulator             |
  | `XcodebuildInstallApp`     | Install application                 |
  | `XcodebuildUninstallApp`   | Uninstall application               |
@@ -699,6 +700,10 @@ M.build_and_run({callback})                   *xcodebuild.actions.build_and_run*
 
 M.clean_derived_data()                   *xcodebuild.actions.clean_derived_data*
   Cleans the derived data.
+
+
+M.edit_env_vars()                             *xcodebuild.actions.edit_env_vars*
+  Opens `env.txt` file in a new tab.
 
 
 M.run({callback})                                       *xcodebuild.actions.run*
@@ -1852,6 +1857,17 @@ M.tool_path({name})                       *xcodebuild.project.appdata.tool_path*
                                      *xcodebuild.project.appdata.create_app_dir*
 M.create_app_dir()
   Creates the `.nvim/xcodebuild` folder if it doesn't exist.
+
+
+                                *xcodebuild.project.appdata.initialize_env_vars*
+M.initialize_env_vars()
+
+
+M.read_env_vars()                     *xcodebuild.project.appdata.read_env_vars*
+  Reads the environment variables from disk.
+
+  Returns: ~
+    (table<string,string>|nil)
 
 
                                  *xcodebuild.project.appdata.read_original_logs*
