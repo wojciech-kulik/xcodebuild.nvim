@@ -314,6 +314,7 @@ function M.fill_xcresult_data(report)
 
   report.tests = get_tests(outputDecoded.testNodes[1])
   report.failedTestsCount = 0
+  report.testsCount = 0
 
   for _, tests in pairs(report.tests) do
     for _, test in ipairs(tests) do
