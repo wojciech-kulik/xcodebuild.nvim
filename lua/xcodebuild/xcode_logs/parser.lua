@@ -108,8 +108,8 @@ local usesSwiftTesting = false
 local xcresultFilepath = nil
 
 -- patterns
-local swiftFilePattern = "[^%:]+%.swift"
-local xcTestLogPattern = "%s+[%w_]+%[%d+%:%d+%]"
+local swiftFilePattern = "[^:]+%.swift"
+local xcTestLogPattern = "%s+[%w_]+%[%d+:%d+%]"
 
 local DEBUG = false
 
@@ -295,7 +295,7 @@ end
 ---@param logLine string
 ---@return string
 local function get_message(logLine)
-  return string.match(logLine, "%-%[[%w_]+%.[%w_]+ %g+%] %: (.*)") or logLine
+  return string.match(logLine, "%-%[[%w_]+%.[%w_]+ %g+%] : (.*)") or logLine
 end
 
 ---Returns the first match line number or nil.
@@ -327,9 +327,9 @@ local function parse_build_error(line)
     return
   end
 
-  if string.find(line, swiftFilePattern .. "%:%d+%:%d*%:? %w*%s*error%: .*") then
+  if string.find(line, swiftFilePattern .. ":%d+:%d*:? %w*%s*error: .*") then
     local filepath, lineNumber, colNumber, message =
-      string.match(line, "(" .. swiftFilePattern .. ")%:(%d+)%:(%d*)%:? %w*%s*error%: (.*)")
+      string.match(line, "(" .. swiftFilePattern .. "):(%d+):(%d*):? %w*%s*error: (.*)")
     if filepath and message then
       lineType = BUILD_ERROR
       lineData = {
@@ -341,8 +341,8 @@ local function parse_build_error(line)
       }
     end
   else
-    local source, message = string.match(line, "(.*)%: %w*%s*error%: (.*)")
-    message = message or string.match(line, "^error%: (.*)")
+    local source, message = string.match(line, "(.*): %w*%s*error: (.*)")
+    message = message or string.match(line, "^error: (.*)")
 
     if message then
       lineType = BUILD_ERROR
@@ -365,17 +365,24 @@ local function parse_test_error(line)
   end
 
   local filepath, lineNumber, message =
-    string.match(line, "(" .. swiftFilePattern .. ")%:(%d+)%:%d*%:? %w*%s*error%: (.*)")
+    string.match(line, "(" .. swiftFilePattern .. "):(%d+):%d*:? %w*%s*error: (.*)")
   local filename = filepath and util.get_filename(filepath)
   lineData.filepath = lineData.filepath or filepath
 
-  if string.find(line, "recorded an issue") then
+  if string.find(line, "recorded an issue at") then
     filename, lineNumber, message =
       string.match(line, "recorded an issue at (" .. swiftFilePattern .. "):(%d+):%d+: (.*)")
     filepath = testSearch.find_filepath_by_filename(filename)
 
-    lineData.filename = lineData.filename or filename
-    lineData.filepath = lineData.filepath or filepath
+    lineData.filename = filename
+    lineData.filepath = filepath
+  elseif string.find(line, "recorded an issue") then
+    filename, lineNumber, message =
+      string.match(line, " at (" .. swiftFilePattern .. "):(%d+):%d+: Caught error: (.*)")
+    filepath = testSearch.find_filepath_by_filename(filename)
+
+    lineData.filename = filename
+    lineData.filepath = filepath
   end
 
   if not filepath or not message then
@@ -419,7 +426,7 @@ local function parse_warning(line)
   end
 
   local filepath, lineNumber, columnNumber, message =
-    string.match(line, "(" .. swiftFilePattern .. ")%:(%d+)%:(%d*)%:? %w*%s*warning%: (.*)")
+    string.match(line, "(" .. swiftFilePattern .. "):(%d+):(%d*):? %w*%s*warning: (.*)")
 
   if filepath and message and util.has_prefix(filepath, vim.fn.getcwd()) then
     lineType = BUILD_WARNING
@@ -520,7 +527,8 @@ local function parse_test_started(line)
   if not testName then
     target = constants.SwiftTestingTarget
     testClass = testSuite or constants.SwiftTestingGlobal
-    testName = string.match(line, '^[^%w]+ Test "([^"]+)"') or string.match(line, "^[^%w]+ Test (%g+)%(%)")
+    testName = string.match(line, '^[^%w]+ Test "([^"]+)"')
+      or string.match(line, "^[^%w]+ Test (%g+)%([^%)]*%)")
     testName = testName and testName:gsub("/", " ")
   end
 
@@ -572,6 +580,9 @@ local function process_line(line)
     end
 
     parse_test_started(line)
+  elseif string.find(line, "◇ Passing") then
+    -- do nothing
+    return
   elseif
     string.find(line, "^Test [Cc]ase.*passed")
     or string.find(line, "^Test [Cc]ase.*failed")
@@ -583,7 +594,7 @@ local function process_line(line)
     flush() -- flush if there is anything
     line = line:gsub("on '[^']*'", "") -- remove simulator name (it appears while parallel testing)
     parse_test_finished(line)
-  elseif string.find(line, "error%:") or string.find(line, "recorded an issue") then
+  elseif string.find(line, "error:") or string.find(line, "recorded an issue") then
     flush()
 
     -- found another failure within the same test
@@ -597,7 +608,7 @@ local function process_line(line)
     elseif testsCount == 0 and lineType == BEGIN then
       parse_build_error(line)
     end
-  elseif string.find(line, "warning%:") then
+  elseif string.find(line, "warning:") then
     flush()
     parse_warning(line)
   elseif string.find(line, "%s*~*%^~*%s*") then
@@ -608,7 +619,7 @@ local function process_line(line)
     if lineType ~= TEST_ERROR then
       flush()
     end
-  elseif string.find(line, "^Linting") or string.find(line, "^note%:") then
+  elseif string.find(line, "^Linting") or string.find(line, "^note:") then
     flush()
   elseif string.find(line, "%.xcresult$") then
     xcresultFilepath = string.match(line, "%s*(.*[^%.%/]+%.xcresult)")

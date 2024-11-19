@@ -42,6 +42,17 @@ local mockSwiftFiles = function()
       },
     }
   end
+
+  ---@diagnostic disable-next-line: duplicate-set-field
+  require("xcodebuild.tests.search").find_filepath_by_filename = function(filename)
+    if filename == "CliClientTests.swift" then
+      return "/Users/john/repo/something/Tests/CliClientTests.swift"
+    elseif filename == "HeckelAlgorithmSwiftTestingTests.swift" then
+      return "/Users/john/repo/something/Tests/HeckelAlgorithmSwiftTestingTests.swift"
+    elseif filename == "TestingProjectTests.swift" then
+      return "/Users/john/repo/something/Tests/TestingProjectTests.swift"
+    end
+  end
 end
 
 local mockLSP = function()
@@ -303,6 +314,16 @@ describe("ENSURE parse_logs", function()
   describe("WHEN the project contains SwiftTesting in multiple targets", function()
     it("THEN should parse test results", function()
       local expectedResult, result = runTestCase(22)
+      assert.are.same(expectedResult, result)
+    end)
+  end)
+
+  --
+  -- SwiftTesting parameterized
+  --
+  describe("WHEN the project contains SwiftTesting tests with parameters", function()
+    it("THEN should parse test results", function()
+      local expectedResult, result = runTestCase(23)
       assert.are.same(expectedResult, result)
     end)
   end)

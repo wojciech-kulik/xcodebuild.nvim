@@ -247,7 +247,7 @@ function M.get_destinations(projectFile, scheme, workingDirectory, callback)
     on_stdout = function(_, output)
       local result = {}
       local foundDestinations = false
-      local valuePattern = "%:%s*([^@}]-)%s*[@}]"
+      local valuePattern = ":%s*([^@}]-)%s*[@}]"
 
       for _, line in ipairs(output) do
         local trimmedLine = util.trim(line)

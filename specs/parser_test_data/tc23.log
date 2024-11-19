@@ -1,0 +1,113 @@
+Command line invocation:
+    /Volumes/Bucket/Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild test-without-building -scheme abc-controller-Package -destination id=00008103-000E79D011EA001E -parallelizeTargets -parallel-testing-enabled NO
+
+User defaults from command line:
+    IDEPackageSupportUseBuiltinSCM = YES
+
+Resolve Package Graph
+
+
+Resolved source packages:
+  xyz-controller: /Volumes/Bucket/Repos/github.com/swift-abc-xyz
+  swift-clocks: https://github.com/pointfreeco/swift-clocks @ 1.0.5
+  swift-atomics: https://github.com/apple/swift-atomics.git @ 1.2.0
+  swift-nio-ssl: https://github.com/apple/swift-nio-ssl.git @ 2.18.0
+  swift-tagged: https://github.com/pointfreeco/swift-tagged @ 0.10.0
+  abc-nio: https://github.com/swift-server-community/abc-nio.git @ 2.11.0
+  swift-log: https://github.com/apple/swift-log.git @ 1.6.1
+  combine-schedulers: https://github.com/pointfreeco/combine-schedulers @ 1.0.2
+  swift-dependencies: https://github.com/pointfreeco/swift-dependencies @ 1.5.2
+  swift-system: https://github.com/apple/swift-system.git @ 1.4.0
+  swift-service-lifecycle: https://github.com/swift-server/swift-service-lifecycle.git @ 2.6.2
+  swift-async-algorithms: https://github.com/apple/swift-async-algorithms.git @ 1.0.2
+  DotEnv: https://github.com/swiftpackages/DotEnv.git @ 3.0.0
+  swift-concurrency-extras: https://github.com/pointfreeco/swift-concurrency-extras @ 1.3.0
+  swift-collections: https://github.com/apple/swift-collections.git @ 1.1.4
+  swift-syntax: https://github.com/swiftlang/swift-syntax @ 600.0.1
+  swift-nio-transport-services: https://github.com/apple/swift-nio-transport-services.git @ 1.11.4
+  xctest-dynamic-overlay: https://github.com/pointfreeco/xctest-dynamic-overlay @ 1.4.2
+  swift-custom-dump: https://github.com/pointfreeco/swift-custom-dump @ 1.3.3
+  swift-psychrometrics: https://github.com/swift-psychrometrics/swift-psychrometrics @ 0.2.3
+  swift-argument-parser: https://github.com/apple/swift-argument-parser.git @ 1.5.0
+  swift-nio: https://github.com/apple/swift-nio @ 2.76.1
+
+--- xcodebuild: WARNING: Using the first of multiple matching destinations:
+{ platform:macOS, arch:arm64e, id:00008103-000E79D011EA001E, name:My Mac }
+{ platform:macOS, arch:arm64, id:00008103-000E79D011EA001E, name:My Mac }
+{ platform:macOS, arch:x86_64, id:00008103-000E79D011EA001E, name:My Mac }
+{ platform:macOS, arch:arm64e, variant:Mac Catalyst, id:00008103-000E79D011EA001E, name:My Mac }
+{ platform:macOS, arch:arm64, variant:Mac Catalyst, id:00008103-000E79D011EA001E, name:My Mac }
+{ platform:macOS, arch:x86_64, variant:Mac Catalyst, id:00008103-000E79D011EA001E, name:My Mac }
+{ platform:macOS, arch:arm64, variant:DriverKit, id:00008103-000E79D011EA001E, name:My Mac }
+Test Suite 'All tests' started at 2024-11-18 11:59:12.070.
+Test Suite 'All tests' passed at 2024-11-18 11:59:12.070.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+◇ Test run started.
+↳ Testing Library Version: 102 (arm64e-apple-macos13.0)
+◇ Test checkParseABCVersion(version:strings:) started.
+◇ Passing 2 arguments version → .v3_1_1, strings → ["3", "3.1", "3.1.1", "00367894"] to checkParseABCVersion(version:strings:)
+​◇ Passing 2 arguments version → .v5_0, strings → ["5", "5.1", "5.1.1", "00000500012"] to checkParseABCVersion(version:strings:)
+​◇ Passing 2 arguments version → nil, strings → ["0", "0.1", "0.1.1", "0000000001267894", "blob"] to checkParseABCVersion(version:strings:)
+​✔ Test checkParseABCVersion(version:strings:) passed after 0.001 seconds.
+◇ Test logLevelFromEnvVars(expectedLevel:environment:) started.
+◇ Passing 2 arguments expectedLevel → .debug, environment → EnvVars(appEnv: Models.EnvVars.AppEnv.staging, host: "127.0.0.1", port: Optional("1883"), identifier: "xyz-controller", userName: Optional("abc_user"), password: Optional("secret!"), logLevel: nil, version: nil) to logLevelFromEnvVars(expectedLevel:environment:)
+​◇ Passing 2 arguments expectedLevel → .debug, environment → EnvVars(appEnv: Models.EnvVars.AppEnv.development, host: "127.0.0.1", port: Optional("1883"), identifier: "xyz-controller", userName: Optional("abc_user"), password: Optional("secret!"), logLevel: nil, version: nil) to logLevelFromEnvVars(expectedLevel:environment:)
+​◇ Passing 2 arguments expectedLevel → .info, environment → EnvVars(appEnv: Models.EnvVars.AppEnv.production, host: "127.0.0.1", port: Optional("1883"), identifier: "xyz-controller", userName: Optional("abc_user"), password: Optional("secret!"), logLevel: nil, version: nil) to logLevelFromEnvVars(expectedLevel:environment:)
+​◇ Passing 2 arguments expectedLevel → .trace, environment → EnvVars(appEnv: Models.EnvVars.AppEnv.testing, host: "127.0.0.1", port: Optional("1883"), identifier: "xyz-controller", userName: Optional("abc_user"), password: Optional("secret!"), logLevel: nil, version: nil) to logLevelFromEnvVars(expectedLevel:environment:)
+​◇ Passing 2 arguments expectedLevel → .info, environment → EnvVars(appEnv: Models.EnvVars.AppEnv.staging, host: "127.0.0.1", port: Optional("1883"), identifier: "xyz-controller", userName: Optional("abc_user"), password: Optional("secret!"), logLevel: Optional(Logging.Logger.Level.info), version: nil) to logLevelFromEnvVars(expectedLevel:environment:)
+​◇ Passing 2 arguments expectedLevel → .trace, environment → EnvVars(appEnv: Models.EnvVars.AppEnv.development, host: "127.0.0.1", port: Optional("1883"), identifier: "xyz-controller", userName: Optional("abc_user"), password: Optional("secret!"), logLevel: Optional(Logging.Logger.Level.trace), version: nil) to logLevelFromEnvVars(expectedLevel:environment:)
+​◇ Passing 2 arguments expectedLevel → .warning, environment → EnvVars(appEnv: Models.EnvVars.AppEnv.production, host: "127.0.0.1", port: Optional("1883"), identifier: "xyz-controller", userName: Optional("abc_user"), password: Optional("secret!"), logLevel: Optional(Logging.Logger.Level.warning), version: nil) to logLevelFromEnvVars(expectedLevel:environment:)
+​◇ Passing 2 arguments expectedLevel → .debug, environment → EnvVars(appEnv: Models.EnvVars.AppEnv.testing, host: "127.0.0.1", port: Optional("1883"), identifier: "xyz-controller", userName: Optional("abc_user"), password: Optional("secret!"), logLevel: Optional(Logging.Logger.Level.debug), version: nil) to logLevelFromEnvVars(expectedLevel:environment:)
+​✔ Test logLevelFromEnvVars(expectedLevel:environment:) passed after 0.025 seconds.
+◇ Test testBundleUrl(file:ext:) started.
+◇ Passing 2 arguments file → "test", ext → "env" to testBundleUrl(file:ext:)
+Optional("file:///Users/user/Library/Developer/Xcode/DerivedData/swift-abc-xyz-bywkwkxxljnetgclhnoieiwigiwm/Build/Products/Debug/CliClientTests.xctest/Contents/Resources/xyz-controller_CliClientTests.bundle/Contents/Resources/test.env")
+​✔ Test testBundleUrl(file:ext:) passed after 0.001 seconds.
+◇ Test checkMakeEnvVars(request:expectedEnvVars:) started.
+◇ Passing 2 arguments request → EnvVarsRequest(envFilePath: nil, logger: nil, abcClientVersion: nil), expectedEnvVars → EnvVars(appEnv: Models.EnvVars.AppEnv.development, host: "127.0.0.1", port: Optional("1883"), identifier: "xyz-controller", userName: Optional("abc_user"), password: Optional("secret!"), logLevel: nil, version: nil) to checkMakeEnvVars(request:expectedEnvVars:)
+​◇ Passing 2 arguments request → EnvVarsRequest(envFilePath: nil, logger: nil, abcClientVersion: Optional("3")), expectedEnvVars → EnvVars(appEnv: Models.EnvVars.AppEnv.development, host: "127.0.0.1", port: Optional("1883"), identifier: "xyz-controller", userName: Optional("abc_user"), password: Optional("secret!"), logLevel: nil, version: Optional("3")) to checkMakeEnvVars(request:expectedEnvVars:)
+​◇ Passing 2 arguments request → EnvVarsRequest(envFilePath: Optional("test.env"), logger: nil, abcClientVersion: nil), expectedEnvVars → EnvVars(appEnv: Models.EnvVars.AppEnv.testing, host: "test.abc", port: Optional("1234"), identifier: "testing-abc", userName: Optional("test-user"), password: Optional("super-secret"), logLevel: Optional(Logging.Logger.Level.debug), version: Optional("5.0")) to checkMakeEnvVars(request:expectedEnvVars:)
+✘ Test checkMakeEnvVars(request:expectedEnvVars:) recorded an issue with 2 arguments request → EnvVarsRequest(envFilePath: Optional("test.env"), logger: nil, abcClientVersion: nil), expectedEnvVars → EnvVars(appEnv: Models.EnvVars.AppEnv.testing, host: "test.abc", port: Optional("1234"), identifier: "testing-abc", userName: Optional("test-user"), password: Optional("super-secret"), logLevel: Optional(Logging.Logger.Level.debug), version: Optional("5.0")) at CliClientTests.swift:59:2: Caught error: fileCouldNotBeRead("test.env", Unicode (UTF-8))
+​◇ Passing 2 arguments request → EnvVarsRequest(envFilePath: Optional("test-env.json"), logger: nil, abcClientVersion: nil), expectedEnvVars → EnvVars(appEnv: Models.EnvVars.AppEnv.testing, host: "test.abc", port: Optional("1234"), identifier: "testing-abc", userName: Optional("test-user"), password: Optional("super-secret"), logLevel: Optional(Logging.Logger.Level.debug), version: Optional("5.0")) to checkMakeEnvVars(request:expectedEnvVars:)
+✘ Test checkMakeEnvVars(request:expectedEnvVars:) recorded an issue with 2 arguments request → EnvVarsRequest(envFilePath: Optional("test-env.json"), logger: nil, abcClientVersion: nil), expectedEnvVars → EnvVars(appEnv: Models.EnvVars.AppEnv.testing, host: "test.abc", port: Optional("1234"), identifier: "testing-abc", userName: Optional("test-user"), password: Optional("super-secret"), logLevel: Optional(Logging.Logger.Level.debug), version: Optional("5.0")) at CliClientTests.swift:59:2: Caught error: Error Domain=NSCocoaErrorDomain Code=260 "The file “test-env.json” couldn’t be opened because there is no such file." UserInfo={NSFilePath=/private/tmp/test-env.json, NSURL=test-env.json -- file:///private/tmp/, NSUnderlyingError=0x60000117da40 {Error Domain=NSPOSIXErrorDomain Code=2 "No such file or directory"}}
+​✘ Test checkMakeEnvVars(request:expectedEnvVars:) failed after 0.011 seconds with 2 issues.
+◇ Test checkFileTypeParsing(expected:file:) started.
+◇ Passing 2 arguments expected → .dotEnv(path: "test.env"), file → "test.env" to checkFileTypeParsing(expected:file:)
+​◇ Passing 2 arguments expected → .json(path: "test.json"), file → "test.json" to checkFileTypeParsing(expected:file:)
+​◇ Passing 2 arguments expected → nil, file → "test" to checkFileTypeParsing(expected:file:)
+​◇ Passing 2 arguments expected → nil, file → "" to checkFileTypeParsing(expected:file:)
+​✔ Test checkFileTypeParsing(expected:file:) passed after 0.001 seconds.
+◇ Test checkLiveProcessInfo() started.
+✔ Test checkLiveProcessInfo() passed after 0.001 seconds.
+✘ Test run with 6 tests failed after 0.039 seconds with 2 issues.
+Test Suite 'All tests' started at 2024-11-18 11:59:15.146.
+Test Suite 'IntegrationTests.xctest' started at 2024-11-18 11:59:15.146.
+Test Suite 'IntegrationTests' started at 2024-11-18 11:59:15.147.
+Test Case '-[IntegrationTests.IntegrationTests testConnectionServiceShutdown]' started.
+Test Case '-[IntegrationTests.IntegrationTests testConnectionServiceShutdown]' passed (0.737 seconds).
+Test Case '-[IntegrationTests.IntegrationTests testListeningResumesAfterDisconnectThenReconnect]' started.
+Test Case '-[IntegrationTests.IntegrationTests testListeningResumesAfterDisconnectThenReconnect]' passed (0.343 seconds).
+Test Case '-[IntegrationTests.IntegrationTests testABCConnectionStream]' started.
+Test Case '-[IntegrationTests.IntegrationTests testABCConnectionStream]' passed (0.723 seconds).
+Test Suite 'IntegrationTests' passed at 2024-11-18 11:59:16.950.
+	 Executed 3 tests, with 0 failures (0 unexpected) in 1.802 (1.804) seconds
+Test Suite 'IntegrationTests.xctest' passed at 2024-11-18 11:59:16.951.
+	 Executed 3 tests, with 0 failures (0 unexpected) in 1.802 (1.805) seconds
+Test Suite 'All tests' passed at 2024-11-18 11:59:16.952.
+	 Executed 3 tests, with 0 failures (0 unexpected) in 1.802 (1.806) seconds
+2024-11-18 11:59:28.027 xcodebuild[72989:6331189] [MT] IDETestOperationsObserverDebug: 17.573 elapsed -- Testing started completed.
+2024-11-18 11:59:28.027 xcodebuild[72989:6331189] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
+2024-11-18 11:59:28.027 xcodebuild[72989:6331189] [MT] IDETestOperationsObserverDebug: 17.573 sec, +17.573 sec -- end
+
+Test session results, code coverage, and logs:
+	/Users/john/Library/Developer/Xcode/DerivedData/swift-abc-xyz-bywkwkxxljnetgclhnoieiwigiwm/Logs/Test/Test-xyz-controller-Package-2024.11.18_11-59-10--0500.xcresult
+
+Failing tests:
+	checkMakeEnvVars(request:expectedEnvVars:)
+	checkMakeEnvVars(request:expectedEnvVars:)
+
+** TEST EXECUTE FAILED **
+
+Testing started
+
+
