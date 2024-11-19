@@ -208,7 +208,7 @@ local function parse_test(testNode, targetId)
     swiftTestingId = testId,
     target = targetIdUnwrapped,
     class = suiteName:gsub("/", " "),
-    name = testNode.name and testNode.name:gsub("%(%)", ""):gsub("/", " "),
+    name = testNode.name and testNode.name:gsub("%([^%)]*%)", ""):gsub("/", " "),
     testResult = testNode.result == "Passed" and "passed" or "failed",
     success = testNode.result == "Passed",
     time = testNode.duration and testNode.duration:gsub("s", " seconds"):gsub(",", "."),
@@ -311,7 +311,16 @@ function M.fill_xcresult_data(report)
   end
 
   ripgrepCache = {}
+
   report.tests = get_tests(outputDecoded.testNodes[1])
+  report.failedTestsCount = 0
+
+  for _, tests in pairs(report.tests) do
+    for _, test in ipairs(tests) do
+      report.failedTestsCount = report.failedTestsCount + (test.success and 1 or 0)
+      report.testsCount = report.testsCount + 1
+    end
+  end
 
   return true
 end
