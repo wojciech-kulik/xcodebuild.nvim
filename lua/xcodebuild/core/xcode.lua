@@ -679,9 +679,18 @@ function M.launch_app_on_device(destination, bundleId, callback)
     destination,
     bundleId,
   }
-  debug_print("launch_app_on_device", command)
 
   local appdata = require("xcodebuild.project.appdata")
+  local runArgs = appdata.read_run_args()
+  if runArgs then
+    table.insert(command, "--")
+    for _, value in ipairs(runArgs) do
+      table.insert(command, value)
+    end
+  end
+
+  debug_print("launch_app_on_device", command)
+
   local env = nil
   for key, value in pairs(appdata.read_env_vars() or {}) do
     env = env or {}
@@ -715,9 +724,23 @@ function M.launch_app_on_simulator(destination, bundleId, waitForDebugger, callb
     bundleId,
   }
   command = util.skip_nil(command)
-  debug_print("launch_app_on_simulator", command)
 
   local appdata = require("xcodebuild.project.appdata")
+  local runArgs = appdata.read_run_args()
+  if runArgs then
+    table.insert(command, "--")
+    for _, value in ipairs(runArgs) do
+      table.insert(command, value)
+    end
+  end
+
+  debug_print("launch_app_on_simulator", command)
+
+  local env = nil
+  for key, value in pairs(appdata.read_env_vars() or {}) do
+    env = env or {}
+    env["SIMCTL_CHILD_" .. key] = value
+  end
 
   local write_logs = function(_, output)
     if output[#output] == "" then
@@ -732,12 +755,6 @@ function M.launch_app_on_simulator(destination, bundleId, waitForDebugger, callb
 
   if require("xcodebuild.core.config").options.commands.focus_simulator_on_app_launch then
     util.shell("open -a Simulator")
-  end
-
-  local env = nil
-  for key, value in pairs(appdata.read_env_vars() or {}) do
-    env = env or {}
-    env["SIMCTL_CHILD_" .. key] = value
   end
 
   return vim.fn.jobstart(command, {

@@ -8,6 +8,7 @@
 --- - Built using official command line tools like `xcodebuild` and `xcrun simctl`.
 --- - Actions to build, run, debug, and test apps on simulators and
 ---   physical devices.
+--- - Environment variables and run arguments management.
 --- - Buffer integration with test results
 ---   (code coverage, success & failure marks, duration, extra diagnostics).
 --- - Code coverage report with customizable levels.

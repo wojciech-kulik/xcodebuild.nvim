@@ -177,12 +177,13 @@ function M.show_xcode_project_actions()
     "Show Project Manager",
     "Show Current Configuration",
     "Show Configuration Wizard",
+    "Edit Environment Variables",
+    "Edit Run Arguments",
     "---------------------------------",
     "Boot Selected Simulator",
     "Install Application",
     "Uninstall Application",
     "---------------------------------",
-    "Edit Environment Variables",
     "Clean DerivedData",
     "Open Project in Xcode",
   }
@@ -218,6 +219,8 @@ function M.show_xcode_project_actions()
     actions.show_project_manager_actions,
     actions.show_current_config,
     actions.configure_project,
+    actions.edit_env_vars,
+    actions.edit_run_args,
 
     function() end,
 
@@ -227,7 +230,6 @@ function M.show_xcode_project_actions()
 
     function() end,
 
-    actions.edit_env_vars,
     actions.clean_derived_data,
     actions.open_in_xcode,
   }

@@ -118,6 +118,12 @@ function M.edit_env_vars()
   vim.cmd("tabedit " .. appdata.env_vars_filepath)
 end
 
+---Opens `run_args.txt` file in a new tab.
+function M.edit_run_args()
+  appdata.initialize_run_args()
+  vim.cmd("tabedit " .. appdata.run_args_filepath)
+end
+
 ---Launches the app.
 ---@param callback function|nil
 function M.run(callback)

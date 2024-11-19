@@ -119,6 +119,7 @@ local function start_dap()
 
   dap.run({
     env = appdata.read_env_vars(),
+    args = appdata.read_run_args(),
     name = "iOS Remote Debugger",
     type = "codelldb",
     request = "launch",

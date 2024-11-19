@@ -223,6 +223,7 @@ Features                                                   *xcodebuild.features*
  - Built using official command line tools like `xcodebuild` and `xcrun simctl`.
  - Actions to build, run, debug, and test apps on simulators and
    physical devices.
+ - Environment variables and run arguments management.
  - Buffer integration with test results
    (code coverage, success & failure marks, duration, extra diagnostics).
  - Code coverage report with customizable levels.
@@ -496,6 +497,7 @@ Configuration
  | `XcodebuildSelectTestPlan` | Show test plan picker               |
  | `XcodebuildShowConfig`     | Print current project configuration |
  | `XcodebuildEditEnvVars`    | Edit environment variables          |
+ | `XcodebuildEditRunArgs`    | Edit run arguments                  |
  | `XcodebuildBootSimulator`  | Boot selected simulator             |
  | `XcodebuildInstallApp`     | Install application                 |
  | `XcodebuildUninstallApp`   | Uninstall application               |
@@ -704,6 +706,10 @@ M.clean_derived_data()                   *xcodebuild.actions.clean_derived_data*
 
 M.edit_env_vars()                             *xcodebuild.actions.edit_env_vars*
   Opens `env.txt` file in a new tab.
+
+
+M.edit_run_args()                             *xcodebuild.actions.edit_run_args*
+  Opens `run_args.txt` file in a new tab.
 
 
 M.run({callback})                                       *xcodebuild.actions.run*
@@ -1861,6 +1867,19 @@ M.create_app_dir()
 
                                 *xcodebuild.project.appdata.initialize_env_vars*
 M.initialize_env_vars()
+  Initializes the `.nvim/xcodebuild/env.txt` file.
+
+
+                                *xcodebuild.project.appdata.initialize_run_args*
+M.initialize_run_args()
+  Initializes the `.nvim/xcodebuild/run_args.txt` file.
+
+
+M.read_run_args()                     *xcodebuild.project.appdata.read_run_args*
+  Reads the run arguments from disk.
+
+  Returns: ~
+    (string[]|nil)
 
 
 M.read_env_vars()                     *xcodebuild.project.appdata.read_env_vars*

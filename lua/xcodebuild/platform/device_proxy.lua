@@ -337,6 +337,10 @@ function M.launch_app(destination, bundleId, callback)
     end
   end
 
+  for _, value in ipairs(appdata.read_run_args() or {}) do
+    table.insert(command, value)
+  end
+
   return vim.fn.jobstart(command, {
     on_exit = callback_or_error("launch", callback),
   })

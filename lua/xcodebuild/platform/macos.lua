@@ -14,7 +14,17 @@ local M = {}
 ---@param callback function|nil
 ---@return number # job id
 function M.launch_app(appPath, callback)
-  return vim.fn.jobstart({ "open", appPath }, {
+  local command = { "open", appPath }
+
+  local runArgs = appdata.read_run_args()
+  if runArgs then
+    table.insert(command, "--args")
+    for _, value in ipairs(runArgs) do
+      table.insert(command, value)
+    end
+  end
+
+  return vim.fn.jobstart(command, {
     env = appdata.read_env_vars(),
     on_exit = function(_, code)
       if code == 0 then
@@ -46,6 +56,7 @@ function M.launch_and_debug(appPath, callback)
     request = "launch",
     cwd = "${workspaceFolder}",
     program = appPath,
+    args = appdata.read_run_args(),
     stopOnEntry = false,
     waitFor = true,
     env = appdata.read_env_vars(),

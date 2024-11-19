@@ -83,6 +83,7 @@
 --- | `XcodebuildSelectTestPlan` | Show test plan picker               |
 --- | `XcodebuildShowConfig`     | Print current project configuration |
 --- | `XcodebuildEditEnvVars`    | Edit environment variables          |
+--- | `XcodebuildEditRunArgs`    | Edit run arguments                  |
 --- | `XcodebuildBootSimulator`  | Boot selected simulator             |
 --- | `XcodebuildInstallApp`     | Install application                 |
 --- | `XcodebuildUninstallApp`   | Uninstall application               |
