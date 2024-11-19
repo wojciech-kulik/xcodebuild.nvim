@@ -15,6 +15,7 @@ local M = {}
 ---@return number # job id
 function M.launch_app(appPath, callback)
   return vim.fn.jobstart({ "open", appPath }, {
+    env = appdata.read_env_vars(),
     on_exit = function(_, code)
       if code == 0 then
         util.call(callback)
@@ -47,6 +48,7 @@ function M.launch_and_debug(appPath, callback)
     program = appPath,
     stopOnEntry = false,
     waitFor = true,
+    env = appdata.read_env_vars(),
   })
 
   util.call(callback)

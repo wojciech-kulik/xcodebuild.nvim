@@ -326,6 +326,17 @@ function M.launch_app(destination, bundleId, callback)
     destination,
   }
 
+  local appdata = require("xcodebuild.project.appdata")
+  local env = appdata.read_env_vars()
+  if env then
+    table.insert(command, "--env")
+
+    for key, value in pairs(env) do
+      table.insert(command, key)
+      table.insert(command, value)
+    end
+  end
+
   return vim.fn.jobstart(command, {
     on_exit = callback_or_error("launch", callback),
   })

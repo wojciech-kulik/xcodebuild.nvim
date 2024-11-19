@@ -115,7 +115,10 @@ local function start_dap()
   notifications.send("Connecting to device...")
   setup_connection_listeners()
 
+  local appdata = require("xcodebuild.project.appdata")
+
   dap.run({
+    env = appdata.read_env_vars(),
     name = "iOS Remote Debugger",
     type = "codelldb",
     request = "launch",
