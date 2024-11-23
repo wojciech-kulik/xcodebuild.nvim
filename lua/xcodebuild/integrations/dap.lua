@@ -98,7 +98,7 @@ function M.build_and_debug(callback)
     return
   end
 
-  if not helpers.validate_project(true) then
+  if not helpers.validate_project({ requiresApp = true }) then
     return
   end
 
@@ -138,7 +138,7 @@ end
 ---the project.
 ---@param callback function|nil
 function M.debug_without_build(callback)
-  if not helpers.validate_project(true) then
+  if not helpers.validate_project({ requiresApp = true }) then
     return
   end
 
@@ -184,7 +184,7 @@ function M.attach_debugger_for_tests()
     return
   end
 
-  if not helpers.validate_project(true) then
+  if not helpers.validate_project({ requiresApp = true }) then
     return
   end
 

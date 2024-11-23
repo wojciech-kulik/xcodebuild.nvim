@@ -17,6 +17,7 @@
 ---@field destination string|nil destination (ex. "28B52DAA-BC2F-410B-A5BE-F485A3AFB0BC")
 ---@field bundleId string|nil bundle identifier (ex. "com.mycompany.myapp")
 ---@field appPath string|nil app path (ex. "path/to/MyApp.app")
+---@field buildDir string|nil buildDir (ex. "/path/to/DerivedData/app-abc123/Build/Products")
 ---@field productName string|nil product name (ex. "MyApp")
 ---@field testPlan string|nil test plan name (ex. "MyAppTests")
 ---@field xcodeproj string|nil xcodeproj file path (ex. "path/to/Project.xcodeproj")
@@ -146,9 +147,29 @@ function M.is_spm_configured()
   end
 end
 
----Checks if Xcode project is configured.
+---Checks if Xcode static library is configured.
 ---@return boolean
-function M.is_project_configured()
+function M.is_library_configured()
+  local settings = M.settings
+  --- no bundle id
+  if
+    settings.platform
+    and settings.projectFile
+    and settings.scheme
+    and settings.destination
+    and not settings.bundleId
+    and settings.appPath
+    and settings.productName
+  then
+    return true
+  else
+    return false
+  end
+end
+
+---Checks if Xcode app project is configured.
+---@return boolean
+function M.is_app_configured()
   local settings = M.settings
   if
     settings.platform
@@ -168,7 +189,7 @@ end
 ---Checks if project is configured.
 ---@return boolean
 function M.is_configured()
-  return M.is_project_configured() or M.is_spm_configured()
+  return M.is_app_configured() or M.is_spm_configured() or M.is_library_configured()
 end
 
 ---Updates the settings (`appPath`, `productName`, and `bundleId`) based on
@@ -190,6 +211,7 @@ function M.update_settings(opts, callback)
     M.settings.appPath = nil
     M.settings.productName = nil
     M.settings.bundleId = nil
+    M.settings.buildDir = nil
     M.save_settings()
     last_platform = nil
     util.call(callback)
@@ -207,6 +229,7 @@ function M.update_settings(opts, callback)
         M.settings.appPath = buildSettings.appPath
         M.settings.productName = buildSettings.productName
         M.settings.bundleId = buildSettings.bundleId
+        M.settings.buildDir = buildSettings.buildDir
         M.save_settings()
         last_platform = M.settings.platform
         util.call(callback)

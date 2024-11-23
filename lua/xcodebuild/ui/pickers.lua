@@ -754,8 +754,10 @@ function M.show_all_actions()
         vim.defer_fn(actionsPointers[index], 100)
       end
     end, { close_on_select = true })
-  elseif projectConfig.is_project_configured() then
+  elseif projectConfig.is_app_configured() then
     pickerActions.show_xcode_project_actions()
+  elseif projectConfig.is_library_configured() then
+    pickerActions.show_library_project_actions()
   elseif projectConfig.is_spm_configured() then
     pickerActions.show_spm_actions()
   end

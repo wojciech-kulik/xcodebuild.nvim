@@ -121,7 +121,7 @@ end
 ---snapshot previews, and Test Explorer.
 ---@param testsToRun string[]|nil test ids
 function M.run_tests(testsToRun)
-  if not helpers.validate_project(false) then
+  if not helpers.validate_project() then
     return
   end
 
@@ -252,7 +252,7 @@ end
 ---it additionally triggers build for testing.
 ---@param opts TestRunnerOptions
 function M.run_selected_tests(opts)
-  if not helpers.validate_project(false) then
+  if not helpers.validate_project() then
     return
   end
 
@@ -334,7 +334,7 @@ end
 
 ---Shows a picker with failing snapshot tests.
 function M.show_failing_snapshot_tests()
-  if not helpers.validate_project(false) then
+  if not helpers.validate_project() then
     return
   end
 

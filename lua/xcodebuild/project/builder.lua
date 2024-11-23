@@ -25,7 +25,7 @@ local CANCELLED_CODE = 143
 ---@see xcodebuild.platform.device.run_app
 ---@see xcodebuild.project.builder.build_project
 function M.build_and_run_app(waitForDebugger, callback)
-  if not helpers.validate_project(true) then
+  if not helpers.validate_project({ requiresApp = true }) then
     return
   end
 
@@ -53,7 +53,7 @@ end
 function M.build_project(opts, callback)
   opts = opts or {}
 
-  if not helpers.validate_project(false) then
+  if not helpers.validate_project() then
     return
   end
 
@@ -127,7 +127,10 @@ end
 function M.clean_derived_data()
   local derivedDataPath
 
-  if projectConfig.settings.appPath then
+  if projectConfig.settings.buildDir then
+    local buildDir = projectConfig.settings.buildDir or ""
+    derivedDataPath = string.match(buildDir, "(.+/DerivedData/[^/]+)/.+") or buildDir
+  elseif projectConfig.settings.appPath then
     derivedDataPath = string.match(projectConfig.settings.appPath, "(.+/DerivedData/[^/]+)/.+")
   else
     derivedDataPath = require("xcodebuild.core.xcode").find_derived_data_path(
