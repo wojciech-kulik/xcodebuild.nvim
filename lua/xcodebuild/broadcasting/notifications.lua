@@ -234,6 +234,8 @@ function M.send_project_settings(settings)
 
       - productName: ]] .. (settings.productName or "-") .. [[
 
+      - buildDir: ]] .. (settings.buildDir or "-") .. [[
+
       - appPath: ]] .. (settings.appPath or "-") .. [[
     ]])
   end

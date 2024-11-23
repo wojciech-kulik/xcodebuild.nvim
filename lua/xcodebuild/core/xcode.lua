@@ -59,6 +59,7 @@
 ---@field appPath string
 ---@field productName string
 ---@field bundleId string
+---@field buildDir string|nil
 
 ---@class XcodeScheme
 ---@field name string
@@ -184,7 +185,6 @@ function M.get_targets_filemap(derivedDataPath)
   end
 
   if not util.dir_exists(searchPath) then
-    notifications.send_error("Could not locate build dir. Please run Build.")
     return {}
   end
 
@@ -555,22 +555,29 @@ function M.get_build_settings(platform, projectFile, scheme, xcodeprojPath, call
         local bundleId = nil
         local productName = nil
         local wrapperName = nil
+        local targetBuildDir = nil
         local buildDir = nil
 
         for _, line in ipairs(output) do
           bundleId = bundleId or find_setting(line, "PRODUCT_BUNDLE_IDENTIFIER")
           productName = productName or find_setting(line, "PRODUCT_NAME")
           wrapperName = wrapperName or find_setting(line, "WRAPPER_NAME")
-          buildDir = buildDir or find_setting(line, "TARGET_BUILD_DIR")
+          targetBuildDir = targetBuildDir or find_setting(line, "TARGET_BUILD_DIR")
+          buildDir = buildDir or find_setting(line, "BUILD_DIR")
 
-          if bundleId and productName and buildDir and wrapperName then
+          if bundleId and productName and targetBuildDir and wrapperName and buildDir then
             break
           end
         end
 
-        if not bundleId or (not productName and not wrapperName) or not buildDir then
+        if (not productName and not wrapperName) or not targetBuildDir then
           notifications.send_error("Could not get build settings")
           return
+        end
+
+        --- Static library does not have a bundle id
+        if not bundleId then
+          notifications.send_warning("Could not find bundle id. Ignore if it's a static library.")
         end
 
         if wrapperName then
@@ -582,9 +589,10 @@ function M.get_build_settings(platform, projectFile, scheme, xcodeprojPath, call
         end
 
         local result = {
-          appPath = buildDir .. "/" .. productName .. ".app",
+          appPath = targetBuildDir .. "/" .. productName .. ".app",
           productName = productName,
           bundleId = bundleId,
+          buildDir = buildDir,
         }
 
         util.call(callback, result)

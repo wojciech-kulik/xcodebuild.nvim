@@ -60,7 +60,7 @@ end
 ---Kills the application on device, simulator, or macOS.
 ---@param callback function|nil
 function M.kill_app(callback)
-  if not helpers.validate_project(true) then
+  if not helpers.validate_project({ requiresApp = true }) then
     return
   end
 
@@ -81,7 +81,7 @@ end
 ---@param waitForDebugger boolean
 ---@param callback function|nil
 function M.run_app(waitForDebugger, callback)
-  if not helpers.validate_project(true) then
+  if not helpers.validate_project({ requiresApp = true }) then
     return
   end
 
@@ -104,7 +104,7 @@ end
 ---Boots the simulator.
 ---@param callback function|nil
 function M.boot_simulator(callback)
-  if not helpers.validate_project(false) then
+  if not helpers.validate_project() then
     return
   end
 
@@ -129,7 +129,7 @@ end
 ---Does not support macOS.
 ---@param callback function|nil
 function M.install_app(callback)
-  if not helpers.validate_project(true) then
+  if not helpers.validate_project({ requiresApp = true }) then
     return
   end
 
@@ -157,7 +157,7 @@ end
 ---Does not support macOS.
 ---@param callback function|nil
 function M.uninstall_app(callback)
-  if not helpers.validate_project(true) then
+  if not helpers.validate_project({ requiresApp = true }) then
     return
   end
 

@@ -1172,6 +1172,7 @@ XcodeBuildSettings                    *xcodebuild.core.xcode.XcodeBuildSettings*
     {appPath}      (string)
     {productName}  (string)
     {bundleId}     (string)
+    {buildDir}     (string|nil)
 
 
 XcodeScheme                                  *xcodebuild.core.xcode.XcodeScheme*
@@ -1708,6 +1709,7 @@ ProjectSettings
     {destination}       (string|nil) destination (ex. "28B52DAA-BC2F-410B-A5BE-F485A3AFB0BC")
     {bundleId}          (string|nil) bundle identifier (ex. "com.mycompany.myapp")
     {appPath}           (string|nil) app path (ex. "path/to/MyApp.app")
+    {buildDir}          (string|nil) buildDir (ex. "/path/to/DerivedData/app-abc123/Build/Products")
     {productName}       (string|nil) product name (ex. "MyApp")
     {testPlan}          (string|nil) test plan name (ex. "MyAppTests")
     {xcodeproj}         (string|nil) xcodeproj file path (ex. "path/to/Project.xcodeproj")
@@ -1783,9 +1785,17 @@ M.is_spm_configured()
     (boolean)
 
 
-                               *xcodebuild.project.config.is_project_configured*
-M.is_project_configured()
-  Checks if Xcode project is configured.
+                               *xcodebuild.project.config.is_library_configured*
+M.is_library_configured()
+  Checks if Xcode static library is configured.
+
+  Returns: ~
+    (boolean)
+
+
+                                   *xcodebuild.project.config.is_app_configured*
+M.is_app_configured()
+  Checks if Xcode app project is configured.
 
   Returns: ~
     (boolean)
@@ -4144,6 +4154,11 @@ M.show_spm_actions()
   Shows available actions for Swift Package project.
 
 
+                     *xcodebuild.ui.picker_actions.show_library_project_actions*
+M.show_library_project_actions()
+  Shows available actions for Xcode library project.
+
+
                        *xcodebuild.ui.picker_actions.show_xcode_project_actions*
 M.show_xcode_project_actions()
   Shows available actions for Xcode project.
@@ -4168,12 +4183,12 @@ M.cancel_actions()                           *xcodebuild.helpers.cancel_actions*
   Cancels all running actions from all modules.
 
 
-M.validate_project({requiresXcodeproj})    *xcodebuild.helpers.validate_project*
+M.validate_project({opts})                 *xcodebuild.helpers.validate_project*
   Validates if the project is configured.
   It sends an error notification if the project is not configured.
 
   Parameters: ~
-    {requiresXcodeproj}  (boolean)
+    {opts}  ({requiresXcodeproj:boolean|nil,requiresApp:boolean|nil}|nil)
 
   Returns: ~
     (boolean)

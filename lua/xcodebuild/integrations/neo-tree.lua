@@ -39,7 +39,8 @@ function M.setup()
   local cwd = vim.fn.getcwd()
 
   local function isProjectFile(path)
-    return projectConfig.is_project_configured() and vim.startswith(path, cwd)
+    return (projectConfig.is_app_configured() or projectConfig.is_library_configured())
+      and vim.startswith(path, cwd)
   end
 
   local function shouldUpdateProject(path)

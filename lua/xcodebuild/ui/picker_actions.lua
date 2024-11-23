@@ -150,6 +150,82 @@ function M.show_spm_actions()
   show_picker(actionsNames, actionsPointers)
 end
 
+---Shows available actions for Xcode library project.
+function M.show_library_project_actions()
+  local actions = require("xcodebuild.actions")
+  local actionsNames = {
+    "Build Project",
+    "Build Project (Clean Build)",
+    "Build For Testing",
+    "Cancel Running Action",
+    "---------------------------------",
+    "Run Current Test Plan (All Tests)",
+    "Run Current Test Target",
+    "Run Current Test Class",
+    "Run Nearest Test",
+    "Rerun Failed Tests",
+    "Repeat Last Test Run",
+    "---------------------------------",
+    "Select Scheme",
+    "Select Device",
+    "Select Test Plan",
+    "---------------------------------",
+    "Toggle Logs",
+    "---------------------------------",
+    "Show Project Manager",
+    "Show Current Configuration",
+    "Show Configuration Wizard",
+    "---------------------------------",
+    "Boot Selected Simulator",
+    "---------------------------------",
+    "Clean DerivedData",
+    "Open Project in Xcode",
+  }
+  local actionsPointers = {
+    actions.build,
+    actions.clean_build,
+    actions.build_for_testing,
+    actions.cancel,
+
+    function() end,
+
+    actions.run_tests,
+    actions.run_target_tests,
+    actions.run_class_tests,
+    actions.run_nearest_test,
+    actions.rerun_failed_tests,
+    actions.repeat_last_test_run,
+
+    function() end,
+
+    actions.select_scheme,
+    actions.select_device,
+    actions.select_testplan,
+
+    function() end,
+
+    actions.toggle_logs,
+
+    function() end,
+
+    actions.show_project_manager_actions,
+    actions.show_current_config,
+    actions.configure_project,
+
+    function() end,
+
+    actions.boot_simulator,
+
+    function() end,
+
+    actions.clean_derived_data,
+    actions.open_in_xcode,
+  }
+
+  add_test_actions(actionsNames, actionsPointers)
+  show_picker(actionsNames, actionsPointers)
+end
+
 ---Shows available actions for Xcode project.
 function M.show_xcode_project_actions()
   local actions = require("xcodebuild.actions")
