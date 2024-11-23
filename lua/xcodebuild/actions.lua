@@ -214,7 +214,7 @@ function M.select_device(callback)
   helpers.cancel_actions()
   pickers.select_destination(function()
     update_settings({ skipIfSamePlatform = true }, callback)
-  end, { close_on_select = true })
+  end, false, { close_on_select = true })
 end
 
 ---Sends a notification with the current project settings.
