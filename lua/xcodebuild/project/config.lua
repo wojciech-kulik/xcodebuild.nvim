@@ -254,7 +254,7 @@ function M.configure_project()
           end, { close_on_select = true, auto_select = true })
 
           M.update_settings({})
-        end)
+        end, false)
       end, { auto_select = true }) -- scheme
     end)
   end)

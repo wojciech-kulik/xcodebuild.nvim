@@ -116,6 +116,15 @@ local defaults = {
       return nil
     end,
   },
+  device_picker = {
+    mappings = {
+      move_up_device = "<M-y>", -- move device up in the list
+      move_down_device = "<M-e>", -- move device down in the list
+      add_device = "<M-a>", -- add device to cache
+      delete_device = "<M-d>", -- delete device from cache
+      refresh_devices = "<C-r>", -- refresh devices list
+    },
+  },
   integrations = {
     pymobiledevice = {
       enabled = true, -- enable pymobiledevice integration (requires configuration, see: `:h xcodebuild.remote-debugger`)

@@ -178,6 +178,15 @@ M.setup({options})                                            *xcodebuild.setup*
           return nil
         end,
       },
+      device_picker = {
+        mappings = {
+          move_up_device = "<M-y>", -- move device up in the list
+          move_down_device = "<M-e>", -- move device down in the list
+          add_device = "<M-a>", -- add device to cache
+          delete_device = "<M-d>", -- delete device from cache
+          refresh_devices = "<C-r>", -- refresh devices list
+        },
+      },
       integrations = {
         pymobiledevice = {
           enabled = true, -- enable pymobiledevice integration (requires configuration, see: `:h xcodebuild.remote-debugger`)
@@ -4020,21 +4029,23 @@ Pickers                                                  *xcodebuild.ui.pickers*
                                                             *xcodebuild.pickers*
 This module is responsible for showing pickers using Telescope.nvim.
 
-Available shortcuts:
+Device picker shortcuts:
 <C-r> - Refresh the picker results
 <M-y> - Move the selected item up
 <M-e> - Move the selected item down
 <M-x> - Remove the selected item
+<M-a> - Add a new device
 
 
 PickerOptions                              *xcodebuild.ui.pickers.PickerOptions*
 
   Fields: ~
-    {on_refresh}       (function|nil)
-    {multiselect}      (boolean|nil)
-    {modifiable}       (boolean|nil)
-    {auto_select}      (boolean|nil)
-    {close_on_select}  (boolean|nil)
+    {on_refresh}              (function|nil)
+    {multiselect}             (boolean|nil)
+    {modifiable}              (boolean|nil)
+    {auto_select}             (boolean|nil)
+    {close_on_select}         (boolean|nil)
+    {device_select_callback}  (function|nil)
 
 
                                                     *xcodebuild.ui.pickers.show*
@@ -4096,12 +4107,14 @@ M.select_testplan({callback}, {opts})    *xcodebuild.ui.pickers.select_testplan*
     (number|nil)  id
 
 
-M.select_destination({callback}, {opts})*xcodebuild.ui.pickers.select_destination*
+                                      *xcodebuild.ui.pickers.select_destination*
+M.select_destination({callback}, {addMode}, {opts})
   Shows a picker with the available devices.
   It returns devices from cache if available.
 
   Parameters: ~
     {callback}  (fun(destination:Device[])|nil)
+    {addMode}   (boolean|nil) if true, it will add the selected device to the cache
     {opts}      (PickerOptions|nil)
 
   Returns: ~

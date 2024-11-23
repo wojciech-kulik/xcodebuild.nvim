@@ -3,11 +3,12 @@
 ---@brief [[
 ---This module is responsible for showing pickers using Telescope.nvim.
 ---
----Available shortcuts:
+---Device picker shortcuts:
 ---<C-r> - Refresh the picker results
 ---<M-y> - Move the selected item up
 ---<M-e> - Move the selected item down
 ---<M-x> - Remove the selected item
+---<M-a> - Add a new device
 ---
 ---@brief ]]
 
@@ -17,6 +18,7 @@
 ---@field modifiable boolean|nil
 ---@field auto_select boolean|nil
 ---@field close_on_select boolean|nil
+---@field device_select_callback function|nil
 
 local util = require("xcodebuild.util")
 local notifications = require("xcodebuild.broadcasting.notifications")
@@ -210,7 +212,10 @@ local function swap_entries(entries, index1, index2)
 end
 
 ---Sets the picker actions for moving and deleting items.
-local function set_picker_actions(bufnr)
+---@param bufnr number
+---@param opts PickerOptions|nil
+local function set_picker_actions(bufnr, opts)
+  local mappings = require("xcodebuild.core.config").options.device_picker.mappings
   local actionState = require("telescope.actions.state")
   local get_entries = function()
     if not activePicker then
@@ -225,7 +230,7 @@ local function set_picker_actions(bufnr)
     return entries
   end
 
-  vim.keymap.set({ "n", "i" }, "<M-y>", function()
+  vim.keymap.set({ "n", "i" }, mappings.move_up_device, function()
     if actionState.get_current_line() ~= "" then
       return
     end
@@ -251,7 +256,7 @@ local function set_picker_actions(bufnr)
     end
   end, { buffer = bufnr })
 
-  vim.keymap.set({ "n", "i" }, "<M-e>", function()
+  vim.keymap.set({ "n", "i" }, mappings.move_down_device, function()
     if actionState.get_current_line() ~= "" then
       return
     end
@@ -278,7 +283,7 @@ local function set_picker_actions(bufnr)
     end
   end, { buffer = bufnr })
 
-  vim.keymap.set({ "n", "i" }, "<M-d>", function()
+  vim.keymap.set({ "n", "i" }, mappings.delete_device, function()
     if activePicker and actionState.get_selected_entry() then
       activePicker:delete_selection(function(selection)
         local index = util.indexOfPredicate(projectConfig.device_cache.devices, function(device)
@@ -290,6 +295,12 @@ local function set_picker_actions(bufnr)
       end)
     end
   end, { buffer = bufnr })
+
+  vim.keymap.set({ "n", "i" }, mappings.add_device, function()
+    M.select_destination(function()
+      M.select_destination((opts or {}).device_select_callback, false, opts)
+    end, true, { close_on_select = false, multiselect = true })
+  end, { buffer = bufnr })
 end
 
 ---Shows a picker using Telescope.nvim.
@@ -298,6 +309,8 @@ end
 ---@param callback function|nil
 ---@param opts PickerOptions|nil
 function M.show(title, items, callback, opts)
+  local mappings = require("xcodebuild.core.config").options.device_picker.mappings
+
   if currentJobId then
     vim.fn.jobstop(currentJobId)
     currentJobId = nil
@@ -315,14 +328,14 @@ function M.show(title, items, callback, opts)
     file_ignore_patterns = {},
     attach_mappings = function(prompt_bufnr, _)
       if opts.on_refresh ~= nil then
-        vim.keymap.set({ "n", "i" }, "<C-r>", function()
+        vim.keymap.set({ "n", "i" }, mappings.refresh_devices, function()
           start_telescope_spinner()
           opts.on_refresh()
         end, { silent = true, buffer = prompt_bufnr })
       end
 
       if opts.modifiable then
-        set_picker_actions(prompt_bufnr)
+        set_picker_actions(prompt_bufnr, opts)
       end
 
       telescopeActions.select_default:replace(function()
@@ -595,10 +608,11 @@ end
 ---Shows a picker with the available devices.
 ---It returns devices from cache if available.
 ---@param callback fun(destination: Device[])|nil
+---@param addMode boolean|nil if true, it will add the selected device to the cache
 ---@param opts PickerOptions|nil
 ---@return number|nil job id if launched
 ---@see xcodebuild.config
-function M.select_destination(callback, opts)
+function M.select_destination(callback, addMode, opts)
   opts = opts or {}
 
   local projectFile = projectConfig.settings.projectFile
@@ -607,7 +621,7 @@ function M.select_destination(callback, opts)
   local workingDirectory = projectConfig.settings.workingDirectory
   local results = {}
 
-  if projectConfig.is_device_cache_valid() then
+  if not addMode and projectConfig.is_device_cache_valid() then
     results = projectConfig.device_cache.devices or {}
     projectConfig.update_device_cache(results)
   end
@@ -633,6 +647,14 @@ function M.select_destination(callback, opts)
       end
 
       local alreadyAdded = {}
+
+      if addMode then
+        local cache = projectConfig.device_cache and projectConfig.device_cache.devices or {}
+        for _, destination in ipairs(cache) do
+          alreadyAdded[destination.id] = true
+        end
+      end
+
       local filtered = util.filter(destinations, function(table)
         if table.id and not alreadyAdded[table.id] then
           alreadyAdded[table.id] = true
@@ -643,7 +665,9 @@ function M.select_destination(callback, opts)
         return false
       end)
 
-      projectConfig.update_device_cache(filtered)
+      if not addMode then
+        projectConfig.update_device_cache(filtered)
+      end
       results = filtered
       update_results(results)
     end)
@@ -665,11 +689,21 @@ function M.select_destination(callback, opts)
   end
 
   opts.on_refresh = getConnectedDevices
-  opts.modifiable = true
+  opts.modifiable = not addMode
+  opts.device_select_callback = not addMode and callback or nil
 
-  M.show("Select Device", results, function(entry, _)
-    projectConfig.set_destination(entry.value)
-    util.call(callback, entry.value)
+  M.show(addMode and "Add Device(s)" or "Select Device", results, function(entry, _)
+    if addMode then
+      local cache = projectConfig.device_cache.devices or {}
+      for _, device in ipairs(entry) do
+        table.insert(cache, device)
+      end
+      projectConfig.update_device_cache(cache)
+      util.call(callback, entry)
+    else
+      projectConfig.set_destination(entry.value)
+      util.call(callback, entry.value)
+    end
   end, opts)
 
   if not hasCachedDevices then
