@@ -38,11 +38,12 @@
 ---👉 Run the following command to install & protect the script
 ---
 --->bash
----  DEST="$HOME/Library/xcodebuild.nvim/remote_debugger" && \
+---  DEST="$HOME/Library/xcodebuild.nvim" && \
 ---    SOURCE="$HOME/.local/share/nvim/lazy/xcodebuild.nvim/tools/remote_debugger" && \
 ---    ME="$(whoami)" && \
----    sudo install -m 755 -o root -D "$SOURCE" "$DEST" && \
----    sudo bash -c "echo \"$ME ALL = (ALL) NOPASSWD: $DEST\" >> /etc/sudoers"
+---    sudo install -d -m 755 -o root "$DEST" && \
+---    sudo install -m 755 -o root "$SOURCE" "$DEST" && \
+---    sudo bash -c "echo \"$ME ALL = (ALL) NOPASSWD: $DEST/remote_debugger\" >> /etc/sudoers"
 ---<
 ---
 ---See also: https://github.com/doronz88/pymobiledevice3/blob/master/misc/RemoteXPC.md#trusted-tunnel
