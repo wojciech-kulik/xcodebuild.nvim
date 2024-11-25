@@ -22,6 +22,7 @@ Project Configuration ·····························
 App Data ·········································· |xcodebuild.project.appdata|
 Project Builder ··································· |xcodebuild.project.builder|
 Project Manager ··································· |xcodebuild.project.manager|
+Project Assets Manager ····························· |xcodebuild.project.assets|
 Device ············································ |xcodebuild.platform.device|
 Device Proxy ································ |xcodebuild.platform.device_proxy|
 macOS Platform Integration ························· |xcodebuild.platform.macos|
@@ -228,6 +229,7 @@ Features                                                   *xcodebuild.features*
  - Support for Swift Packages (building & testing).
  - Project-based configuration.
  - Project Manager to deal with project files without using Xcode.
+ - Assets Manager to manage images, colors, and data assets.
  - Test Explorer to visually present a tree with all tests and results.
  - Built using official command line tools like `xcodebuild` and `xcrun simctl`.
  - Actions to build, run, debug, and test apps on simulators and
@@ -449,6 +451,7 @@ Project Manager
  | Command                            | Description                                                |
  | ---------------------------------- | ---------------------------------------------------------- |
  | `XcodebuildProjectManager`           | Show picker with all Project Manager actions               |
+ | `XcodebuildAssetsManager`            | Show picker with all Assets Manager actions                |
  | `XcodebuildCreateNewFile`            | Create a new file and add it to target(s)                  |
  | `XcodebuildAddCurrentFile`           | Add the active file to target(s)                           |
  | `XcodebuildRenameCurrentFile`        | Rename the current file                                    |
@@ -861,6 +864,10 @@ M.test_explorer_run_selected_tests()
                                   *xcodebuild.actions.test_explorer_rerun_tests*
 M.test_explorer_rerun_tests()
   Runs last executed tests or all if nothing was executed.
+
+
+M.show_assets_manager()                 *xcodebuild.actions.show_assets_manager*
+  Show the Assets Manager.
 
 
 M.get_project_targets()                 *xcodebuild.actions.get_project_targets*
@@ -2231,6 +2238,62 @@ M.show_current_file_targets()
                                  *xcodebuild.project.manager.show_action_picker*
 M.show_action_picker()
   Shows the action picker with all available actions.
+
+
+==============================================================================
+Project Assets Manager                               *xcodebuild.project.assets*
+
+This module contains the functionality to manage Xcode project assets.
+
+It allows to add, delete, and browse assets in the project.
+Supported asset types are: images, colors, and data.
+
+                                        *xcodebuild.project.assets.create_image*
+M.create_image({filename}, {path}, {template})
+  Creates a new image set.
+
+  Parameters: ~
+    {filename}  (string)
+    {path}      (string)
+    {template}  (boolean) renderings as template
+
+
+M.create_data({filename}, {path})        *xcodebuild.project.assets.create_data*
+  Creates a new data set.
+
+  Parameters: ~
+    {filename}  (string)
+    {path}      (string)
+
+
+M.create_color({name}, {color}, {path}) *xcodebuild.project.assets.create_color*
+  Creates a new color set.
+
+  Parameters: ~
+    {name}   (string) color name
+    {color}  (string) color in hex format, e.g. #FF0000
+    {path}   (string)
+
+
+                             *xcodebuild.project.assets.create_new_asset_picker*
+M.create_new_asset_picker()
+  Shows a wizard to create a new asset.
+
+
+                                   *xcodebuild.project.assets.show_asset_picker*
+M.show_asset_picker()
+  Shows a picker with all the assets in the project.
+  Opens the asset in Finder or Quick Look.
+
+
+                                 *xcodebuild.project.assets.delete_asset_picker*
+M.delete_asset_picker()
+  Shows a picker to delete an asset.
+
+
+                                 *xcodebuild.project.assets.show_assets_manager*
+M.show_assets_manager()
+  Shows the Assets Manager with all available actions.
 
 
 ==============================================================================
@@ -4417,7 +4480,7 @@ M.shell({cmd})                                           *xcodebuild.util.shell*
 
 
 M.shellAsync({cmd}, {callback})                     *xcodebuild.util.shellAsync*
-  Runs a shell command and asynchronously.
+  Runs a shell command asynchronously.
 
   Parameters: ~
     {cmd}       (string|string[])

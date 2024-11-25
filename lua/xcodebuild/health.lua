@@ -33,7 +33,7 @@ local optional_dependencies = {
   {
     binary = "fd",
     url = "https://github.com/sharkdp/fd",
-    message = "Improves performance when searching for files.",
+    message = "Improves performance when searching for files. Required for Assets Manager.",
   },
 }
 

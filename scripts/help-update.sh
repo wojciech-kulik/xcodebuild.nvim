@@ -25,6 +25,7 @@ lemmy-help \
   ./lua/xcodebuild/project/appdata.lua \
   ./lua/xcodebuild/project/builder.lua \
   ./lua/xcodebuild/project/manager.lua \
+  ./lua/xcodebuild/project/assets.lua \
   ./lua/xcodebuild/platform/device.lua \
   ./lua/xcodebuild/platform/device_proxy.lua \
   ./lua/xcodebuild/platform/macos.lua \

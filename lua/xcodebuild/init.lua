@@ -329,6 +329,9 @@ function M.setup(options)
   vim.api.nvim_create_user_command("XcodebuildUpdateCurrentFileTargets", call(actions.update_current_file_targets), { nargs = 0 })
   vim.api.nvim_create_user_command("XcodebuildShowCurrentFileTargets", call(actions.show_current_file_targets), { nargs = 0 })
 
+  -- Assets Manager
+  vim.api.nvim_create_user_command("XcodebuildAssetsManager", call(actions.show_assets_manager), { nargs = 0 })
+
   -- Other
   vim.api.nvim_create_user_command("XcodebuildEditEnvVars", call(actions.edit_env_vars), { nargs = 0 })
   vim.api.nvim_create_user_command("XcodebuildEditRunArgs", call(actions.edit_run_args), { nargs = 0 })

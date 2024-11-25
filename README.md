@@ -13,6 +13,7 @@ It provides all essential actions for development including building, debugging,
 - [x] Support for Swift Packages (building & testing).
 - [x] Project-based configuration.
 - [x] Project Manager to deal with project files without using Xcode.
+- [x] Assets Manager to manage images, colors, and data assets.
 - [x] Test Explorer to visually present a tree with all tests and results.
 - [x] Built using official command line tools like `xcodebuild` and `xcrun simctl`.
 - [x] Actions to build, run, debug, and test apps on simulators and physical devices.

@@ -4,6 +4,7 @@
 --- - Support for Swift Packages (building & testing).
 --- - Project-based configuration.
 --- - Project Manager to deal with project files without using Xcode.
+--- - Assets Manager to manage images, colors, and data assets.
 --- - Test Explorer to visually present a tree with all tests and results.
 --- - Built using official command line tools like `xcodebuild` and `xcrun simctl`.
 --- - Actions to build, run, debug, and test apps on simulators and

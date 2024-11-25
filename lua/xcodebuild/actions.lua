@@ -20,6 +20,7 @@ local testRunner = require("xcodebuild.tests.runner")
 local projectBuilder = require("xcodebuild.project.builder")
 local projectConfig = require("xcodebuild.project.config")
 local projectManager = require("xcodebuild.project.manager")
+local assetsManager = require("xcodebuild.project.assets")
 local appdata = require("xcodebuild.project.appdata")
 local lsp = require("xcodebuild.integrations.lsp")
 
@@ -308,6 +309,13 @@ end
 ---Runs last executed tests or all if nothing was executed.
 function M.test_explorer_rerun_tests()
   testExplorer.repeat_last_run()
+end
+
+-- Assets Management
+
+---Show the Assets Manager.
+function M.show_assets_manager()
+  assetsManager.show_assets_manager()
 end
 
 -- Project Management
