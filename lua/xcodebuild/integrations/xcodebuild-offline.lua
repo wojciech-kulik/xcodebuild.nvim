@@ -67,11 +67,12 @@
 ---👉 Run the following command to install & protect the script
 ---
 --->bash
----  DEST="$HOME/Library/xcodebuild.nvim/xcodebuild_offline" && \
+---  DEST="$HOME/Library/xcodebuild.nvim" && \
 ---    SOURCE="$HOME/.local/share/nvim/lazy/xcodebuild.nvim/tools/xcodebuild_offline" && \
 ---    ME="$(whoami)" && \
----    sudo install -m 755 -o root -D "$SOURCE" "$DEST" && \
----    sudo bash -c "echo \"$ME ALL = (ALL) NOPASSWD: $DEST\" >> /etc/sudoers"
+---    sudo install -d -m 755 -o root "$DEST" && \
+---    sudo install -m 755 -o root "$SOURCE" "$DEST" && \
+---    sudo bash -c "echo \"$ME ALL = (ALL) NOPASSWD: $DEST/xcodebuild_offline\" >> /etc/sudoers"
 ---<
 ---
 ---
