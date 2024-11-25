@@ -26,6 +26,7 @@
 --- | Command                            | Description                                                |
 --- | ---------------------------------- | ---------------------------------------------------------- |
 --- | `XcodebuildProjectManager`           | Show picker with all Project Manager actions               |
+--- | `XcodebuildAssetsManager`            | Show picker with all Assets Manager actions                |
 --- | `XcodebuildCreateNewFile`            | Create a new file and add it to target(s)                  |
 --- | `XcodebuildAddCurrentFile`           | Add the active file to target(s)                           |
 --- | `XcodebuildRenameCurrentFile`        | Rename the current file                                    |

@@ -209,7 +209,7 @@ function M.shell(cmd)
   return result or {}
 end
 
----Runs a shell command and asynchronously.
+---Runs a shell command asynchronously.
 ---@param cmd string|string[]
 ---@param callback function|nil
 function M.shellAsync(cmd, callback)

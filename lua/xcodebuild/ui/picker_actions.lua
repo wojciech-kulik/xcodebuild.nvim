@@ -173,6 +173,7 @@ function M.show_library_project_actions()
     "Toggle Logs",
     "---------------------------------",
     "Show Project Manager",
+    "Show Assets Manager",
     "Show Current Configuration",
     "Show Configuration Wizard",
     "---------------------------------",
@@ -209,6 +210,7 @@ function M.show_library_project_actions()
     function() end,
 
     actions.show_project_manager_actions,
+    actions.show_assets_manager,
     actions.show_current_config,
     actions.configure_project,
 
@@ -251,6 +253,7 @@ function M.show_xcode_project_actions()
     "Toggle Logs",
     "---------------------------------",
     "Show Project Manager",
+    "Show Assets Manager",
     "Show Current Configuration",
     "Show Configuration Wizard",
     "Edit Environment Variables",
@@ -293,6 +296,7 @@ function M.show_xcode_project_actions()
     function() end,
 
     actions.show_project_manager_actions,
+    actions.show_assets_manager,
     actions.show_current_config,
     actions.configure_project,
     actions.edit_env_vars,
