@@ -303,6 +303,13 @@ local function set_picker_actions(bufnr, opts)
   end, { buffer = bufnr })
 end
 
+---Closes the active picker.
+function M.close()
+  if activePicker then
+    telescopeActions.close(activePicker.prompt_bufnr)
+  end
+end
+
 ---Shows a picker using Telescope.nvim.
 ---@param title string
 ---@param items string[]|XcodeDevice[]

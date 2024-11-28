@@ -2275,15 +2275,23 @@ M.create_color({name}, {color}, {path}) *xcodebuild.project.assets.create_color*
     {path}   (string)
 
 
+                                *xcodebuild.project.assets.delete_folder_picker*
+M.delete_folder_picker()
+  Shows a picker to delete a folder.
+
+
                              *xcodebuild.project.assets.create_new_asset_picker*
 M.create_new_asset_picker()
   Shows a wizard to create a new asset.
 
 
                                    *xcodebuild.project.assets.show_asset_picker*
-M.show_asset_picker()
+M.show_asset_picker({reveal})
   Shows a picker with all the assets in the project.
   Opens the asset in Finder or Quick Look.
+
+  Parameters: ~
+    {reveal}  (boolean) reveal in Finder
 
 
                                  *xcodebuild.project.assets.delete_asset_picker*
@@ -4121,6 +4129,10 @@ PickerOptions                              *xcodebuild.ui.pickers.PickerOptions*
     {auto_select}             (boolean|nil)
     {close_on_select}         (boolean|nil)
     {device_select_callback}  (function|nil)
+
+
+M.close()                                          *xcodebuild.ui.pickers.close*
+  Closes the active picker.
 
 
                                                     *xcodebuild.ui.pickers.show*
