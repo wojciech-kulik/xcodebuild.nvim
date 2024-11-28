@@ -57,8 +57,10 @@ local function select_assets(callback)
 end
 
 ---Shows a picker to select a folder.
+---@param assetsDir string
+---@param deleteMode boolean
 ---@param callback function(string)|nil
-local function select_folder(assetsDir, callback)
+local function select_folder(assetsDir, deleteMode, callback)
   local folders = util.shell({
     "fd",
     "--type",
@@ -75,17 +77,49 @@ local function select_folder(assetsDir, callback)
     assetsDir,
   })
 
-  table.insert(folders, 1, assetsDir)
+  if not deleteMode then
+    table.insert(folders, 1, assetsDir)
+    table.insert(folders, 2, "")
+    if #folders > 2 then
+      table.insert(folders, 3, "")
+    end
+  end
   folders = clean_up_paths(folders)
 
   local titles = util.select(folders, function(folder)
     local trimmed = folder:gsub(assetsDir .. "/", "")
     return trimmed
   end)
-  titles[1] = "[Root]"
+
+  if not deleteMode then
+    titles[1] = "[Root]"
+    titles[2] = "[Create New Folder]"
+    if #titles > 2 then
+      titles[3] = ""
+    end
+  end
 
   pickers.show("Select Folder", titles, function(_, index)
-    util.call(callback, folders[index])
+    if deleteMode then
+      util.call(callback, folders[index])
+      return
+    end
+
+    if index == 2 then
+      pickers.close()
+
+      local newFolder = vim.fn.input("Enter folder name: ")
+      if newFolder == "" then
+        notifications.send_error("Invalid folder name")
+        return
+      end
+
+      local path = vim.fs.joinpath(assetsDir, newFolder)
+      util.shell({ "mkdir", "-p", path })
+      util.call(callback, path)
+    elseif index ~= 3 then
+      util.call(callback, folders[index])
+    end
   end)
 end
 
@@ -231,6 +265,25 @@ function M.create_color(name, color, path)
   notifications.send("Color '" .. name .. "' has been added")
 end
 
+---Shows a picker to delete a folder.
+function M.delete_folder_picker()
+  if not validate_if_fd_installed() then
+    return
+  end
+
+  select_assets(function(asset)
+    select_folder(asset, true, function(path)
+      local confirm = vim.fn.confirm("Are you sure you want to delete: " .. path .. "?", "&Yes\n&No", 2) == 1
+
+      if confirm then
+        util.shell({ "rm", "-rf", path })
+        pickers.close()
+        notifications.send("Folder deleted: " .. path)
+      end
+    end)
+  end)
+end
+
 ---Shows a wizard to create a new asset.
 function M.create_new_asset_picker()
   if not validate_if_fd_installed() then
@@ -238,7 +291,7 @@ function M.create_new_asset_picker()
   end
 
   select_assets(function(asset)
-    select_folder(asset, function(path)
+    select_folder(asset, false, function(path)
       select_asset_type(function(assetType)
         if assetType == "Image" then
           local filename = vim.fn.input("Enter filename (e.g. image.svg): ")
@@ -260,7 +313,8 @@ end
 
 ---Shows a picker with all the assets in the project.
 ---Opens the asset in Finder or Quick Look.
-function M.show_asset_picker()
+---@param reveal boolean reveal in Finder
+function M.show_asset_picker(reveal)
   if not validate_if_fd_installed() then
     return
   end
@@ -279,7 +333,7 @@ function M.show_asset_picker()
   pickers.show("Show Asset", assets, function(asset, _)
     local isImage = string.find(asset.value, "%.imageset") or string.find(asset.value, "%.appiconset")
 
-    if isImage then
+    if isImage and not reveal then
       vim.fn.jobstart({ "qlmanage", "-p", asset.value }, {
         detach = true,
         on_exit = function() end,
@@ -333,9 +387,10 @@ function M.delete_asset_picker()
 
     if confirm then
       util.shell({ "rm", "-rf", asset.value })
+      pickers.close()
       notifications.send("Asset deleted: " .. asset.value)
     end
-  end, { close_on_select = true })
+  end)
 end
 
 ---Shows the Assets Manager with all available actions.
@@ -347,12 +402,20 @@ function M.show_assets_manager()
   local titles = {
     "Create New Asset",
     "Delete Asset",
-    "Show Asset",
+    "Delete Folder",
+    "Preview Asset",
+    "Reveal Asset in Finder",
   }
   local actions = {
     M.create_new_asset_picker,
     M.delete_asset_picker,
-    M.show_asset_picker,
+    M.delete_folder_picker,
+    function()
+      M.show_asset_picker(false)
+    end,
+    function()
+      M.show_asset_picker(true)
+    end,
   }
 
   pickers.show("Assets Manager", titles, function(_, selectedIndex)
