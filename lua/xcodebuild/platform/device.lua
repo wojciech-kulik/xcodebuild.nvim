@@ -40,7 +40,10 @@ local function launch_app(waitForDebugger, callback)
     if waitForDebugger then
       return macos.launch_and_debug(settings.appPath, finished)
     else
-      return macos.launch_app(settings.appPath, finished)
+      vim.defer_fn(function()
+        macos.launch_app(settings.appPath, finished)
+      end, 300)
+      return nil
     end
   end
 
