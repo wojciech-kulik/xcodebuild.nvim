@@ -144,7 +144,7 @@ local function run(action, params)
   local project = projectConfig.settings.xcodeproj
 
   local path = find_path_in_params(params or {})
-  local customProject = path and config.project_for_path(path)
+  local customProject = config.project_for_path(path or "")
 
   params = params or {}
 
