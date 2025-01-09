@@ -302,7 +302,7 @@ local function check_remote_debugger()
     return
   end
 
-  start("Checking remote debugger integration (pymobildevice3)")
+  start("Checking remote debugger integration (pymobiledevice3)")
 
   if has_sudo_access(".local/share/nvim/lazy/xcodebuild.nvim/tools/remote_debugger") then
     error(
@@ -314,7 +314,7 @@ local function check_remote_debugger()
     ok("`remote_debugger` script installed")
   else
     error(
-      "`pymobildevice3` detected, but the `remote_debugger` script is not installed. (see: `:h xcodebuild.remote-debugger`)"
+      "`pymobiledevice3` detected, but the `remote_debugger` script is not installed. (see: `:h xcodebuild.remote-debugger`)"
     )
   end
 
