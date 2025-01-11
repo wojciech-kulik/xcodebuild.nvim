@@ -632,7 +632,7 @@ function M.install_app_on_device(destination, appPath, callback)
   return vim.fn.jobstart(command, {
     stderr_buffered = true,
     on_stderr = show_stderr_output,
-    on_exit = callback_or_error("installl", callback),
+    on_exit = callback_or_error("install", callback),
   })
 end
 
@@ -839,7 +839,7 @@ function M.uninstall_app_from_simulator(destination, bundleId, callback)
 
   return vim.fn.jobstart(command, {
     stdout_buffered = true,
-    on_exit = callback_or_error("uninstalll", callback),
+    on_exit = callback_or_error("uninstall", callback),
   })
 end
 
@@ -855,7 +855,7 @@ function M.uninstall_app_from_device(destination, bundleId, callback)
   return vim.fn.jobstart(command, {
     stderr_buffered = true,
     on_stderr = show_stderr_output,
-    on_exit = callback_or_error("uninstalll", callback),
+    on_exit = callback_or_error("uninstall", callback),
   })
 end
 
