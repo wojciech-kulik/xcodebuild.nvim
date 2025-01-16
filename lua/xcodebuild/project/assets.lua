@@ -340,8 +340,8 @@ function M.show_asset_picker(reveal)
       })
 
       -- HACK: the preview stays behind the terminal window
-      -- when Neovim is running in tmux.
-      if vim.env.TERM_PROGRAM == "tmux" then
+      -- when Neovim is running in tmux or zellij.
+      if vim.env.TERM_PROGRAM == "tmux" or vim.env.ZELLIJ_PANE_ID then
         vim.defer_fn(function()
           util.shell("open -a qlmanage")
         end, 100)
