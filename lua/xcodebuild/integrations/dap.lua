@@ -593,9 +593,15 @@ end
 ---Commands:
 ---  - `XcodebuildAttachDebugger` - starts the debugger session.
 ---  - `XcodebuildDetachDebugger` - disconnects the debugger session.
+---  - `XcodebuildBuildDebug` - builds, installs, and runs the project with the debugger.
+---  - `XcodebuildDebug` - installs and runs the project with the debugger.
 function M.register_user_commands()
+  -- stylua: ignore start
   vim.api.nvim_create_user_command("XcodebuildAttachDebugger", M.attach_and_debug, { nargs = 0 })
   vim.api.nvim_create_user_command("XcodebuildDetachDebugger", M.detach_debugger, { nargs = 0 })
+  vim.api.nvim_create_user_command("XcodebuildBuildDebug", function() M.build_and_debug() end, { nargs = 0 })
+  vim.api.nvim_create_user_command("XcodebuildDebug", function() M.debug_without_build() end, { nargs = 0 })
+  -- stylua: ignore end
 end
 
 ---Sets up the adapter and configuration for the `nvim-dap` plugin.

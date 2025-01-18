@@ -485,6 +485,8 @@ Debugging
  | -------------------------- | ----------------------------------------- |
  | `XcodebuildAttachDebugger`   | Attach debugger to the running process      |
  | `XcodebuildDetachDebugger`   | Detach debugger without killing the process |
+ | `XcodebuildBuildDebug`       | Build, install, and debug the app           |
+ | `XcodebuildDebug`            | Install and debug the app without building  |
 
 Code Coverage
 
@@ -3735,6 +3737,8 @@ M.register_user_commands()
   Commands:
     - `XcodebuildAttachDebugger` - starts the debugger session.
     - `XcodebuildDetachDebugger` - disconnects the debugger session.
+    - `XcodebuildBuildDebug` - builds, installs, and runs the project with the debugger.
+    - `XcodebuildDebug` - installs and runs the project with the debugger.
 
 
                                              *xcodebuild.integrations.dap.setup*
