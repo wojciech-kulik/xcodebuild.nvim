@@ -244,6 +244,10 @@ local function get_tests(node, targetName)
   local tests = {}
 
   if node.nodeType == nodeType.testCase then
+    if node.result == "Skipped" then
+      return tests
+    end
+
     local key, test = parse_test(node, targetName)
     if not tests[key] then
       tests[key] = {}
