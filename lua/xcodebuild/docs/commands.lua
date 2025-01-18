@@ -53,6 +53,13 @@
 --- | `XcodebuildTestRepeat`       | Repeat the last test run                  |
 --- | `XcodebuildFailingSnapshots` | Show a picker with failing snapshot tests |
 ---
+---Debugging
+---
+--- | Command                    | Description                               |
+--- | -------------------------- | ----------------------------------------- |
+--- | `XcodebuildAttachDebugger`   | Attach debugger to the running process      |
+--- | `XcodebuildDetachDebugger`   | Detach debugger without killing the process |
+---
 ---Code Coverage
 ---
 --- | Command                          | Description                                |

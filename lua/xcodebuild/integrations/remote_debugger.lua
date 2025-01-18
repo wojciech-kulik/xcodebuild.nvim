@@ -101,7 +101,10 @@ local function setup_connection_listeners()
 end
 
 ---Starts `nvim-dap` debug session. It connects to `codelldb`.
-local function start_dap()
+---@param opts {attach: boolean}|nil
+local function start_dap(opts)
+  opts = opts or {}
+
   local success, dap = pcall(require, "dap")
   if not success then
     error("xcodebuild.nvim: Could not load nvim-dap plugin")
@@ -140,11 +143,11 @@ local function start_dap()
           deviceProxy.find_app_path(projectConfig.settings.destination, projectConfig.settings.bundleId)
 
         if not appPath then
-          error("xcodebuild.nvim: Failed to find the app path on the device.")
-          return nil
+          notifications.send_error("Failed to find the app path on the device.")
+          return "platform status"
         end
 
-        update_console({ "App path: " .. appPath, "" })
+        update_console({ "App path: " .. appPath })
 
         return "script lldb.target.module[0].SetPlatformFileSpec(lldb.SBFileSpec('" .. appPath .. "'))"
       end,
@@ -157,7 +160,25 @@ local function start_dap()
         end
       end,
 
-      "process launch",
+      function()
+        if opts.attach then
+          local pid = deviceProxy.find_app_pid(projectConfig.settings.productName)
+          if not pid or pid == "" then
+            notifications.send_error("Failed to find the app PID on the device.")
+            return "platform status"
+          end
+          update_console({ "App PID: " .. pid })
+
+          return "process attach --pid " .. pid
+        else
+          return "process launch"
+        end
+      end,
+
+      function()
+        update_console({ "" })
+        return opts.attach and "continue" or "process status"
+      end,
     },
   })
 end
@@ -171,8 +192,9 @@ end
 
 ---Starts legacy server without trusted channel.
 ---After the server is started, it starts the debug session.
+---@param opts {attach: boolean}|nil
 ---@param callback function|nil
-local function start_legacy_server(callback)
+local function start_legacy_server(opts, callback)
   local config = require("xcodebuild.core.config")
 
   M.debug_server_job = deviceProxy.start_server(
@@ -185,7 +207,7 @@ local function start_legacy_server(callback)
         "Connecting to " .. connection_string:gsub("process connect connect://", ""),
       })
       setup_terminate_listeners()
-      start_dap()
+      start_dap(opts)
 
       util.call(callback)
     end
@@ -194,22 +216,24 @@ end
 
 ---Starts secured tunnel with trusted channel.
 ---After the tunnel is established, it starts the debug session.
+---@param opts {attach: boolean}|nil
 ---@param callback function|nil
-local function start_secured_tunnel(callback)
+local function start_secured_tunnel(opts, callback)
   M.debug_server_job = deviceProxy.create_secure_tunnel(projectConfig.settings.destination, function(rsdParam)
     M.rsd_param = rsdParam
 
     update_console({ "Connecting to " .. rsdParam:gsub("%-%-rsd ", "") })
     setup_terminate_listeners()
-    start_dap()
+    start_dap(opts)
 
     util.call(callback)
   end)
 end
 
 ---Starts the remote debugger based on the mode.
+---@param opts {attach: boolean}|nil
 ---@param callback function|nil
-function M.start_remote_debugger(callback)
+function M.start_remote_debugger(opts, callback)
   if not deviceProxy.validate_installation() then
     return
   end
@@ -220,9 +244,9 @@ function M.start_remote_debugger(callback)
   require("xcodebuild.project.appdata").clear_app_logs()
 
   if M.mode == M.LEGACY_MODE then
-    start_legacy_server(callback)
+    start_legacy_server(opts, callback)
   else
-    start_secured_tunnel(callback)
+    start_secured_tunnel(opts, callback)
   end
 end
 

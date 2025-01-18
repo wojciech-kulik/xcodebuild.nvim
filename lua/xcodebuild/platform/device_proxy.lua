@@ -422,6 +422,23 @@ function M.find_app_path(destination, bundleId)
   return app and app.Path or nil
 end
 
+---Returns the PID of the application with the provided name.
+---@param processName string
+---@return string|nil # pid
+function M.find_app_pid(processName)
+  if vim.fn.executable("jq") == 0 then
+    notifications.send_error("`jq` is required to find the app PID. Please install it.")
+    return nil
+  end
+
+  local command = "pymobiledevice3 processes ps | "
+    .. "jq -r 'to_entries[] | select(.value.ProcessName == \""
+    .. processName
+    .. "\") | .key'"
+
+  return util.shell(command)[1]
+end
+
 ---Starts the secure server.
 ---It is used on devices with iOS 17 and above.
 ---

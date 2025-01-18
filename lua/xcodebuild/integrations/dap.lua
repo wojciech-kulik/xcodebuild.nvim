@@ -89,6 +89,76 @@ local function stop_session()
   end
 end
 
+---Disconnects the current `nvim-dap` session.
+local function disconnect_session()
+  local loadedDap, dap = pcall(require, "dap")
+  if not loadedDap then
+    return
+  end
+
+  if not dap.session() then
+    return
+  end
+
+  local isDevice = constants.is_device(projectConfig.settings.platform)
+  if isDevice then
+    dap.repl.execute("process detach")
+  else
+    dap.disconnect()
+  end
+end
+
+---Detaches the debugger from the running application.
+function M.detach_debugger()
+  disconnect_session()
+end
+
+---Attaches the debugger to the running application.
+---@param callback function|nil
+function M.attach_and_debug(callback)
+  local loadedDap, _ = pcall(require, "dap")
+  if not loadedDap then
+    notifications.send_error("Could not load nvim-dap plugin")
+    return
+  end
+
+  if not helpers.validate_project({ requiresApp = true }) then
+    return
+  end
+
+  stop_session()
+
+  local xcode = require("xcodebuild.core.xcode")
+  local isDevice = constants.is_device(projectConfig.settings.platform)
+  local productName = projectConfig.settings.productName
+  local pid
+
+  if not productName then
+    notifications.send_error("You must build the application first")
+    return
+  end
+
+  if isDevice then
+    pid = require("xcodebuild.platform.device_proxy").find_app_pid(productName)
+  else
+    pid = xcode.get_app_pid(productName, projectConfig.settings.platform)
+  end
+
+  if not pid or pid == "" then
+    notifications.send_error("The application is not running. Could not attach the debugger.")
+    return
+  end
+
+  notifications.send("Attaching debugger...")
+
+  if isDevice then
+    set_remote_debugger_mode()
+    remoteDebugger.start_remote_debugger({ attach = true }, callback)
+  else
+    start_dap()
+  end
+end
+
 ---Builds, installs and runs the project. Also, it starts the debugger.
 ---@param callback function|nil
 function M.build_and_debug(callback)
@@ -123,7 +193,7 @@ function M.build_and_debug(callback)
     if isDevice then
       device.install_app(function()
         set_remote_debugger_mode()
-        remoteDebugger.start_remote_debugger(callback)
+        remoteDebugger.start_remote_debugger({}, callback)
       end)
     else
       if isSimulator then
@@ -150,7 +220,7 @@ function M.debug_without_build(callback)
   if isDevice then
     device.install_app(function()
       set_remote_debugger_mode()
-      remoteDebugger.start_remote_debugger(callback)
+      remoteDebugger.start_remote_debugger({}, callback)
     end)
   else
     device.kill_app()
@@ -513,8 +583,19 @@ function M.get_actions()
     { name = "Debug Without Building", action = M.debug_without_build },
     { name = "Debug Tests", action = M.debug_tests },
     { name = "Debug Current Test Class", action = M.debug_class_tests },
+    { name = "Attach Debugger", action = M.attach_and_debug },
+    { name = "Detach Debugger", action = disconnect_session },
     { name = "Clear DAP Console", action = M.clear_console },
   }
+end
+
+---Registers user commands for the `nvim-dap` plugin integration.
+---Commands:
+---  - `XcodebuildAttachDebugger` - starts the debugger session.
+---  - `XcodebuildDetachDebugger` - disconnects the debugger session.
+function M.register_user_commands()
+  vim.api.nvim_create_user_command("XcodebuildAttachDebugger", M.attach_and_debug, { nargs = 0 })
+  vim.api.nvim_create_user_command("XcodebuildDetachDebugger", M.detach_debugger, { nargs = 0 })
 end
 
 ---Sets up the adapter and configuration for the `nvim-dap` plugin.
@@ -529,6 +610,8 @@ function M.setup(codelldbPath, loadBreakpoints)
   dap.configurations.swift = M.get_swift_configuration()
   dap.adapters.codelldb = M.get_codelldb_adapter(codelldbPath)
   dap.defaults.fallback.exception_breakpoints = {}
+
+  M.register_user_commands()
 
   if loadBreakpoints ~= false then
     vim.api.nvim_create_autocmd({ "BufReadPost" }, {
