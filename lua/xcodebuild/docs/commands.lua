@@ -59,6 +59,8 @@
 --- | -------------------------- | ----------------------------------------- |
 --- | `XcodebuildAttachDebugger`   | Attach debugger to the running process      |
 --- | `XcodebuildDetachDebugger`   | Detach debugger without killing the process |
+--- | `XcodebuildBuildDebug`       | Build, install, and debug the app           |
+--- | `XcodebuildDebug`            | Install and debug the app without building  |
 ---
 ---Code Coverage
 ---
