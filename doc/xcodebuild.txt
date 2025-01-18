@@ -292,6 +292,7 @@ External tools
  - `Xcodeproj` to manage project files within Neovim.
  - `Ruby` to use `Xcodeproj` gem.
  - `pymobiledevice3` to debug on physical devices and/or run apps on devices below iOS 17.
+ - `jq` to get some information from `pymobiledevice3`.
  - `xcode-build-server` to make LSP work properly with xcodeproj/xcworkspace.
  - `codelldb` to debug applications.
  - `ripgrep` to find matching test files while using Swift Testing framework.
@@ -299,7 +300,7 @@ External tools
 
 Installation
 >bash
-  brew install xcode-build-server xcbeautify ruby pipx rg
+  brew install xcode-build-server xcbeautify ruby pipx rg jq
   gem install xcodeproj
   pipx install pymobiledevice3
 <
@@ -477,6 +478,13 @@ Testing
  | `XcodebuildTestFailing`      | Rerun previously failed tests             |
  | `XcodebuildTestRepeat`       | Repeat the last test run                  |
  | `XcodebuildFailingSnapshots` | Show a picker with failing snapshot tests |
+
+Debugging
+
+ | Command                    | Description                               |
+ | -------------------------- | ----------------------------------------- |
+ | `XcodebuildAttachDebugger`   | Attach debugger to the running process      |
+ | `XcodebuildDetachDebugger`   | Detach debugger without killing the process |
 
 Code Coverage
 
@@ -2499,6 +2507,17 @@ M.find_app_path({destination}, {bundleId})
     (string|nil)   app path
 
 
+                                 *xcodebuild.platform.device_proxy.find_app_pid*
+M.find_app_pid({processName})
+  Returns the PID of the application with the provided name.
+
+  Parameters: ~
+    {processName}  (string)
+
+  Returns: ~
+    (string|nil)   pid
+
+
                           *xcodebuild.platform.device_proxy.start_secure_server*
 M.start_secure_server({destination}, {rsd})
   Starts the secure server.
@@ -3535,6 +3554,19 @@ See:
   https://github.com/vadimcn/codelldb
 
 
+                                   *xcodebuild.integrations.dap.detach_debugger*
+M.detach_debugger()
+  Detaches the debugger from the running application.
+
+
+                                  *xcodebuild.integrations.dap.attach_and_debug*
+M.attach_and_debug({callback})
+  Attaches the debugger to the running application.
+
+  Parameters: ~
+    {callback}  (function|nil)
+
+
                                    *xcodebuild.integrations.dap.build_and_debug*
 M.build_and_debug({callback})
   Builds, installs and runs the project. Also, it starts the debugger.
@@ -3697,6 +3729,14 @@ M.get_actions()                        *xcodebuild.integrations.dap.get_actions*
   @return table<{name:string,action:function}>
 
 
+                            *xcodebuild.integrations.dap.register_user_commands*
+M.register_user_commands()
+  Registers user commands for the `nvim-dap` plugin integration.
+  Commands:
+    - `XcodebuildAttachDebugger` - starts the debugger session.
+    - `XcodebuildDetachDebugger` - disconnects the debugger session.
+
+
                                              *xcodebuild.integrations.dap.setup*
 M.setup({codelldbPath}, {loadBreakpoints})
   Sets up the adapter and configuration for the `nvim-dap` plugin.
@@ -3748,10 +3788,11 @@ M.set_mode({mode})
 
 
                  *xcodebuild.integrations.remote_debugger.start_remote_debugger*
-M.start_remote_debugger({callback})
+M.start_remote_debugger({opts}, {callback})
   Starts the remote debugger based on the mode.
 
   Parameters: ~
+    {opts}      ({attach:boolean}|nil)
     {callback}  (function|nil)
 
 
