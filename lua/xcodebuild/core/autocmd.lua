@@ -12,9 +12,11 @@ local M = {}
 
 ---Setup the autocommands for xcodebuild.nvim
 function M.setup()
+  local helpers = require("xcodebuild.helpers")
   local appdata = require("xcodebuild.project.appdata")
   local config = require("xcodebuild.core.config").options
   local projectConfig = require("xcodebuild.project.config")
+  local projectManager = require("xcodebuild.project.manager")
   local diagnostics = require("xcodebuild.tests.diagnostics")
   local logsPanel = require("xcodebuild.xcode_logs.panel")
   local coverage = require("xcodebuild.code_coverage.coverage")
@@ -43,6 +45,28 @@ function M.setup()
     pattern = "*.swiftinterface",
     command = "set filetype=swift",
   })
+
+  if config.guess_scheme then
+    vim.api.nvim_create_autocmd({ "BufReadPost" }, {
+      group = autogroup,
+      pattern = "*.swift",
+      callback = function(ev)
+        local targets = projectManager.get_current_file_targets()
+
+        if #targets == 0 then
+          return
+        end
+
+        local target = targets[1]
+
+        projectConfig.settings.scheme = target
+        projectConfig.save_settings()
+
+        print(string.format("xcodebuild.nvim: selected scheme changed to '%s'", target))
+        helpers.update_xcode_build_server_config()
+      end
+    })
+  end
 
   if config.marks.show_diagnostics or config.marks.show_signs then
     vim.api.nvim_create_autocmd({ "BufReadPost" }, {

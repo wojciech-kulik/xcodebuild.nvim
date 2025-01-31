@@ -2240,6 +2240,18 @@ M.guess_target({groupPath})            *xcodebuild.project.manager.guess_target*
     (string[]|nil)
 
 
+                           *xcodebuild.project.manager.get_current_file_targets*
+M.get_current_file_targets({filePath})
+  Finds the target fior existing file in the project
+
+
+  Parameters: ~
+    {filePath}  (string)
+
+  Returns: ~
+    (string[]|nil)
+
+
                           *xcodebuild.project.manager.show_current_file_targets*
 M.show_current_file_targets()
   Shows the targets for the current file.
@@ -4366,6 +4378,11 @@ M.update_readonly_buffer({bufnr}, {updateFoo})
   Parameters: ~
     {bufnr}      (number|nil)
     {updateFoo}  (function)
+
+
+                           *xcodebuild.helpers.update_xcode_build_server_config*
+M.update_xcode_build_server_config()
+  Updates xcode-build-server config if needed.
 
 
 ==============================================================================
