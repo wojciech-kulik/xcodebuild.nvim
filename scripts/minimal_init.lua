@@ -47,7 +47,13 @@ function M.setup()
 
   if not parserFileExists then
     print("Installing Swift parser")
-    vim.cmd("TSInstallSync swift")
+
+    vim.fn.mkdir(M.root(".tests/site/pack/deps/start/nvim-treesitter/parser"), "p")
+    vim.fn.system({
+      "cp",
+      M.root("scripts/swift.so"),
+      M.root(".tests/site/pack/deps/start/nvim-treesitter/parser/swift.so"),
+    })
   end
 end
 
