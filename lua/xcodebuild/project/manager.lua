@@ -689,7 +689,6 @@ function M.get_current_file_targets()
   end
 
   local filepath = vim.fn.expand("%:p")
-  local filename = vim.fn.expand("%:t")
   return run("list_targets_for_file", { filepath })
 end
 

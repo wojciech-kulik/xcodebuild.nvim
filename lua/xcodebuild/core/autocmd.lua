@@ -50,7 +50,7 @@ function M.setup()
     vim.api.nvim_create_autocmd({ "BufReadPost" }, {
       group = autogroup,
       pattern = "*.swift",
-      callback = function(ev)
+      callback = function()
         local targets = projectManager.get_current_file_targets()
 
         if #targets == 0 then
@@ -64,7 +64,7 @@ function M.setup()
 
         print(string.format("xcodebuild.nvim: selected scheme changed to '%s'", target))
         helpers.update_xcode_build_server_config()
-      end
+      end,
     })
   end
 
