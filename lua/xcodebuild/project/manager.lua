@@ -679,6 +679,17 @@ function M.guess_target(groupPath)
   return run_list_targets_for_group(groupPath)
 end
 
+---Finds the targets for the current file.
+---@return string[]|nil
+function M.get_current_file_targets()
+  if not helpers.validate_project({ requiresXcodeproj = true }) or not validate_xcodeproj_tool() then
+    return
+  end
+
+  local filepath = vim.fn.expand("%:p")
+  return run("list_targets_for_file", { filepath })
+end
+
 ---Shows the targets for the current file.
 function M.show_current_file_targets()
   if not helpers.validate_project({ requiresXcodeproj = true }) or not validate_xcodeproj_tool() then
