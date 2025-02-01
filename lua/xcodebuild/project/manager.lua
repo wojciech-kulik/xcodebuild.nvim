@@ -694,6 +694,10 @@ local function select_scheme_for_targets(targets)
     for _, scheme_name in ipairs(scheme_names) do
       for _, target in ipairs(targets) do
         if scheme_name == target then
+          if projectConfig.settings.scheme == target then
+            return
+          end
+
           projectConfig.settings.scheme = target
           projectConfig.save_settings()
 
