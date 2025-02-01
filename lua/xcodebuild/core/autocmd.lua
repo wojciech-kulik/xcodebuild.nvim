@@ -59,6 +59,10 @@ function M.setup()
 
         local target = targets[1]
 
+        if target == projectConfig.settings.scheme then
+            return
+        end
+
         projectConfig.settings.scheme = target
         projectConfig.save_settings()
 
