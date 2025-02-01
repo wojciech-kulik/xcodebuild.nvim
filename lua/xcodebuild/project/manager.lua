@@ -679,9 +679,7 @@ function M.guess_target(groupPath)
   return run_list_targets_for_group(groupPath)
 end
 
----Finds the target fior existing file in the project
----
----@param filePath string
+---Finds the targets for the current file.
 ---@return string[]|nil
 function M.get_current_file_targets()
   if not helpers.validate_project({ requiresXcodeproj = true }) or not validate_xcodeproj_tool() then
