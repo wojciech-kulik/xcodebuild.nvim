@@ -62,6 +62,8 @@ M.test_explorer_filepath = M.appdir .. "/test-explorer.json"
 M.breakpoints_filepath = M.appdir .. "/breakpoints.json"
 M.env_vars_filepath = M.appdir .. "/env.txt"
 M.run_args_filepath = M.appdir .. "/run_args.txt"
+M.build_xcresult_filepath = M.appdir .. "/build.xcresult"
+M.test_xcresult_filepath = M.appdir .. "/test.xcresult"
 
 M.GETSNAPSHOTS_TOOL = "getsnapshots"
 M.PROJECT_HELPER_TOOL = "project_helper.rb"
