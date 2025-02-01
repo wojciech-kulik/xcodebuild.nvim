@@ -12,7 +12,6 @@ local M = {}
 
 ---Setup the autocommands for xcodebuild.nvim
 function M.setup()
-  local helpers = require("xcodebuild.helpers")
   local appdata = require("xcodebuild.project.appdata")
   local config = require("xcodebuild.core.config").options
   local projectConfig = require("xcodebuild.project.config")
@@ -22,7 +21,6 @@ function M.setup()
   local coverage = require("xcodebuild.code_coverage.coverage")
   local events = require("xcodebuild.broadcasting.events")
   local autogroup = vim.api.nvim_create_augroup("xcodebuild.nvim", { clear = true })
-  local notifications = require("xcodebuild.broadcasting.notifications")
 
   if config.restore_on_start then
     vim.api.nvim_create_autocmd({ "VimEnter" }, {
@@ -52,23 +50,7 @@ function M.setup()
       group = autogroup,
       pattern = "*.swift",
       callback = function()
-        local targets = projectManager.get_current_file_targets()
-
-        if targets == nil or #targets == 0 then
-          return
-        end
-
-        local target = targets[1]
-
-        if target == projectConfig.settings.scheme then
-          return
-        end
-
-        projectConfig.settings.scheme = target
-        projectConfig.save_settings()
-
-        notifications.send("Scheme changed to: " .. target)
-        helpers.update_xcode_build_server_config()
+        projectManager.update_current_file_scheme()
       end,
     })
   end

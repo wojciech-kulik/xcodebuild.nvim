@@ -25,6 +25,7 @@ local projectConfig = require("xcodebuild.project.config")
 local notifications = require("xcodebuild.broadcasting.notifications")
 local pickers = require("xcodebuild.ui.pickers")
 local config = require("xcodebuild.core.config").options.project_manager
+local xcode = require("xcodebuild.core.xcode")
 
 local M = {}
 
@@ -662,6 +663,65 @@ function M.update_current_file_targets()
   end)
 end
 
+---Finds the targets for the current file.
+---@return string[]|nil
+local function get_current_file_targets()
+  if not helpers.validate_project({ requiresXcodeproj = true }) or not validate_xcodeproj_tool() then
+    return
+  end
+
+  local filepath = vim.fn.expand("%:p")
+  return run("list_targets_for_file", { filepath })
+end
+
+---Selects the first scheme in the project whose name matches one of the provided target names.
+---@param targets string[]
+---@return string|nil
+local function select_scheme_for_targets(targets)
+  local xcodeproj = projectConfig.settings.xcodeproj
+  local workingDirectory = projectConfig.settings.workingDirectory
+
+  if not xcodeproj and not workingDirectory then
+    notifications.send_error("Project file not set")
+    return
+  end
+
+  xcode.find_schemes(xcodeproj, workingDirectory, function(schemes)
+    local scheme_names = util.select(schemes, function(scheme)
+      return scheme.name
+    end)
+
+    for _, scheme_name in ipairs(scheme_names) do
+      for _, target in ipairs(targets) do
+        if scheme_name == target then
+          projectConfig.settings.scheme = target
+          projectConfig.save_settings()
+
+          notifications.send("Scheme changed to: " .. target)
+          helpers.update_xcode_build_server_config()
+
+          return
+        end
+      end
+    end
+  end)
+end
+
+---Updates the project scheme based on current file targets.
+---
+---Retrieves the current file's targets and, if valid targets are found,
+---selects an appropriate scheme for those targets if exists.
+function M.update_current_file_scheme()
+  local file_targets = get_current_file_targets()
+
+  if file_targets == nil or #file_targets == 0 then
+    notifications.send_error("No targets found for current file")
+    return
+  end
+
+  select_scheme_for_targets(file_targets)
+end
+
 ---Finds the first existing group in the project for the provided {groupPath}
 ---and tries to list targets for the first Swift file it encounters there or in subgroups.
 ---
@@ -677,17 +737,6 @@ function M.guess_target(groupPath)
   end
 
   return run_list_targets_for_group(groupPath)
-end
-
----Finds the targets for the current file.
----@return string[]|nil
-function M.get_current_file_targets()
-  if not helpers.validate_project({ requiresXcodeproj = true }) or not validate_xcodeproj_tool() then
-    return
-  end
-
-  local filepath = vim.fn.expand("%:p")
-  return run("list_targets_for_file", { filepath })
 end
 
 ---Shows the targets for the current file.

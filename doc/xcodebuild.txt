@@ -2224,6 +2224,14 @@ M.update_current_file_targets()
   Asks the user to select the targets.
 
 
+                         *xcodebuild.project.manager.update_current_file_scheme*
+M.update_current_file_scheme()
+  Updates the project scheme based on current file targets.
+
+  Retrieves the current file's targets and, if valid targets are found,
+  selects an appropriate scheme for those targets if exists.
+
+
 M.guess_target({groupPath})            *xcodebuild.project.manager.guess_target*
   Finds the first existing group in the project for the provided {groupPath}
   and tries to list targets for the first Swift file it encounters there or in subgroups.
@@ -2235,14 +2243,6 @@ M.guess_target({groupPath})            *xcodebuild.project.manager.guess_target*
 
   Parameters: ~
     {groupPath}  (string)
-
-  Returns: ~
-    (string[]|nil)
-
-
-                           *xcodebuild.project.manager.get_current_file_targets*
-M.get_current_file_targets()
-  Finds the targets for the current file.
 
   Returns: ~
     (string[]|nil)
