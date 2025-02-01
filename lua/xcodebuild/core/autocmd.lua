@@ -47,7 +47,7 @@ function M.setup()
   })
 
   if config.guess_scheme then
-    vim.api.nvim_create_autocmd({ "BufReadPost" }, {
+    vim.api.nvim_create_autocmd({ "BufEnter" }, {
       group = autogroup,
       pattern = "*.swift",
       callback = function()
