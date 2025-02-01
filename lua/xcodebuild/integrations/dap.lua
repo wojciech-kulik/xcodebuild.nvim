@@ -423,7 +423,7 @@ function M.update_console(output, append)
     autoscroll = currentWinnr ~= winnr or currentLine == lastLine
   end
 
-  if append then
+  if append and vim.api.nvim_buf_line_count(bufnr) > 1 then
     local lastLine = vim.api.nvim_buf_get_lines(bufnr, -2, -1, false)[1]
     output[1] = lastLine .. output[1]
     vim.api.nvim_buf_set_lines(bufnr, -2, -1, false, output)
