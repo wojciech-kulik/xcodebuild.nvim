@@ -691,7 +691,12 @@ local function get_cached_scheme_for_targets(targets)
   return nil
 end
 
---- Selects a new scheme for the project and updated build server conif if needed.
+---Clears cached schemes table
+function M.clear_cached_schemes()
+  cachedSchemes = {}
+end
+
+---Selects a new scheme for the project and updated build server conif if needed.
 ---@param scheme string
 local function select_scheme(scheme)
   if scheme == nil or projectConfig.settings.scheme == scheme then

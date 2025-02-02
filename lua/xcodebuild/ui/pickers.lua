@@ -483,6 +483,8 @@ function M.select_project(callback, opts)
       projectConfig.settings.projectFile = projectFile
     end
 
+    require("xcodebuild.project.manager").clear_cached_schemes()
+
     projectConfig.save_settings()
     helpers.update_xcode_build_server_config()
     util.call(callback, projectFile)
