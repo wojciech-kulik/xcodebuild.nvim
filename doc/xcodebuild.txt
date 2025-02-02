@@ -2224,6 +2224,11 @@ M.update_current_file_targets()
   Asks the user to select the targets.
 
 
+                               *xcodebuild.project.manager.clear_cached_schemes*
+M.clear_cached_schemes()
+  Clears cached schemes table
+
+
                          *xcodebuild.project.manager.update_current_file_scheme*
 M.update_current_file_scheme()
   Updates the project scheme based on current file targets.
