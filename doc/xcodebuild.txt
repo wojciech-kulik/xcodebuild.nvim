@@ -84,7 +84,7 @@ M.setup({options})                                            *xcodebuild.setup*
       prepare_snapshot_test_previews = true, -- prepares a list with failing snapshot tests
       test_search = {
         file_matching = "filename_lsp", -- one of: filename, lsp, lsp_filename, filename_lsp. Check out README for details
-        target_matching = true, -- checks if the test file target matches the one from logs. Try disabling it in case of not showing test results
+        target_matching = true, -- automatically select scheme based on the current file
         lsp_client = "sourcekit", -- name of your LSP for Swift files
         lsp_timeout = 200, -- LSP timeout in milliseconds
       },
@@ -2222,6 +2222,19 @@ M.delete_current_group()
 M.update_current_file_targets()
   Updates the file targets in the project.
   Asks the user to select the targets.
+
+
+                               *xcodebuild.project.manager.clear_cached_schemes*
+M.clear_cached_schemes()
+  Clears cached schemes table
+
+
+                         *xcodebuild.project.manager.update_current_file_scheme*
+M.update_current_file_scheme()
+  Updates the project scheme based on current file targets.
+
+  Retrieves the current file's targets and, if valid targets are found,
+  selects an appropriate scheme for those targets if exists.
 
 
 M.guess_target({groupPath})            *xcodebuild.project.manager.guess_target*
@@ -4366,6 +4379,11 @@ M.update_readonly_buffer({bufnr}, {updateFoo})
   Parameters: ~
     {bufnr}      (number|nil)
     {updateFoo}  (function)
+
+
+                           *xcodebuild.helpers.update_xcode_build_server_config*
+M.update_xcode_build_server_config()
+  Updates xcode-build-server config if needed.
 
 
 ==============================================================================

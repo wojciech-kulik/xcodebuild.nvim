@@ -25,6 +25,7 @@ local projectConfig = require("xcodebuild.project.config")
 local notifications = require("xcodebuild.broadcasting.notifications")
 local pickers = require("xcodebuild.ui.pickers")
 local config = require("xcodebuild.core.config").options.project_manager
+local xcode = require("xcodebuild.core.xcode")
 
 local M = {}
 
@@ -660,6 +661,112 @@ function M.update_current_file_targets()
     run_update_file_targets(filepath, targets)
     notifications.send("File targets have been updated")
   end)
+end
+
+---Finds the targets for the current file.
+---@return string[]|nil
+local function get_current_file_targets()
+  if not helpers.validate_project({ requiresXcodeproj = true }) or not validate_xcodeproj_tool() then
+    return
+  end
+
+  local filepath = vim.fn.expand("%:p")
+  return run("list_targets_for_file", { filepath })
+end
+
+--- Cached scheme names
+---@type table<string, boolean>
+local cachedSchemes = {}
+
+---Returns the first scheme that has same name as one of the provided target names.
+---@param targets string[]
+---@return string|nil
+local function get_cached_scheme_for_targets(targets)
+  for _, target in ipairs(targets) do
+    if cachedSchemes[target] == true then
+      return target
+    end
+  end
+
+  return nil
+end
+
+---Clears cached schemes table
+function M.clear_cached_schemes()
+  cachedSchemes = {}
+end
+
+---Selects a new scheme for the project and updated build server config if needed.
+---@param scheme string
+local function select_scheme(scheme)
+  if scheme == nil or projectConfig.settings.scheme == scheme then
+    return
+  end
+
+  projectConfig.settings.scheme = scheme
+  projectConfig.save_settings()
+
+  notifications.send("Scheme changed to: " .. scheme)
+  helpers.update_xcode_build_server_config()
+end
+
+---Current find schemes job id
+---@type number|nil
+local findSchemesJobId
+
+---Selects the first scheme in the project whose name matches one of the provided target names.
+---@param targets string[]
+local function select_scheme_for_targets(targets)
+  local xcodeproj = projectConfig.settings.xcodeproj
+  local workingDirectory = projectConfig.settings.workingDirectory
+
+  if not xcodeproj and not workingDirectory then
+    notifications.send_error("Project file not set")
+    return
+  end
+
+  local cachedScheme = get_cached_scheme_for_targets(targets)
+
+  if cachedScheme then
+    select_scheme(cachedScheme)
+    return
+  end
+
+  if findSchemesJobId then
+    vim.fn.jobstop(findSchemesJobId)
+  end
+
+  findSchemesJobId = xcode.find_schemes(xcodeproj, workingDirectory, function(schemes)
+    local matchingScheme = util.find(schemes, function(scheme)
+      for _, target in ipairs(targets) do
+        if target == scheme.name then
+          return true
+        end
+      end
+
+      return false
+    end)
+
+    if matchingScheme then
+      select_scheme(matchingScheme.name)
+      cachedSchemes[matchingScheme.name] = true
+    end
+  end)
+end
+
+---Updates the project scheme based on current file targets.
+---
+---Retrieves the current file's targets and, if valid targets are found,
+---selects an appropriate scheme for those targets if exists.
+function M.update_current_file_scheme()
+  local file_targets = get_current_file_targets()
+
+  if file_targets == nil or #file_targets == 0 then
+    notifications.send_error("No targets found for current file")
+    return
+  end
+
+  select_scheme_for_targets(file_targets)
 end
 
 ---Finds the first existing group in the project for the provided {groupPath}

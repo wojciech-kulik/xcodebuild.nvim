@@ -20,6 +20,7 @@
 ---@field close_on_select boolean|nil
 ---@field device_select_callback function|nil
 
+local helpers = require("xcodebuild.helpers")
 local util = require("xcodebuild.util")
 local notifications = require("xcodebuild.broadcasting.notifications")
 local constants = require("xcodebuild.core.constants")
@@ -102,22 +103,6 @@ local function entry_maker(entry)
     display = entry,
     ordinal = entry,
   }
-end
-
----Updates xcode-build-server config if needed.
-local function update_xcode_build_server_config()
-  local xcodeBuildServer = require("xcodebuild.integrations.xcode-build-server")
-
-  if not xcodeBuildServer.is_enabled() or not xcodeBuildServer.is_installed() then
-    return
-  end
-
-  local projectFile = projectConfig.settings.projectFile
-  local scheme = projectConfig.settings.scheme
-
-  if projectFile and scheme then
-    xcodeBuildServer.run_config(projectFile, scheme)
-  end
 end
 
 ---Stops the spinner animation.
@@ -498,8 +483,10 @@ function M.select_project(callback, opts)
       projectConfig.settings.projectFile = projectFile
     end
 
+    require("xcodebuild.project.manager").clear_cached_schemes()
+
     projectConfig.save_settings()
-    update_xcode_build_server_config()
+    helpers.update_xcode_build_server_config()
     util.call(callback, projectFile)
   end, opts)
 end
@@ -520,7 +507,7 @@ function M.select_scheme(callback, opts)
   local function selectScheme(scheme)
     projectConfig.settings.scheme = scheme
     projectConfig.save_settings()
-    update_xcode_build_server_config()
+    helpers.update_xcode_build_server_config()
 
     vim.defer_fn(function()
       util.call(callback, scheme)
