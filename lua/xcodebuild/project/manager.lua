@@ -696,7 +696,7 @@ function M.clear_cached_schemes()
   cachedSchemes = {}
 end
 
----Selects a new scheme for the project and updated build server conif if needed.
+---Selects a new scheme for the project and updated build server config if needed.
 ---@param scheme string
 local function select_scheme(scheme)
   if scheme == nil or projectConfig.settings.scheme == scheme then
