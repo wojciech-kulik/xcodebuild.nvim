@@ -674,11 +674,43 @@ local function get_current_file_targets()
   return run("list_targets_for_file", { filepath })
 end
 
+--- Cached scheme names
+---@type table<string, boolean>
+local cachedSchemes = {}
+
+---Returns the first scheme that has same name as one of the provided target names.
+---@param targets string[]
+---@return string|nil
+local function get_cached_scheme_for_targets(targets)
+  for _, target in ipairs(targets) do
+    if cachedSchemes[target] == true then
+      return target
+    end
+  end
+
+  return nil
+end
+
+--- Selects a new scheme for the project and updated build server conif if needed.
+---@param scheme string
+local function select_scheme(scheme)
+  if scheme == nil or projectConfig.settings.scheme == scheme then
+    return
+  end
+
+  projectConfig.settings.scheme = scheme
+  projectConfig.save_settings()
+
+  notifications.send("Scheme changed to: " .. scheme)
+  helpers.update_xcode_build_server_config()
+end
+
+---Current find schemes job id
+---@type number|nil
 local findSchemesJobId
 
 ---Selects the first scheme in the project whose name matches one of the provided target names.
 ---@param targets string[]
----@return string|nil
 local function select_scheme_for_targets(targets)
   local xcodeproj = projectConfig.settings.xcodeproj
   local workingDirectory = projectConfig.settings.workingDirectory
@@ -688,31 +720,31 @@ local function select_scheme_for_targets(targets)
     return
   end
 
+  local cachedScheme = get_cached_scheme_for_targets(targets)
+
+  if cachedScheme then
+    select_scheme(cachedScheme)
+    return
+  end
+
   if findSchemesJobId then
     vim.fn.jobstop(findSchemesJobId)
   end
 
   findSchemesJobId = xcode.find_schemes(xcodeproj, workingDirectory, function(schemes)
-    local scheme_names = util.select(schemes, function(scheme)
-      return scheme.name
-    end)
-
-    for _, scheme_name in ipairs(scheme_names) do
+    local matchingScheme = util.find(schemes, function(scheme)
       for _, target in ipairs(targets) do
-        if scheme_name == target then
-          if projectConfig.settings.scheme == target then
-            return
-          end
-
-          projectConfig.settings.scheme = target
-          projectConfig.save_settings()
-
-          notifications.send("Scheme changed to: " .. target)
-          helpers.update_xcode_build_server_config()
-
-          return
+        if target == scheme.name then
+          return true
         end
       end
+
+      return false
+    end)
+
+    if matchingScheme then
+      select_scheme(matchingScheme.name)
+      cachedSchemes[matchingScheme.name] = true
     end
   end)
 end
