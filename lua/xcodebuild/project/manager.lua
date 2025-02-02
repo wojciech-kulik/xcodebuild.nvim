@@ -674,6 +674,8 @@ local function get_current_file_targets()
   return run("list_targets_for_file", { filepath })
 end
 
+local findSchemesJobId
+
 ---Selects the first scheme in the project whose name matches one of the provided target names.
 ---@param targets string[]
 ---@return string|nil
@@ -686,7 +688,11 @@ local function select_scheme_for_targets(targets)
     return
   end
 
-  xcode.find_schemes(xcodeproj, workingDirectory, function(schemes)
+  if findSchemesJobId then
+    vim.fn.jobstop(findSchemesJobId)
+  end
+
+  findSchemesJobId = xcode.find_schemes(xcodeproj, workingDirectory, function(schemes)
     local scheme_names = util.select(schemes, function(scheme)
       return scheme.name
     end)
