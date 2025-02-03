@@ -52,6 +52,7 @@ local projectConfig = require("xcodebuild.project.config")
 local device = require("xcodebuild.platform.device")
 local actions = require("xcodebuild.actions")
 local remoteDebugger = require("xcodebuild.integrations.remote_debugger")
+local dapSymbolicate = require("xcodebuild.integrations.dap-symbolicate")
 
 local M = {}
 
@@ -74,6 +75,7 @@ local function start_dap()
     return
   end
 
+  dapSymbolicate.dap_started()
   dap.run(dap.configurations.swift[1])
 end
 
@@ -411,6 +413,13 @@ function M.update_console(output, append)
   if util.is_empty(output) then
     return
   end
+
+  dapSymbolicate.process_logs(output, function(symbolicated)
+    vim.bo[bufnr].modifiable = true
+    vim.api.nvim_buf_set_lines(bufnr, -1, -1, false, symbolicated)
+    vim.bo[bufnr].modified = false
+    vim.bo[bufnr].modifiable = false
+  end)
 
   vim.bo[bufnr].modifiable = true
 
