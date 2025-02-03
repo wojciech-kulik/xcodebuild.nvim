@@ -192,7 +192,7 @@ function M.is_configured()
   return M.is_app_configured() or M.is_spm_configured() or M.is_library_configured()
 end
 
----Updates the settings (`appPath`, `productName`, and `bundleId`) based on
+---Updates the settings (`appPath`, `productName`, `buildDir`, and `bundleId`) based on
 ---the current project.
 ---Calls `xcodebuild` commands to get the build settings.
 ---@param opts {skipIfSamePlatform:boolean} the options table

@@ -84,7 +84,7 @@ M.setup({options})                                            *xcodebuild.setup*
       prepare_snapshot_test_previews = true, -- prepares a list with failing snapshot tests
       test_search = {
         file_matching = "filename_lsp", -- one of: filename, lsp, lsp_filename, filename_lsp. Check out README for details
-        target_matching = true, -- automatically select scheme based on the current file
+        target_matching = true, -- checks if the test file target matches the one from logs. Try disabling it in case of not showing test results
         lsp_client = "sourcekit", -- name of your LSP for Swift files
         lsp_timeout = 200, -- LSP timeout in milliseconds
       },
@@ -198,6 +198,7 @@ M.setup({options})                                            *xcodebuild.setup*
         },
         xcode_build_server = {
           enabled = true, -- enable calling "xcode-build-server config" when project config changes
+          guess_scheme = false, -- run "xcode-build-server config" with the scheme matching the current file's target
         },
         nvim_tree = {
           enabled = true, -- enable updating Xcode project files when using nvim-tree
@@ -1828,7 +1829,7 @@ M.is_configured()                      *xcodebuild.project.config.is_configured*
 
                                      *xcodebuild.project.config.update_settings*
 M.update_settings({opts}, {callback})
-  Updates the settings (`appPath`, `productName`, and `bundleId`) based on
+  Updates the settings (`appPath`, `productName`, `buildDir`, and `bundleId`) based on
   the current project.
   Calls `xcodebuild` commands to get the build settings.
 
@@ -2224,19 +2225,6 @@ M.update_current_file_targets()
   Asks the user to select the targets.
 
 
-                               *xcodebuild.project.manager.clear_cached_schemes*
-M.clear_cached_schemes()
-  Clears cached schemes table
-
-
-                         *xcodebuild.project.manager.update_current_file_scheme*
-M.update_current_file_scheme()
-  Updates the project scheme based on current file targets.
-
-  Retrieves the current file's targets and, if valid targets are found,
-  selects an appropriate scheme for those targets if exists.
-
-
 M.guess_target({groupPath})            *xcodebuild.project.manager.guess_target*
   Finds the first existing group in the project for the provided {groupPath}
   and tries to list targets for the first Swift file it encounters there or in subgroups.
@@ -2251,6 +2239,14 @@ M.guess_target({groupPath})            *xcodebuild.project.manager.guess_target*
 
   Returns: ~
     (string[]|nil)
+
+
+                           *xcodebuild.project.manager.get_current_file_targets*
+M.get_current_file_targets()
+  Finds the targets for the current file.
+
+  Returns: ~
+    (string[])
 
 
                           *xcodebuild.project.manager.show_current_file_targets*
@@ -4062,6 +4058,50 @@ M.run_config({projectFile}, {scheme})
     (number)   job id
 
 
+              *xcodebuild.integrations.xcode-build-server.run_config_if_enabled*
+M.run_config_if_enabled({scheme})
+  Calls "config" command of xcode-build-server in order to update buildServer.json file.
+  This function is called only if the integration is enabled and the
+  xcode-build-server is installed.
+
+  Parameters: ~
+    {scheme}  (string|nil)
+
+
+              *xcodebuild.integrations.xcode-build-server.update_cached_schemes*
+M.update_cached_schemes({schemes})
+  Updates cached schemes.
+
+  Parameters: ~
+    {schemes}  (string[])
+
+
+               *xcodebuild.integrations.xcode-build-server.clear_cached_schemes*
+M.clear_cached_schemes()
+  Clears cached schemes.
+
+
+                                                       *xcodebuild.guess-scheme*
+                       *xcodebuild.integrations.xcode-build-server.guess_scheme*
+M.guess_scheme()
+  This function is responsible for running the `xcode-build-server config` command
+  with the scheme matching the current file's target. It's not perfect, because
+  schemes can have different names than targets, but it might be helpful in some
+  cases.
+
+  You can enable it by setting `guess_scheme` to `true` in the configuration.
+  It will be triggered every time you enter a `Swift` buffer, so the performance
+  might be affected.
+
+  Schemes are cached to avoid unnecessary calls to `xcodebuild` when switching
+  between files. To clear the cache, you can use the `clear_cached_schemes`
+  function, restart Neovim, or show schemes picker.
+
+
+                              *xcodebuild.integrations.xcode-build-server.setup*
+M.setup()
+
+
 ==============================================================================
 Xcodebuild Workaround               *xcodebuild.integrations.xcodebuild-offline*
 
@@ -4379,11 +4419,6 @@ M.update_readonly_buffer({bufnr}, {updateFoo})
   Parameters: ~
     {bufnr}      (number|nil)
     {updateFoo}  (function)
-
-
-                           *xcodebuild.helpers.update_xcode_build_server_config*
-M.update_xcode_build_server_config()
-  Updates xcode-build-server config if needed.
 
 
 ==============================================================================
