@@ -15,7 +15,6 @@ function M.setup()
   local appdata = require("xcodebuild.project.appdata")
   local config = require("xcodebuild.core.config").options
   local projectConfig = require("xcodebuild.project.config")
-  local projectManager = require("xcodebuild.project.manager")
   local diagnostics = require("xcodebuild.tests.diagnostics")
   local logsPanel = require("xcodebuild.xcode_logs.panel")
   local coverage = require("xcodebuild.code_coverage.coverage")
@@ -44,16 +43,6 @@ function M.setup()
     pattern = "*.swiftinterface",
     command = "set filetype=swift",
   })
-
-  if config.guess_scheme then
-    vim.api.nvim_create_autocmd({ "BufEnter" }, {
-      group = autogroup,
-      pattern = "*.swift",
-      callback = function()
-        projectManager.update_current_file_scheme()
-      end,
-    })
-  end
 
   if config.marks.show_diagnostics or config.marks.show_signs then
     vim.api.nvim_create_autocmd({ "BufReadPost" }, {

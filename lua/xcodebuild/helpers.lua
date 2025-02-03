@@ -198,21 +198,4 @@ function M.update_readonly_buffer(bufnr, updateFoo)
   M.buf_set_option(bufnr, "readonly", true)
 end
 
----Updates xcode-build-server config if needed.
-function M.update_xcode_build_server_config()
-  local projectConfig = require("xcodebuild.project.config")
-  local xcodeBuildServer = require("xcodebuild.integrations.xcode-build-server")
-
-  if not xcodeBuildServer.is_enabled() or not xcodeBuildServer.is_installed() then
-    return
-  end
-
-  local projectFile = projectConfig.settings.projectFile
-  local scheme = projectConfig.settings.scheme
-
-  if projectFile and scheme then
-    xcodeBuildServer.run_config(projectFile, scheme)
-  end
-end
-
 return M

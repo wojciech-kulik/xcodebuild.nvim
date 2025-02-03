@@ -20,7 +20,6 @@
 ---@field close_on_select boolean|nil
 ---@field device_select_callback function|nil
 
-local helpers = require("xcodebuild.helpers")
 local util = require("xcodebuild.util")
 local notifications = require("xcodebuild.broadcasting.notifications")
 local constants = require("xcodebuild.core.constants")
@@ -483,10 +482,11 @@ function M.select_project(callback, opts)
       projectConfig.settings.projectFile = projectFile
     end
 
-    require("xcodebuild.project.manager").clear_cached_schemes()
+    local xcodeBuildServer = require("xcodebuild.integrations.xcode-build-server")
+    xcodeBuildServer.clear_cached_schemes()
 
     projectConfig.save_settings()
-    helpers.update_xcode_build_server_config()
+    xcodeBuildServer.run_config_if_enabled()
     util.call(callback, projectFile)
   end, opts)
 end
@@ -504,10 +504,12 @@ function M.select_scheme(callback, opts)
 
   opts = opts or {}
 
+  local xcodeBuildServer = require("xcodebuild.integrations.xcode-build-server")
+
   local function selectScheme(scheme)
     projectConfig.settings.scheme = scheme
     projectConfig.save_settings()
-    helpers.update_xcode_build_server_config()
+    xcodeBuildServer.run_config_if_enabled(scheme)
 
     vim.defer_fn(function()
       util.call(callback, scheme)
@@ -524,6 +526,7 @@ function M.select_scheme(callback, opts)
       return scheme.name
     end)
 
+    xcodeBuildServer.update_cached_schemes(names)
     update_results(names, true)
 
     if util.is_empty(names) then
