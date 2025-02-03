@@ -105,6 +105,7 @@ function M.process_logs(output, on_symbolicate)
           symbolicate(crashCallStack, function(symbolicated)
             on_symbolicate(symbolicated)
           end)
+          crashCallStack = {}
         end, 100)
 
         break
@@ -120,6 +121,7 @@ end
 ---Use to notify the module that the debugger has started.
 function M.dap_started()
   foundException = false
+  crashCallStack = {}
 end
 
 return M
