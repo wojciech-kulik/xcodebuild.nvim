@@ -39,6 +39,7 @@ Xcresult File Parser ························ |xcodebuil
 Code Coverage ······························ |xcodebuild.code_coverage.coverage|
 Code Coverage Report ························· |xcodebuild.code_coverage.report|
 DAP Integration ·································· |xcodebuild.integrations.dap|
+DAP Symbolicate ······················ |xcodebuild.integrations.dap-symbolicate|
 Remote Debugger Integration ·········· |xcodebuild.integrations.remote_debugger|
 LSP Integration ·································· |xcodebuild.integrations.lsp|
 nvim-tree Integration ······················ |xcodebuild.integrations.nvim-tree|
@@ -3761,6 +3762,25 @@ M.setup({codelldbPath}, {loadBreakpoints})
   Parameters: ~
     {codelldbPath}     (string)
     {loadBreakpoints}  (boolean|nil) default: true
+
+
+==============================================================================
+DAP Symbolicate                        *xcodebuild.integrations.dap-symbolicate*
+
+This module provides a DAP integration for symbolication of crash call stacks.
+
+                          *xcodebuild.integrations.dap-symbolicate.process_logs*
+M.process_logs({output}, {on_symbolicate})
+  Collects the crash call stack from the console output.
+
+  Parameters: ~
+    {output}          (string[]) # the console output
+    {on_symbolicate}  (fun(symbolicatedCallStack:string[])) # callback with the symbolicated call stack
+
+
+                           *xcodebuild.integrations.dap-symbolicate.dap_started*
+M.dap_started()
+  Use to notify the module that the debugger has started.
 
 
 ==============================================================================

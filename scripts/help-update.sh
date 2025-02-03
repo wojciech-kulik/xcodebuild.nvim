@@ -42,6 +42,7 @@ lemmy-help \
   ./lua/xcodebuild/code_coverage/coverage.lua \
   ./lua/xcodebuild/code_coverage/report.lua \
   ./lua/xcodebuild/integrations/dap.lua \
+  ./lua/xcodebuild/integrations/dap-symbolicate.lua \
   ./lua/xcodebuild/integrations/remote_debugger.lua \
   ./lua/xcodebuild/integrations/lsp.lua \
   ./lua/xcodebuild/integrations/nvim-tree.lua \
