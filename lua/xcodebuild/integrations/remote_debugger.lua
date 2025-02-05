@@ -95,7 +95,21 @@ local function setup_connection_listeners()
       buffer = splitted[#splitted]
       table.remove(splitted, #splitted)
 
-      appdata.append_app_logs(splitted)
+      -- filters out output used for symbolication when debugger stops
+      local filtered = {}
+      local status = require("dap").status()
+
+      if status:find("Stopped") then
+        for _, line in ipairs(splitted) do
+          if not line:find("%s+Summary: ") and not line:find("%s+Address: ") then
+            table.insert(filtered, line)
+          end
+        end
+      else
+        filtered = splitted
+      end
+
+      appdata.append_app_logs(filtered)
     end
   end
 end
