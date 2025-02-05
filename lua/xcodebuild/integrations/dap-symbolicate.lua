@@ -97,7 +97,13 @@ end
 function M.process_logs(output, on_symbolicate)
   for _, line in ipairs(output) do
     if foundException then
-      if line == ")" then
+      if line == ")" or line:find("%(0x%x+%s.*%)") then
+        if line:find("%(0x%x+%s.*%)") then
+          for address in line:gmatch("0x%x+") do
+            table.insert(crashCallStack, address .. " XYZ")
+          end
+        end
+
         foundException = false
 
         -- defer to allow DAP print the original output
@@ -109,11 +115,12 @@ function M.process_logs(output, on_symbolicate)
         end, 100)
 
         break
-      else
+      elseif line ~= "(" then
         table.insert(crashCallStack, line)
       end
     else
       foundException = line:find("__exceptionPreprocess") ~= nil
+        or line:find(escape_magic("*** First throw call stack:")) ~= nil
     end
   end
 end

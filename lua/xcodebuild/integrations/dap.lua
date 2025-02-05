@@ -387,6 +387,11 @@ function M.clear_console()
     return
   end
 
+  if vim.bo.buftype == "terminal" then
+    notifications.send_error("Cannot clear DAP console while debugging macOS apps.")
+    return
+  end
+
   vim.bo[bufnr].modifiable = true
   vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, {})
   vim.bo[bufnr].modified = false
