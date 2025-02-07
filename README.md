@@ -78,6 +78,7 @@ Big thanks to all the sponsors who support this project 🍻!
 <a href="https://github.com/kg8m"><img src="https://avatars.githubusercontent.com/u/694547" width="40" height="40" alt="@kg8m" title="kg8m"></a>
 <a href="https://github.com/m-housh"><img src="https://avatars.githubusercontent.com/u/9305678" width="40" height="40" alt="@m-housh" title="m-housh"></a>
 <a href="https://github.com/soundsmitten"><img src="https://avatars.githubusercontent.com/u/852801" width="40" height="40" alt="@soundsmitten" title="soundsmitten"></a>
+<a href="https://github.com/humblehacker"><img src="https://avatars.githubusercontent.com/u/117582" width="40" height="40" alt="@humblehacker" title="humblehacker"></a>
 
 ### One Time Sponsors
 
