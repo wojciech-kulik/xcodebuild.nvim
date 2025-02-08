@@ -623,12 +623,15 @@ end
 ---
 ---Sample {codelldbPath} - `/your/path/to/codelldb-aarch64-darwin/extension/adapter/codelldb`
 ---{loadBreakpoints} - if true or nil, sets up an autocmd to load breakpoints when a Swift file is opened.
+---{lldbPath} - default: `/Applications/Xcode.app/Contents/SharedFrameworks/LLDB.framework/Versions/A/LLDB`
+---Provide {lldbPath} if your Xcode installation is not in the default location.
 ---@param codelldbPath string
 ---@param loadBreakpoints boolean|nil default: true
-function M.setup(codelldbPath, loadBreakpoints)
+---@param lldbPath string|nil
+function M.setup(codelldbPath, loadBreakpoints, lldbPath)
   local dap = require("dap")
   dap.configurations.swift = M.get_swift_configuration()
-  dap.adapters.codelldb = M.get_codelldb_adapter(codelldbPath)
+  dap.adapters.codelldb = M.get_codelldb_adapter(codelldbPath, lldbPath)
   dap.defaults.fallback.exception_breakpoints = {}
 
   M.register_user_commands()
