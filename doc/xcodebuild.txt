@@ -3752,16 +3752,19 @@ M.register_user_commands()
 
 
                                              *xcodebuild.integrations.dap.setup*
-M.setup({codelldbPath}, {loadBreakpoints})
+M.setup({codelldbPath}, {loadBreakpoints}, {lldbPath})
   Sets up the adapter and configuration for the `nvim-dap` plugin.
   {codelldbPath} - path to the `codelldb` binary.
 
   Sample {codelldbPath} - `/your/path/to/codelldb-aarch64-darwin/extension/adapter/codelldb`
   {loadBreakpoints} - if true or nil, sets up an autocmd to load breakpoints when a Swift file is opened.
+  {lldbPath} - default: `/Applications/Xcode.app/Contents/SharedFrameworks/LLDB.framework/Versions/A/LLDB`
+  Provide {lldbPath} if your Xcode installation is not in the default location.
 
   Parameters: ~
     {codelldbPath}     (string)
     {loadBreakpoints}  (boolean|nil) default: true
+    {lldbPath}         (string|nil)
 
 
 ==============================================================================
