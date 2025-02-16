@@ -49,7 +49,7 @@ integrations, settings, and examples.
 
 xcodebuild.nvim supports code coverage, test explorer, diagnostics, snapshot tests, Quick framework, and more!
 
-https://github.com/user-attachments/assets/30da2636-34e1-4940-b1f9-d422ccb7ff46
+https://github.com/user-attachments/assets/50f8848e-e90b-4b0b-a0ee-79e836982f12
 
 ### Working With Code
 
@@ -57,14 +57,14 @@ Neovim can be easily integrated with SwiftLint, SwiftFormat, Copilot, and more.
 In the video, you can see basic navigation, diagnostics, formatting, linting, code completion, and of course,
 launching the app on a simulator.
 
-https://github.com/user-attachments/assets/2b44ad01-a736-42ba-b5aa-be0ecaea5a29
+https://github.com/user-attachments/assets/67b844f8-c1bd-453d-be64-0592b904e3c2
 
 ### Debugging
 
 The plugin allows you to debug both on simulators and physical devices. You get access to all basic things like breakpoints,
 variables inspection, call stack, lldb, etc. You can even see app logs.
 
-https://github.com/user-attachments/assets/a2b87eab-5cdc-4fe5-8f96-78bc1a21e924
+https://github.com/user-attachments/assets/27644dcd-ef4e-4471-8ddc-cf1c9d2ca27e
 
 &nbsp;
 
