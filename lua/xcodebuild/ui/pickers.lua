@@ -587,6 +587,7 @@ function M.select_testplan(callback, opts)
 
       projectConfig.settings.testPlan = nil
       projectConfig.save_settings()
+      events.project_settings_updated(projectConfig.settings)
       closePicker()
       util.call(callback)
     else
