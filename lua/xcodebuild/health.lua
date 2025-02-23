@@ -87,6 +87,12 @@ local plugins = {
     info = "(Optional to visually manage project files)",
   },
   {
+    name = "snacks.nvim",
+    lib = "snacks",
+    optional = true,
+    info = "(Optional to show previews for SwiftUI, UIKit, and AppKit views)",
+  },
+  {
     name = "nvim-dap",
     lib = "dap",
     optional = true,

@@ -78,6 +78,27 @@ local function add_dap_actions(actionsNames, actionsPointers)
   end
 end
 
+---Adds Previews actions to the list of actions.
+---@param actionsNames string[]
+---@param actionsPointers function[]
+local function add_previews_actions(actionsNames, actionsPointers)
+  local loadedSnacks, _ = pcall(require, "snacks")
+
+  if loadedSnacks then
+    local previews = require("xcodebuild.core.previews")
+    local previewsActions = previews.get_actions()
+    local counter = util.indexOf(actionsNames, "Repeat Last Test Run") or 6
+
+    table.insert(previewsActions, 1, { name = "---------------------------------", action = function() end })
+
+    for _, action in ipairs(previewsActions) do
+      counter = counter + 1
+      table.insert(actionsNames, counter, action.name)
+      table.insert(actionsPointers, counter, action.action)
+    end
+  end
+end
+
 ---Shows available actions for Swift Package project.
 function M.show_spm_actions()
   local actions = require("xcodebuild.actions")
@@ -316,6 +337,7 @@ function M.show_xcode_project_actions()
 
   add_test_actions(actionsNames, actionsPointers)
   add_dap_actions(actionsNames, actionsPointers)
+  add_previews_actions(actionsNames, actionsPointers)
   show_picker(actionsNames, actionsPointers)
 end
 

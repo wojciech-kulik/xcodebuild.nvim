@@ -23,6 +23,7 @@ local projectManager = require("xcodebuild.project.manager")
 local assetsManager = require("xcodebuild.project.assets")
 local appdata = require("xcodebuild.project.appdata")
 local lsp = require("xcodebuild.integrations.lsp")
+local previews = require("xcodebuild.core.previews")
 
 local M = {}
 
@@ -276,6 +277,38 @@ end
 ---Jumps to the previous coverage marker.
 function M.jump_to_previous_coverage()
   coverage.jump_to_previous_coverage()
+end
+
+-- Previews
+
+---Generates the preview.
+---@param callback function|nil
+function M.previews_generate(callback)
+  previews.generate_preview(callback)
+end
+
+---Generates and shows the preview.
+---@param callback function|nil
+function M.previews_generate_and_show(callback)
+  previews.generate_preview(function()
+    M.previews_show()
+    util.call(callback)
+  end)
+end
+
+---Shows the preview.
+function M.previews_show()
+  previews.show_preview()
+end
+
+---Hides the preview.
+function M.previews_hide()
+  previews.hide_preview()
+end
+
+---Toggle the preview.
+function M.previews_toggle()
+  previews.toggle_preview()
 end
 
 -- Test Explorer

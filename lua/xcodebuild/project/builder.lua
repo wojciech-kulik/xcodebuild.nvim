@@ -165,4 +165,29 @@ function M.clean_derived_data()
   end, 200)
 end
 
+---Builds the project for preview.
+---@param callback function(code: number)|nil
+---@see xcodebuild.core.xcode.build_project
+function M.build_project_for_preview(callback)
+  if not helpers.validate_project() then
+    return
+  end
+
+  local xcode = require("xcodebuild.core.xcode")
+
+  M.currentJobId = xcode.build_project({
+    on_exit = function(_, code, _)
+      util.call(callback, code)
+    end,
+    on_stdout = function() end,
+    on_stderr = function() end,
+
+    workingDirectory = projectConfig.settings.workingDirectory,
+    destination = projectConfig.settings.destination,
+    projectFile = projectConfig.settings.projectFile,
+    scheme = projectConfig.settings.scheme,
+    extraBuildArgs = config.commands.extra_build_args,
+  })
+end
+
 return M

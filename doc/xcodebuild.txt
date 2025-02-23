@@ -16,6 +16,7 @@ Autocommands ·································�
 Default Options ······································· |xcodebuild.core.config|
 Quickfix List ······································· |xcodebuild.core.quickfix|
 Xcodebuild Wrapper ····································· |xcodebuild.core.xcode|
+UI Previews ········································· |xcodebuild.core.previews|
 Xcode Logs Parser ······························· |xcodebuild.xcode_logs.parser|
 Logs Panel ······································· |xcodebuild.xcode_logs.panel|
 Project Configuration ······························ |xcodebuild.project.config|
@@ -180,6 +181,10 @@ M.setup({options})                                            *xcodebuild.setup*
           return nil
         end,
       },
+      previews = {
+        open_command = "vertical botright split +vertical\\ resize\\ 50 %s | wincmd p", -- command used to open preview window
+        show_notifications = true, -- show preview-related notifications
+      },
       device_picker = {
         mappings = {
           move_up_device = "<M-y>", -- move device up in the list
@@ -235,6 +240,7 @@ Features                                                   *xcodebuild.features*
  - Test Explorer to visually present a tree with all tests and results.
  - Built using official command line tools like `xcodebuild` and `xcrun simctl`.
  - Actions to build, run, debug, and test apps on simulators and
+ - Previews for SwiftUI, UIKit, and AppKit views.
    physical devices.
  - Environment variables and run arguments management.
  - Buffer integration with test results
@@ -285,6 +291,7 @@ Neovim environment
  - `Neovim 0.9.5+`
  - `telescope.nvim` to present pickers.
  - `nui.nvim` to present floating code coverage report.
+ - `snacks.nvim` to show previews for SwiftUI, UIKit, and AppKit views.
  - `nvim-tree`, `neo-tree.nvim`, or `oil.nvim` to visually manage your project files.
  - `nvim-dap` and `nvim-dap-ui` to debug apps.
  - `nvim-treesitter` + Swift parser to show test results for tests written using `Quick` framework.
@@ -398,8 +405,10 @@ Sample key bindings for the plugin.
     vim.keymap.set("n", "<leader>xe", "<cmd>XcodebuildTestExplorerToggle<cr>", { desc = "Toggle Test Explorer" })
     vim.keymap.set("n", "<leader>xs", "<cmd>XcodebuildFailingSnapshots<cr>", { desc = "Show Failing Snapshots" })
 
+    vim.keymap.set("n", "<leader>xp", "<cmd>XcodebuildPreviewGenerateAndShow<cr>", { desc = "Generate Preview" })
+    vim.keymap.set("n", "<leader>x<cr>", "<cmd>XcodebuildPreviewToggle<cr>", { desc = "Toggle Preview" })
+
     vim.keymap.set("n", "<leader>xd", "<cmd>XcodebuildSelectDevice<cr>", { desc = "Select Device" })
-    vim.keymap.set("n", "<leader>xp", "<cmd>XcodebuildSelectTestPlan<cr>", { desc = "Select Test Plan" })
     vim.keymap.set("n", "<leader>xq", "<cmd>Telescope quickfix<cr>", { desc = "Show QuickFix List" })
 
     vim.keymap.set("n", "<leader>xx", "<cmd>XcodebuildQuickfixLine<cr>", { desc = "Quickfix Line" })
@@ -467,6 +476,16 @@ Project Manager
  | `XcodebuildShowCurrentFileTargets`   | Show target membership of the active file                  |
 
  👉 To add a file to multiple targets use multi-select feature (by default `tab`).
+
+Previews
+
+ | Command                            | Description                                                |
+ | ---------------------------------- | ---------------------------------------------------------- |
+ | `XcodebuildPreviewGenerate`           | Generate preview                                        |
+ | `XcodebuildPreviewGenerateAndShow`    | Generate and show preview                               |
+ | `XcodebuildPreviewShow`               | Show preview                                            |
+ | `XcodebuildPreviewHide`               | Hide preview                                            |
+ | `XcodebuildPreviewToggle`             | Toggle preview                                          |
 
 Testing
 
@@ -850,6 +869,33 @@ M.jump_to_next_coverage()             *xcodebuild.actions.jump_to_next_coverage*
                                   *xcodebuild.actions.jump_to_previous_coverage*
 M.jump_to_previous_coverage()
   Jumps to the previous coverage marker.
+
+
+M.previews_generate({callback})           *xcodebuild.actions.previews_generate*
+  Generates the preview.
+
+  Parameters: ~
+    {callback}  (function|nil)
+
+
+                                 *xcodebuild.actions.previews_generate_and_show*
+M.previews_generate_and_show({callback})
+  Generates and shows the preview.
+
+  Parameters: ~
+    {callback}  (function|nil)
+
+
+M.previews_show()                             *xcodebuild.actions.previews_show*
+  Shows the preview.
+
+
+M.previews_hide()                             *xcodebuild.actions.previews_hide*
+  Hides the preview.
+
+
+M.previews_toggle()                         *xcodebuild.actions.previews_toggle*
+  Toggle the preview.
 
 
 M.test_explorer_clear()                 *xcodebuild.actions.test_explorer_clear*
@@ -1531,6 +1577,69 @@ M.run_tests({opts})                            *xcodebuild.core.xcode.run_tests*
 
 
 ==============================================================================
+UI Previews                                           *xcodebuild.core.previews*
+
+                                                           *xcodebuild.previews*
+This module contains the functionality to preview SwiftUI, UIKit, and AppKit views
+directly from Neovim.
+
+Installation:
+ - Make sure that your terminal supports images.
+ - Install the `snacks.nvim` plugin to enable image support.
+ - Make sure that `image` snack is enabled.
+ - Install Swift Package `wojciech-kulik/xcodebuild-nvim-preview` in your project.
+ - Configure the preview in `application(_:didFinishLaunchingWithOptions:)` function.
+   You can also try putting it somewhere else, but it must be triggered automatically
+   after the app launch without user interaction.
+
+>swift
+    import XcodebuildNvimPreview
+
+    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        // ...
+
+        XcodebuildNvimPreview.setup(view: MainView())
+
+        return true
+    }
+<
+
+ - Run `:XcodebuildPreviewGenerateAndShow` to generate and show the preview.
+
+WARNING: snacks.nvim doesn't support clearing the in-memory cache right now, which makes it
+impossible to refresh previews without restarting Neovim. If you want to use this feature,
+you either need to wait until it is added (github.com/folke/snacks.nvim/issues/1394) or
+you can use my fork where I removed the cache: wojciech-kulik/snacks.nvim.
+
+
+M.show_preview()                         *xcodebuild.core.previews.show_preview*
+  Shows the preview image in a new window.
+
+
+M.hide_preview()                         *xcodebuild.core.previews.hide_preview*
+  Hides the preview window.
+
+
+M.toggle_preview()                     *xcodebuild.core.previews.toggle_preview*
+  Toggles the preview window.
+
+
+                                     *xcodebuild.core.previews.generate_preview*
+M.generate_preview({callback})
+  Builds & runs the project to generate a preview.
+  If successful, the preview will be saved in `/tmp/xcodebuild.nvim/<product-name>.png`.
+  The {callback} function is called after the preview is generated.
+
+  Parameters: ~
+    {callback}  (function|nil)
+
+
+M.get_actions()                           *xcodebuild.core.previews.get_actions*
+  Returns a list of actions with names for Previews.
+  @return table<{name:string,action:function}>
+
+
+==============================================================================
 Xcode Logs Parser                                 *xcodebuild.xcode_logs.parser*
 
 This module is responsible for processing logs produced by `xcodebuild`
@@ -2058,6 +2167,13 @@ M.build_project({opts}, {callback})   *xcodebuild.project.builder.build_project*
 M.clean_derived_data()
   Cleans the `DerivedData` folder.
   It will ask for confirmation before deleting it.
+
+
+                          *xcodebuild.project.builder.build_project_for_preview*
+M.build_project_for_preview()
+
+  See: ~
+    |xcodebuild.core.xcode.build_project|
 
 
 ==============================================================================
