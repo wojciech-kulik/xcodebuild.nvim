@@ -17,6 +17,7 @@ It provides all essential actions for development including building, debugging,
 - [x] Test Explorer to visually present a tree with all tests and results.
 - [x] Built using official command line tools like `xcodebuild` and `xcrun simctl`.
 - [x] Actions to build, run, debug, and test apps on simulators and physical devices.
+- [x] Previews for SwiftUI, UIKit, and AppKit views.
 - [x] Environment variables and run arguments management.
 - [x] Buffer integration with test results (code coverage, success & failure marks, duration,
       extra diagnostics).
@@ -66,6 +67,16 @@ variables inspection, call stack, lldb, etc. You can even see app logs.
 
 https://github.com/user-attachments/assets/27644dcd-ef4e-4471-8ddc-cf1c9d2ca27e
 
+### Previews
+
+The plugin allows you to display previews for SwiftUI, UIKit, and AppKit views.
+The setup is quite easy, you just need to install [snacks.nvim] to enable image
+support and [xcodebuild-nvim-preview] package to add previews to your project.
+See [Wiki](https://github.com/wojciech-kulik/xcodebuild.nvim/wiki/Integrations#-previews)
+for more details.
+
+https://github.com/user-attachments/assets/fb624f66-57dd-4c41-b74f-c12281a0f9f4
+
 &nbsp;
 
 ## 💛  Sponsors
@@ -103,3 +114,5 @@ Big thanks to all the sponsors who support this project 🍻!
 [Quick]: https://github.com/Quick/Quick
 [lualine.nvim]: https://github.com/nvim-lualine/lualine.nvim
 [Swift Testing]: https://developer.apple.com/xcode/swift-testing/
+[snacks.nvim]: https://github.com/folke/snacks.nvim
+[xcodebuild-nvim-preview]: https://github.com/wojciech-kulik/xcodebuild-nvim-preview

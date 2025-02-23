@@ -8,6 +8,7 @@
 --- - Test Explorer to visually present a tree with all tests and results.
 --- - Built using official command line tools like `xcodebuild` and `xcrun simctl`.
 --- - Actions to build, run, debug, and test apps on simulators and
+--- - Previews for SwiftUI, UIKit, and AppKit views.
 ---   physical devices.
 --- - Environment variables and run arguments management.
 --- - Buffer integration with test results

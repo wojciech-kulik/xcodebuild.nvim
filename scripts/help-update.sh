@@ -19,6 +19,7 @@ lemmy-help \
   ./lua/xcodebuild/core/config.lua \
   ./lua/xcodebuild/core/quickfix.lua \
   ./lua/xcodebuild/core/xcode.lua \
+  ./lua/xcodebuild/core/previews.lua \
   ./lua/xcodebuild/xcode_logs/parser.lua \
   ./lua/xcodebuild/xcode_logs/panel.lua \
   ./lua/xcodebuild/project/config.lua \
