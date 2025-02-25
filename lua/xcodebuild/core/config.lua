@@ -117,7 +117,7 @@ local defaults = {
     end,
   },
   previews = {
-    open_command = "vertical botright split +vertical\\ resize\\ 50 %s | wincmd p", -- command used to open preview window
+    open_command = "vertical botright split +vertical\\ resize\\ 42 %s | wincmd p", -- command used to open preview window
     show_notifications = true, -- show preview-related notifications
   },
   device_picker = {

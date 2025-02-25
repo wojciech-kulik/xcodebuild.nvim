@@ -42,6 +42,8 @@ function M.cancel_actions()
   cancel(require("xcodebuild.platform.device"))
   cancel(require("xcodebuild.project.builder"))
   cancel(require("xcodebuild.tests.runner"))
+  require("xcodebuild.core.previews").cancel()
+  require("xcodebuild.platform.device").kill_app()
 end
 
 ---Validates if the project is configured.

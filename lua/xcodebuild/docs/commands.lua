@@ -42,13 +42,13 @@
 ---
 ---Previews
 ---
---- | Command                            | Description                                                |
---- | ---------------------------------- | ---------------------------------------------------------- |
---- | `XcodebuildPreviewGenerate`           | Generate preview                                        |
---- | `XcodebuildPreviewGenerateAndShow`    | Generate and show preview                               |
---- | `XcodebuildPreviewShow`               | Show preview                                            |
---- | `XcodebuildPreviewHide`               | Hide preview                                            |
---- | `XcodebuildPreviewToggle`             | Toggle preview                                          |
+--- | Command                            | Description                                                   |
+--- | ---------------------------------- | ------------------------------------------------------------- |
+--- | `XcodebuildPreviewGenerate`           | Generate preview (optional parameter: `hotReload`)         |
+--- | `XcodebuildPreviewGenerateAndShow`    | Generate and show preview (optional parameter `hotReload`) |
+--- | `XcodebuildPreviewShow`               | Show preview                                               |
+--- | `XcodebuildPreviewHide`               | Hide preview                                               |
+--- | `XcodebuildPreviewToggle`             | Toggle preview                                             |
 ---
 ---Testing
 ---

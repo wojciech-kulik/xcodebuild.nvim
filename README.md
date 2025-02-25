@@ -75,7 +75,7 @@ support and [xcodebuild-nvim-preview] package to add previews to your project.
 See [Wiki](https://github.com/wojciech-kulik/xcodebuild.nvim/wiki/Integrations#-previews)
 for more details.
 
-https://github.com/user-attachments/assets/5f9c9276-e477-4c56-b599-2ef7cb262961
+https://github.com/user-attachments/assets/ec6c6e96-667a-40a3-a9d3-a75c9c9cf272
 
 &nbsp;
 

@@ -182,7 +182,7 @@ M.setup({options})                                            *xcodebuild.setup*
         end,
       },
       previews = {
-        open_command = "vertical botright split +vertical\\ resize\\ 50 %s | wincmd p", -- command used to open preview window
+        open_command = "vertical botright split +vertical\\ resize\\ 42 %s | wincmd p", -- command used to open preview window
         show_notifications = true, -- show preview-related notifications
       },
       device_picker = {
@@ -479,13 +479,13 @@ Project Manager
 
 Previews
 
- | Command                            | Description                                                |
- | ---------------------------------- | ---------------------------------------------------------- |
- | `XcodebuildPreviewGenerate`           | Generate preview                                        |
- | `XcodebuildPreviewGenerateAndShow`    | Generate and show preview                               |
- | `XcodebuildPreviewShow`               | Show preview                                            |
- | `XcodebuildPreviewHide`               | Hide preview                                            |
- | `XcodebuildPreviewToggle`             | Toggle preview                                          |
+ | Command                            | Description                                                   |
+ | ---------------------------------- | ------------------------------------------------------------- |
+ | `XcodebuildPreviewGenerate`           | Generate preview (optional parameter: `hotReload`)         |
+ | `XcodebuildPreviewGenerateAndShow`    | Generate and show preview (optional parameter `hotReload`) |
+ | `XcodebuildPreviewShow`               | Show preview                                               |
+ | `XcodebuildPreviewHide`               | Hide preview                                               |
+ | `XcodebuildPreviewToggle`             | Toggle preview                                             |
 
 Testing
 
@@ -871,19 +871,24 @@ M.jump_to_previous_coverage()
   Jumps to the previous coverage marker.
 
 
-M.previews_generate({callback})           *xcodebuild.actions.previews_generate*
+                                          *xcodebuild.actions.previews_generate*
+M.previews_generate({hotReload}, {callback})
   Generates the preview.
+  If {hotReload} is true, the app will be kept running.
 
   Parameters: ~
-    {callback}  (function|nil)
+    {hotReload}  (boolean|nil)
+    {callback}   (function|nil)
 
 
                                  *xcodebuild.actions.previews_generate_and_show*
-M.previews_generate_and_show({callback})
+M.previews_generate_and_show({hotReload}, {callback})
   Generates and shows the preview.
+  If {hotReload} is true, the app will be kept running.
 
   Parameters: ~
-    {callback}  (function|nil)
+    {hotReload}  (boolean|nil)
+    {callback}   (function|nil)
 
 
 M.previews_show()                             *xcodebuild.actions.previews_show*
@@ -1588,10 +1593,27 @@ Installation:
  - Install the `snacks.nvim` plugin to enable image support.
  - Make sure that `image` snack is enabled.
  - Install Swift Package `wojciech-kulik/xcodebuild-nvim-preview` in your project.
- - Configure the preview in `application(_:didFinishLaunchingWithOptions:)` function.
-   You can also try putting it somewhere else, but it must be triggered automatically
-   after the app launch without user interaction.
+ - Configure the preview in a place that gets automatically called when the app starts.
 
+Examples:
+
+SwiftUI (supports hot reload):
+>swift
+    import SwiftUI
+    import XcodebuildNvimPreview
+
+    @main
+    struct MyApp: App {
+        var body: some Scene {
+            WindowGroup {
+                MainView()
+                  .setupNvimPreview { HomeView() }
+            }
+        }
+    }
+<
+
+UIKit (similar for AppKit):
 >swift
     import XcodebuildNvimPreview
 
@@ -1600,16 +1622,29 @@ Installation:
 
         XcodebuildNvimPreview.setup(view: MainView())
 
+        // (optional) enable hot reload for preview (requires integration with `Inject`)
+        observeHotReload()
+            .sink { XcodebuildNvimPreview.setup(view: HomeView()) }
+            .store(in: &cancellables)
+
         return true
     }
 <
 
  - Run `:XcodebuildPreviewGenerateAndShow` to generate and show the preview.
+   Alternatively, run `:XcodebuildPreviewGenerateAndShow hotReload` to keep
+   the app running for hot reloading.
 
 WARNING: snacks.nvim doesn't support clearing the in-memory cache right now, which makes it
 impossible to refresh previews without restarting Neovim. If you want to use this feature,
 you either need to wait until it is added (github.com/folke/snacks.nvim/issues/1394) or
 you can use my fork where I removed the cache: wojciech-kulik/snacks.nvim.
+
+If you want to use the hot reload feature, you need to integrate your app with `Inject`,
+read more about it here: https://github.com/wojciech-kulik/xcodebuild.nvim/wiki/Tips-&-Tricks#hot-reload
+
+M.cancel()                                     *xcodebuild.core.previews.cancel*
+  Cancels awaiting preview generation.
 
 
 M.show_preview()                         *xcodebuild.core.previews.show_preview*
@@ -1625,13 +1660,15 @@ M.toggle_preview()                     *xcodebuild.core.previews.toggle_preview*
 
 
                                      *xcodebuild.core.previews.generate_preview*
-M.generate_preview({callback})
+M.generate_preview({hotReload}, {callback})
   Builds & runs the project to generate a preview.
   If successful, the preview will be saved in `/tmp/xcodebuild.nvim/<product-name>.png`.
+  If {hotReload} is true, the app will be kept running to allow hot reloading using `Inject`.
   The {callback} function is called after the preview is generated.
 
   Parameters: ~
-    {callback}  (function|nil)
+    {hotReload}  (boolean|nil)
+    {callback}   (function|nil)
 
 
 M.get_actions()                           *xcodebuild.core.previews.get_actions*

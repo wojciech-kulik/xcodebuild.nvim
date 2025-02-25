@@ -9,10 +9,27 @@
 --- - Install the `snacks.nvim` plugin to enable image support.
 --- - Make sure that `image` snack is enabled.
 --- - Install Swift Package `wojciech-kulik/xcodebuild-nvim-preview` in your project.
---- - Configure the preview in `application(_:didFinishLaunchingWithOptions:)` function.
----   You can also try putting it somewhere else, but it must be triggered automatically
----   after the app launch without user interaction.
+--- - Configure the preview in a place that gets automatically called when the app starts.
 ---
+---Examples:
+---
+---SwiftUI (supports hot reload):
+--->swift
+---    import SwiftUI
+---    import XcodebuildNvimPreview
+---
+---    @main
+---    struct MyApp: App {
+---        var body: some Scene {
+---            WindowGroup {
+---                MainView()
+---                  .setupNvimPreview { HomeView() }
+---            }
+---        }
+---    }
+---<
+---
+---UIKit (similar for AppKit):
 --->swift
 ---    import XcodebuildNvimPreview
 ---
@@ -21,17 +38,26 @@
 ---
 ---        XcodebuildNvimPreview.setup(view: MainView())
 ---
+---        // (optional) enable hot reload for preview (requires integration with `Inject`)
+---        observeHotReload()
+---            .sink { XcodebuildNvimPreview.setup(view: HomeView()) }
+---            .store(in: &cancellables)
+---
 ---        return true
 ---    }
 ---<
 ---
 --- - Run `:XcodebuildPreviewGenerateAndShow` to generate and show the preview.
+---   Alternatively, run `:XcodebuildPreviewGenerateAndShow hotReload` to keep
+---   the app running for hot reloading.
 ---
 ---WARNING: snacks.nvim doesn't support clearing the in-memory cache right now, which makes it
 ---impossible to refresh previews without restarting Neovim. If you want to use this feature,
 ---you either need to wait until it is added (github.com/folke/snacks.nvim/issues/1394) or
 ---you can use my fork where I removed the cache: wojciech-kulik/snacks.nvim.
 ---
+---If you want to use the hot reload feature, you need to integrate your app with `Inject`,
+---read more about it here: https://github.com/wojciech-kulik/xcodebuild.nvim/wiki/Tips-&-Tricks#hot-reload
 ---@brief ]]
 
 local config = require("xcodebuild.core.config").options.previews
@@ -93,18 +119,49 @@ local function update_progress(message)
   end
 end
 
----@param code number the exit code
-local function handle_result(code)
-  if code ~= 0 then
+---@param success boolean
+local function show_result(success)
+  if success then
+    update_progress("Preview Updated")
+  else
     update_progress("Failed to generate preview")
-    return
   end
-
-  update_progress("Preview Updated")
 end
 
+local previewTimer = nil
+
+local function stop_preview_timer()
+  if previewTimer then
+    vim.fn.timer_stop(previewTimer)
+    previewTimer = nil
+  end
+end
+
+---@param hotReload boolean|nil
 ---@param callback function|nil
-local function generate_mobile_preview(callback)
+local function wait_for_preview(hotReload, callback)
+  local startTime = os.time()
+  local device = require("xcodebuild.platform.device")
+
+  previewTimer = vim.fn.timer_start(500, function()
+    if util.file_exists(getPath()) then
+      stop_preview_timer()
+      show_result(true)
+      util.call(callback)
+      if not hotReload then
+        device.kill_app()
+      end
+    elseif os.difftime(os.time(), startTime) > 30 then
+      stop_preview_timer()
+      show_result(false)
+      device.kill_app()
+    end
+  end, { ["repeat"] = -1 })
+end
+
+---@param hotReload boolean|nil
+---@param callback function|nil
+local function generate_mobile_preview(hotReload, callback)
   local projectSettings = projectConfig.settings
 
   projectBuilder.build_project_for_preview(function(code)
@@ -131,20 +188,15 @@ local function generate_mobile_preview(callback)
         "--xcodebuild-nvim-snapshot",
       }
 
-      vim.fn.jobstart(command, {
-        on_exit = function(_, exitCode)
-          handle_result(exitCode)
-          if exitCode == 0 then
-            util.call(callback)
-          end
-        end,
-      })
+      vim.fn.jobstart(command)
+      wait_for_preview(hotReload, callback)
     end)
   end)
 end
 
+---@param hotReload boolean|nil
 ---@param callback function|nil
-local function generate_macos_preview(callback)
+local function generate_macos_preview(hotReload, callback)
   local appPath = projectConfig.settings.appPath
 
   projectBuilder.build_project_for_preview(function(code)
@@ -158,15 +210,14 @@ local function generate_macos_preview(callback)
       return
     end
 
-    vim.fn.jobstart({ "open", appPath, "-W", "--args", "--xcodebuild-nvim-snapshot" }, {
-      on_exit = function(_, exitCode)
-        handle_result(exitCode)
-        if exitCode == 0 then
-          util.call(callback)
-        end
-      end,
-    })
+    vim.fn.jobstart({ "open", appPath, "--args", "--xcodebuild-nvim-snapshot" })
+    wait_for_preview(hotReload, callback)
   end)
+end
+
+---Cancels awaiting preview generation.
+function M.cancel()
+  stop_preview_timer()
 end
 
 ---Shows the preview image in a new window.
@@ -224,9 +275,11 @@ end
 
 ---Builds & runs the project to generate a preview.
 ---If successful, the preview will be saved in `/tmp/xcodebuild.nvim/<product-name>.png`.
+---If {hotReload} is true, the app will be kept running to allow hot reloading using `Inject`.
 ---The {callback} function is called after the preview is generated.
+---@param hotReload boolean|nil
 ---@param callback function|nil
-function M.generate_preview(callback)
+function M.generate_preview(hotReload, callback)
   if not validate() then
     return
   end
@@ -239,9 +292,9 @@ function M.generate_preview(callback)
   xcode.kill_app(projectSettings.productName, projectSettings.platform)
 
   if projectSettings.platform == constants.Platform.MACOS then
-    generate_macos_preview(callback)
+    generate_macos_preview(hotReload, callback)
   else
-    generate_mobile_preview(callback)
+    generate_mobile_preview(hotReload, callback)
   end
 end
 
