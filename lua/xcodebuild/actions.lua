@@ -282,15 +282,21 @@ end
 -- Previews
 
 ---Generates the preview.
+---If {hotReload} is true, the app will be kept running.
+---@param hotReload boolean|nil
 ---@param callback function|nil
-function M.previews_generate(callback)
-  previews.generate_preview(callback)
+function M.previews_generate(hotReload, callback)
+  helpers.cancel_actions()
+  previews.generate_preview(hotReload, callback)
 end
 
 ---Generates and shows the preview.
+---If {hotReload} is true, the app will be kept running.
+---@param hotReload boolean|nil
 ---@param callback function|nil
-function M.previews_generate_and_show(callback)
-  previews.generate_preview(function()
+function M.previews_generate_and_show(hotReload, callback)
+  helpers.cancel_actions()
+  previews.generate_preview(hotReload, function()
     M.previews_show()
     util.call(callback)
   end)
