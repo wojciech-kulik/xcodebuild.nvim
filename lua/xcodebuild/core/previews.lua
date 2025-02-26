@@ -238,9 +238,12 @@ function M.show_preview()
 
   vim.defer_fn(function()
     local newWinid = vim.fn.bufwinid(getPath())
-    vim.api.nvim_win_call(newWinid, function()
-      vim.cmd("edit!")
-    end)
+    if newWinid == -1 then
+      return
+    end
+
+    vim.api.nvim_set_current_win(newWinid)
+    vim.cmd("edit! | wincmd p")
   end, 500)
 end
 
