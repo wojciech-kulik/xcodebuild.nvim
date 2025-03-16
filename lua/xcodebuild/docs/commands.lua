@@ -40,6 +40,16 @@
 ---
 --- 👉 To add a file to multiple targets use multi-select feature (by default `tab`).
 ---
+---Previews
+---
+--- | Command                            | Description                                                   |
+--- | ---------------------------------- | ------------------------------------------------------------- |
+--- | `XcodebuildPreviewGenerate`           | Generate preview (optional parameter: `hotReload`)         |
+--- | `XcodebuildPreviewGenerateAndShow`    | Generate and show preview (optional parameter `hotReload`) |
+--- | `XcodebuildPreviewShow`               | Show preview                                               |
+--- | `XcodebuildPreviewHide`               | Hide preview                                               |
+--- | `XcodebuildPreviewToggle`             | Toggle preview                                             |
+---
 ---Testing
 ---
 --- | Command                    | Description                               |

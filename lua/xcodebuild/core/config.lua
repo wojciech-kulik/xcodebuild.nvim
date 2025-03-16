@@ -116,6 +116,10 @@ local defaults = {
       return nil
     end,
   },
+  previews = {
+    open_command = "vertical botright split +vertical\\ resize\\ 42 %s | wincmd p", -- command used to open preview window
+    show_notifications = true, -- show preview-related notifications
+  },
   device_picker = {
     mappings = {
       move_up_device = "<M-y>", -- move device up in the list

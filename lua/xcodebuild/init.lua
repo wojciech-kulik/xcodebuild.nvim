@@ -200,6 +200,10 @@ end
 ---      return nil
 ---    end,
 ---  },
+---  previews = {
+---    open_command = "vertical botright split +vertical\\ resize\\ 42 %s | wincmd p", -- command used to open preview window
+---    show_notifications = true, -- show preview-related notifications
+---  },
 ---  device_picker = {
 ---    mappings = {
 ---      move_up_device = "<M-y>", -- move device up in the list
@@ -280,6 +284,25 @@ function M.setup(options)
   vim.api.nvim_create_user_command("XcodebuildBuildForTesting", call(actions.build_for_testing), { nargs = 0 })
   vim.api.nvim_create_user_command("XcodebuildRun", call(actions.run), { nargs = 0 })
   vim.api.nvim_create_user_command("XcodebuildCancel", call(actions.cancel), { nargs = 0 })
+
+  -- Previews
+  vim.api.nvim_create_user_command("XcodebuildPreviewGenerate",
+    function(opts)
+        ---@diagnostic disable-next-line: undefined-field
+        actions.previews_generate(opts.fargs[1] == "hotReload")
+    end,
+    { nargs = "?", complete = function() return { "hotReload" } end }
+  )
+  vim.api.nvim_create_user_command("XcodebuildPreviewGenerateAndShow",
+    function(opts)
+        ---@diagnostic disable-next-line: undefined-field
+        actions.previews_generate_and_show(opts.fargs[1] == "hotReload")
+    end,
+    { nargs = "?", complete = function() return { "hotReload" } end }
+  )
+  vim.api.nvim_create_user_command("XcodebuildPreviewShow", call(actions.previews_show), { nargs = 0 })
+  vim.api.nvim_create_user_command("XcodebuildPreviewHide", call(actions.previews_hide), { nargs = 0 })
+  vim.api.nvim_create_user_command("XcodebuildPreviewToggle", call(actions.previews_toggle), { nargs = 0 })
 
   -- Testing
   vim.api.nvim_create_user_command("XcodebuildTest", call(actions.run_tests), { nargs = 0 })

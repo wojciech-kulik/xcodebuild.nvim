@@ -23,6 +23,7 @@ local projectManager = require("xcodebuild.project.manager")
 local assetsManager = require("xcodebuild.project.assets")
 local appdata = require("xcodebuild.project.appdata")
 local lsp = require("xcodebuild.integrations.lsp")
+local previews = require("xcodebuild.core.previews")
 
 local M = {}
 
@@ -276,6 +277,44 @@ end
 ---Jumps to the previous coverage marker.
 function M.jump_to_previous_coverage()
   coverage.jump_to_previous_coverage()
+end
+
+-- Previews
+
+---Generates the preview.
+---If {hotReload} is true, the app will be kept running.
+---@param hotReload boolean|nil
+---@param callback function|nil
+function M.previews_generate(hotReload, callback)
+  helpers.cancel_actions()
+  previews.generate_preview(hotReload, callback)
+end
+
+---Generates and shows the preview.
+---If {hotReload} is true, the app will be kept running.
+---@param hotReload boolean|nil
+---@param callback function|nil
+function M.previews_generate_and_show(hotReload, callback)
+  helpers.cancel_actions()
+  previews.generate_preview(hotReload, function()
+    M.previews_show()
+    util.call(callback)
+  end)
+end
+
+---Shows the preview.
+function M.previews_show()
+  previews.show_preview()
+end
+
+---Hides the preview.
+function M.previews_hide()
+  previews.hide_preview()
+end
+
+---Toggle the preview.
+function M.previews_toggle()
+  previews.toggle_preview()
 end
 
 -- Test Explorer
