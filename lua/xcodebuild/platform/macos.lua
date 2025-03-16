@@ -14,7 +14,9 @@ local M = {}
 ---@param callback function|nil
 ---@return number # job id
 function M.launch_app(appPath, callback)
-  local command = { "open", appPath }
+  local appName = util.get_filename(appPath)
+  local executablePath = appPath .. "/Contents/MacOS/" .. appName
+  local command = { executablePath }
 
   local runArgs = appdata.read_run_args()
   if runArgs then
@@ -24,8 +26,20 @@ function M.launch_app(appPath, callback)
     end
   end
 
+  local function write_logs(_, output)
+    if output[#output] == "" then
+      table.remove(output, #output)
+    end
+    appdata.append_app_logs(output)
+  end
+
+  appdata.clear_app_logs()
+
   return vim.fn.jobstart(command, {
     env = appdata.read_env_vars(),
+    pty = true,
+    on_stdout = write_logs,
+    on_stderr = write_logs,
     on_exit = function(_, code)
       if code == 0 then
         util.call(callback)
