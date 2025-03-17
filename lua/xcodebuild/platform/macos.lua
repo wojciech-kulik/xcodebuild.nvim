@@ -16,15 +16,8 @@ local M = {}
 ---@return number # job id
 function M.launch_app(appPath, productName, callback)
   local executablePath = appPath .. "/Contents/MacOS/" .. productName
-  local command = { executablePath }
-
-  local runArgs = appdata.read_run_args()
-  if runArgs then
-    table.insert(command, "--args")
-    for _, value in ipairs(runArgs) do
-      table.insert(command, value)
-    end
-  end
+  local args = table.concat(appdata.read_run_args() or {}, " ")
+  local command = executablePath .. " " .. args
 
   local function write_logs(_, output)
     if output[#output] == "" then
