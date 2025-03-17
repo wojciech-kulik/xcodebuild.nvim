@@ -11,11 +11,11 @@ local M = {}
 
 ---Simply starts the application on macOS.
 ---@param appPath string
+---@param productName string
 ---@param callback function|nil
 ---@return number # job id
-function M.launch_app(appPath, callback)
-  local appName = util.get_filename(appPath)
-  local executablePath = appPath .. "/Contents/MacOS/" .. appName
+function M.launch_app(appPath, productName, callback)
+  local executablePath = appPath .. "/Contents/MacOS/" .. productName
   local command = { executablePath }
 
   local runArgs = appdata.read_run_args()
