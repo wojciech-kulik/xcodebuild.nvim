@@ -11,21 +11,34 @@ local M = {}
 
 ---Simply starts the application on macOS.
 ---@param appPath string
+---@param productName string
 ---@param callback function|nil
 ---@return number # job id
-function M.launch_app(appPath, callback)
-  local command = { "open", appPath }
+function M.launch_app(appPath, productName, callback)
+  local executablePath = appPath .. "/Contents/MacOS/" .. productName
+  local command = { executablePath }
 
   local runArgs = appdata.read_run_args()
   if runArgs then
-    table.insert(command, "--args")
     for _, value in ipairs(runArgs) do
       table.insert(command, value)
     end
   end
 
+  local function write_logs(_, output)
+    if output[#output] == "" then
+      table.remove(output, #output)
+    end
+    appdata.append_app_logs(output)
+  end
+
+  appdata.clear_app_logs()
+
   return vim.fn.jobstart(command, {
     env = appdata.read_env_vars(),
+    pty = true,
+    on_stdout = write_logs,
+    on_stderr = write_logs,
     on_exit = function(_, code)
       if code == 0 then
         util.call(callback)
