@@ -41,7 +41,7 @@ local function launch_app(waitForDebugger, callback)
       return macos.launch_and_debug(settings.appPath, finished)
     else
       vim.defer_fn(function()
-        macos.launch_app(settings.appPath, finished)
+        macos.launch_app(settings.appPath, settings.productName, finished)
       end, 300)
       return nil
     end

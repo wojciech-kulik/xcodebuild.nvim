@@ -2754,12 +2754,14 @@ macOS Platform Integration                           *xcodebuild.platform.macos*
 
 This module is responsible for the integration of macOS platform with `nvim-dap`.
 
-M.launch_app({appPath}, {callback})       *xcodebuild.platform.macos.launch_app*
+                                          *xcodebuild.platform.macos.launch_app*
+M.launch_app({appPath}, {productName}, {callback})
   Simply starts the application on macOS.
 
   Parameters: ~
-    {appPath}   (string)
-    {callback}  (function|nil)
+    {appPath}      (string)
+    {productName}  (string)
+    {callback}     (function|nil)
 
   Returns: ~
     (number)   job id
