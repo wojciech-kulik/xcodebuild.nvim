@@ -22,9 +22,10 @@ local M = {
 
 ---Launches the application on device, simulator, or macOS.
 ---@param waitForDebugger boolean
+---@param detached boolean|nil # affects only macOS platform
 ---@param callback function|nil
 ---@return number|nil # job id
-local function launch_app(waitForDebugger, callback)
+local function launch_app(waitForDebugger, detached, callback)
   local settings = projectConfig.settings
   local function finished()
     notifications.send("Application has been launched")
@@ -41,7 +42,7 @@ local function launch_app(waitForDebugger, callback)
       return macos.launch_and_debug(settings.appPath, finished)
     else
       vim.defer_fn(function()
-        macos.launch_app(settings.appPath, settings.productName, finished)
+        macos.launch_app(settings.appPath, settings.productName, detached, finished)
       end, 300)
       return nil
     end
@@ -82,8 +83,9 @@ end
 
 ---Runs the application on device, simulator, or macOS.
 ---@param waitForDebugger boolean
+---@param detached boolean|nil # affects only macOS platform
 ---@param callback function|nil
-function M.run_app(waitForDebugger, callback)
+function M.run_app(waitForDebugger, detached, callback)
   if not helpers.validate_project({ requiresApp = true }) then
     return
   end
@@ -96,10 +98,10 @@ function M.run_app(waitForDebugger, callback)
   end
 
   if projectConfig.settings.platform == constants.Platform.MACOS then
-    M.currentJobId = launch_app(waitForDebugger, callback)
+    M.currentJobId = launch_app(waitForDebugger, detached, callback)
   else
     M.currentJobId = M.install_app(function()
-      M.currentJobId = launch_app(waitForDebugger, callback)
+      M.currentJobId = launch_app(waitForDebugger, nil, callback)
     end)
   end
 end

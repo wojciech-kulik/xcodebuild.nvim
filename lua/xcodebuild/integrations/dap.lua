@@ -201,7 +201,7 @@ function M.build_and_debug(callback)
       if isSimulator then
         start_dap()
       end
-      device.run_app(true, callback)
+      device.run_app(true, nil, callback)
     end
   end)
 end
@@ -229,7 +229,7 @@ function M.debug_without_build(callback)
     if isSimulator then
       start_dap()
     end
-    device.run_app(true, callback)
+    device.run_app(true, nil, callback)
   end
 end
 
