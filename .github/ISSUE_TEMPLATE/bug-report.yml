@@ -53,3 +53,5 @@ body:
     attributes:
       label: Health check
       description: Please run `:checkhealth xcodebuild` and paste the output here
+    validations:
+      required: true
