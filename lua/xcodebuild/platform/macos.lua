@@ -54,7 +54,7 @@ function M.launch_app(appPath, productName, detached, callback)
         util.call(callback)
       end
 
-      if code ~= 0 then
+      if code ~= 0 and code ~= 137 then
         notifications.send_warning("Could not launch app, code: " .. code)
       end
     end,
