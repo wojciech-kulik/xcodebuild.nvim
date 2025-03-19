@@ -24,8 +24,8 @@ body:
     attributes:
       label: Workaround?
       description: Could it be achieved using the existing features? You can provide here a workaround if you have one.
-      options:
-        - label: It could be achieved using existing features.
+      placeholder: Optional
+      render: lua
   - type: textarea
     id: problem
     attributes:
