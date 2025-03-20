@@ -1,0 +1,42 @@
+---
+name: Feature Request
+description: Request a new feature
+labels: ["feature request"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for filing a feature request!
+
+        ## Important
+        - Please search existing issues to avoid creating duplicates.
+        - For questions or if you're unsure, please use GitHub Discussions.
+        - Please fill out the template below to the best of your ability.
+  - type: checkboxes
+    id: captchas
+    attributes:
+      label: Captchas
+      description: Please confirm that you have read the following before submitting your issue.
+      options:
+        - label: I have checked [Wiki](https://github.com/wojciech-kulik/xcodebuild.nvim/wiki).
+  - type: textarea
+    id: workaround
+    attributes:
+      label: Workaround?
+      description: Could it be achieved using the existing features? You can provide here a workaround if you have one.
+      placeholder: Optional
+      render: lua
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem are you trying to solve?
+      description: Please describe the problem you are trying to solve with this feature.
+    validations:
+      required: true
+  - type: textarea
+    id: request
+    attributes:
+      label: Requested feature
+      description: Please provide a detailed description of the feature you would like to see.
+    validations:
+      required: true

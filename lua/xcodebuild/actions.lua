@@ -130,7 +130,16 @@ end
 ---@param callback function|nil
 function M.run(callback)
   helpers.cancel_actions()
-  device.run_app(false, callback)
+  device.run_app(false, nil, callback)
+end
+
+---Launches macOS app detached.
+---For macOS apps the process is by default attached to Neovim,
+---which allows to print logs to DAP console.
+---@param callback function|nil
+function M.run_macos_app_detached(callback)
+  helpers.cancel_actions()
+  device.run_app(false, true, callback)
 end
 
 ---Starts tests.

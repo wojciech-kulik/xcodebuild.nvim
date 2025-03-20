@@ -1,0 +1,57 @@
+---
+name: Bug Report
+description: File a bug report
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for filing a bug report!
+
+        ## Important
+        - Please search existing issues to avoid creating duplicates.
+        - For questions or if you're unsure if it's a bug, please use GitHub Discussions.
+        - Please fill out the template below to the best of your ability.
+        - Please describe the issue as much as possible and provide steps to reproduce it along with visual aids if possible.
+  - type: checkboxes
+    id: captchas
+    attributes:
+      label: Captchas
+      description: Please confirm that you have read the following before submitting your issue.
+      options:
+        - label: I have searched existing issues.
+        - label: I have checked [Wiki](https://github.com/wojciech-kulik/xcodebuild.nvim/wiki).
+        - label: I am not asking about LSP issues. Please use GitHub Discussions for that.
+        - label: The issue also occurs when using [ios-dev-starter](https://github.com/wojciech-kulik/ios-dev-starter-nvim)
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Please provide a step-by-step guide to reproduce the issue.
+      placeholder: |
+        1. Run X command
+        2. Check Y
+        3. Observe Z
+    validations:
+      required: true
+  - type: textarea
+    id: actual-result
+    attributes:
+      label: Actual result
+      description: Describe what happened. If possible, include screenshots or screen recordings.
+    validations:
+      required: true
+  - type: textarea
+    id: expected-result
+    attributes:
+      label: Expected result
+      description: Describe what you expected to happen.
+    validations:
+      required: true
+  - type: textarea
+    id: checkhealth
+    attributes:
+      label: Health check
+      description: Please run `:checkhealth xcodebuild` and paste the output here
+    validations:
+      required: true

@@ -12,9 +12,14 @@ local M = {}
 ---Simply starts the application on macOS.
 ---@param appPath string
 ---@param productName string
+---@param detached boolean|nil
 ---@param callback function|nil
 ---@return number # job id
-function M.launch_app(appPath, productName, callback)
+function M.launch_app(appPath, productName, detached, callback)
+  if detached == nil then
+    detached = false
+  end
+
   local executablePath = appPath .. "/Contents/MacOS/" .. productName
   local command = { executablePath }
 
@@ -34,15 +39,22 @@ function M.launch_app(appPath, productName, callback)
 
   appdata.clear_app_logs()
 
+  if detached then
+    util.call(callback)
+  end
+
   return vim.fn.jobstart(command, {
     env = appdata.read_env_vars(),
-    pty = true,
+    pty = not detached,
+    detach = detached,
     on_stdout = write_logs,
     on_stderr = write_logs,
     on_exit = function(_, code)
-      if code == 0 then
+      if not detached and code == 0 then
         util.call(callback)
-      else
+      end
+
+      if code ~= 0 and code ~= 137 then
         notifications.send_warning("Could not launch app, code: " .. code)
       end
     end,
