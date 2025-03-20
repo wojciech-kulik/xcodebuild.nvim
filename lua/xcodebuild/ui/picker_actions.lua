@@ -56,20 +56,6 @@ local function add_test_actions(actionsNames, actionsPointers)
   end
 end
 
-local function add_macos_actions(actionsNames, actionsPointers)
-  local actions = require("xcodebuild.actions")
-  local macOS = require("xcodebuild.core.constants").Platform.MACOS
-  local runIndex = util.indexOf(actionsNames, "Cancel Running Action")
-  if not runIndex then
-    return
-  end
-
-  if require("xcodebuild.project.config").settings.platform == macOS then
-    table.insert(actionsNames, runIndex, "Run Without Building (Detached)")
-    table.insert(actionsPointers, runIndex, actions.run_macos_app_detached)
-  end
-end
-
 ---Adds DAP actions to the list of actions.
 ---@param actionsNames string[]
 ---@param actionsPointers function[]
@@ -349,7 +335,6 @@ function M.show_xcode_project_actions()
     actions.open_in_xcode,
   }
 
-  add_macos_actions(actionsNames, actionsPointers)
   add_test_actions(actionsNames, actionsPointers)
   add_dap_actions(actionsNames, actionsPointers)
   add_previews_actions(actionsNames, actionsPointers)

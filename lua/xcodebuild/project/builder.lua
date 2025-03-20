@@ -36,7 +36,7 @@ function M.build_and_run_app(waitForDebugger, callback)
     end
 
     local device = require("xcodebuild.platform.device")
-    device.run_app(waitForDebugger, nil, callback)
+    device.run_app(waitForDebugger, callback)
   end)
 end
 
