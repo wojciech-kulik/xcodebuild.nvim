@@ -35,6 +35,11 @@ local optional_dependencies = {
     url = "https://github.com/sharkdp/fd",
     message = "Improves performance when searching for files. Required for Assets Manager.",
   },
+  {
+    binary = "stdbuf",
+    url = "https://formulae.brew.sh/formula/coreutils#default",
+    message = "Allows to see macOS app logs without launching debugger.",
+  },
 }
 
 local required_dependencies = {

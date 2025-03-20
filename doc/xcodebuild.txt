@@ -309,7 +309,7 @@ External tools
 
 Installation
 >bash
-  brew install xcode-build-server xcbeautify ruby pipx rg jq
+  brew install xcode-build-server xcbeautify ruby pipx rg jq coreutils
   gem install xcodeproj
   pipx install pymobiledevice3
 <
@@ -758,16 +758,6 @@ M.edit_run_args()                             *xcodebuild.actions.edit_run_args*
 
 M.run({callback})                                       *xcodebuild.actions.run*
   Launches the app.
-
-  Parameters: ~
-    {callback}  (function|nil)
-
-
-                                     *xcodebuild.actions.run_macos_app_detached*
-M.run_macos_app_detached({callback})
-  Launches macOS app detached.
-  For macOS apps the process is by default attached to Neovim,
-  which allows to print logs to DAP console.
 
   Parameters: ~
     {callback}  (function|nil)
@@ -2503,13 +2493,11 @@ M.kill_app({callback})                     *xcodebuild.platform.device.kill_app*
     {callback}  (function|nil)
 
 
-                                            *xcodebuild.platform.device.run_app*
-M.run_app({waitForDebugger}, {detached}, {callback})
+M.run_app({waitForDebugger}, {callback})    *xcodebuild.platform.device.run_app*
   Runs the application on device, simulator, or macOS.
 
   Parameters: ~
     {waitForDebugger}  (boolean)
-    {detached}         (boolean|nil) # affects only macOS platform
     {callback}         (function|nil)
 
 
@@ -2766,15 +2754,12 @@ macOS Platform Integration                           *xcodebuild.platform.macos*
 
 This module is responsible for the integration of macOS platform with `nvim-dap`.
 
-                                          *xcodebuild.platform.macos.launch_app*
-M.launch_app({appPath}, {productName}, {detached}, {callback})
+M.launch_app({appPath}, {callback})       *xcodebuild.platform.macos.launch_app*
   Simply starts the application on macOS.
 
   Parameters: ~
-    {appPath}      (string)
-    {productName}  (string)
-    {detached}     (boolean|nil)
-    {callback}     (function|nil)
+    {appPath}   (string)
+    {callback}  (function|nil)
 
   Returns: ~
     (number)   job id
