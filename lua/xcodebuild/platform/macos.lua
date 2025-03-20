@@ -11,23 +11,51 @@ local M = {}
 
 ---Simply starts the application on macOS.
 ---@param appPath string
----@param productName string
----@param detached boolean|nil
 ---@param callback function|nil
 ---@return number # job id
-function M.launch_app(appPath, productName, detached, callback)
-  if detached == nil then
-    detached = false
-  end
+function M.launch_app(appPath, callback)
+  local command = { "open", appPath }
+  local fifoPath = "/tmp/xcodebuild_nvim_" .. util.get_filename(appPath) .. ".fifo"
 
-  local executablePath = appPath .. "/Contents/MacOS/" .. productName
-  local command = { executablePath }
+  local isStdbufInstalled = vim.fn.executable("stdbuf") ~= 0
+  if isStdbufInstalled then
+    vim.fn.delete(fifoPath)
+    vim.fn.system({ "mkfifo", fifoPath })
+
+    command = {
+      "stdbuf",
+      "-o0",
+      "open",
+      "--stdout",
+      fifoPath,
+      appPath,
+    }
+
+    appdata.clear_app_logs()
+  end
 
   local runArgs = appdata.read_run_args()
   if runArgs then
+    table.insert(command, "--args")
     for _, value in ipairs(runArgs) do
       table.insert(command, value)
     end
+  end
+
+  local launchJobId = vim.fn.jobstart(command, {
+    clear_env = true,
+    env = appdata.read_env_vars(),
+    on_exit = function(_, code)
+      if code == 0 then
+        util.call(callback)
+      else
+        notifications.send_warning("Could not launch app, code: " .. code)
+      end
+    end,
+  })
+
+  if not isStdbufInstalled then
+    return launchJobId
   end
 
   local function write_logs(_, output)
@@ -37,26 +65,12 @@ function M.launch_app(appPath, productName, detached, callback)
     appdata.append_app_logs(output)
   end
 
-  appdata.clear_app_logs()
-
-  if detached then
-    util.call(callback)
-  end
-
-  return vim.fn.jobstart(command, {
-    env = appdata.read_env_vars(),
-    pty = not detached,
-    detach = detached,
+  return vim.fn.jobstart({ "cat", fifoPath }, {
     on_stdout = write_logs,
     on_stderr = write_logs,
-    on_exit = function(_, code)
-      if not detached and code == 0 then
-        util.call(callback)
-      end
-
-      if code ~= 0 and code ~= 137 then
-        notifications.send_warning("Could not launch app, code: " .. code)
-      end
+    on_exit = function()
+      vim.fn.delete(fifoPath)
+      write_logs(nil, { "", "[Process finished]" })
     end,
   })
 end
