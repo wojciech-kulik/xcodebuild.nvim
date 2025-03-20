@@ -36,7 +36,7 @@ function M.find_tests(opts)
   local selectedTests = {}
 
   for _, line in ipairs(lines) do
-    selectedClass = string.match(line, "class ([^:%s]+)%s*:?")
+    selectedClass = string.match(line, "^[^/]*class ([^:%s]+)%s*:?")
     if selectedClass then
       break
     end
