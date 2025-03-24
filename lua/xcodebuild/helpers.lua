@@ -48,7 +48,7 @@ end
 
 ---Validates if the project is configured.
 ---It sends an error notification if the project is not configured.
----@param opts {requiresXcodeproj:boolean|nil, requiresApp:boolean|nil}|nil
+---@param opts {requiresXcodeproj:boolean|nil, requiresApp:boolean|nil, silent: boolean|nil}|nil
 ---@return boolean
 function M.validate_project(opts)
   opts = opts or {}
@@ -57,18 +57,24 @@ function M.validate_project(opts)
   local requiresApp = opts.requiresApp
   local requiresXcodeproj = opts.requiresXcodeproj or requiresApp
 
+  local send_error = function(message)
+    if not opts.silent then
+      notifications.send_error(message)
+    end
+  end
+
   if requiresXcodeproj and projectConfig.is_spm_configured() then
-    notifications.send_error("This operation is not supported for Swift Package.")
+    send_error("This operation is not supported for Swift Package.")
     return false
   end
 
   if requiresApp and projectConfig.is_library_configured() then
-    notifications.send_error("This operation is not supported for Xcode Library.")
+    send_error("This operation is not supported for Xcode Library.")
     return false
   end
 
   if requiresApp and not projectConfig.is_app_configured() then
-    notifications.send_error("The project is missing some details. Please run XcodebuildSetup first.")
+    send_error("The project is missing some details. Please run XcodebuildSetup first.")
     return false
   end
 
@@ -77,12 +83,12 @@ function M.validate_project(opts)
     and not projectConfig.is_app_configured()
     and not projectConfig.is_library_configured()
   then
-    notifications.send_error("The project is missing some details. Please run XcodebuildSetup first.")
+    send_error("The project is missing some details. Please run XcodebuildSetup first.")
     return false
   end
 
   if not projectConfig.is_configured() then
-    notifications.send_error("The project is missing some details. Please run XcodebuildSetup first.")
+    send_error("The project is missing some details. Please run XcodebuildSetup first.")
     return false
   end
 

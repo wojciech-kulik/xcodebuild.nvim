@@ -63,7 +63,7 @@ end
 ---Kills the application on device, simulator, or macOS.
 ---@param callback function|nil
 function M.kill_app(callback)
-  if not helpers.validate_project({ requiresApp = true }) then
+  if not helpers.validate_project({ requiresApp = true, silent = true }) then
     return
   end
 

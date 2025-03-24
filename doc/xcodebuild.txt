@@ -4539,7 +4539,7 @@ M.validate_project({opts})                 *xcodebuild.helpers.validate_project*
   It sends an error notification if the project is not configured.
 
   Parameters: ~
-    {opts}  ({requiresXcodeproj:boolean|nil,requiresApp:boolean|nil}|nil)
+    {opts}  ({requiresXcodeproj:boolean|nil,requiresApp:boolean|nil,silent:boolean|nil}|nil)
 
   Returns: ~
     (boolean)
