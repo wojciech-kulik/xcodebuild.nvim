@@ -3807,8 +3807,11 @@ M.wait_for_pid()                      *xcodebuild.integrations.dap.wait_for_pid*
 
 
                                      *xcodebuild.integrations.dap.clear_console*
-M.clear_console()
+M.clear_console({validate})
   Clears the DAP console buffer.
+
+  Parameters: ~
+    {validate}  (boolean|nil) # if true, shows error if the buffer is a terminal
 
 
                                     *xcodebuild.integrations.dap.update_console*
