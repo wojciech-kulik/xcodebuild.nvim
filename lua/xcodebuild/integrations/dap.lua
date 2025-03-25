@@ -376,7 +376,8 @@ function M.wait_for_pid()
 end
 
 ---Clears the DAP console buffer.
-function M.clear_console()
+---@param validate boolean|nil # if true, shows error if the buffer is a terminal
+function M.clear_console(validate)
   local success, dapui = pcall(require, "dapui")
   if not success then
     return
@@ -387,8 +388,16 @@ function M.clear_console()
     return
   end
 
-  if vim.bo.buftype == "terminal" then
-    notifications.send_error("Cannot clear DAP console while debugging macOS apps.")
+  if vim.bo[bufnr].buftype == "terminal" then
+    if validate then
+      local isMacOS = projectConfig.settings.platform == constants.Platform.MACOS
+      if isMacOS then
+        notifications.send_error("Cannot clear DAP console while debugging macOS apps.")
+      else
+        notifications.send_error("Cannot clear DAP console when it's a terminal buffer.")
+      end
+    end
+
     return
   end
 
@@ -599,7 +608,12 @@ function M.get_actions()
     { name = "Debug Current Test Class", action = M.debug_class_tests },
     { name = "Attach Debugger", action = M.attach_and_debug },
     { name = "Detach Debugger", action = disconnect_session },
-    { name = "Clear DAP Console", action = M.clear_console },
+    {
+      name = "Clear DAP Console",
+      action = function()
+        M.clear_console(true)
+      end,
+    },
   }
 end
 
