@@ -254,7 +254,7 @@ function M.get_destinations(projectFile, scheme, workingDirectory, callback)
 
         if foundDestinations and trimmedLine == "" then
           break
-        elseif foundDestinations then
+        elseif foundDestinations and vim.startswith(trimmedLine, "{") then
           local sanitizedLine = string.gsub(trimmedLine, ", ", "@")
           local destination = {
             platform = string.match(sanitizedLine, "platform" .. valuePattern),
@@ -265,7 +265,10 @@ function M.get_destinations(projectFile, scheme, workingDirectory, callback)
             os = string.match(sanitizedLine, "OS" .. valuePattern),
             error = string.match(sanitizedLine, "error" .. valuePattern),
           }
-          table.insert(result, destination)
+
+          if destination.platform and destination.id and destination.name then
+            table.insert(result, destination)
+          end
         elseif string.find(trimmedLine, "Available destinations") then
           foundDestinations = true
         end
