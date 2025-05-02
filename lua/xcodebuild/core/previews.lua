@@ -294,6 +294,11 @@ function M.generate_preview(hotReload, callback)
   vim.fn.delete(getPath())
   xcode.kill_app(projectSettings.productName, projectSettings.platform)
 
+  local success, snacks = pcall(require, "snacks")
+  if success and snacks.image.config.cache and snacks.image.config.cache ~= "" then
+    vim.fn.delete(snacks.image.config.cache, "rf")
+  end
+
   if projectSettings.platform == constants.Platform.MACOS then
     generate_macos_preview(hotReload, callback)
   else
