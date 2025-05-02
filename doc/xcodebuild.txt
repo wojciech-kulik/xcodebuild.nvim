@@ -1320,12 +1320,12 @@ M.find_schemes({xcodeprojPath}, {workingDirectory}, {callback})
 
 
                                  *xcodebuild.core.xcode.get_project_information*
-M.get_project_information({xcodeproj}, {workingDirectory}, {callback})
+M.get_project_information({projectFile}, {workingDirectory}, {callback})
   Returns the list of project information including schemes, configs, and
-  targets for the given {xcodeproj}.
+  targets for the given {projectFile}.
 
   Parameters: ~
-    {xcodeproj}         (string|nil)
+    {projectFile}       (string|nil)
     {workingDirectory}  (string|nil)
     {callback}          (fun(settings:XcodeProjectInfo))
 

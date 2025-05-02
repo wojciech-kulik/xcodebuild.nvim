@@ -343,7 +343,7 @@ function M.show(title, items, callback, opts)
           end
         end
 
-        if opts.close_on_select and selection then
+        if opts.close_on_select and selection and selection.value ~= "[Reload Schemes]" then
           telescopeActions.close(prompt_bufnr)
         end
 
@@ -518,7 +518,19 @@ function M.select_scheme(callback, opts)
 
   start_telescope_spinner()
   M.show("Select Scheme", {}, function(entry, _)
-    selectScheme(entry.value)
+    if entry.value == "[Reload Schemes]" then
+      update_results({}, true)
+      start_telescope_spinner()
+      currentJobId = xcode.get_project_information(
+        projectConfig.settings.projectFile,
+        workingDirectory,
+        function(settings)
+          update_results(settings.schemes, true)
+        end
+      )
+    else
+      selectScheme(entry.value)
+    end
   end, opts)
 
   currentJobId = xcode.find_schemes(xcodeproj, workingDirectory, function(schemes)
@@ -527,11 +539,13 @@ function M.select_scheme(callback, opts)
     end)
 
     xcodeBuildServer.update_cached_schemes(names)
+
+    table.insert(names, "[Reload Schemes]")
     update_results(names, true)
 
-    if util.is_empty(names) then
+    if #names == 1 then
       notifications.send_error("No schemes found")
-    elseif #names == 1 and opts.auto_select then
+    elseif #names == 2 and opts.auto_select then
       selectScheme(names[1])
     end
   end)

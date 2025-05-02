@@ -362,19 +362,19 @@ function M.find_schemes(xcodeprojPath, workingDirectory, callback)
 end
 
 ---Returns the list of project information including schemes, configs, and
----targets for the given {xcodeproj}.
----@param xcodeproj string|nil
+---targets for the given {projectFile}.
+---@param projectFile string|nil
 ---@param workingDirectory string|nil
 ---@param callback fun(settings: XcodeProjectInfo)
 ---@return number # job id
-function M.get_project_information(xcodeproj, workingDirectory, callback)
+function M.get_project_information(projectFile, workingDirectory, callback)
   local command = { "xcodebuild", "-list" }
 
-  if xcodeproj then
+  if projectFile then
     command = {
       "xcodebuild",
-      "-project",
-      xcodeproj,
+      get_project_param(projectFile),
+      projectFile,
       "-list",
     }
   end
