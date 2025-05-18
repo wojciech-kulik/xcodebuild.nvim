@@ -31,6 +31,9 @@ M.SECURED_MODE = 2
 ---@type RemoteDebuggerMode
 M.mode = M.SECURED_MODE
 
+---@type string # lockdown or remote
+M.secured_service = "lockdown"
+
 ---Updates logs in the DAP console.
 ---@param lines string[]
 local function update_console(lines)
@@ -197,6 +200,14 @@ local function start_dap(opts)
   })
 end
 
+---Sets the service for secured mode.
+---iOS 18.2 requires `lockdown` instead of `remote`.
+---`lockdown` can be used starting from iOS 17.4.
+---@param service string
+function M.set_secured_service(service)
+  M.secured_service = service
+end
+
 ---Sets the mode of the remote debugger.
 ---Use `M.LEGACY_MODE` or `M.SECURED_MODE`.
 ---@param mode RemoteDebuggerMode
@@ -233,15 +244,19 @@ end
 ---@param opts {attach: boolean}|nil
 ---@param callback function|nil
 local function start_secured_tunnel(opts, callback)
-  M.debug_server_job = deviceProxy.create_secure_tunnel(projectConfig.settings.destination, function(rsdParam)
-    M.rsd_param = rsdParam
+  M.debug_server_job = deviceProxy.create_secure_tunnel(
+    projectConfig.settings.destination,
+    M.secured_service,
+    function(rsdParam)
+      M.rsd_param = rsdParam
 
-    update_console({ "Connecting to " .. rsdParam:gsub("%-%-rsd ", "") })
-    setup_terminate_listeners()
-    start_dap(opts)
+      update_console({ "Connecting to " .. rsdParam:gsub("%-%-rsd ", "") })
+      setup_terminate_listeners()
+      start_dap(opts)
 
-    util.call(callback)
-  end)
+      util.call(callback)
+    end
+  )
 end
 
 ---Starts the remote debugger based on the mode.

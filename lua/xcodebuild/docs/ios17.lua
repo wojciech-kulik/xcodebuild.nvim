@@ -72,6 +72,17 @@
 ---`integrations.pymobiledevice`.
 ---
 ---@brief ]]
+---
+---@tag xcodebuild.remote-debugger-update
+---@brief [[
+---To update the `remote_debugger` script, you can run:
+---
+--->bash
+--- DEST="$HOME/Library/xcodebuild.nvim" && \
+---    SOURCE="$HOME/.local/share/nvim/lazy/xcodebuild.nvim/tools/remote_debugger" && \
+---    sudo install -m 755 -o root "$SOURCE" "$DEST"
+---<
+---@brief ]]
 
 local M = {}
 return M

@@ -58,12 +58,32 @@ local M = {}
 
 ---Sets the remote debugger mode based on the OS version.
 local function set_remote_debugger_mode()
+  local isWatchOS = projectConfig.settings.platform == constants.Platform.WATCHOS_DEVICE
+  local isVisionOS = projectConfig.settings.platform == constants.Platform.VISIONOS_DEVICE
+
+  if isWatchOS or isVisionOS then
+    remoteDebugger.set_mode(remoteDebugger.SECURED_MODE)
+    remoteDebugger.set_secured_service("lockdown")
+    return
+  end
+
+  -- iOS / iPadOS / tvOS
+
   local majorVersion = helpers.get_major_os_version()
+  local minorVersion = helpers.get_minor_os_version()
 
   if majorVersion and majorVersion < 17 then
     remoteDebugger.set_mode(remoteDebugger.LEGACY_MODE)
   else
     remoteDebugger.set_mode(remoteDebugger.SECURED_MODE)
+    majorVersion = majorVersion or 0
+    minorVersion = minorVersion or 0
+
+    if (majorVersion == 17 and minorVersion >= 4) or (majorVersion > 17) then
+      remoteDebugger.set_secured_service("lockdown")
+    else
+      remoteDebugger.set_secured_service("remote")
+    end
   end
 end
 
