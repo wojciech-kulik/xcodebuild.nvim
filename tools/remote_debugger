@@ -2,9 +2,10 @@
 set -e
 
 if [ "$1" = "kill" ]; then
+  ps ax -o pid,command | grep "[p]ymobiledevice3 lockdown start-tunnel" | awk '{print$1}' | xargs kill -9
   ps ax -o pid,command | grep "[p]ymobiledevice3 remote start-tunnel" | awk '{print$1}' | xargs kill -9
 elif [ "$1" = "start" ]; then
-  pymobiledevice3 remote start-tunnel --no-color --udid $2
+  pymobiledevice3 $2 start-tunnel --no-color --udid $3
 fi
 
-# @version: 1
+# @version: 2

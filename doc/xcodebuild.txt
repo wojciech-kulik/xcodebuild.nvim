@@ -671,6 +671,15 @@ Please also note that remote debugger config options have been moved to:
 `integrations.pymobiledevice`.
 
 
+                                             *xcodebuild.remote-debugger-update*
+To update the `remote_debugger` script, you can run:
+
+>bash
+ DEST="$HOME/Library/xcodebuild.nvim" && \
+    SOURCE="$HOME/.local/share/nvim/lazy/xcodebuild.nvim/tools/remote_debugger" && \
+    sudo install -m 755 -o root "$SOURCE" "$DEST"
+<
+
 ==============================================================================
 Health Check                                                 *xcodebuild.health*
 
@@ -2540,7 +2549,7 @@ For other devices, the |xcodebuild.core.xcode| module is used.
 
 The tool can be installed by:
 >bash
-    python3 -m pip install -U pymobiledevice
+    pipx install pymobiledevice3
 <
 
 See:
@@ -2719,7 +2728,7 @@ M.start_server({destination}, {port}, {callback})
 
 
                          *xcodebuild.platform.device_proxy.create_secure_tunnel*
-M.create_secure_tunnel({destination}, {callback})
+M.create_secure_tunnel({destination}, {service}, {callback})
   Creates a secure tunnel with the device.
   It is used on devices with iOS 17 and above.
 
@@ -2736,6 +2745,7 @@ M.create_secure_tunnel({destination}, {callback})
 
   Parameters: ~
     {destination}  (string) # device id
+    {service}      (string) # lockdown (17.4+) or remote
     {callback}     (fun(rsd:string)|nil)
 
   Returns: ~
@@ -3970,6 +3980,23 @@ M.mode
     (RemoteDebuggerMode)
 
 
+                       *xcodebuild.integrations.remote_debugger.secured_service*
+M.secured_service
+
+  Type: ~
+    (string)  # lockdown or remote
+
+
+                   *xcodebuild.integrations.remote_debugger.set_secured_service*
+M.set_secured_service({service})
+  Sets the service for secured mode.
+  iOS 18.2 requires `lockdown` instead of `remote`.
+  `lockdown` can be used starting from iOS 17.4.
+
+  Parameters: ~
+    {service}  (string)
+
+
                               *xcodebuild.integrations.remote_debugger.set_mode*
 M.set_mode({mode})
   Sets the mode of the remote debugger.
@@ -4562,6 +4589,14 @@ M.find_all_swift_files()               *xcodebuild.helpers.find_all_swift_files*
 
 M.get_major_os_version()               *xcodebuild.helpers.get_major_os_version*
   Returns the major version of the OS (ex. 17 for 17.1.1).
+  It uses the device from the project configuration.
+
+  Returns: ~
+    (number|nil)
+
+
+M.get_minor_os_version()               *xcodebuild.helpers.get_minor_os_version*
+  Returns the minor version of the OS (ex. 1 for 17.1.2).
   It uses the device from the project configuration.
 
   Returns: ~

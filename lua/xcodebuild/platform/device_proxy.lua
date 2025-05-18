@@ -12,7 +12,7 @@
 ---
 ---The tool can be installed by:
 --->bash
----    python3 -m pip install -U pymobiledevice
+---    pipx install pymobiledevice3
 ---<
 ---
 ---See:
@@ -47,6 +47,25 @@ local function check_sudo(path)
   for _, line in ipairs(permissions) do
     if line:match("NOPASSWD.*" .. path) then
       return true
+    end
+  end
+
+  return false
+end
+
+---Checks if the `remote_debugger` tool is up to date.
+---@param path string
+---@return boolean
+local function is_up_to_date(path)
+  local success, lines = util.readfile(path)
+  if not success then
+    return false
+  end
+
+  for _, line in ipairs(lines) do
+    if string.find(line, "@version:") then
+      local version = string.match(line, "@version: (%d+)")
+      return version and tonumber(version) >= 2
     end
   end
 
@@ -518,9 +537,10 @@ end
 ---
 ---Requires passwordless `sudo` for the `remote_debugger` tool.
 ---@param destination string # device id
+---@param service string # lockdown (17.4+) or remote
 ---@param callback fun(rsd: string)|nil
 ---@return number|nil # job id
-function M.create_secure_tunnel(destination, callback)
+function M.create_secure_tunnel(destination, service, callback)
   if check_sudo(".local/share/nvim/lazy/xcodebuild.nvim/tools/remote_debugger") then
     notifications.send_error(
       "You are using insecure integration with pymobiledevice3. Please migrate your installation (see: `:h xcodebuild.remote-debugger-migration`)"
@@ -535,10 +555,18 @@ function M.create_secure_tunnel(destination, callback)
     return nil
   end
 
+  if not is_up_to_date(M.scriptPath) then
+    notifications.send_error(
+      "remote_debugger tool is outdated. Please see `:h xcodebuild.remote-debugger-update` to learn how to update it."
+    )
+    return nil
+  end
+
   local cmd = {
     "sudo",
     M.scriptPath,
     "start",
+    service,
     destination,
   }
 

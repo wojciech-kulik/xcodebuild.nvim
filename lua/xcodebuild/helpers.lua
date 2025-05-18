@@ -163,6 +163,14 @@ function M.get_major_os_version()
   return settings.os and tonumber(vim.split(settings.os, ".", { plain = true })[1]) or nil
 end
 
+---Returns the minor version of the OS (ex. 1 for 17.1.2).
+---It uses the device from the project configuration.
+---@return number|nil
+function M.get_minor_os_version()
+  local settings = require("xcodebuild.project.config").settings
+  return settings.os and tonumber(vim.split(settings.os, ".", { plain = true })[2]) or nil
+end
+
 ---Wraps any nvim_buf_set_option() call to ensure forward compatibility.
 ---The function is required because nvim_buf_set_option() was deprecated in nvim-0.10.
 ---@param bufnr number
