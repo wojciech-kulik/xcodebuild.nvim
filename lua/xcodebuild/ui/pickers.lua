@@ -7,7 +7,7 @@
 ---<C-r> - Refresh the picker results
 ---<M-y> - Move the selected item up
 ---<M-e> - Move the selected item down
----<M-x> - Remove the selected item
+---<M-d> - Remove the selected item
 ---<M-a> - Add a new device
 ---
 ---@brief ]]
@@ -116,7 +116,7 @@ end
 local function update_telescope_spinner()
   if activePicker and vim.api.nvim_win_is_valid(activePicker.results_win) then
     currentProgressFrame = currentProgressFrame >= #progressFrames and 1 or currentProgressFrame + 1
-    activePicker:change_prompt_prefix(progressFrames[currentProgressFrame] .. " ", "TelescopePromptPrefix")
+    activePicker:set_prompt(progressFrames[currentProgressFrame] .. " ", true)
   else
     stop_telescope_spinner()
   end
@@ -149,6 +149,7 @@ local function update_results(results, force)
         new_prefix = telescopeConfig.prompt_prefix,
       }
     )
+    activePicker:reset_prompt()
   end
 end
 

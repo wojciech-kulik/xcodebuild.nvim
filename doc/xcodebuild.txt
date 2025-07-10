@@ -4420,7 +4420,7 @@ Device picker shortcuts:
 <C-r> - Refresh the picker results
 <M-y> - Move the selected item up
 <M-e> - Move the selected item down
-<M-x> - Remove the selected item
+<M-d> - Remove the selected item
 <M-a> - Add a new device
 
 
