@@ -105,6 +105,12 @@ Big thanks to all the sponsors who support this project 🍻!
 <a href="https://github.com/stephenhuh"><img src="https://avatars.githubusercontent.com/u/6165538" width="40" height="40" alt="@stephenhuh" title="stephenhuh"></a>
 <a href="https://github.com/joeldrotleff"><img src="https://avatars.githubusercontent.com/u/2484624" width="40" height="40" alt="@joeldrotleff" title="joeldrotleff"></a>
 
+## 🤓 My Other Projects
+
+- [Snippety](https://snippety.app) - Snippets manager for macOS & iOS
+- [FlashSpace](https://github.com/wojciech-kulik/FlashSpace) - Fast virtual workspace manager for macOS
+- [Smog Poland](https://smog-polska.pl) - Air quality monitoring app for Poland
+
 &nbsp;
 
 [Wiki]: https://github.com/wojciech-kulik/xcodebuild.nvim/wiki
