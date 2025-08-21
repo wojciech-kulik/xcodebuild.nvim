@@ -78,7 +78,7 @@ end
 
 ---Creates the `.nvim/xcodebuild` folder if it doesn't exist.
 function M.create_app_dir()
-  util.shell("mkdir -p .nvim/xcodebuild")
+  util.shell({ "mkdir", "-p", ".nvim/xcodebuild" })
 end
 
 ---Initializes the `.nvim/xcodebuild/env.txt` file.
