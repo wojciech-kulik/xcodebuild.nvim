@@ -58,6 +58,9 @@ local function map_shortcut(shortcut)
   return result
 end
 
+---Sets the key bindings for the picker.
+---@param actions table<string, function|table>
+---@param opts PickerOptions
 local function set_bindings(actions, opts)
   local mappings = require("xcodebuild.core.config").options.device_picker.mappings
 
@@ -66,6 +69,10 @@ local function set_bindings(actions, opts)
       opts.on_refresh,
       fzf.actions.resume,
     }
+  end
+
+  if not opts.modifiable then
+    return
   end
 
   if mappings.add_device then
