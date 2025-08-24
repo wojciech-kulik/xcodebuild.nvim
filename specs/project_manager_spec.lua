@@ -75,8 +75,9 @@ local function mock()
   require("xcodebuild.project.config").settings.xcodeproj = projectRoot .. "XcodebuildNvimApp.xcodeproj"
   require("xcodebuild.core.config").options.logs.notify = function(_, _) end
   require("xcodebuild.core.config").options.project_manager.guess_target = true
+  require("xcodebuild.ui.pickers").setup()
 
-  require("xcodebuild.ui.pickers").show = function(_, list, callback, _)
+  local mockPicker = function(_, list, callback, _)
     pickerReceivedItems = list
     pickerShown = true
 
@@ -86,6 +87,9 @@ local function mock()
       vim.api.nvim_exec_autocmds("BufWinLeave", {})
     end
   end
+
+  require("xcodebuild.ui.pickers").show = mockPicker
+  require("xcodebuild.ui.pickers").show_multiselect = mockPicker
 
   pickerShown = false
   pickerReceivedItems = {}
@@ -132,7 +136,7 @@ describe("ensure", function()
   describe("update_current_file_targets", function()
     before_each(function()
       setFilePath(projectRoot .. "XcodebuildNvimApp/Modules/Main/MainViewModel.swift")
-      require("xcodebuild.ui.pickers").show = function(_, items, callback, _)
+      require("xcodebuild.ui.pickers").show_multiselect = function(_, items, callback, _)
         pickerReceivedItems = items
         if callback then
           callback({ "XcodebuildNvimApp", "XcodebuildNvimAppTests" })

@@ -208,7 +208,7 @@ end
 ---Returns `true` if the picker has been shown, otherwise `false`.
 ---@param title string
 ---@param opts {autoselect: boolean, targets: string[]|nil}|nil
----@param callback fun(target: string[])|nil
+---@param callback function(target: string[])|nil
 ---@return boolean
 local function run_select_targets(title, opts, callback)
   opts = opts or {}
@@ -219,7 +219,7 @@ local function run_select_targets(title, opts, callback)
     return false
   end
 
-  pickers.show(title, targets, callback, { close_on_select = true, multiselect = true })
+  pickers.show_multiselect(title, targets, callback, { close_on_select = true })
   return true
 end
 

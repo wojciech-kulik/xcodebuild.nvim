@@ -49,8 +49,10 @@ oil.nvim Integration ························ |xcodebuil
 Quick Test Framework Integration ··············· |xcodebuild.integrations.quick|
 xcode-build-server Integration ···· |xcodebuild.integrations.xcode-build-server|
 Xcodebuild Workaround ············· |xcodebuild.integrations.xcodebuild-offline|
+Telescope Picker ··························· |xcodebuild.integrations.telescope|
 Pickers ················································ |xcodebuild.ui.pickers|
 Picker Actions ·································· |xcodebuild.ui.picker_actions|
+Utils For Pickers ································ |xcodebuild.ui.pickers_utils|
 Helpers ··················································· |xcodebuild.helpers|
 Lua Utils ···················································· |xcodebuild.util|
 
@@ -4411,10 +4413,65 @@ M.wrap_command_if_needed({command})
 
 
 ==============================================================================
+Telescope Picker                             *xcodebuild.integrations.telescope*
+
+                                                  *xcodebuild.pickers.telescope*
+This module is responsible for showing pickers using Telescope.nvim.
+
+
+                           *xcodebuild.integrations.telescope.PickerIntegration*
+PickerIntegration
+
+
+                              *xcodebuild.integrations.telescope.start_progress*
+M.start_progress()
+  Starts the progress animation.
+
+
+                               *xcodebuild.integrations.telescope.stop_progress*
+M.stop_progress()
+  Stops the progress animation.
+
+
+                              *xcodebuild.integrations.telescope.update_results*
+M.update_results({results})
+  Updates the results of the picker and stops the animation.
+
+  Parameters: ~
+    {results}  (any[])
+
+
+M.close()                              *xcodebuild.integrations.telescope.close*
+  Closes the active picker.
+
+
+                                        *xcodebuild.integrations.telescope.show*
+M.show({title}, {items}, {opts}, {callback})
+  Shows a picker using Telescope.nvim.
+
+  Parameters: ~
+    {title}     (string)
+    {items}     (any[])
+    {opts}      (PickerOptions|nil)
+    {callback}  (fun(result:{index:number,value:any},index:number)|nil)
+
+
+                            *xcodebuild.integrations.telescope.show_multiselect*
+M.show_multiselect({title}, {items}, {opts}, {callback})
+  Shows a multiselect picker using Telescope.nvim.
+
+  Parameters: ~
+    {title}     (string)
+    {items}     (any[])
+    {opts}      (PickerOptions|nil)
+    {callback}  (fun(result:any[])|nil)
+
+
+==============================================================================
 Pickers                                                  *xcodebuild.ui.pickers*
 
                                                             *xcodebuild.pickers*
-This module is responsible for showing pickers using Telescope.nvim.
+This module is responsible for showing pickers.
 
 Device picker shortcuts:
 <C-r> - Refresh the picker results
@@ -4427,12 +4484,14 @@ Device picker shortcuts:
 PickerOptions                              *xcodebuild.ui.pickers.PickerOptions*
 
   Fields: ~
-    {on_refresh}              (function|nil)
-    {multiselect}             (boolean|nil)
-    {modifiable}              (boolean|nil)
-    {auto_select}             (boolean|nil)
-    {close_on_select}         (boolean|nil)
-    {device_select_callback}  (function|nil)
+    {on_refresh}              (function|nil) # function to call when refresh mapping is triggered
+    {modifiable}              (boolean|nil) # allow modifying the results (moving, deleting, adding)
+    {auto_select}             (boolean|nil) # if one result, select it automatically
+    {close_on_select}         (boolean|nil) # close the picker after selection
+    {device_select_callback}  (function|nil) # callback used when selecting a device in non-add mode
+
+
+PickerIntegration                      *xcodebuild.ui.pickers.PickerIntegration*
 
 
 M.close()                                          *xcodebuild.ui.pickers.close*
@@ -4441,12 +4500,23 @@ M.close()                                          *xcodebuild.ui.pickers.close*
 
                                                     *xcodebuild.ui.pickers.show*
 M.show({title}, {items}, {callback}, {opts})
-  Shows a picker using Telescope.nvim.
+  Shows a picker.
 
   Parameters: ~
     {title}     (string)
-    {items}     (string[]|XcodeDevice[])
-    {callback}  (function|nil)
+    {items}     (any[])
+    {callback}  (fun(result:{index:number,value:any},index:number)|nil)
+    {opts}      (PickerOptions|nil)
+
+
+                                        *xcodebuild.ui.pickers.show_multiselect*
+M.show_multiselect({title}, {items}, {callback}, {opts})
+  Shows a multiselect picker.
+
+  Parameters: ~
+    {title}     (string)
+    {items}     (any[])
+    {callback}  (fun(result:any[])|nil)
     {opts}      (PickerOptions|nil)
 
 
@@ -4525,6 +4595,9 @@ M.show_all_actions()                    *xcodebuild.ui.pickers.show_all_actions*
   If the project is not configured, it will show the configuration wizard.
 
 
+M.setup()                                          *xcodebuild.ui.pickers.setup*
+
+
 ==============================================================================
 Picker Actions                                    *xcodebuild.ui.picker_actions*
 
@@ -4543,6 +4616,36 @@ M.show_library_project_actions()
                        *xcodebuild.ui.picker_actions.show_xcode_project_actions*
 M.show_xcode_project_actions()
   Shows available actions for Xcode project.
+
+
+==============================================================================
+Utils For Pickers                                  *xcodebuild.ui.pickers_utils*
+
+                                                      *xcodebuild.pickers_utils*
+This module is responsible for utility functions for pickers.
+
+
+                                 *xcodebuild.ui.pickers_utils.PickerIntegration*
+PickerIntegration
+
+  Fields: ~
+    {start_progress}    (fun())
+    {stop_progress}     (fun())
+    {close}             (fun())
+    {update_results}    (fun(results:any[]))
+    {show}              (fun(title:string,items:any[],opts?:PickerOptions,callback?:fun(result:{index:number,value:any},index:number)))
+    {show_multiselect}  (fun(title:string,items:any[],opts?:PickerOptions,callback?:fun(result:any[])))
+
+
+                              *xcodebuild.ui.pickers_utils.get_destination_name*
+M.get_destination_name({destination})
+  Gets user-friendly device name
+
+  Parameters: ~
+    {destination}  (XcodeDevice)
+
+  Returns: ~
+    (string)
 
 
 ==============================================================================

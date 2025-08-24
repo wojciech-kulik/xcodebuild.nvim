@@ -1,0 +1,49 @@
+---@mod xcodebuild.integrations.<provider> <Provider> Integration
+---@tag xcodebuild.pickers.<provider>
+---@brief [[
+---This module is responsible for showing pickers using <Provider>.
+---
+---@brief ]]
+
+local pickersUtils = require("xcodebuild.ui.pickers_utils")
+
+---@class PickerIntegration
+local M = {}
+
+---Starts the progress animation.
+function M.start_progress() end
+
+---Stops the progress animation.
+function M.stop_progress() end
+
+---Closes the active picker.
+function M.close() end
+
+---Updates the results of the picker and stops the animation.
+---@param results any[]
+function M.update_results(results) end
+
+---Shows a picker using <Provider>.
+---@param title string
+---@param items any[]
+---@param opts PickerOptions|nil
+---@param callback fun(result: {index: number, value: any}, index: number)|nil
+function M.show(title, items, opts, callback)
+  local mappings = require("xcodebuild.core.config").options.device_picker.mappings
+
+  -- Configure mappings and show picker
+  -- mappings.refresh_devices should be configured if opts.on_refresh is provided
+  -- other mappings should be configured if opts.modifiable is true
+
+  -- Don't close the picker if the selected item is '[Reload Schemes]'.
+end
+
+---Shows a multiselect picker using <Provider>.
+---@param title string
+---@param items any[]
+---@param opts PickerOptions|nil
+---@param opts PickerOptions|nil
+---@param callback fun(result: any[])|nil
+function M.show_multiselect(title, items, opts, callback) end
+
+return M
