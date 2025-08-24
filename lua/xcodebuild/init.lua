@@ -206,8 +206,8 @@ end
 ---  },
 ---  device_picker = {
 ---    mappings = {
----      move_up_device = "<M-y>", -- move device up in the list
----      move_down_device = "<M-e>", -- move device down in the list
+---      move_up_device = "<M-y>", -- move device up in the list (only for telescope)
+---      move_down_device = "<M-e>", -- move device down in the list (only for telescope)
 ---      add_device = "<M-a>", -- add device to cache
 ---      delete_device = "<M-d>", -- delete device from cache
 ---      refresh_devices = "<C-r>", -- refresh devices list
@@ -237,6 +237,14 @@ end
 ---    quick = { -- integration with Swift test framework: github.com/Quick/Quick
 ---      enabled = true, -- enable Quick tests support (requires Swift parser for nvim-treesitter)
 ---    },
+---    telescope_nvim = {
+---      enabled = true, -- enable telescope picker
+---    },
+---    fzf_lua = {
+---      enabled = true, -- enable fzf-lua picker
+---      fzf_opts = {},  -- fzf options
+---      win_opts = {},  -- window options
+---    },
 ---  },
 ---  highlights = {
 ---    -- you can override here any highlight group used by this plugin
@@ -262,6 +270,7 @@ function M.setup(options)
   local oilNvim = require("xcodebuild.integrations.oil-nvim")
   local neoTree = require("xcodebuild.integrations.neo-tree")
   local xcodeBuildServer = require("xcodebuild.integrations.xcode-build-server")
+  local pickers = require("xcodebuild.ui.pickers")
 
   autocmd.setup()
   projectConfig.load_settings()
@@ -274,6 +283,7 @@ function M.setup(options)
   oilNvim.setup()
   neoTree.setup()
   xcodeBuildServer.setup()
+  pickers.setup()
   setupHighlights()
   warnAboutOldConfig()
 
