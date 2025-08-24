@@ -42,7 +42,7 @@ function M.show(title, items, opts, callback)
   -- mappings.refresh_devices should be configured if opts.on_refresh is provided
   -- other mappings should be configured if opts.modifiable is true
 
-  -- Ignore options: close_on_select, auto_select 
+  -- Ignore opt.auto_select 
 end
 
 ---Shows a multiselect picker using <Provider>.
