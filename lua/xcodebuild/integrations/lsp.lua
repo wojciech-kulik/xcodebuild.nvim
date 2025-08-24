@@ -49,15 +49,16 @@ function M.restart_sourcekit_lsp()
     return
   end
 
-  local client
+  local clientId
   if vim.fn.has("nvim-0.10") == 1 then
-    client = vim.lsp.get_clients({ name = "sourcekit" })[1]
+    local client = vim.lsp.get_clients({ name = "sourcekit" })[1]
+    ---@diagnostic disable-next-line: undefined-field
+    clientId = client and client.name
   else
-    client = vim.lsp.get_active_clients({ name = "sourcekit" })[1]
+    local client = vim.lsp.get_active_clients({ name = "sourcekit" })[1]
+    ---@diagnostic disable-next-line: undefined-field
+    clientId = client and client.id and tostring(client.id)
   end
-
-  ---@diagnostic disable-next-line: undefined-field
-  local clientId = client and client.id
 
   if not clientId then
     return
