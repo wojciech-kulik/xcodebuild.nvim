@@ -533,10 +533,13 @@ end
 
 function M.setup()
   local hasTelescope, _ = pcall(require, "telescope.pickers")
+  local hasSnacks, _ = pcall(require, "snacks.picker")
   local hasFzfLua, _ = pcall(require, "fzf-lua")
 
   if config.integrations.telescope_nvim.enabled and hasTelescope then
     integration = require("xcodebuild.integrations.telescope-nvim")
+  elseif config.integrations.snacks_nvim.enabled and hasSnacks then
+    integration = require("xcodebuild.integrations.snacks-picker")
   elseif config.integrations.fzf_lua.enabled and hasFzfLua then
     integration = require("xcodebuild.integrations.fzf-lua")
   else

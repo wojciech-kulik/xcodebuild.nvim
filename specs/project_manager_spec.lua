@@ -10,6 +10,11 @@ package.loaded["telescope.actions.utils"] = {}
 package.loaded["telescope.themes"] = {}
 package.loaded["fzf-lua"] = {}
 
+Snacks = {}
+Snacks.picker = {
+  pick = function() end,
+}
+
 local assert = require("luassert")
 local manager = require("xcodebuild.project.manager")
 local util = require("xcodebuild.util")
