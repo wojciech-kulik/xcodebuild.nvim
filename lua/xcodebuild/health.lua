@@ -64,8 +64,14 @@ local plugins = {
   {
     name = "telescope.nvim",
     lib = "telescope",
-    optional = false,
-    info = "(Required to present pickers for actions and configurations)",
+    optional = true,
+    info = "(One picker plugin is required to interact with the plugin)",
+  },
+  {
+    name = "fzf-lua",
+    lib = "fzf-lua",
+    optional = true,
+    info = "(One picker plugin is required to interact with the plugin)",
   },
   {
     name = "nui.nvim",
