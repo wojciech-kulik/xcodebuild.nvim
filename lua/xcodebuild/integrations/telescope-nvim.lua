@@ -6,7 +6,6 @@
 ---@brief ]]
 
 local util = require("xcodebuild.util")
-local projectConfig = require("xcodebuild.project.config")
 local pickersUtils = require("xcodebuild.ui.pickers_utils")
 
 local telescopePickers = require("telescope.pickers")
@@ -16,8 +15,15 @@ local telescopeActions = require("telescope.actions")
 local telescopeState = require("telescope.actions.state")
 local telescopeActionsUtils = require("telescope.actions.utils")
 
----@class PickerIntegration
-local M = {}
+---@type PickerIntegration
+local M = {
+  start_progress = function() end,
+  stop_progress = function() end,
+  close = function() end,
+  update_results = function() end,
+  show = function() end,
+  show_multiselect = function() end,
+}
 
 local activePicker = nil
 local progressTimer = nil
@@ -61,12 +67,6 @@ local function update_telescope_spinner()
   end
 end
 
-local function swap_entries(entries, index1, index2)
-  local tmp = entries[index1]
-  entries[index1] = entries[index2]
-  entries[index2] = tmp
-end
-
 ---Sets the picker actions for moving and deleting items.
 ---@param bufnr number
 ---@param opts PickerOptions|nil
@@ -99,9 +99,8 @@ local function set_picker_actions(bufnr, opts)
         return
       end
 
-      swap_entries(entries, index, index - 1)
-      swap_entries(projectConfig.device_cache.devices, index, index - 1)
-      projectConfig.save_device_cache()
+      pickersUtils.swap_entries(entries, index, index - 1)
+      pickersUtils.reorder_device_in_cache(index, index - 1)
       M.update_results(entries)
 
       vim.defer_fn(function()
@@ -126,9 +125,8 @@ local function set_picker_actions(bufnr, opts)
         return
       end
 
-      swap_entries(entries, index, index + 1)
-      swap_entries(projectConfig.device_cache.devices, index, index + 1)
-      projectConfig.save_device_cache()
+      pickersUtils.swap_entries(entries, index, index + 1)
+      pickersUtils.reorder_device_in_cache(index, index + 1)
       M.update_results(entries)
 
       vim.defer_fn(function()
@@ -142,21 +140,13 @@ local function set_picker_actions(bufnr, opts)
   vim.keymap.set({ "n", "i" }, mappings.delete_device, function()
     if activePicker and actionState.get_selected_entry() then
       activePicker:delete_selection(function(selection)
-        local index = util.indexOfPredicate(projectConfig.device_cache.devices, function(device)
-          return device.id == selection.value.id
-        end)
-
-        table.remove(projectConfig.device_cache.devices, index)
-        projectConfig.save_device_cache()
+        pickersUtils.delete_device_from_cache(selection.value.id)
       end)
     end
   end, { buffer = bufnr })
 
   vim.keymap.set({ "n", "i" }, mappings.add_device, function()
-    local pickers = require("xcodebuild.ui.pickers")
-    pickers.select_destination(function()
-      pickers.select_destination((opts or {}).device_select_callback, false, opts)
-    end, true, { close_on_select = false, multiselect = true })
+    pickersUtils.add_device(opts)
   end, { buffer = bufnr })
 end
 
@@ -170,7 +160,6 @@ local function setup_bindings(prompt_bufnr, opts)
     local mappings = require("xcodebuild.core.config").options.device_picker.mappings
 
     vim.keymap.set({ "n", "i" }, mappings.refresh_devices, function()
-      M.start_progress()
       opts.on_refresh()
     end, { silent = true, buffer = prompt_bufnr })
   end
@@ -259,11 +248,8 @@ end
 ---Shows a multiselect picker using Telescope.nvim.
 ---@param title string
 ---@param items any[]
----@param opts PickerOptions|nil
 ---@param callback fun(result: any[])|nil
-function M.show_multiselect(title, items, opts, callback)
-  opts = opts or {}
-
+function M.show_multiselect(title, items, callback)
   activePicker = telescopePickers.new(require("telescope.themes").get_dropdown({}), {
     prompt_title = title,
     finder = telescopeFinders.new_table({
@@ -273,8 +259,6 @@ function M.show_multiselect(title, items, opts, callback)
     sorter = telescopeConfig.generic_sorter(),
     file_ignore_patterns = {},
     attach_mappings = function(prompt_bufnr, _)
-      setup_bindings(prompt_bufnr, opts)
-
       telescopeActions.select_default:replace(function()
         local selection = telescopeState.get_selected_entry()
         local results = {}
@@ -287,7 +271,7 @@ function M.show_multiselect(title, items, opts, callback)
           table.insert(results, selection.value)
         end
 
-        if opts.close_on_select and selection and selection.value ~= "[Reload Schemes]" then
+        if selection and selection.value ~= "[Reload Schemes]" then
           telescopeActions.close(prompt_bufnr)
         end
 

@@ -219,7 +219,7 @@ local function run_select_targets(title, opts, callback)
     return false
   end
 
-  pickers.show_multiselect(title, targets, callback, { close_on_select = true })
+  pickers.show_multiselect(title, targets, callback)
   return true
 end
 
@@ -365,7 +365,7 @@ local function show_target_picker(filename, targets, callback, closeCallback)
     pattern = "*",
     once = true,
     callback = function()
-      if vim.bo.filetype == "TelescopePrompt" then
+      if vim.bo.filetype == "TelescopePrompt" or vim.bo.filetype == "fzf" then
         util.call(closeCallback)
       end
     end,

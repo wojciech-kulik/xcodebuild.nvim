@@ -7,8 +7,15 @@
 
 local pickersUtils = require("xcodebuild.ui.pickers_utils")
 
----@class PickerIntegration
-local M = {}
+---@type PickerIntegration
+local M = {
+  start_progress = function() end,
+  stop_progress = function() end,
+  close = function() end,
+  update_results = function() end,
+  show = function() end,
+  show_multiselect = function() end,
+}
 
 ---Starts the progress animation.
 function M.start_progress() end
@@ -35,15 +42,13 @@ function M.show(title, items, opts, callback)
   -- mappings.refresh_devices should be configured if opts.on_refresh is provided
   -- other mappings should be configured if opts.modifiable is true
 
-  -- Don't close the picker if the selected item is '[Reload Schemes]'.
+  -- Ignore options: close_on_select, auto_select 
 end
 
 ---Shows a multiselect picker using <Provider>.
 ---@param title string
 ---@param items any[]
----@param opts PickerOptions|nil
----@param opts PickerOptions|nil
 ---@param callback fun(result: any[])|nil
-function M.show_multiselect(title, items, opts, callback) end
+function M.show_multiselect(title, items, callback) end
 
 return M

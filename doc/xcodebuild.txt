@@ -50,6 +50,7 @@ Quick Test Framework Integration ··············· |xcodebuild.inte
 xcode-build-server Integration ···· |xcodebuild.integrations.xcode-build-server|
 Xcodebuild Workaround ············· |xcodebuild.integrations.xcodebuild-offline|
 Telescope Picker ··························· |xcodebuild.integrations.telescope|
+fzf-lua Integration ·························· |xcodebuild.integrations.fzf-lua|
 Pickers ················································ |xcodebuild.ui.pickers|
 Picker Actions ·································· |xcodebuild.ui.picker_actions|
 Utils For Pickers ································ |xcodebuild.ui.pickers_utils|
@@ -189,8 +190,8 @@ M.setup({options})                                            *xcodebuild.setup*
       },
       device_picker = {
         mappings = {
-          move_up_device = "<M-y>", -- move device up in the list
-          move_down_device = "<M-e>", -- move device down in the list
+          move_up_device = "<M-y>", -- move device up in the list (only for telescope)
+          move_down_device = "<M-e>", -- move device down in the list (only for telescope)
           add_device = "<M-a>", -- add device to cache
           delete_device = "<M-d>", -- delete device from cache
           refresh_devices = "<C-r>", -- refresh devices list
@@ -219,6 +220,14 @@ M.setup({options})                                            *xcodebuild.setup*
         },
         quick = { -- integration with Swift test framework: github.com/Quick/Quick
           enabled = true, -- enable Quick tests support (requires Swift parser for nvim-treesitter)
+        },
+        telescope_nvim = {
+          enabled = true, -- enable telescope picker
+        },
+        fzf_lua = {
+          enabled = true, -- enable fzf-lua picker
+          fzf_opts = {},  -- fzf options
+          win_opts = {},  -- window options
         },
       },
       highlights = {
@@ -291,7 +300,7 @@ Requirements                                           *xcodebuild.requirements*
                                                        *xcodebuild.dependencies*
 Neovim environment
  - `Neovim 0.9.5+`
- - `telescope.nvim` to present pickers.
+ - `telescope.nvim` or `fzf-lua` to present pickers.
  - `nui.nvim` to present floating code coverage report.
  - `snacks.nvim` to show previews for SwiftUI, UIKit, and AppKit views.
  - `nvim-tree`, `neo-tree.nvim`, or `oil.nvim` to visually manage your project files.
@@ -4419,10 +4428,6 @@ Telescope Picker                             *xcodebuild.integrations.telescope*
 This module is responsible for showing pickers using Telescope.nvim.
 
 
-                           *xcodebuild.integrations.telescope.PickerIntegration*
-PickerIntegration
-
-
                               *xcodebuild.integrations.telescope.start_progress*
 M.start_progress()
   Starts the progress animation.
@@ -4457,13 +4462,62 @@ M.show({title}, {items}, {opts}, {callback})
 
 
                             *xcodebuild.integrations.telescope.show_multiselect*
-M.show_multiselect({title}, {items}, {opts}, {callback})
+M.show_multiselect({title}, {items}, {callback})
   Shows a multiselect picker using Telescope.nvim.
 
   Parameters: ~
     {title}     (string)
     {items}     (any[])
+    {callback}  (fun(result:any[])|nil)
+
+
+==============================================================================
+fzf-lua Integration                            *xcodebuild.integrations.fzf-lua*
+
+                                                    *xcodebuild.pickers.fzf-lua*
+This module is responsible for showing pickers using fzf-lua.
+
+
+                                *xcodebuild.integrations.fzf-lua.start_progress*
+M.start_progress()
+  Starts the progress animation.
+
+
+                                 *xcodebuild.integrations.fzf-lua.stop_progress*
+M.stop_progress()
+  Stops the progress animation.
+
+
+M.close()                                *xcodebuild.integrations.fzf-lua.close*
+  Closes the active picker.
+
+
+                                *xcodebuild.integrations.fzf-lua.update_results*
+M.update_results({results})
+  Updates the results of the picker and stops the animation.
+
+  Parameters: ~
+    {results}  (any[])
+
+
+                                          *xcodebuild.integrations.fzf-lua.show*
+M.show({title}, {items}, {opts}, {callback})
+  Shows a picker using fzf-lua.
+
+  Parameters: ~
+    {title}     (string)
+    {items}     (any[])
     {opts}      (PickerOptions|nil)
+    {callback}  (fun(result:{index:number,value:any},index:number)|nil)
+
+
+                              *xcodebuild.integrations.fzf-lua.show_multiselect*
+M.show_multiselect({title}, {items}, {callback})
+  Shows a multiselect picker using fzf-lua.
+
+  Parameters: ~
+    {title}     (string)
+    {items}     (any[])
     {callback}  (fun(result:any[])|nil)
 
 
@@ -4510,14 +4564,13 @@ M.show({title}, {items}, {callback}, {opts})
 
 
                                         *xcodebuild.ui.pickers.show_multiselect*
-M.show_multiselect({title}, {items}, {callback}, {opts})
+M.show_multiselect({title}, {items}, {callback})
   Shows a multiselect picker.
 
   Parameters: ~
     {title}     (string)
     {items}     (any[])
     {callback}  (fun(result:any[])|nil)
-    {opts}      (PickerOptions|nil)
 
 
                               *xcodebuild.ui.pickers.select_xcodeproj_if_needed*
@@ -4634,7 +4687,41 @@ PickerIntegration
     {close}             (fun())
     {update_results}    (fun(results:any[]))
     {show}              (fun(title:string,items:any[],opts?:PickerOptions,callback?:fun(result:{index:number,value:any},index:number)))
-    {show_multiselect}  (fun(title:string,items:any[],opts?:PickerOptions,callback?:fun(result:any[])))
+    {show_multiselect}  (fun(title:string,items:any[],callback?:fun(result:any[])))
+
+
+                                      *xcodebuild.ui.pickers_utils.swap_entries*
+M.swap_entries({entries}, {index1}, {index2})
+  Swaps two entries in a list.
+
+  Parameters: ~
+    {entries}  (any[])
+    {index1}   (number)
+    {index2}   (number)
+
+
+M.add_device({opts})                    *xcodebuild.ui.pickers_utils.add_device*
+  Shows the device addition picker.
+
+  Parameters: ~
+    {opts}  (PickerOptions|nil)
+
+
+                           *xcodebuild.ui.pickers_utils.reorder_device_in_cache*
+M.reorder_device_in_cache({oldIndex}, {newIndex})
+  Reorders a device in the cached devices list.
+
+  Parameters: ~
+    {oldIndex}  (number)
+    {newIndex}  (number)
+
+
+                          *xcodebuild.ui.pickers_utils.delete_device_from_cache*
+M.delete_device_from_cache({deviceId})
+  Deletes a device from the cached devices list by {deviceId}.
+
+  Parameters: ~
+    {deviceId}  (string|nil)
 
 
                               *xcodebuild.ui.pickers_utils.get_destination_name*

@@ -4,7 +4,7 @@
 ---@brief [[
 ---Neovim environment
 --- - `Neovim 0.9.5+`
---- - `telescope.nvim` to present pickers.
+--- - `telescope.nvim` or `fzf-lua` to present pickers.
 --- - `nui.nvim` to present floating code coverage report.
 --- - `snacks.nvim` to show previews for SwiftUI, UIKit, and AppKit views.
 --- - `nvim-tree`, `neo-tree.nvim`, or `oil.nvim` to visually manage your project files.

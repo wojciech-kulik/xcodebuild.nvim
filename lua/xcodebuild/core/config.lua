@@ -122,8 +122,8 @@ local defaults = {
   },
   device_picker = {
     mappings = {
-      move_up_device = "<M-y>", -- move device up in the list
-      move_down_device = "<M-e>", -- move device down in the list
+      move_up_device = "<M-y>", -- move device up in the list (only for telescope)
+      move_down_device = "<M-e>", -- move device down in the list (only for telescope)
       add_device = "<M-a>", -- add device to cache
       delete_device = "<M-d>", -- delete device from cache
       refresh_devices = "<C-r>", -- refresh devices list
@@ -152,6 +152,14 @@ local defaults = {
     },
     quick = { -- integration with Swift test framework: github.com/Quick/Quick
       enabled = true, -- enable Quick tests support (requires Swift parser for nvim-treesitter)
+    },
+    telescope_nvim = {
+      enabled = true, -- enable telescope picker
+    },
+    fzf_lua = {
+      enabled = true, -- enable fzf-lua picker
+      fzf_opts = {}, -- fzf options
+      win_opts = {}, -- window options
     },
   },
   highlights = {

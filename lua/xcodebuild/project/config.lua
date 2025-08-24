@@ -106,10 +106,16 @@ end
 ---Updates the device cache.
 ---@param devices XcodeDevice[]
 function M.update_device_cache(devices)
+  -- make a copy to avoid keeping reference used outside
+  local copyOfDevices = {}
+  for _, device in ipairs(devices) do
+    table.insert(copyOfDevices, device)
+  end
+
   M.device_cache = {
     scheme = M.settings.scheme,
     projectFile = M.settings.projectFile or M.settings.swiftPackage,
-    devices = devices,
+    devices = copyOfDevices,
   }
   M.save_device_cache()
 end

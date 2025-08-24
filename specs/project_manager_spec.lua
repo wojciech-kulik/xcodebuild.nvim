@@ -8,6 +8,7 @@ package.loaded["telescope.config"] = {}
 package.loaded["telescope.actions.state"] = {}
 package.loaded["telescope.actions.utils"] = {}
 package.loaded["telescope.themes"] = {}
+package.loaded["fzf-lua"] = {}
 
 local assert = require("luassert")
 local manager = require("xcodebuild.project.manager")

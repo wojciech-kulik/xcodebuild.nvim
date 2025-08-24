@@ -106,14 +106,13 @@ end
 ---@param title string
 ---@param items any[]
 ---@param callback fun(result: any[])|nil
----@param opts PickerOptions|nil
-function M.show_multiselect(title, items, callback, opts)
+function M.show_multiselect(title, items, callback)
   if currentJobId then
     vim.fn.jobstop(currentJobId)
     currentJobId = nil
   end
 
-  integration.show_multiselect(title, items, opts, callback)
+  integration.show_multiselect(title, items, callback)
 end
 
 ---Shows a picker with the available `xcodeproj` files
@@ -353,11 +352,11 @@ function M.select_testplan(callback, opts)
       integration.close()
       util.call(callback)
     else
-      update_results(testPlans)
-
       if opts.auto_select and testPlans and #testPlans == 1 then
         selectTestPlan(testPlans[1])
         integration.close()
+      else
+        update_results(testPlans)
       end
     end
   end)
@@ -382,7 +381,11 @@ function M.select_destination(callback, addMode, opts)
   local results = {}
 
   if not addMode and projectConfig.is_device_cache_valid() then
-    results = projectConfig.device_cache.devices or {}
+    -- make a copy
+    for _, device in ipairs(projectConfig.device_cache.devices or {}) do
+      table.insert(results, device)
+    end
+
     projectConfig.update_device_cache(results)
   end
 
@@ -448,7 +451,10 @@ function M.select_destination(callback, addMode, opts)
     integration.start_progress()
   end
 
-  opts.on_refresh = getConnectedDevices
+  opts.on_refresh = function()
+    integration.start_progress()
+    getConnectedDevices()
+  end
   opts.modifiable = not addMode
   opts.device_select_callback = not addMode and callback or nil
 
@@ -460,7 +466,7 @@ function M.select_destination(callback, addMode, opts)
       end
       projectConfig.update_device_cache(cache)
       util.call(callback, entry)
-    end, opts)
+    end)
   else
     M.show("Select Device", results, function(entry, _)
       projectConfig.set_destination(entry.value)
@@ -526,7 +532,31 @@ function M.show_all_actions()
 end
 
 function M.setup()
-  integration = require("xcodebuild.integrations.telescope")
+  local hasTelescope, _ = pcall(require, "telescope.pickers")
+  local hasFzfLua, _ = pcall(require, "fzf-lua")
+
+  if config.integrations.telescope_nvim.enabled and hasTelescope then
+    integration = require("xcodebuild.integrations.telescope-nvim")
+  elseif config.integrations.fzf_lua.enabled and hasFzfLua then
+    integration = require("xcodebuild.integrations.fzf-lua")
+  else
+    local showError = function()
+      notifications.send_error(
+        "No supported picker integration configured. Please install telescope.nvim or fzf-lua and enable the integration."
+      )
+    end
+
+    integration = {
+      show = showError,
+      show_multiselect = showError,
+      start_progress = function() end,
+      stop_progress = function() end,
+      update_results = function() end,
+      close = function() end,
+    }
+
+    showError()
+  end
 end
 
 return M
