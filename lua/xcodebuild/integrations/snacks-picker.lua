@@ -46,6 +46,43 @@ local function entry_maker(entry)
   return name
 end
 
+---Moves the selected item up or down in the list.
+---@param down boolean If true, move down; if false, move up.
+local function move_item(down)
+  local search = pickerRequest.picker.input.filter.pattern
+  if not search or search ~= "" then
+    -- Disable deletion when searching
+    return
+  end
+
+  local selected = pickerRequest.picker:selected({ fallback = true })
+  selected = selected and selected[1]
+
+  if not selected then
+    return
+  end
+
+  local index = util.indexOfPredicate(pickerRequest.picker.finder.items, function(it)
+    return it.item.id == selected.item.id
+  end)
+
+  if not index then
+    return
+  end
+
+  if (down and index == #pickerRequest.picker.finder.items) or (not down and index == 1) then
+    return
+  end
+
+  local offset = down and 1 or -1
+
+  pickersUtils.swap_entries(pickerRequest.picker.finder.items, index, index + offset)
+  pickersUtils.swap_entries(pickerRequest.items, index, index + offset)
+  pickersUtils.reorder_device_in_cache(index, index + offset)
+  pickerRequest.picker:update({ force = true })
+  pickerRequest.picker.list:view(index + offset)
+end
+
 ---Sets the key bindings for the picker.
 ---@param keys table<string, any>
 ---@param opts PickerOptions
@@ -105,28 +142,7 @@ local function set_bindings(keys, opts)
   if mappings.move_down_device then
     keys[mappings.move_down_device] = {
       function()
-        local search = pickerRequest.picker.input.filter.pattern
-        if not search or search ~= "" then
-          -- Disable deletion when searching
-          return
-        end
-
-        local selected = pickerRequest.picker:selected({ fallback = true })
-        selected = selected and selected[1]
-
-        if not selected then
-          return
-        end
-
-        local index = selected.idx
-        if index == #pickerRequest.items then
-          return
-        end
-
-        pickersUtils.swap_entries(pickerRequest.items, index, index + 1)
-        pickersUtils.reorder_device_in_cache(index, index + 1)
-        M.show(pickerRequest.title, pickerRequest.items, opts, pickerRequest.callback)
-        pickerRequest.picker.list:view(index + 1)
+        move_item(true)
       end,
       mode = { "n", "i" },
     }
@@ -135,28 +151,7 @@ local function set_bindings(keys, opts)
   if mappings.move_up_device then
     keys[mappings.move_up_device] = {
       function()
-        local search = pickerRequest.picker.input.filter.pattern
-        if not search or search ~= "" then
-          -- Disable deletion when searching
-          return
-        end
-
-        local selected = pickerRequest.picker:selected({ fallback = true })
-        selected = selected and selected[1]
-
-        if not selected then
-          return
-        end
-
-        local index = selected.idx
-        if index == 1 then
-          return
-        end
-
-        pickersUtils.swap_entries(pickerRequest.items, index, index - 1)
-        pickersUtils.reorder_device_in_cache(index, index - 1)
-        M.show(pickerRequest.title, pickerRequest.items, opts, pickerRequest.callback)
-        pickerRequest.picker.list:view(index - 1)
+        move_item(false)
       end,
       mode = { "n", "i" },
     }
