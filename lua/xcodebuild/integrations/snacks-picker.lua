@@ -18,6 +18,7 @@ local M = {
   update_results = function() end,
   show = function() end,
   show_multiselect = function() end,
+  show_snapshot_picker = function(_) end,
 }
 
 local pickerRequest = {
@@ -278,6 +279,27 @@ end
 ---@param callback fun(result: any[])|nil
 function M.show_multiselect(title, items, callback)
   _show(title, items, {}, true, callback)
+end
+
+--- Shows a file picker for failing snapshots with image preview.
+---@param callback fun(result: {index: number, value: any}, index: number)|nil
+function M.show_snapshot_picker(callback)
+  local appData = require("xcodebuild.project.appdata")
+  local notifications = require("xcodebuild.broadcasting.notifications")
+  local path = appData.snapshots_dir
+
+  if vim.fn.isdirectory(path) ~= 0 then
+    snacks.picker.files({
+      dirs = { path },
+      confirm = function(_, result)
+        vim.schedule(function()
+          util.call(callback, { index = result.idx, value = result.item }, result.idx)
+        end)
+      end,
+    })
+  else
+    notifications.send("No Failing Snapshots")
+  end
 end
 
 return M

@@ -486,7 +486,7 @@ function M.select_failing_snapshot_test()
     return util.get_filename(item)
   end)
 
-  M.show("Failing Snapshot Tests", filenames, function(_, index)
+  local callback = function(_, index)
     local selectedFile = failingSnapshots[index]
     vim.fn.jobstart({ "qlmanage", "-p", selectedFile }, {
       detach = true,
@@ -500,7 +500,16 @@ function M.select_failing_snapshot_test()
         util.shell("open -a qlmanage")
       end, 100)
     end
-  end)
+  end
+
+  local hasSnacks, _ = pcall(require, "snacks.picker")
+
+  if hasSnacks and config.integrations.snacks_nvim.enabled then
+    local snacksPicker = require("xcodebuild.integrations.snacks-picker")
+    snacksPicker.show_snapshot_picker(callback)
+  else
+    M.show("Failing Snapshot Tests", filenames, callback)
+  end
 end
 
 ---Shows a picker with the available actions.

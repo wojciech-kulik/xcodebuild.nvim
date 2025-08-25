@@ -156,14 +156,14 @@ local defaults = {
     telescope_nvim = {
       enabled = true, -- enable telescope picker
     },
+    snacks_nvim = {
+      enabled = true, -- enable Snacks.nvim picker
+      layout = nil, -- Snacks layout config, check Snacks docs for details
+    },
     fzf_lua = {
       enabled = true, -- enable fzf-lua picker
       fzf_opts = {}, -- fzf options
       win_opts = {}, -- window options
-    },
-    snacks_nvim = {
-      enabled = true, -- enable Snacks.nvim picker
-      layout = nil, -- Snacks layout config, check Snacks docs for details
     },
   },
   highlights = {

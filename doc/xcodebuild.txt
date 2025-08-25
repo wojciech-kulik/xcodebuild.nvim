@@ -225,14 +225,14 @@ M.setup({options})                                            *xcodebuild.setup*
         telescope_nvim = {
           enabled = true, -- enable telescope picker
         },
+        snacks_nvim = {
+          enabled = true, -- enable Snacks.nvim picker
+          layout = nil,   -- Snacks layout config, check Snacks docs for details
+        },
         fzf_lua = {
           enabled = true, -- enable fzf-lua picker
           fzf_opts = {},  -- fzf options
           win_opts = {},  -- window options
-        },
-        snacks_nvim = {
-          enabled = true, -- enable Snacks.nvim picker
-          layout = nil,   -- Snacks layout config, check Snacks docs for details
         },
       },
       highlights = {
@@ -4575,6 +4575,14 @@ M.show_multiselect({title}, {items}, {callback})
     {title}     (string)
     {items}     (any[])
     {callback}  (fun(result:any[])|nil)
+
+
+                    *xcodebuild.integrations.snacks-picker.show_snapshot_picker*
+M.show_snapshot_picker({callback})
+   Shows a file picker for failing snapshots with image preview.
+
+  Parameters: ~
+    {callback}  (fun(result:{index:number,value:any},index:number)|nil)
 
 
 ==============================================================================
