@@ -2,12 +2,12 @@
   "workspace.library": [
     "${3rd}/luv/library",
     "${3rd}/luassert/library",
+    "${3rd}/busted/library",
     "~/.local/share/nvim/lazy/snacks.nvim/lua",
     "/home/runner/work/xcodebuild.nvim/xcodebuild.nvim/.ci/snacks.nvim/lua/snacks",
     "${env:VIMRUNTIME}",
     "${env:VR}"
   ],
-  "runtime.path": ["lua"],
   "workspace.checkThirdParty": false,
   "diagnostics.libraryFiles": "Disable",
   "diagnostics.globals": [

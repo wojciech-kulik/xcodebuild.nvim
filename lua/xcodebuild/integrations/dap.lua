@@ -681,7 +681,6 @@ function M.setup(codelldbPath, loadBreakpoints, lldbPath)
   end
 
   local orig_notify = require("dap.utils").notify
-  ---@diagnostic disable-next-line: duplicate-set-field
   require("dap.utils").notify = function(msg, log_level)
     if not string.find(msg, "Either the adapter is slow", 1, true) then
       orig_notify(msg, log_level)

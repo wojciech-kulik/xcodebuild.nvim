@@ -111,7 +111,6 @@ end
 ---Shows notifications with the progress message.
 ---@param message string the message to show
 local function update_progress(message)
-  ---@diagnostic disable-next-line: inject-field
   vim.g.xcodebuild_last_status = message
 
   if config.show_notifications then
