@@ -35,6 +35,7 @@ function M.setup()
 
   M.install("nvim-lua/plenary.nvim")
   M.install("nvim-treesitter/nvim-treesitter")
+  M.install("folke/snacks.nvim")
 
   vim.cmd([[packadd plenary.nvim]])
   vim.cmd([[packadd nvim-treesitter]])

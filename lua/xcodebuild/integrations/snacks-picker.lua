@@ -5,8 +5,6 @@
 ---
 ---@brief ]]
 
----@diagnostic disable: undefined-field
-
 local util = require("xcodebuild.util")
 local pickersUtils = require("xcodebuild.ui.pickers_utils")
 local snacks = require("snacks")
@@ -24,6 +22,7 @@ local M = {
 
 local pickerRequest = {
   title = "",
+  ---@type snacks.Picker
   picker = nil,
   items = {},
   multiselect = false,

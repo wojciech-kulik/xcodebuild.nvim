@@ -4860,6 +4860,16 @@ M.buf_set_option({bufnr}, {name}, {value})
     {value}  (any)
 
 
+M.buf_get_option({bufnr}, {name})            *xcodebuild.helpers.buf_get_option*
+
+  Parameters: ~
+    {bufnr}  (number)
+    {name}   (string)
+
+  Returns: ~
+    (any)
+
+
                                              *xcodebuild.helpers.win_set_option*
 M.win_set_option({winnr}, {name}, {value})
   Wraps any nvim_win_set_option() call to ensure forward compatibility.

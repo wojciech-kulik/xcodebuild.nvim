@@ -146,7 +146,7 @@ end
 ---@return number|nil
 function M.get_buf_by_filetype(filetype)
   for _, buf in ipairs(vim.api.nvim_list_bufs()) do
-    if vim.api.nvim_buf_get_option(buf, "filetype") == filetype then
+    if require("xcodebuild.helpers").buf_get_option(buf, "filetype") == filetype then
       return buf
     end
   end

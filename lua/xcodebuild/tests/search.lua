@@ -45,6 +45,7 @@ local function lsp_search(targetName, className)
   if vim.fn.has("nvim-0.10") == 1 then
     sourcekitClients = vim.lsp.get_clients({ name = config.lsp_client })
   else
+    ---@diagnostic disable-next-line: deprecated
     sourcekitClients = vim.lsp.get_active_clients({ name = config.lsp_client })
   end
 
