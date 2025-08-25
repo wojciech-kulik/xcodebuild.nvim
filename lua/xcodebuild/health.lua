@@ -74,6 +74,12 @@ local plugins = {
     info = "(One picker plugin is required to interact with the plugin)",
   },
   {
+    name = "snacks.nvim",
+    lib = "snacks",
+    optional = true,
+    info = "(Optional to use as a picker or show previews for SwiftUI, UIKit, and AppKit views)",
+  },
+  {
     name = "nui.nvim",
     lib = "nui.popup",
     optional = false,
@@ -96,12 +102,6 @@ local plugins = {
     lib = "oil",
     optional = true,
     info = "(Optional to visually manage project files)",
-  },
-  {
-    name = "snacks.nvim",
-    lib = "snacks",
-    optional = true,
-    info = "(Optional to show previews for SwiftUI, UIKit, and AppKit views)",
   },
   {
     name = "nvim-dap",

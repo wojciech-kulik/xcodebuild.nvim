@@ -206,8 +206,8 @@ end
 ---  },
 ---  device_picker = {
 ---    mappings = {
----      move_up_device = "<M-y>", -- move device up in the list (only for telescope)
----      move_down_device = "<M-e>", -- move device down in the list (only for telescope)
+---      move_up_device = "<M-y>", -- move device up in the list
+---      move_down_device = "<M-e>", -- move device down in the list
 ---      add_device = "<M-a>", -- add device to cache
 ---      delete_device = "<M-d>", -- delete device from cache
 ---      refresh_devices = "<C-r>", -- refresh devices list
@@ -244,6 +244,10 @@ end
 ---      enabled = true, -- enable fzf-lua picker
 ---      fzf_opts = {},  -- fzf options
 ---      win_opts = {},  -- window options
+---    },
+---    snacks_nvim = {
+---      enabled = true, -- enable Snacks.nvim picker
+---      layout = nil,   -- Snacks layout config, check Snacks docs for details
 ---    },
 ---  },
 ---  highlights = {

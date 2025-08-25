@@ -51,6 +51,7 @@ xcode-build-server Integration ···· |xcodebuild.integrations.xcode-build-ser
 Xcodebuild Workaround ············· |xcodebuild.integrations.xcodebuild-offline|
 Telescope Picker ··························· |xcodebuild.integrations.telescope|
 fzf-lua Integration ·························· |xcodebuild.integrations.fzf-lua|
+Snacks Picker Integration ·············· |xcodebuild.integrations.snacks-picker|
 Pickers ················································ |xcodebuild.ui.pickers|
 Picker Actions ·································· |xcodebuild.ui.picker_actions|
 Utils For Pickers ································ |xcodebuild.ui.pickers_utils|
@@ -190,8 +191,8 @@ M.setup({options})                                            *xcodebuild.setup*
       },
       device_picker = {
         mappings = {
-          move_up_device = "<M-y>", -- move device up in the list (only for telescope)
-          move_down_device = "<M-e>", -- move device down in the list (only for telescope)
+          move_up_device = "<M-y>", -- move device up in the list
+          move_down_device = "<M-e>", -- move device down in the list
           add_device = "<M-a>", -- add device to cache
           delete_device = "<M-d>", -- delete device from cache
           refresh_devices = "<C-r>", -- refresh devices list
@@ -228,6 +229,10 @@ M.setup({options})                                            *xcodebuild.setup*
           enabled = true, -- enable fzf-lua picker
           fzf_opts = {},  -- fzf options
           win_opts = {},  -- window options
+        },
+        snacks_nvim = {
+          enabled = true, -- enable Snacks.nvim picker
+          layout = nil,   -- Snacks layout config, check Snacks docs for details
         },
       },
       highlights = {
@@ -300,7 +305,7 @@ Requirements                                           *xcodebuild.requirements*
                                                        *xcodebuild.dependencies*
 Neovim environment
  - `Neovim 0.9.5+`
- - `telescope.nvim` or `fzf-lua` to present pickers.
+ - `telescope.nvim`, `fzf-lua`, or `snacks.nvim` to present pickers.
  - `nui.nvim` to present floating code coverage report.
  - `snacks.nvim` to show previews for SwiftUI, UIKit, and AppKit views.
  - `nvim-tree`, `neo-tree.nvim`, or `oil.nvim` to visually manage your project files.
@@ -4514,6 +4519,57 @@ M.show({title}, {items}, {opts}, {callback})
                               *xcodebuild.integrations.fzf-lua.show_multiselect*
 M.show_multiselect({title}, {items}, {callback})
   Shows a multiselect picker using fzf-lua.
+
+  Parameters: ~
+    {title}     (string)
+    {items}     (any[])
+    {callback}  (fun(result:any[])|nil)
+
+
+==============================================================================
+Snacks Picker Integration                *xcodebuild.integrations.snacks-picker*
+
+                                                     *xcodebuild.pickers.snacks*
+This module is responsible for showing pickers using Snacks.nvim.
+
+
+                          *xcodebuild.integrations.snacks-picker.start_progress*
+M.start_progress()
+  Starts the progress animation.
+
+
+                           *xcodebuild.integrations.snacks-picker.stop_progress*
+M.stop_progress()
+  Stops the progress animation.
+
+
+                                   *xcodebuild.integrations.snacks-picker.close*
+M.close()
+  Closes the active picker.
+
+
+                          *xcodebuild.integrations.snacks-picker.update_results*
+M.update_results({results})
+  Updates the results of the picker and stops the animation.
+
+  Parameters: ~
+    {results}  (any[])
+
+
+                                    *xcodebuild.integrations.snacks-picker.show*
+M.show({title}, {items}, {opts}, {callback})
+  Shows a picker using Snacks.nvim.
+
+  Parameters: ~
+    {title}     (string)
+    {items}     (any[])
+    {opts}      (PickerOptions|nil)
+    {callback}  (fun(result:{index:number,value:any},index:number)|nil)
+
+
+                        *xcodebuild.integrations.snacks-picker.show_multiselect*
+M.show_multiselect({title}, {items}, {callback})
+  Shows a multiselect picker using Snacks.nvim.
 
   Parameters: ~
     {title}     (string)

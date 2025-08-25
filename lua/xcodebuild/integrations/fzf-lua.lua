@@ -104,7 +104,7 @@ local function set_bindings(actions, opts)
     actions[map_shortcut(mappings.move_up_device)] = {
       function()
         notifications.send_warning(
-          "This feature is supported only in telescope.nvim. Please edit devices.json manually."
+          "This feature is supported only by telescope.nvim and snacks.nvim. Please edit devices.json manually."
         )
       end,
       fzf.actions.resume,
@@ -115,7 +115,7 @@ local function set_bindings(actions, opts)
     actions[map_shortcut(mappings.move_down_device)] = {
       function()
         notifications.send_warning(
-          "This feature is supported only in telescope.nvim. Please edit devices.json manually."
+          "This feature is supported only by telescope.nvim and snacks.nvim. Please edit devices.json manually."
         )
       end,
       fzf.actions.resume,

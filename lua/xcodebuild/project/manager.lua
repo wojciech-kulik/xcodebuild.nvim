@@ -365,7 +365,11 @@ local function show_target_picker(filename, targets, callback, closeCallback)
     pattern = "*",
     once = true,
     callback = function()
-      if vim.bo.filetype == "TelescopePrompt" or vim.bo.filetype == "fzf" then
+      if
+        vim.bo.filetype == "TelescopePrompt"
+        or vim.bo.filetype == "fzf"
+        or vim.bo.filetype == "snacks_picker_input"
+      then
         util.call(closeCallback)
       end
     end,
