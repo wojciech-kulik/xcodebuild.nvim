@@ -7,12 +7,16 @@
 DIR_SRC="lua"
 DIR_OUT="scripts/luals-out"
 
+# Check runtime path
+VR=$(nvim --headless --clean -c 'echo $VIMRUNTIME' -c 'qa!' 2>&1)
+echo "Neovim Runtime: $VR"
+
 # clear output
 rm -rf "${DIR_OUT}"
 mkdir "${DIR_OUT}"
 
 # execute inside lua to prevent luals itself from being checked
-OUT=$(lua-language-server --check="${DIR_SRC}" --configpath="${PWD}/.luarc.json" --checklevel=Information --logpath="${DIR_OUT}" --loglevel=error)
+OUT=$(VR="$VR" lua-language-server --check="${DIR_SRC}" --configpath="${PWD}/.luarc.json" --checklevel=Information --logpath="${DIR_OUT}" --loglevel=error)
 RC=$?
 
 echo "${OUT}" >&2

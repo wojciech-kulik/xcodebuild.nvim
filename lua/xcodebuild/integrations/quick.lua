@@ -45,6 +45,10 @@ local cachedSwiftParserResult = nil
 local function parse_test_file(bufnr)
   local result = {}
   local tree = ts.get_parser(bufnr, "swift"):parse()
+  if not tree then
+    return result
+  end
+
   local root = tree[1]:root()
 
   local quickQueries = ts.query.parse(
@@ -248,6 +252,10 @@ function M.contains_quick_tests(bufnr)
   end
 
   local tree = ts.get_parser(bufnr, "swift"):parse()
+  if not tree then
+    return false
+  end
+
   local root = tree[1]:root()
 
   local testClassQuery = ts.query.parse(

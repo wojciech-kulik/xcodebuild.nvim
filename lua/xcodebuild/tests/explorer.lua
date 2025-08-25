@@ -100,6 +100,28 @@ local line_to_test = {}
 ---@type IdToTestNode[]
 local id_to_test = {}
 
+--- @param buffer integer
+--- @param ns_id integer
+--- @param hl_group string
+--- @param line integer
+--- @param col_start integer
+--- @param col_end integer
+local function nvim_buf_add_highlight(buffer, ns_id, hl_group, line, col_start, col_end)
+  if vim.fn.has("nvim-0.10") == 1 then
+    vim.hl.range(
+      buffer,
+      ns_id,
+      hl_group,
+      { line, col_start },
+      { line, col_end },
+      { priority = vim.hl.priorities.treesitter }
+    )
+  else
+    ---@diagnostic disable-next-line: deprecated
+    vim.api.nvim_buf_add_highlight(buffer, ns_id, hl_group, line, col_start, col_end)
+  end
+end
+
 ---@param text string|nil
 ---@param number number|nil
 ---@return string|nil
@@ -140,7 +162,7 @@ local function show_notests_message()
   end)
 
   for i = 4, 10 do
-    vim.api.nvim_buf_add_highlight(M.bufnr, ns, "Comment", i - 1, 0, -1)
+    nvim_buf_add_highlight(M.bufnr, ns, "Comment", i - 1, 0, -1)
   end
 
   is_notests_message_visible = true
@@ -416,7 +438,7 @@ local function update_test_line(testData, row)
   vim.api.nvim_buf_set_lines(M.bufnr, row - 1, row, false, { text })
 
   for _, hl in ipairs(hls) do
-    vim.api.nvim_buf_add_highlight(M.bufnr, ns, hl.group, row - 1, hl.col_start, hl.col_end)
+    nvim_buf_add_highlight(M.bufnr, ns, hl.group, row - 1, hl.col_start, hl.col_end)
   end
 end
 
@@ -523,7 +545,7 @@ local function refresh_explorer(dontUpdateBuffer)
   end)
 
   for _, highlight in ipairs(highlights) do
-    vim.api.nvim_buf_add_highlight(
+    nvim_buf_add_highlight(
       M.bufnr,
       ns,
       highlight.group,
@@ -1119,13 +1141,13 @@ function M.show_help()
     end,
   })
 
-  vim.api.nvim_buf_add_highlight(buf, -1, "XcodebuildTestExplorerTarget", 0, 0, -1)
+  nvim_buf_add_highlight(buf, -1, "XcodebuildTestExplorerTarget", 0, 0, -1)
   for i = 2, 10 do
-    vim.api.nvim_buf_add_highlight(buf, -1, "XcodebuildTestExplorerTest", i, 0, 2)
+    nvim_buf_add_highlight(buf, -1, "XcodebuildTestExplorerTest", i, 0, 2)
   end
-  vim.api.nvim_buf_add_highlight(buf, -1, "XcodebuildTestExplorerTest", 12, 0, 4)
-  vim.api.nvim_buf_add_highlight(buf, -1, "XcodebuildTestExplorerTest", 13, 0, 5)
-  vim.api.nvim_buf_add_highlight(buf, -1, "XcodebuildTestExplorerTest", 15, 6, 7)
+  nvim_buf_add_highlight(buf, -1, "XcodebuildTestExplorerTest", 12, 0, 4)
+  nvim_buf_add_highlight(buf, -1, "XcodebuildTestExplorerTest", 13, 0, 5)
+  nvim_buf_add_highlight(buf, -1, "XcodebuildTestExplorerTest", 15, 6, 7)
 
   local width = vim.api.nvim_win_get_width(0)
   local opts = {

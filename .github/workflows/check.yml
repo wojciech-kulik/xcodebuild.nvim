@@ -40,13 +40,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - name: Install
         run: |
           eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
           brew install lua-language-server
+
+      - name: Install Neovim
+        uses: rhysd/action-setup-vim@v1
+        with:
+          neovim: true
+          version: stable
+
       - name: Check
         run: |
           eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+          git clone --depth=1 https://github.com/folke/snacks.nvim.git ./.ci/snacks.nvim
           make lsp-check
 
   help-check:

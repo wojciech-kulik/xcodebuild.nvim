@@ -180,7 +180,20 @@ function M.buf_set_option(bufnr, name, value)
   if vim.fn.has("nvim-0.10") == 1 then
     vim.api.nvim_set_option_value(name, value, { buf = bufnr })
   else
+    ---@diagnostic disable-next-line: deprecated
     vim.api.nvim_buf_set_option(bufnr, name, value)
+  end
+end
+
+---@param bufnr number
+---@param name string
+---@return any
+function M.buf_get_option(bufnr, name)
+  if vim.fn.has("nvim-0.10") == 1 then
+    vim.api.nvim_get_option_value(name, { buf = bufnr })
+  else
+    ---@diagnostic disable-next-line: deprecated
+    vim.api.nvim_buf_get_option(bufnr, name)
   end
 end
 
@@ -193,6 +206,7 @@ function M.win_set_option(winnr, name, value)
   if vim.fn.has("nvim-0.10") == 1 then
     vim.api.nvim_set_option_value(name, value, { win = winnr })
   else
+    ---@diagnostic disable-next-line: deprecated
     vim.api.nvim_win_set_option(winnr, name, value)
   end
 end

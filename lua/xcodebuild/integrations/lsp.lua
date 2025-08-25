@@ -55,8 +55,8 @@ function M.restart_sourcekit_lsp()
     ---@diagnostic disable-next-line: undefined-field
     clientId = client and client.name
   else
+    ---@diagnostic disable-next-line: deprecated
     local client = vim.lsp.get_active_clients({ name = "sourcekit" })[1]
-    ---@diagnostic disable-next-line: undefined-field
     clientId = client and client.id and tostring(client.id)
   end
 
