@@ -302,14 +302,12 @@ function M.setup(options)
   -- Previews
   vim.api.nvim_create_user_command("XcodebuildPreviewGenerate",
     function(opts)
-        ---@diagnostic disable-next-line: undefined-field
         actions.previews_generate(opts.fargs[1] == "hotReload")
     end,
     { nargs = "?", complete = function() return { "hotReload" } end }
   )
   vim.api.nvim_create_user_command("XcodebuildPreviewGenerateAndShow",
     function(opts)
-        ---@diagnostic disable-next-line: undefined-field
         actions.previews_generate_and_show(opts.fargs[1] == "hotReload")
     end,
     { nargs = "?", complete = function() return { "hotReload" } end }

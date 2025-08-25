@@ -58,7 +58,6 @@ local function lsp_search(targetName, className)
   local bufnr = 0
 
   if vim.bo.filetype ~= "swift" then
-    ---@diagnostic disable-next-line: undefined-field
     local sourcekitId = sourcekitClients[1].id
     bufnr = vim.lsp.get_buffers_by_client_id(sourcekitId)[1] or 0
   end

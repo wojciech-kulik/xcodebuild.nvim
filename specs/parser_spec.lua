@@ -18,7 +18,6 @@ local mockSwiftFiles = function()
     return "/Users/john/repositories/calendar-app-ios"
   end
 
-  ---@diagnostic disable-next-line: duplicate-set-field
   require("xcodebuild.core.xcode").get_targets_filemap = function(_)
     return {
       ["ShortcutRecorderCrashTests"] = {
@@ -43,7 +42,6 @@ local mockSwiftFiles = function()
     }
   end
 
-  ---@diagnostic disable-next-line: duplicate-set-field
   require("xcodebuild.tests.search").find_filepath_by_filename = function(filename)
     if filename == "CliClientTests.swift" then
       return "/Users/john/repo/something/Tests/CliClientTests.swift"

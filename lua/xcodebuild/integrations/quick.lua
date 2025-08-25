@@ -106,6 +106,7 @@ local function parse_test_file(bufnr)
         local currentMatch = match[i]
 
         if currentMatch and capture ~= "quick-func" then
+          ---@diagnostic disable-next-line: undefined-field
           local startRow, _, endRow, _ = currentMatch:range()
           table.insert(capturedNodes, {
             id = capture,
