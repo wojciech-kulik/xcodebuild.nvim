@@ -1141,13 +1141,14 @@ function M.show_help()
     end,
   })
 
-  nvim_buf_add_highlight(buf, -1, "XcodebuildTestExplorerTarget", 0, 0, -1)
+  local help_ns = vim.api.nvim_create_namespace("XcodebuildTestExplorerHelp")
+  nvim_buf_add_highlight(buf, help_ns, "XcodebuildTestExplorerTarget", 0, 0, -1)
   for i = 2, 10 do
-    nvim_buf_add_highlight(buf, -1, "XcodebuildTestExplorerTest", i, 0, 2)
+    nvim_buf_add_highlight(buf, help_ns, "XcodebuildTestExplorerTest", i, 0, 2)
   end
-  nvim_buf_add_highlight(buf, -1, "XcodebuildTestExplorerTest", 12, 0, 4)
-  nvim_buf_add_highlight(buf, -1, "XcodebuildTestExplorerTest", 13, 0, 5)
-  nvim_buf_add_highlight(buf, -1, "XcodebuildTestExplorerTest", 15, 6, 7)
+  nvim_buf_add_highlight(buf, help_ns, "XcodebuildTestExplorerTest", 12, 0, 4)
+  nvim_buf_add_highlight(buf, help_ns, "XcodebuildTestExplorerTest", 13, 0, 5)
+  nvim_buf_add_highlight(buf, help_ns, "XcodebuildTestExplorerTest", 15, 6, 7)
 
   local width = vim.api.nvim_win_get_width(0)
   local opts = {
