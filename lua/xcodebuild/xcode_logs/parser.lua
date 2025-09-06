@@ -95,6 +95,7 @@ local lineData = {}
 local lastTest = nil
 local lastErrorTest = {}
 local testSuite = nil
+local buildPhaseName = nil
 
 -- report fields
 local testsCount = 0
@@ -357,6 +358,31 @@ local function parse_build_error(line)
 end
 
 ---@param line string
+---@see ParsedBuildGenericError
+local function parse_build_phase_error(line)
+  lineType = BUILD_ERROR
+  lineData = {
+    message = {
+      "Build phase '" .. (buildPhaseName or "Unknown") .. "' failed:",
+      line,
+    },
+  }
+
+  debug_print("detected_build_phase_error", lineData)
+end
+
+---@param line string
+---@see ParsedBuildGenericError
+local function parse_general_build_failure(line)
+  lineType = BUILD_ERROR
+  lineData = {
+    message = { line },
+  }
+
+  debug_print("detected_general_build_failure", lineData)
+end
+
+---@param line string
 ---@see ParsedTest
 ---@see ParsedTestError
 local function parse_test_error(line)
@@ -608,11 +634,22 @@ local function process_line(line)
     elseif testsCount == 0 and lineType == BEGIN then
       parse_build_error(line)
     end
+  elseif string.find(line, "PhaseScriptExecution failed") then
+    flush()
+    parse_build_phase_error(line)
+    flush()
+    buildPhaseName = nil
   elseif string.find(line, "warning:") then
     flush()
     parse_warning(line)
   elseif string.find(line, "%s*~*%^~*%s*") then
     flush(line)
+  elseif string.find(line, "^PhaseScriptExecution") then
+    buildPhaseName = string.match(line, "^PhaseScriptExecution ([^/]+) /")
+    buildPhaseName = buildPhaseName and buildPhaseName:gsub("\\", "")
+  elseif string.find(line, "** BUILD FAILED **") and util.is_empty(buildErrors) then
+    parse_general_build_failure(line)
+    flush()
   elseif string.find(line, "^%s*$") then
     -- test errors can contain multiple lines with empty lines
     -- we'll flush when we encounter finished test line.

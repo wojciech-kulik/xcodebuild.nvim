@@ -1,0 +1,13 @@
+{
+  buildErrors = { {
+      message = { "** BUILD FAILED **" }
+    } },
+  buildWarnings = {},
+  failedTestsCount = 0,
+  output = {},
+  testErrors = {},
+  tests = {},
+  testsCount = 0,
+  usesSwiftTesting = false,
+  xcresultFilepath = "/Users/john/repositories/SwiftUI-Redux-Demo/.nvim/xcodebuild/build.xcresult"
+}

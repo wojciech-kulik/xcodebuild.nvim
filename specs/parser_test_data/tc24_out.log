@@ -1,0 +1,13 @@
+{
+  buildErrors = { {
+      message = { "Build phase 'MY CUSTOM PHASE' failed:", "Command PhaseScriptExecution failed with a nonzero exit code" }
+    } },
+  buildWarnings = {},
+  failedTestsCount = 0,
+  output = {},
+  testErrors = {},
+  tests = {},
+  testsCount = 0,
+  usesSwiftTesting = false,
+  xcresultFilepath = "/Users/john/repositories/SwiftUI-Redux-Demo/.nvim/xcodebuild/build.xcresult"
+}

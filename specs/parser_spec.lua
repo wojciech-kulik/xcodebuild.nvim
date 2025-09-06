@@ -235,6 +235,20 @@ describe("ENSURE parse_logs", function()
         assert.are.same(expectedResult, result)
       end)
     end)
+
+    describe("because of build phase failure", function()
+      it("THEN should set build errors", function()
+        local expectedResult, result = runTestCase(24)
+        assert.are.same(expectedResult, result)
+      end)
+    end)
+
+    describe("because of BUILD FAILED detection", function()
+      it("THEN should set build error", function()
+        local expectedResult, result = runTestCase(25)
+        assert.are.same(expectedResult, result)
+      end)
+    end)
   end)
 
   --
