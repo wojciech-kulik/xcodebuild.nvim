@@ -109,7 +109,17 @@ local usesSwiftTesting = false
 local xcresultFilepath = nil
 
 -- patterns
-local swiftFilePattern = "[^:]+%.swift"
+local filePattern = "[^:]+%.#ALT#"
+local allExtensions = {
+  "swift",
+  "cpp",
+  "c",
+  "h",
+  "m",
+  "mm",
+  "storyboard",
+  "xib",
+}
 local xcTestLogPattern = "%s+[%w_]+%[%d+:%d+%]"
 
 local DEBUG = false
@@ -121,6 +131,32 @@ local function debug_print(name, value)
   if DEBUG then
     print(name .. ":", vim.inspect(value))
   end
+end
+
+---Tries to match the string against a list of patterns created by substituting
+---the give {alternatives} into the {pattern}.
+---@param str string
+---@param pattern string A pattern with a single '#ALT#' where the alternative should be placed.
+---@param alternatives string[] A list of alternatives to substitute into the pattern.
+---@return ...any
+local function match_any(str, pattern, alternatives)
+  for _, alternative in ipairs(alternatives) do
+    local patternWithParam = pattern:gsub("#ALT#", alternative)
+
+    if string.find(str, patternWithParam) then
+      return string.match(str, patternWithParam)
+    end
+  end
+end
+
+---Tries to find the string against a list of patterns created by substituting
+---the give {alternatives} into the {pattern}.
+---@param str string
+---@param pattern string A pattern with a single '#ALT#' where the alternative should be placed.
+---@param alternatives string[] A list of alternatives to substitute into the pattern.
+---@return boolean
+local function find_any(str, pattern, alternatives)
+  return match_any(str, pattern, alternatives) ~= nil
 end
 
 ---Sends test data to the report results.
@@ -328,9 +364,9 @@ local function parse_build_error(line)
     return
   end
 
-  if string.find(line, swiftFilePattern .. ":%d+:%d*:? %w*%s*error: .*") then
+  if find_any(line, filePattern .. ":%d+:%d*:? %w*%s*error: .*", allExtensions) then
     local filepath, lineNumber, colNumber, message =
-      string.match(line, "(" .. swiftFilePattern .. "):(%d+):(%d*):? %w*%s*error: (.*)")
+      match_any(line, "(" .. filePattern .. "):(%d+):(%d*):? %w*%s*error: (.*)", allExtensions)
     if filepath and message then
       lineType = BUILD_ERROR
       lineData = {
@@ -391,20 +427,20 @@ local function parse_test_error(line)
   end
 
   local filepath, lineNumber, message =
-    string.match(line, "(" .. swiftFilePattern .. "):(%d+):%d*:? %w*%s*error: (.*)")
+    match_any(line, "(" .. filePattern .. "):(%d+):%d*:? %w*%s*error: (.*)", allExtensions)
   local filename = filepath and util.get_filename(filepath)
   lineData.filepath = lineData.filepath or filepath
 
   if string.find(line, "recorded an issue at") then
     filename, lineNumber, message =
-      string.match(line, "recorded an issue at (" .. swiftFilePattern .. "):(%d+):%d+: (.*)")
+      match_any(line, "recorded an issue at (" .. filePattern .. "):(%d+):%d+: (.*)", allExtensions)
     filepath = testSearch.find_filepath_by_filename(filename)
 
     lineData.filename = filename
     lineData.filepath = filepath
   elseif string.find(line, "recorded an issue") then
     filename, lineNumber, message =
-      string.match(line, " at (" .. swiftFilePattern .. "):(%d+):%d+: Caught error: (.*)")
+      match_any(line, " at (" .. filePattern .. "):(%d+):%d+: Caught error: (.*)", allExtensions)
     filepath = testSearch.find_filepath_by_filename(filename)
 
     lineData.filename = filename
@@ -452,7 +488,7 @@ local function parse_warning(line)
   end
 
   local filepath, lineNumber, columnNumber, message =
-    string.match(line, "(" .. swiftFilePattern .. "):(%d+):(%d*):? %w*%s*warning: (.*)")
+    match_any(line, "(" .. filePattern .. "):(%d+):(%d*):? %w*%s*warning: (.*)", allExtensions)
 
   if filepath and message and util.has_prefix(filepath, vim.fn.getcwd()) then
     lineType = BUILD_WARNING

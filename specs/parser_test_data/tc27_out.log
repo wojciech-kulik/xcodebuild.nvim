@@ -1,0 +1,16 @@
+{
+  buildErrors = { {
+      columnNumber = 23,
+      filename = "splatLoader",
+      filepath = "/Users/john/Git/Wyrd/splat-ply/splatLoader.cpp",
+      lineNumber = 55,
+      message = { "expected ';' after return statement", "   55 |         return nullptr", "      |                       ^" }
+    } },
+  buildWarnings = {},
+  failedTestsCount = 0,
+  output = {},
+  testErrors = {},
+  tests = {},
+  testsCount = 0,
+  usesSwiftTesting = false
+}

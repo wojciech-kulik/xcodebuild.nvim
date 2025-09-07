@@ -339,4 +339,20 @@ describe("ENSURE parse_logs", function()
       assert.are.same(expectedResult, result)
     end)
   end)
+
+  --
+  -- Other than swift extensions
+  --
+  describe("WHEN the project contains warnings from other than swift files", function()
+    it("THEN should parse them correctly", function()
+      local expectedResult, result = runTestCase(26)
+      assert.are.same(expectedResult, result)
+    end)
+  end)
+  describe("WHEN the project contains errors from cpp files", function()
+    it("THEN should parse them correctly", function()
+      local expectedResult, result = runTestCase(27)
+      assert.are.same(expectedResult, result)
+    end)
+  end)
 end)
