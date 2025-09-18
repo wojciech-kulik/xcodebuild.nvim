@@ -40,10 +40,18 @@ end
 ---Opens the project in Xcode.
 function M.open_in_xcode()
   if helpers.validate_project() then
+    local xcodePath = vim.fn.system({ "xcode-select", "-p" })
+
+    if xcodePath and xcodePath ~= "" then
+      xcodePath = xcodePath:gsub("/Contents/Developer", ""):gsub("\n", "")
+    else
+      xcodePath = "Xcode"
+    end
+
     vim.fn.system({
       "open",
       "-a",
-      "Xcode",
+      xcodePath,
       projectConfig.settings.projectFile or projectConfig.settings.swiftPackage,
     })
   end
