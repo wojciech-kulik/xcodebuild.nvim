@@ -329,6 +329,10 @@ end
 ---@param packageIdentity string
 ---@return string|nil
 local function find_package_checkout_dir(packageIdentity)
+  if not packageIdentity then
+    return nil
+  end
+
   local derivedDataPath = find_project_derived_data()
   if not derivedDataPath then
     return nil

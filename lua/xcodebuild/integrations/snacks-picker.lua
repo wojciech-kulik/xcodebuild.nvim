@@ -302,41 +302,81 @@ local function create_macro_preview(items)
     return nil
   end
 
-  return function(item)
-    if not item or not item.item then
-      return {}
+  ---@param ctx snacks.picker.preview.ctx
+  return function(ctx)
+    if not ctx or not ctx.item then
+      return false
+    end
+
+    -- Handle both wrapped and direct item structures
+    local macro_item = ctx.item.item or ctx.item
+
+    -- Validate macro item has required fields
+    if type(macro_item) ~= "table" or not macro_item.packageIdentity or not macro_item.targetName then
+      ctx.preview:reset()
+      ctx.preview:set_lines({
+        "⚠️  Invalid macro item structure",
+        "",
+        "Missing packageIdentity or targetName",
+      })
+      return true
     end
 
     local macros = require("xcodebuild.platform.macros")
-    local files = macros.find_macro_source_files(item.item.packageIdentity, item.item.targetName)
+    local files = macros.find_macro_source_files(macro_item.packageIdentity, macro_item.targetName)
 
     if not files or #files == 0 then
       local lines = {
         "⚠️  Macro source files not available",
         "",
-        "Package: " .. item.item.packageIdentity,
-        "Target: " .. item.item.targetName,
+        "Package: " .. macro_item.packageIdentity,
+        "Target: " .. macro_item.targetName,
         "",
         "DerivedData not found or package not checked out.",
         "Try building the project first.",
       }
 
-      if item.item.message and item.item.message ~= "" then
+      if macro_item.message and macro_item.message ~= "" then
         table.insert(lines, "")
         table.insert(lines, "Error Message:")
         table.insert(
           lines,
           "─────────────────────────────────────"
         )
-        for _, line in ipairs(vim.split(item.item.message, "\n", { plain = true })) do
+        for _, line in ipairs(vim.split(macro_item.message, "\n", { plain = true })) do
           table.insert(lines, line)
         end
       end
 
-      return lines
+      ctx.preview:reset()
+      ctx.preview:set_lines(lines)
+      return true
     end
 
-    return { file = files[1], ft = "swift" }
+    -- Read the Swift file and display it
+    local file_path = files[1]
+    local ok, file_lines = pcall(vim.fn.readfile, file_path)
+
+    if not ok or not file_lines then
+      ctx.preview:reset()
+      ctx.preview:notify("Could not read file: " .. file_path, "error")
+      return false
+    end
+
+    -- Set the preview content
+    ctx.preview:reset()
+    ctx.preview:set_title(vim.fn.fnamemodify(file_path, ":t"))
+
+    -- Get or create the preview buffer
+    local buf = ctx.preview:scratch()
+
+    -- Set buffer content
+    vim.api.nvim_buf_set_lines(buf, 0, -1, false, file_lines)
+
+    -- Set filetype for syntax highlighting
+    vim.bo[buf].filetype = "swift"
+
+    return true
   end
 end
 
