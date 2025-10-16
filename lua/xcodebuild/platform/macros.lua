@@ -277,6 +277,141 @@ function M.approve_macros(macrosToApprove)
   return success
 end
 
+---Finds the DerivedData path for the current project.
+---@return string|nil
+local function find_project_derived_data()
+  local buildDir = projectConfig.settings.buildDir
+
+  if buildDir then
+    local derivedDataPath = string.match(buildDir, "(.+/DerivedData/[^/]+)")
+    if derivedDataPath and util.dir_exists(derivedDataPath) then
+      return derivedDataPath
+    end
+  end
+
+  local productName = projectConfig.settings.productName
+  local workingDirectory = projectConfig.settings.workingDirectory
+
+  if productName and workingDirectory then
+    local xcode = require("xcodebuild.core.xcode")
+    local derivedDataPath = xcode.find_derived_data_path(productName, workingDirectory)
+    if derivedDataPath then
+      return derivedDataPath
+    end
+  end
+
+  local derivedDataDir = vim.fn.expand("~/Library/Developer/Xcode/DerivedData")
+  if not util.dir_exists(derivedDataDir) then
+    return nil
+  end
+
+  local projectFile = projectConfig.settings.projectFile or projectConfig.settings.swiftPackage
+  if not projectFile then
+    return nil
+  end
+
+  local projectName = vim.fn.fnamemodify(projectFile, ":t:r")
+  local pattern = derivedDataDir .. "/" .. projectName .. "-*"
+  local dirs = vim.fn.glob(pattern, false, true)
+
+  if #dirs == 0 then
+    return nil
+  end
+
+  table.sort(dirs, function(a, b)
+    return vim.fn.getftime(a) > vim.fn.getftime(b)
+  end)
+
+  return dirs[1]
+end
+
+---Finds the package checkout directory in DerivedData.
+---@param packageIdentity string
+---@return string|nil
+local function find_package_checkout_dir(packageIdentity)
+  local derivedDataPath = find_project_derived_data()
+  if not derivedDataPath then
+    return nil
+  end
+
+  local checkoutsDir = derivedDataPath .. "/SourcePackages/checkouts"
+  if not util.dir_exists(checkoutsDir) then
+    return nil
+  end
+
+  local normalizedIdentity = packageIdentity:lower():gsub("[^a-z0-9]", "")
+
+  local dirs = vim.fn.glob(checkoutsDir .. "/*", false, true)
+  for _, dir in ipairs(dirs) do
+    local dirName = vim.fn.fnamemodify(dir, ":t"):lower():gsub("[^a-z0-9]", "")
+    if dirName:find(normalizedIdentity, 1, true) or normalizedIdentity:find(dirName, 1, true) then
+      return dir
+    end
+  end
+
+  return nil
+end
+
+---Finds the source files for a macro target.
+---@param packageIdentity string
+---@param targetName string
+---@return string[]|nil
+function M.find_macro_source_files(packageIdentity, targetName)
+  local checkoutDir = find_package_checkout_dir(packageIdentity)
+  if not checkoutDir then
+    return nil
+  end
+
+  local sourcesDir = checkoutDir .. "/Sources/" .. targetName
+  if not util.dir_exists(sourcesDir) then
+    return nil
+  end
+
+  -- Recursively search for Swift files in all subdirectories
+  local files = vim.fn.glob(sourcesDir .. "/**/*.swift", false, true)
+  if #files == 0 then
+    return nil
+  end
+
+  -- Sort files prioritizing macro-related files and directories
+  table.sort(files, function(a, b)
+    local aFileName = vim.fn.fnamemodify(a, ":t"):lower()
+    local bFileName = vim.fn.fnamemodify(b, ":t"):lower()
+    local aPath = a:lower()
+    local bPath = b:lower()
+
+    -- Check if filename contains "macro" or is in a "macros" directory
+    local aHasMacro = aFileName:find("macro", 1, true) ~= nil or aPath:find("/macros/", 1, true) ~= nil
+    local bHasMacro = bFileName:find("macro", 1, true) ~= nil or bPath:find("/macros/", 1, true) ~= nil
+
+    if aHasMacro and not bHasMacro then
+      return true
+    elseif not aHasMacro and bHasMacro then
+      return false
+    end
+
+    return a < b
+  end)
+
+  return files
+end
+
+---Opens the first macro source file in the editor.
+---@param macroError MacroError
+function M.open_macro_source(macroError)
+  local files = M.find_macro_source_files(macroError.packageIdentity, macroError.targetName)
+
+  if not files or #files == 0 then
+    notifications.send_warning(
+      "Could not find source files for " .. macroError.packageIdentity .. "/" .. macroError.targetName
+    )
+    return
+  end
+
+  vim.cmd("hide edit " .. vim.fn.fnameescape(files[1]))
+  notifications.send("Opened: " .. vim.fn.fnamemodify(files[1], ":t"))
+end
+
 ---Checks if the last build report contains unapproved macros.
 ---This helper avoids emitting notifications, so it can be used in UI probes.
 ---@return boolean

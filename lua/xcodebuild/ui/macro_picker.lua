@@ -13,7 +13,6 @@ local pickers = require("xcodebuild.ui.pickers")
 local M = {}
 
 ---Shows a picker to approve Swift macros.
----Supports multi-selection via tab key.
 ---@param macrosToApprove MacroError[]
 function M.show_macro_approval_picker(macrosToApprove)
   if util.is_empty(macrosToApprove) then
@@ -24,25 +23,45 @@ function M.show_macro_approval_picker(macrosToApprove)
   -- Show security warning
   notifications.send_warning("⚠️  Only approve macros from trusted sources!")
 
-  -- Callback when user selects macros
-  local function on_select(selected)
-    if util.is_empty(selected) then
+  -- Callback when user opens macro source (default action)
+  local function on_open(selection)
+    if not selection or not selection.value then
       return
     end
 
-    -- Selected items are the macro objects themselves
+    -- Close picker first to avoid buffer modified issues
+    pickers.close()
+
+    -- Small delay to ensure picker is fully closed before opening file
+    vim.defer_fn(function()
+      local macros = require("xcodebuild.platform.macros")
+      macros.open_macro_source(selection.value)
+    end, 50)
+  end
+
+  -- Callback when user approves macro (custom action)
+  local function on_approve(selection)
+    if not selection or not selection.value then
+      return
+    end
+
     local macros = require("xcodebuild.platform.macros")
-    local success = macros.approve_macros(selected)
+    local success = macros.approve_macros({ selection.value })
 
     if success then
-      notifications.send("✓ Macros approved. Run build again to apply changes.")
+      notifications.send("✓ Macro approved. Run build again to apply changes.")
     else
-      notifications.send_error("Failed to approve macros")
+      notifications.send_error("Failed to approve macro")
     end
   end
 
   -- Pass macro objects directly - the picker integration will format them
-  pickers.show_multiselect("Approve Swift Macros (Tab to select multiple)", macrosToApprove, on_select)
+  pickers.show(
+    "Swift Macros (<CR> to open, <C-a> to approve)",
+    macrosToApprove,
+    on_open,
+    { macro_approve_callback = on_approve }
+  )
 end
 
 return M

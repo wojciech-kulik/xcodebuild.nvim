@@ -160,6 +160,62 @@ function M.update_results(results)
   end, 10)
 end
 
+---Creates a preview function for macro objects.
+---@param items any[]
+---@return function|nil
+local function create_macro_preview(items)
+  if type(items[1]) ~= "table" or not items[1].targetName then
+    return nil
+  end
+
+  return function(selected)
+    local selected_line = selected[1]
+    local macro = nil
+
+    for _, item in ipairs(items) do
+      if entry_maker(item) == selected_line then
+        macro = item
+        break
+      end
+    end
+
+    if not macro then
+      return ""
+    end
+
+    local macros = require("xcodebuild.platform.macros")
+    local files = macros.find_macro_source_files(macro.packageIdentity, macro.targetName)
+
+    if not files or #files == 0 then
+      local lines = {
+        "⚠️  Macro source files not available",
+        "",
+        "Package: " .. macro.packageIdentity,
+        "Target: " .. macro.targetName,
+        "",
+        "DerivedData not found or package not checked out.",
+        "Try building the project first.",
+      }
+
+      if macro.message and macro.message ~= "" then
+        table.insert(lines, "")
+        table.insert(lines, "Error Message:")
+        table.insert(
+          lines,
+          "─────────────────────────────────────"
+        )
+        for _, line in ipairs(vim.split(macro.message, "\n", { plain = true })) do
+          table.insert(lines, line)
+        end
+      end
+
+      return table.concat(lines, "\n")
+    end
+
+    return files[1]
+  end
+end
+
 ---Shows a picker using fzf-lua.
 ---@param title string
 ---@param items any[]
@@ -169,6 +225,7 @@ function M.show(title, items, opts, callback)
   opts = opts or {}
 
   local formattedItems = util.select(items, entry_maker)
+  local has_macro_items = type(items[1]) == "table" and items[1].targetName ~= nil
 
   pickerRequest = {
     title = title,
@@ -179,6 +236,7 @@ function M.show(title, items, opts, callback)
     callback = callback,
   }
 
+  ---@type table<string, fun(selected: string[]): nil>
   local actions = {
     ["default"] = function(selected)
       local index = util.indexOfPredicate(formattedItems, function(item)
@@ -189,16 +247,36 @@ function M.show(title, items, opts, callback)
     end,
   }
 
+  if has_macro_items and opts.macro_approve_callback then
+    local pluginConfig = require("xcodebuild.core.config")
+    local mappings = pluginConfig.options.macro_picker.mappings
+
+    actions[map_shortcut(mappings.approve_macro)] = function(selected)
+      local index = util.indexOfPredicate(formattedItems, function(item)
+        return item == selected[1]
+      end)
+
+      opts.macro_approve_callback({ index = index, value = items[index] })
+    end
+  end
+
   set_bindings(actions, opts)
 
   local winopts = config.win_opts or {}
   winopts.title = title
 
-  fzf.fzf_exec(formattedItems, {
+  local preview_fn = has_macro_items and create_macro_preview(items) or nil
+  local fzf_options = {
     winopts = winopts,
     fzf_opts = config.fzf_opts or {},
     actions = actions,
-  })
+  }
+
+  if preview_fn then
+    fzf_options.previewer = preview_fn
+  end
+
+  fzf.fzf_exec(formattedItems, fzf_options)
 end
 
 ---Shows a multiselect picker using fzf-lua.
@@ -231,9 +309,9 @@ function M.show_multiselect(title, items, callback)
         local result = {}
 
         for _, sel in ipairs(selected) do
-          for i, item in ipairs(formattedItems) do
+          for idx, item in ipairs(formattedItems) do
             if item == sel or item.name == sel then
-              table.insert(result, items[i])
+              table.insert(result, items[idx])
               break
             end
           end

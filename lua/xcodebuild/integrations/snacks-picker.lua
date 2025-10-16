@@ -166,15 +166,19 @@ local function set_bindings(keys, opts)
   end
 end
 
+---@class ShowOptions : PickerOptions
+---@field preview function|nil
+
 ---@param title string
 ---@param items any[]
----@param opts PickerOptions|nil
+---@param opts ShowOptions|PickerOptions|nil
 ---@param multiselect boolean
 ---@param callback fun(result: {index: number, value: any}, index: number)|nil
 local function _show(title, items, opts, multiselect, callback)
   opts = opts or {}
 
   local completed = false
+  local has_macro_items = type(items[1]) == "table" and items[1].targetName ~= nil
 
   pickerRequest = {
     title = title,
@@ -200,6 +204,23 @@ local function _show(title, items, opts, multiselect, callback)
     keys["<Tab>"] = { "", mode = { "n", "i" } }
     keys["<S-Tab>"] = { "", mode = { "n", "i" } }
   end
+
+  if has_macro_items and opts.macro_approve_callback then
+    local pluginConfig = require("xcodebuild.core.config")
+    local mappings = pluginConfig.options.macro_picker.mappings
+
+    keys[mappings.approve_macro] = {
+      function()
+        local selected = pickerRequest.picker:selected({ fallback = true })
+        if selected and selected[1] and selected[1].item then
+          pickerRequest.picker:close()
+          opts.macro_approve_callback({ index = selected[1].idx, value = selected[1].item })
+        end
+      end,
+      mode = { "n", "i" },
+    }
+  end
+
   set_bindings(keys, opts)
 
   local layout = config.layout
@@ -210,9 +231,14 @@ local function _show(title, items, opts, multiselect, callback)
         width = 0.4,
       },
     }
-  layout.preview = false
 
-  pickerRequest.picker = snacks.picker.pick({
+  if opts.preview then
+    layout.preview = true
+  else
+    layout.preview = false
+  end
+
+  local picker_opts = {
     title = title,
     items = finder_items,
     format = snacks.picker.format.text,
@@ -248,7 +274,13 @@ local function _show(title, items, opts, multiselect, callback)
         keys = keys,
       },
     },
-  })
+  }
+
+  if opts.preview then
+    picker_opts.preview = opts.preview
+  end
+
+  pickerRequest.picker = snacks.picker.pick(picker_opts)
 end
 
 ---Starts the progress animation.
@@ -260,6 +292,52 @@ function M.stop_progress() end
 ---Closes the active picker.
 function M.close()
   pickerRequest.picker:close()
+end
+
+---Creates a preview function for macro objects.
+---@param items any[]
+---@return function|nil
+local function create_macro_preview(items)
+  if type(items[1]) ~= "table" or not items[1].targetName then
+    return nil
+  end
+
+  return function(item)
+    if not item or not item.item then
+      return {}
+    end
+
+    local macros = require("xcodebuild.platform.macros")
+    local files = macros.find_macro_source_files(item.item.packageIdentity, item.item.targetName)
+
+    if not files or #files == 0 then
+      local lines = {
+        "⚠️  Macro source files not available",
+        "",
+        "Package: " .. item.item.packageIdentity,
+        "Target: " .. item.item.targetName,
+        "",
+        "DerivedData not found or package not checked out.",
+        "Try building the project first.",
+      }
+
+      if item.item.message and item.item.message ~= "" then
+        table.insert(lines, "")
+        table.insert(lines, "Error Message:")
+        table.insert(
+          lines,
+          "─────────────────────────────────────"
+        )
+        for _, line in ipairs(vim.split(item.item.message, "\n", { plain = true })) do
+          table.insert(lines, line)
+        end
+      end
+
+      return lines
+    end
+
+    return { file = files[1], ft = "swift" }
+  end
 end
 
 ---Updates the results of the picker and stops the animation.
@@ -278,6 +356,19 @@ end
 ---@param opts PickerOptions|nil
 ---@param callback fun(result: {index: number, value: any}, index: number)|nil
 function M.show(title, items, opts, callback)
+  opts = opts or {}
+  local has_macro_items = type(items[1]) == "table" and items[1].targetName ~= nil
+
+  if has_macro_items then
+    local preview_fn = create_macro_preview(items)
+    if preview_fn then
+      ---@type ShowOptions
+      local show_opts = vim.tbl_extend("force", opts, { preview = preview_fn })
+      _show(title, items, show_opts, false, callback)
+      return
+    end
+  end
+
   _show(title, items, opts, false, callback)
 end
 
