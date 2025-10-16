@@ -35,8 +35,16 @@ local M = {
 local function entry_maker(entry)
   local name
 
-  if type(entry) == "table" and entry.id then
-    name = pickersUtils.get_destination_name(entry)
+  if type(entry) == "table" then
+    if entry.id then
+      -- Device object
+      name = pickersUtils.get_destination_name(entry)
+    elseif entry.targetName and entry.packageIdentity then
+      -- Macro object
+      name = string.format("%s (%s)", entry.targetName, entry.packageIdentity)
+    else
+      name = entry
+    end
   else
     name = entry
   end

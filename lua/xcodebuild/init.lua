@@ -382,6 +382,9 @@ function M.setup(options)
   vim.api.nvim_create_user_command("XcodebuildQuickfixLine", call(actions.quickfix_line), { nargs = 0 })
   vim.api.nvim_create_user_command("XcodebuildCodeActions", call(actions.show_code_actions), { nargs = 0 })
 
+  -- Swift Macros
+  vim.api.nvim_create_user_command("XcodebuildApproveMacros", call(actions.approve_macros), { nargs = 0 })
+
   -- Backward compatibility
   vim.api.nvim_create_user_command("XcodebuildTestFunc", function()
     print("xcodebuild.nvim: Use `XcodebuildTestNearest` instead of `XcodebuildTestFunc`")

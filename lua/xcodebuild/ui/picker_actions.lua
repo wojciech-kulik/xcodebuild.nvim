@@ -99,6 +99,22 @@ local function add_previews_actions(actionsNames, actionsPointers)
   end
 end
 
+---Adds Swift Macro approval action to the list of actions.
+---@param actionsNames string[]
+---@param actionsPointers function[]
+local function add_macro_actions(actionsNames, actionsPointers)
+  local actions = require("xcodebuild.actions")
+  local macros = require("xcodebuild.platform.macros")
+
+  if macros.has_unapproved_macros() then
+    local cleanIndex = util.indexOf(actionsNames, "Clean DerivedData")
+    if cleanIndex then
+      table.insert(actionsNames, cleanIndex, "Approve Swift Macros")
+      table.insert(actionsPointers, cleanIndex, actions.approve_macros)
+    end
+  end
+end
+
 ---Shows available actions for Swift Package project.
 function M.show_spm_actions()
   local actions = require("xcodebuild.actions")
@@ -168,6 +184,7 @@ function M.show_spm_actions()
   }
 
   add_test_actions(actionsNames, actionsPointers)
+  add_macro_actions(actionsNames, actionsPointers)
   show_picker(actionsNames, actionsPointers)
 end
 
@@ -246,6 +263,7 @@ function M.show_library_project_actions()
   }
 
   add_test_actions(actionsNames, actionsPointers)
+  add_macro_actions(actionsNames, actionsPointers)
   show_picker(actionsNames, actionsPointers)
 end
 
@@ -338,6 +356,7 @@ function M.show_xcode_project_actions()
   add_test_actions(actionsNames, actionsPointers)
   add_dap_actions(actionsNames, actionsPointers)
   add_previews_actions(actionsNames, actionsPointers)
+  add_macro_actions(actionsNames, actionsPointers)
   show_picker(actionsNames, actionsPointers)
 end
 

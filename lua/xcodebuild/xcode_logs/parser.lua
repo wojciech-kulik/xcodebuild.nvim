@@ -33,6 +33,9 @@
 ---@class ParsedBuildGenericError
 ---@field source string|nil
 ---@field message string[]
+---@field isMacroError boolean|nil
+---@field macroName string|nil
+---@field packageIdentity string|nil
 
 ---@class ParsedTestError
 ---@field filepath string
@@ -364,29 +367,61 @@ local function parse_build_error(line)
     return
   end
 
-  if find_any(line, filePattern .. ":%d+:%d*:? %w*%s*error: .*", allExtensions) then
-    local filepath, lineNumber, colNumber, message =
-      match_any(line, "(" .. filePattern .. "):(%d+):(%d*):? %w*%s*error: (.*)", allExtensions)
-    if filepath and message then
+  -- Check for macro error format: filepath:PACKAGE-TARGET:MacroName: error: message
+  -- This needs special handling because the source contains extra colon-separated parts
+  if string.find(line, ":PACKAGE%-TARGET:") then
+    local filepath, macroTarget, message = string.match(line, "([^:]+):PACKAGE%-TARGET:([^:]+): error: (.*)")
+    if filepath and macroTarget and message then
       lineType = BUILD_ERROR
       lineData = {
-        filename = util.get_filename(filepath),
-        filepath = filepath,
-        lineNumber = tonumber(lineNumber),
-        columnNumber = tonumber(colNumber) or 0,
+        source = filepath,
         message = { message },
       }
+      debug_print("detected_build_error (package-target format)", lineData)
+      -- Continue to macro detection below
     end
-  else
-    local source, message = string.match(line, "(.*): %w*%s*error: (.*)")
-    message = message or string.match(line, "^error: (.*)")
+  end
 
-    if message then
-      lineType = BUILD_ERROR
-      lineData = {
-        source = source,
-        message = { message },
-      }
+  -- If not already parsed, try standard error patterns
+  if not lineData.message then
+    if find_any(line, filePattern .. ":%d+:%d*:? %w*%s*error: .*", allExtensions) then
+      local filepath, lineNumber, colNumber, message =
+        match_any(line, "(" .. filePattern .. "):(%d+):(%d*):? %w*%s*error: (.*)", allExtensions)
+      if filepath and message then
+        lineType = BUILD_ERROR
+        lineData = {
+          filename = util.get_filename(filepath),
+          filepath = filepath,
+          lineNumber = tonumber(lineNumber),
+          columnNumber = tonumber(colNumber) or 0,
+          message = { message },
+        }
+      end
+    else
+      local source, message = string.match(line, "(.*): %w*%s*error: (.*)")
+      message = message or string.match(line, "^error: (.*)")
+
+      if message then
+        lineType = BUILD_ERROR
+        lineData = {
+          source = source,
+          message = { message },
+        }
+      end
+    end
+  end
+
+  -- Post-process: Check if ANY error message is a macro approval error
+  -- NOTE: Xcode uses CURLY QUOTES “ and ” not straight quotes "
+  if lineData.message and lineData.message[1] then
+    local macroName, packageIdentity =
+      string.match(lineData.message[1], "Macro “([^”]+)” from package “([^”]+)”")
+    if macroName and packageIdentity then
+      lineData.isMacroError = true
+      lineData.macroName = macroName
+      lineData.packageIdentity = packageIdentity
+      lineData.filepath = nil -- Macro errors don't have specific file locations
+      debug_print("detected_macro_error", lineData)
     end
   end
 
@@ -683,7 +718,11 @@ local function process_line(line)
   elseif string.find(line, "^PhaseScriptExecution") then
     buildPhaseName = string.match(line, "^PhaseScriptExecution ([^/]+) /")
     buildPhaseName = buildPhaseName and buildPhaseName:gsub("\\", "")
-  elseif string.find(line, "** BUILD FAILED **") and util.is_empty(buildErrors) then
+  elseif
+    string.find(line, "** BUILD FAILED **")
+    and util.is_empty(buildErrors)
+    and lineType ~= BUILD_ERROR
+  then
     parse_general_build_failure(line)
     flush()
   elseif string.find(line, "^%s*$") then

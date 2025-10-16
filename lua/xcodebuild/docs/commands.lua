@@ -108,6 +108,12 @@
 --- | `XcodebuildInstallApp`     | Install application                 |
 --- | `XcodebuildUninstallApp`   | Uninstall application               |
 ---
+---Swift Macros
+---
+--- | Command                  | Description                         |
+--- | -------------------------| ----------------------------------- |
+--- | `XcodebuildApproveMacros`  | Show picker to approve Swift macros |
+---
 ---@brief ]]
 
 local M = {}
