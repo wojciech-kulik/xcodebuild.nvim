@@ -561,6 +561,12 @@ Configuration
  | `XcodebuildInstallApp`     | Install application                 |
  | `XcodebuildUninstallApp`   | Uninstall application               |
 
+Swift Macros
+
+ | Command                  | Description                         |
+ | -------------------------| ----------------------------------- |
+ | `XcodebuildApproveMacros`  | Show picker to approve Swift macros |
+
 
 ==============================================================================
 Global Variables                                   *xcodebuild.global_variables*
@@ -1033,6 +1039,10 @@ M.quickfix_line()                             *xcodebuild.actions.quickfix_line*
 
 M.show_code_actions()                     *xcodebuild.actions.show_code_actions*
   Shows the code actions for the current line.
+
+
+M.approve_macros()                           *xcodebuild.actions.approve_macros*
+  Shows picker to approve Swift macros.
 
 
 M.run_func_test()                             *xcodebuild.actions.run_func_test*
@@ -1742,8 +1752,11 @@ ParsedBuildError
 ParsedBuildGenericError
 
   Fields: ~
-    {source}   (string|nil)
-    {message}  (string[])
+    {source}           (string|nil)
+    {message}          (string[])
+    {isMacroError}     (boolean|nil)
+    {macroName}        (string|nil)
+    {packageIdentity}  (string|nil)
 
 
                                   *xcodebuild.xcode_logs.parser.ParsedTestError*
@@ -4533,6 +4546,13 @@ Snacks Picker Integration                *xcodebuild.integrations.snacks-picker*
 This module is responsible for showing pickers using Snacks.nvim.
 
 
+                             *xcodebuild.integrations.snacks-picker.ShowOptions*
+ShowOptions : PickerOptions
+
+  Fields: ~
+    {preview}  (function|nil)
+
+
                           *xcodebuild.integrations.snacks-picker.start_progress*
 M.start_progress()
   Starts the progress animation.
@@ -4607,6 +4627,7 @@ PickerOptions                              *xcodebuild.ui.pickers.PickerOptions*
     {auto_select}             (boolean|nil) # if one result, select it automatically
     {close_on_select}         (boolean|nil) # close the picker after selection
     {device_select_callback}  (function|nil) # callback used when selecting a device in non-add mode
+    {macro_approve_callback}  (function|nil) # callback used when approving a macro with <C-a>
 
 
 PickerIntegration                      *xcodebuild.ui.pickers.PickerIntegration*
