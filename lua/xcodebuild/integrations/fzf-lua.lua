@@ -169,6 +169,11 @@ local function create_macro_preview(items)
   end
 
   return function(selected)
+    -- Handle nil case (can happen during initialization)
+    if not selected or not selected[1] then
+      return ""
+    end
+
     local selected_line = selected[1]
     local macro = nil
 
@@ -212,7 +217,14 @@ local function create_macro_preview(items)
       return table.concat(lines, "\n")
     end
 
-    return files[1]
+    -- Return a shell command to preview the file
+    -- Use bat for syntax highlighting if available, otherwise use cat
+    local file_path = vim.fn.shellescape(files[1])
+    if vim.fn.executable("bat") == 1 then
+      return "bat --color=always --style=numbers --language=swift " .. file_path
+    else
+      return "cat " .. file_path
+    end
   end
 end
 
@@ -273,7 +285,10 @@ function M.show(title, items, opts, callback)
   }
 
   if preview_fn then
-    fzf_options.previewer = preview_fn
+    fzf_options.preview = {
+      type = "cmd",
+      fn = preview_fn,
+    }
   end
 
   fzf.fzf_exec(formattedItems, fzf_options)
