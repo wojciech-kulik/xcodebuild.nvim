@@ -193,11 +193,13 @@ end
 ---@param report ParsedReport
 local function should_show_panel(report)
   local hasErrors = util.is_not_empty(report.buildErrors) or report.failedTestsCount > 0
-  local configValue = util.is_not_empty(report.tests)
-      and (hasErrors and config.auto_open_on_failed_tests or config.auto_open_on_success_tests)
-    or (hasErrors and config.auto_open_on_failed_build or config.auto_open_on_success_build)
+  local isTestReport = util.is_not_empty(report.tests)
+  local shouldShowForTests = isTestReport
+    and (hasErrors and config.auto_open_on_failed_tests or config.auto_open_on_success_tests)
+  local shouldShowForBuild = not isTestReport
+    and (hasErrors and config.auto_open_on_failed_build or config.auto_open_on_success_build)
 
-  return configValue
+  return shouldShowForBuild or shouldShowForTests
 end
 
 ---Returns whether the panel should be closed based on the {report} and config.
