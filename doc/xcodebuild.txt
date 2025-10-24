@@ -1660,11 +1660,6 @@ UIKit (similar for AppKit):
    Alternatively, run `:XcodebuildPreviewGenerateAndShow hotReload` to keep
    the app running for hot reloading.
 
-WARNING: snacks.nvim doesn't support clearing the in-memory cache right now, which makes it
-impossible to refresh previews without restarting Neovim. If you want to use this feature,
-you either need to wait until it is added (github.com/folke/snacks.nvim/issues/1394) or
-you can use my fork where I removed the cache: wojciech-kulik/snacks.nvim.
-
 If you want to use the hot reload feature, you need to integrate your app with `Inject`,
 read more about it here: https://github.com/wojciech-kulik/xcodebuild.nvim/wiki/Tips-&-Tricks#hot-reload
 
