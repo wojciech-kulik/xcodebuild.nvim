@@ -232,9 +232,10 @@ function M.approve_macros(macrosToApprove)
     local fingerprint = M.get_fingerprint(macroError.packageIdentity)
 
     if not fingerprint then
-      notifications.send_warning(
+      notifications.send_error(
         "Could not find fingerprint for " .. macroError.packageIdentity .. "/" .. macroError.targetName
       )
+      return false
     else
       -- Check if macro already exists
       local found = false
