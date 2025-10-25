@@ -219,7 +219,7 @@ end
 ---      remote_debugger_port = 65123, -- port used by remote debugger (passed to pymobiledevice3)
 ---    },
 ---    xcodebuild_offline = {
----      enabled = false, -- improves build time (requires configuration, see `:h xcodebuild.xcodebuild-offline`)
+---      enabled = false, -- improves build time when using Xcode below 26 (requires configuration, see `:h xcodebuild.xcodebuild-offline`)
 ---    },
 ---    xcode_build_server = {
 ---      enabled = true, -- enable calling "xcode-build-server config" when project config changes
