@@ -2,6 +2,8 @@
 ---@tag xcodebuild.xcodebuild-offline
 ---@brief [[
 ---
+---NOTE: This issue has been fixed in Xcode 26 and later versions.
+---
 ---This module provides a workaround for the issue with slow `xcodebuild` command.
 ---
 ---The issue is caused by the fact that `xcodebuild` tries to connect to the Apple
