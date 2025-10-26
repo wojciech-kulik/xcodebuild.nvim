@@ -51,11 +51,6 @@
 ---   Alternatively, run `:XcodebuildPreviewGenerateAndShow hotReload` to keep
 ---   the app running for hot reloading.
 ---
----WARNING: snacks.nvim doesn't support clearing the in-memory cache right now, which makes it
----impossible to refresh previews without restarting Neovim. If you want to use this feature,
----you either need to wait until it is added (github.com/folke/snacks.nvim/issues/1394) or
----you can use my fork where I removed the cache: wojciech-kulik/snacks.nvim.
----
 ---If you want to use the hot reload feature, you need to integrate your app with `Inject`,
 ---read more about it here: https://github.com/wojciech-kulik/xcodebuild.nvim/wiki/Tips-&-Tricks#hot-reload
 ---@brief ]]
@@ -102,10 +97,18 @@ local function validate()
 end
 
 ---@return string the path to the preview image
-local function getPath()
+local function get_path()
   local previewPath = "/tmp/xcodebuild.nvim"
   local productName = projectConfig.settings.productName
   return string.format("%s/%s.png", previewPath, productName)
+end
+
+---Clears the snacks image cache.
+local function clear_cache()
+  local success, snacks = pcall(require, "snacks.image.image")
+  if success and snacks.clear ~= nil then
+    snacks.clear()
+  end
 end
 
 ---Shows notifications with the progress message.
@@ -128,6 +131,14 @@ local function show_result(success)
 end
 
 local previewTimer = nil
+local clearCacheTimer = nil
+
+local function stop_clear_cache_timer()
+  if clearCacheTimer then
+    vim.fn.timer_stop(clearCacheTimer)
+    clearCacheTimer = nil
+  end
+end
 
 local function stop_preview_timer()
   if previewTimer then
@@ -143,7 +154,7 @@ local function wait_for_preview(hotReload, callback)
   local device = require("xcodebuild.platform.device")
 
   previewTimer = vim.fn.timer_start(500, function()
-    if util.file_exists(getPath()) then
+    if util.file_exists(get_path()) then
       stop_preview_timer()
       show_result(true)
       util.call(callback)
@@ -217,6 +228,7 @@ end
 ---Cancels awaiting preview generation.
 function M.cancel()
   stop_preview_timer()
+  stop_clear_cache_timer()
 end
 
 ---Shows the preview image in a new window.
@@ -225,18 +237,18 @@ function M.show_preview()
     return
   end
 
-  if not util.file_exists(getPath()) then
+  if not util.file_exists(get_path()) then
     update_progress("No preview available")
     return
   end
 
-  local winid = vim.fn.bufwinid(getPath())
+  local winid = vim.fn.bufwinid(get_path())
   if winid == -1 then
-    vim.cmd(string.format(config.open_command, getPath()))
+    vim.cmd(string.format(config.open_command, get_path()))
   end
 
   vim.defer_fn(function()
-    local newWinid = vim.fn.bufwinid(getPath())
+    local newWinid = vim.fn.bufwinid(get_path())
     if newWinid == -1 then
       return
     end
@@ -268,7 +280,7 @@ function M.toggle_preview()
     return
   end
 
-  if vim.fn.bufwinnr(getPath()) == -1 then
+  if vim.fn.bufwinnr(get_path()) == -1 then
     M.show_preview()
   else
     M.hide_preview()
@@ -290,12 +302,17 @@ function M.generate_preview(hotReload, callback)
   vim.fn.mkdir("/tmp/xcodebuild.nvim", "p")
   update_progress("Generating Preview...")
 
-  vim.fn.delete(getPath())
+  vim.fn.delete(get_path())
   xcode.kill_app(projectSettings.productName, projectSettings.platform)
 
   local success, snacks = pcall(require, "snacks")
   if success and snacks.image.config.cache and snacks.image.config.cache ~= "" then
+    clear_cache()
     vim.fn.delete(snacks.image.config.cache, "rf")
+  end
+
+  if hotReload then
+    clearCacheTimer = vim.fn.timer_start(1000, clear_cache, { ["repeat"] = -1 })
   end
 
   if projectSettings.platform == constants.Platform.MACOS then

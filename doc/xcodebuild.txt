@@ -204,7 +204,7 @@ M.setup({options})                                            *xcodebuild.setup*
           remote_debugger_port = 65123, -- port used by remote debugger (passed to pymobiledevice3)
         },
         xcodebuild_offline = {
-          enabled = false, -- improves build time (requires configuration, see `:h xcodebuild.xcodebuild-offline`)
+          enabled = false, -- improves build time when using Xcode below 26 (requires configuration, see `:h xcodebuild.xcodebuild-offline`)
         },
         xcode_build_server = {
           enabled = true, -- enable calling "xcode-build-server config" when project config changes
@@ -1669,11 +1669,6 @@ UIKit (similar for AppKit):
  - Run `:XcodebuildPreviewGenerateAndShow` to generate and show the preview.
    Alternatively, run `:XcodebuildPreviewGenerateAndShow hotReload` to keep
    the app running for hot reloading.
-
-WARNING: snacks.nvim doesn't support clearing the in-memory cache right now, which makes it
-impossible to refresh previews without restarting Neovim. If you want to use this feature,
-you either need to wait until it is added (github.com/folke/snacks.nvim/issues/1394) or
-you can use my fork where I removed the cache: wojciech-kulik/snacks.nvim.
 
 If you want to use the hot reload feature, you need to integrate your app with `Inject`,
 read more about it here: https://github.com/wojciech-kulik/xcodebuild.nvim/wiki/Tips-&-Tricks#hot-reload
@@ -4341,6 +4336,8 @@ M.setup()
 Xcodebuild Workaround               *xcodebuild.integrations.xcodebuild-offline*
 
                                                  *xcodebuild.xcodebuild-offline*
+
+NOTE: This issue has been fixed in Xcode 26 and later versions.
 
 This module provides a workaround for the issue with slow `xcodebuild` command.
 
