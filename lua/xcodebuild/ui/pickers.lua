@@ -468,7 +468,15 @@ function M.select_destination(callback, addMode, opts)
       util.call(callback, entry)
     end)
   else
-    M.show("Select Device", results, function(entry, _)
+    local title = string.format(
+      "Select Device (%s - refresh, %s - add, %s - delete, %s - up, %s - down)",
+      config.device_picker.mappings.refresh_devices,
+      config.device_picker.mappings.add_device,
+      config.device_picker.mappings.delete_device,
+      config.device_picker.mappings.move_up_device,
+      config.device_picker.mappings.move_down_device
+    )
+    M.show(title, results, function(entry, _)
       projectConfig.set_destination(entry.value)
       util.call(callback, entry.value)
     end, opts)
