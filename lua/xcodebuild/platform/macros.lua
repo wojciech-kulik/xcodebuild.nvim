@@ -68,9 +68,9 @@ function M.write_macros_json(macros)
   end
 
   local json = vim.fn.json_encode(macros)
-  local formatted_json = vim.split(json, "\n", { plain = true })
+  local formattedJson = vim.split(json, "\n", { plain = true })
 
-  local success = pcall(vim.fn.writefile, formatted_json, MACROS_JSON_PATH)
+  local success = pcall(vim.fn.writefile, formattedJson, MACROS_JSON_PATH)
   if not success then
     notifications.send_error("Failed to write macros.json")
     return false

@@ -221,7 +221,7 @@ end
 ---@return table
 local function create_macro_previewer()
   local telescopePreviewers = require("telescope.previewers")
-  local conf = require("telescope.config").values
+  local config = require("telescope.config").values
 
   return telescopePreviewers.new_buffer_previewer({
     title = "Macro Source Code",
@@ -255,7 +255,7 @@ local function create_macro_previewer()
 
         vim.api.nvim_buf_set_lines(self.state.bufnr, 0, -1, false, lines)
       else
-        conf.buffer_previewer_maker(files[1], self.state.bufnr, {
+        config.buffer_previewer_maker(files[1], self.state.bufnr, {
           bufname = self.state.bufname,
           winid = self.state.winid,
           callback = function(bufnr)
@@ -275,7 +275,7 @@ end
 function M.show(title, items, opts, callback)
   opts = opts or {}
 
-  local has_macro_items = type(items[1]) == "table" and items[1].targetName ~= nil
+  local hasMacroItems = type(items[1]) == "table" and items[1].targetName ~= nil
 
   activePicker = telescopePickers.new(require("telescope.themes").get_dropdown({}), {
     prompt_title = title,
@@ -284,12 +284,12 @@ function M.show(title, items, opts, callback)
       entry_maker = entry_maker,
     }),
     sorter = telescopeConfig.generic_sorter(),
-    previewer = has_macro_items and create_macro_previewer() or nil,
+    previewer = hasMacroItems and create_macro_previewer() or nil,
     file_ignore_patterns = {},
     attach_mappings = function(prompt_bufnr, _)
       setup_bindings(prompt_bufnr, opts)
 
-      if has_macro_items and opts.macro_approve_callback then
+      if hasMacroItems and opts.macro_approve_callback then
         local config = require("xcodebuild.core.config")
         local mappings = config.options.macro_picker.mappings
 

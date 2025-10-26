@@ -174,11 +174,11 @@ local function create_macro_preview(items)
       return ""
     end
 
-    local selected_line = selected[1]
+    local selectedLine = selected[1]
     local macro = nil
 
     for _, item in ipairs(items) do
-      if entry_maker(item) == selected_line then
+      if entry_maker(item) == selectedLine then
         macro = item
         break
       end
@@ -219,11 +219,11 @@ local function create_macro_preview(items)
 
     -- Return a shell command to preview the file
     -- Use bat for syntax highlighting if available, otherwise use cat
-    local file_path = vim.fn.shellescape(files[1])
+    local filePath = vim.fn.shellescape(files[1])
     if vim.fn.executable("bat") == 1 then
-      return "bat --color=always --style=numbers --language=swift " .. file_path
+      return "bat --color=always --style=numbers --language=swift " .. filePath
     else
-      return "cat " .. file_path
+      return "cat " .. filePath
     end
   end
 end
@@ -237,7 +237,7 @@ function M.show(title, items, opts, callback)
   opts = opts or {}
 
   local formattedItems = util.select(items, entry_maker)
-  local has_macro_items = type(items[1]) == "table" and items[1].targetName ~= nil
+  local hasMacroItems = type(items[1]) == "table" and items[1].targetName ~= nil
 
   pickerRequest = {
     title = title,
@@ -259,7 +259,7 @@ function M.show(title, items, opts, callback)
     end,
   }
 
-  if has_macro_items and opts.macro_approve_callback then
+  if hasMacroItems and opts.macro_approve_callback then
     local pluginConfig = require("xcodebuild.core.config")
     local mappings = pluginConfig.options.macro_picker.mappings
 
@@ -277,21 +277,21 @@ function M.show(title, items, opts, callback)
   local winopts = config.win_opts or {}
   winopts.title = title
 
-  local preview_fn = has_macro_items and create_macro_preview(items) or nil
-  local fzf_options = {
+  local previewFn = hasMacroItems and create_macro_preview(items) or nil
+  local fzfOptions = {
     winopts = winopts,
     fzf_opts = config.fzf_opts or {},
     actions = actions,
   }
 
-  if preview_fn then
-    fzf_options.preview = {
+  if previewFn then
+    fzfOptions.preview = {
       type = "cmd",
-      fn = preview_fn,
+      fn = previewFn,
     }
   end
 
-  fzf.fzf_exec(formattedItems, fzf_options)
+  fzf.fzf_exec(formattedItems, fzfOptions)
 end
 
 ---Shows a multiselect picker using fzf-lua.

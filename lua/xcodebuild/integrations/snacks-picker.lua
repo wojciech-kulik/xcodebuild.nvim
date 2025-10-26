@@ -178,7 +178,7 @@ local function _show(title, items, opts, multiselect, callback)
   opts = opts or {}
 
   local completed = false
-  local has_macro_items = type(items[1]) == "table" and items[1].targetName ~= nil
+  local hasMacroItems = type(items[1]) == "table" and items[1].targetName ~= nil
 
   pickerRequest = {
     title = title,
@@ -205,7 +205,7 @@ local function _show(title, items, opts, multiselect, callback)
     keys["<S-Tab>"] = { "", mode = { "n", "i" } }
   end
 
-  if has_macro_items and opts.macro_approve_callback then
+  if hasMacroItems and opts.macro_approve_callback then
     local pluginConfig = require("xcodebuild.core.config")
     local mappings = pluginConfig.options.macro_picker.mappings
 
@@ -238,7 +238,7 @@ local function _show(title, items, opts, multiselect, callback)
     layout.preview = false
   end
 
-  local picker_opts = {
+  local pickerOpts = {
     title = title,
     items = finder_items,
     format = snacks.picker.format.text,
@@ -277,10 +277,10 @@ local function _show(title, items, opts, multiselect, callback)
   }
 
   if opts.preview then
-    picker_opts.preview = opts.preview
+    pickerOpts.preview = opts.preview
   end
 
-  pickerRequest.picker = snacks.picker.pick(picker_opts)
+  pickerRequest.picker = snacks.picker.pick(pickerOpts)
 end
 
 ---Starts the progress animation.
@@ -309,10 +309,10 @@ local function create_macro_preview(items)
     end
 
     -- Handle both wrapped and direct item structures
-    local macro_item = ctx.item.item or ctx.item
+    local macroItem = ctx.item.item or ctx.item
 
     -- Validate macro item has required fields
-    if type(macro_item) ~= "table" or not macro_item.packageIdentity or not macro_item.targetName then
+    if type(macroItem) ~= "table" or not macroItem.packageIdentity or not macroItem.targetName then
       ctx.preview:reset()
       ctx.preview:set_lines({
         "⚠️  Invalid macro item structure",
@@ -323,27 +323,27 @@ local function create_macro_preview(items)
     end
 
     local macros = require("xcodebuild.platform.macros")
-    local files = macros.find_macro_source_files(macro_item.packageIdentity, macro_item.targetName)
+    local files = macros.find_macro_source_files(macroItem.packageIdentity, macroItem.targetName)
 
     if not files or #files == 0 then
       local lines = {
         "⚠️  Macro source files not available",
         "",
-        "Package: " .. macro_item.packageIdentity,
-        "Target: " .. macro_item.targetName,
+        "Package: " .. macroItem.packageIdentity,
+        "Target: " .. macroItem.targetName,
         "",
         "DerivedData not found or package not checked out.",
         "Try building the project first.",
       }
 
-      if macro_item.message and macro_item.message ~= "" then
+      if macroItem.message and macroItem.message ~= "" then
         table.insert(lines, "")
         table.insert(lines, "Error Message:")
         table.insert(
           lines,
           "─────────────────────────────────────"
         )
-        for _, line in ipairs(vim.split(macro_item.message, "\n", { plain = true })) do
+        for _, line in ipairs(vim.split(macroItem.message, "\n", { plain = true })) do
           table.insert(lines, line)
         end
       end
@@ -363,17 +363,11 @@ local function create_macro_preview(items)
       return false
     end
 
-    -- Set the preview content
     ctx.preview:reset()
     ctx.preview:set_title(vim.fn.fnamemodify(file_path, ":t"))
 
-    -- Get or create the preview buffer
     local buf = ctx.preview:scratch()
-
-    -- Set buffer content
     vim.api.nvim_buf_set_lines(buf, 0, -1, false, file_lines)
-
-    -- Set filetype for syntax highlighting
     vim.bo[buf].filetype = "swift"
 
     return true
@@ -397,13 +391,13 @@ end
 ---@param callback fun(result: {index: number, value: any}, index: number)|nil
 function M.show(title, items, opts, callback)
   opts = opts or {}
-  local has_macro_items = type(items[1]) == "table" and items[1].targetName ~= nil
+  local hasMacroItems = type(items[1]) == "table" and items[1].targetName ~= nil
 
-  if has_macro_items then
-    local preview_fn = create_macro_preview(items)
-    if preview_fn then
+  if hasMacroItems then
+    local previewFn = create_macro_preview(items)
+    if previewFn then
       ---@type ShowOptions
-      local show_opts = vim.tbl_extend("force", opts, { preview = preview_fn })
+      local show_opts = vim.tbl_extend("force", opts, { preview = previewFn })
       _show(title, items, show_opts, false, callback)
       return
     end
