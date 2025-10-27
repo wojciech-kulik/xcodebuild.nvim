@@ -461,7 +461,7 @@ end
 ---Starts the secure server.
 ---It is used on devices with iOS 17 and above.
 ---
----Returns the command to connect to the device using `codelldb`.
+---Returns the command to connect to the device using `lldb`.
 ---@param destination string # device id
 ---@param rsd string # rsd parameter
 ---@return string|nil # connection command
@@ -496,7 +496,7 @@ end
 ---It is used on devices with iOS below 17.
 ---
 ---The callback returns {connection_string} that can be used to connect
----to the device using `codelldb`.
+---to the device using `lldb`.
 ---
 ---This process must be alive during the debugging session.
 ---Later, it can be closed with `vim.fn.jobstop({job_id})`.

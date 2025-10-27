@@ -255,6 +255,15 @@ end
 ---      fzf_opts = {},  -- fzf options
 ---      win_opts = {},  -- window options
 ---    },
+---    codelldb = {
+---      enabled = false, -- enable codelldb dap adapter for Swift debugging
+---      port = 13000, -- port used by codelldb adapter
+---      codelldb_path = nil, -- path to codelldb adapter, REQUIRED
+---      lldb_lib_path = "/Applications/Xcode.app/Contents/SharedFrameworks/LLDB.framework/Versions/A/LLDB", -- path to lldb library
+---    },
+---    lldb = {
+---      port = 13000, -- port used by lldb-dap
+---    },
 ---  },
 ---  highlights = {
 ---    -- you can override here any highlight group used by this plugin
