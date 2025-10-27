@@ -168,7 +168,7 @@ local defaults = {
     codelldb = {
       enabled = false, -- enable codelldb dap adapter for Swift debugging
       port = 13000, -- port used by codelldb adapter
-      codelldb_path = nil, -- path to codelldb adapter, REQUIRED
+      codelldb_path = nil, -- path to codelldb binary, REQUIRED, example: "/Users/xyz/tools/codelldb/extension/adapter/codelldb"
       lldb_lib_path = "/Applications/Xcode.app/Contents/SharedFrameworks/LLDB.framework/Versions/A/LLDB", -- path to lldb library
     },
     lldb = {
