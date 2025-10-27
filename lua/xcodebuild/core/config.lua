@@ -130,6 +130,7 @@ local defaults = {
     },
   },
   macro_picker = {
+    auto_show_on_error = true,
     mappings = {
       approve_macro = "<C-a>", -- approve the selected macro
     },

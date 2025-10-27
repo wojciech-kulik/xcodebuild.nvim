@@ -214,6 +214,7 @@ end
 ---    },
 ---  },
 ---  macro_picker = {
+---    auto_show_on_error = true, -- automatically show macro approval picker when build fails due to unapproved macros
 ---    mappings = {
 ---      approve_macro = "<C-a>", -- approve the selected macro
 ---    },
