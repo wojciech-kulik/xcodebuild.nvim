@@ -354,20 +354,20 @@ local function create_macro_preview(items)
     end
 
     -- Read the Swift file and display it
-    local file_path = files[1]
-    local ok, file_lines = pcall(vim.fn.readfile, file_path)
+    local filePath = files[1]
+    local ok, fileLines = pcall(vim.fn.readfile, filePath)
 
-    if not ok or not file_lines then
+    if not ok or not fileLines then
       ctx.preview:reset()
-      ctx.preview:notify("Could not read file: " .. file_path, "error")
+      ctx.preview:notify("Could not read file: " .. filePath, "error")
       return false
     end
 
     ctx.preview:reset()
-    ctx.preview:set_title(vim.fn.fnamemodify(file_path, ":t"))
+    ctx.preview:set_title(vim.fn.fnamemodify(filePath, ":t"))
 
     local buf = ctx.preview:scratch()
-    vim.api.nvim_buf_set_lines(buf, 0, -1, false, file_lines)
+    vim.api.nvim_buf_set_lines(buf, 0, -1, false, fileLines)
     vim.bo[buf].filetype = "swift"
 
     return true
