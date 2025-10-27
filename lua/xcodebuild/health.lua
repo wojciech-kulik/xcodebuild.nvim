@@ -302,11 +302,14 @@ local function check_ruby_version()
 end
 
 local function check_os()
+  local util = require("xcodebuild.util")
   local os = vim.loop.os_uname()
   local name = os.sysname
+
   if name == "Darwin" then
-    if os.release:match("^2[3-4]%.") then
-      ok("macOS 14+: release " .. os.release)
+    local version = util.shell("sw_vers -productVersion")[1]
+    if version:match("^1[4-5]%.") or version:match("^2[6-9]%.") then
+      ok("macOS version: " .. version)
     else
       warn("macOS below 14 was not tested.")
     end
