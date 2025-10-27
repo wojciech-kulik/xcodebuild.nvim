@@ -9,15 +9,16 @@
 ---  ~/Library/org.swift.swiftpm/security/macros.json
 ---
 ---It contains an array of approved macros with their fingerprints (revision hashes or checksum):
+---
+--->json
 ---  [
 ---    {
----      "fingerprint": "626c3d4b6b55354b4af3aa309f998fae9b31a3d9",
+---      "fingerprint": "abc123...",
 ---      "packageIdentity": "swift-dependencies",
 ---      "targetName": "DependenciesMacrosPlugin"
 ---    }
 ---  ]
----
----Fingerprints are read directly from Package.resolved's revision field.
+---<
 ---@brief ]]
 
 ---@class MacroError
