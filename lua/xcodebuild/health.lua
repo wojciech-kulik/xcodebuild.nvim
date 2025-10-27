@@ -365,19 +365,29 @@ end
 
 local function check_xcodebuild_offline_sudo()
   local util = require("xcodebuild.util")
+  local xcodeVersion = util.shell("xcodebuild -version")[1]
+  local majorVersion = xcodeVersion:match("Xcode (%d+)%.")
+  local isXcode26 = majorVersion and tonumber(majorVersion) >= 26
+
   local config = require("xcodebuild.core.config").options.integrations.xcodebuild_offline
   local path = require("xcodebuild.integrations.xcodebuild-offline").scriptPath
   if not config.enabled then
-    start("Checking xcodebuild_offline tool")
-    warn("tool not enabled - builds might be slower.")
-    warn("see `:h xcodebuild.xcodebuild-offline` for more information.")
+    if not isXcode26 then
+      start("Checking xcodebuild_offline tool")
+      warn("tool not enabled - builds might be slower")
+      warn("see `:h xcodebuild.xcodebuild-offline` for more information.")
+    end
     return
   end
 
   start("Checking xcodebuild-offline integration")
 
   if util.file_exists(path) then
-    ok("`xcodebuild_offline` script installed")
+    if isXcode26 then
+      warn("xcodebuild_offline: script installed, but Xcode 26+ detected - integration is not required.")
+    else
+      ok("`xcodebuild_offline` script installed")
+    end
   else
     error("`xcodebuild_offline` script is not installed. (see: `:h xcodebuild.xcodebuild-offline`)")
   end
