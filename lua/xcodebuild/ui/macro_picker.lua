@@ -57,9 +57,12 @@ function M.show_macro_approval_picker(macrosToApprove)
     end
   end
 
+  local config = require("xcodebuild.core.config")
+  local mapping = config.options.macro_picker.mappings.approve_macro
+
   -- Pass macro objects directly - the picker integration will format them
   pickers.show(
-    "Swift Macros (<CR> to open, <C-a> to approve)",
+    string.format("Swift Macros (<CR> to open, %s to approve)", mapping),
     macrosToApprove,
     on_open,
     { macro_approve_callback = on_approve }
