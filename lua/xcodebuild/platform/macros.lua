@@ -3,19 +3,21 @@
 ---This module is responsible for managing Swift macro approvals.
 ---
 ---It handles parsing macro errors from build logs, reading/writing
----the macros.json file, and resolving package fingerprints.
+---the macros.json file, and resolving package fingerprints from Package.resolved.
 ---
 ---The macros.json file is located at:
 ---  ~/Library/org.swift.swiftpm/security/macros.json
 ---
----It contains an array of approved macros with their fingerprints:
+---It contains an array of approved macros with their fingerprints (revision hashes or checksum):
 ---  [
 ---    {
----      "fingerprint": "abc123...",
+---      "fingerprint": "626c3d4b6b55354b4af3aa309f998fae9b31a3d9",
 ---      "packageIdentity": "swift-dependencies",
 ---      "targetName": "DependenciesMacrosPlugin"
 ---    }
 ---  ]
+---
+---Fingerprints are read directly from Package.resolved's revision field.
 ---@brief ]]
 
 ---@class MacroError
@@ -24,7 +26,7 @@
 ---@field message string full error message
 
 ---@class ApprovedMacro
----@field fingerprint string SHA hash of the macro version
+---@field fingerprint string revision hash or checksum from Package.resolved
 ---@field packageIdentity string package identity
 ---@field targetName string macro target name
 
@@ -35,7 +37,6 @@ local projectConfig = require("xcodebuild.project.config")
 local M = {}
 
 local MACROS_JSON_PATH = vim.fn.expand("~/Library/org.swift.swiftpm/security/macros.json")
-local FINGERPRINTS_DIR = vim.fn.expand("~/Library/org.swift.swiftpm/security/fingerprints")
 
 ---Reads the macros.json file.
 ---@return ApprovedMacro[]
@@ -105,24 +106,10 @@ function M.parse_macro_errors(buildErrors)
   return macroErrors
 end
 
----Finds the fingerprint file for a package.
+---Reads Package.resolved to get package information including fingerprint.
 ---@param packageIdentity string
----@return string|nil filepath
-local function find_fingerprint_file(packageIdentity)
-  local pattern = packageIdentity .. "-*.json"
-  local files = vim.fn.glob(FINGERPRINTS_DIR .. "/" .. pattern, false, true)
-
-  if #files > 0 then
-    return files[1]
-  end
-
-  return nil
-end
-
----Reads Package.resolved to get the current package version.
----@param packageIdentity string
----@return string|nil version
-local function get_package_version(packageIdentity)
+---@return {version: string|nil, revision: string|nil, checksum: string|nil}|nil
+local function get_package_info(packageIdentity)
   local workingDir = projectConfig.settings.workingDirectory or vim.fn.getcwd()
   local packageResolved = workingDir .. "/Package.resolved"
 
@@ -151,8 +138,12 @@ local function get_package_version(packageIdentity)
 
     for _, dep in ipairs(data.object.dependencies) do
       if dep.packageRef and dep.packageRef.identity == packageIdentity then
-        if dep.state and dep.state.version then
-          return dep.state.version
+        if dep.state then
+          return {
+            version = dep.state.version,
+            revision = dep.state.revision,
+            checksum = dep.state.checksum,
+          }
         end
       end
     end
@@ -160,6 +151,7 @@ local function get_package_version(packageIdentity)
     return nil
   end
 
+  -- Parse Package.resolved
   local success, content = util.readfile(packageResolved)
   if not success then
     return nil
@@ -172,8 +164,12 @@ local function get_package_version(packageIdentity)
 
   for _, pin in ipairs(data.pins) do
     if pin.identity == packageIdentity then
-      if pin.state and pin.state.version then
-        return pin.state.version
+      if pin.state then
+        return {
+          version = pin.state.version,
+          revision = pin.state.revision,
+          checksum = pin.state.checksum,
+        }
       end
     end
   end
@@ -181,37 +177,24 @@ local function get_package_version(packageIdentity)
   return nil
 end
 
----Gets the fingerprint for a package at a specific version.
+---Gets the fingerprint for a package from Package.resolved.
+---The fingerprint is the revision (SHA-1 hash) or checksum from the package's state.
 ---@param packageIdentity string
----@param version string|nil
 ---@return string|nil fingerprint
-function M.get_fingerprint(packageIdentity, version)
-  local fingerprintFile = find_fingerprint_file(packageIdentity)
-  if not fingerprintFile then
+function M.get_fingerprint(packageIdentity)
+  local packageInfo = get_package_info(packageIdentity)
+
+  if not packageInfo then
     return nil
   end
 
-  local success, content = util.readfile(fingerprintFile)
-  if not success then
-    return nil
+  if type(packageInfo.revision) == "string" and packageInfo.revision ~= "" then
+    -- The revision IS the fingerprint
+    return packageInfo.revision
   end
 
-  local ok, data = pcall(vim.fn.json_decode, content)
-  if not ok then
-    return nil
-  end
-
-  -- If no version provided, try to get it from Package.resolved
-  if not version then
-    version = get_package_version(packageIdentity)
-  end
-
-  -- Look up fingerprint by version
-  if version and data.versionFingerprints and data.versionFingerprints[version] then
-    local versionData = data.versionFingerprints[version]
-    if versionData.sourceControl and versionData.sourceControl.sourceCode then
-      return versionData.sourceControl.sourceCode.fingerprint
-    end
+  if type(packageInfo.checksum) == "string" and packageInfo.checksum ~= "" then
+    return packageInfo.checksum
   end
 
   return nil
@@ -233,7 +216,9 @@ function M.approve_macros(macrosToApprove)
 
     if not fingerprint then
       notifications.send_error(
-        "Could not find fingerprint for " .. macroError.packageIdentity .. "/" .. macroError.targetName
+        "Could not find package '"
+          .. macroError.packageIdentity
+          .. "' in Package.resolved. Build the project first."
       )
       return false
     else
