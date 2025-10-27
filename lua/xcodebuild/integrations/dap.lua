@@ -250,10 +250,14 @@ function M.debug_without_build(callback)
     end)
   else
     device.kill_app()
-    if isSimulator then
-      start_dap()
-    end
-    device.run_app(true, callback)
+    device.run_app(true, function()
+      -- macOS apps are launched via dap "launch" request. Otherwise, logs wouldn't be captured.
+      -- iOS simulator apps we first launch, then attach debugger.
+      if isSimulator then
+        start_dap()
+      end
+      util.call(callback)
+    end)
   end
 end
 
