@@ -30,6 +30,7 @@ lemmy-help \
   ./lua/xcodebuild/platform/device.lua \
   ./lua/xcodebuild/platform/device_proxy.lua \
   ./lua/xcodebuild/platform/macos.lua \
+  ./lua/xcodebuild/platform/debugger.lua \
   ./lua/xcodebuild/broadcasting/events.lua \
   ./lua/xcodebuild/broadcasting/notifications.lua \
   ./lua/xcodebuild/tests/diagnostics.lua \
@@ -43,6 +44,8 @@ lemmy-help \
   ./lua/xcodebuild/code_coverage/coverage.lua \
   ./lua/xcodebuild/code_coverage/report.lua \
   ./lua/xcodebuild/integrations/dap.lua \
+  ./lua/xcodebuild/integrations/lldb.lua \
+  ./lua/xcodebuild/integrations/codelldb.lua \
   ./lua/xcodebuild/integrations/dap-symbolicate.lua \
   ./lua/xcodebuild/integrations/remote_debugger.lua \
   ./lua/xcodebuild/integrations/lsp.lua \

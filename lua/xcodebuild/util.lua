@@ -193,6 +193,21 @@ function M.get_filename(filepath)
   return string.match(filepath, ".*%/([^/]*)%..+$")
 end
 
+---Runs a shell command and returns exit code
+---@param cmd string|string[]
+---@return number
+function M.shell_execute(cmd)
+  local result
+  local jobid = vim.fn.jobstart(cmd, {
+    on_exit = function(_, exit_code, _)
+      result = exit_code
+    end,
+  })
+  vim.fn.jobwait({ jobid })
+
+  return result or -1
+end
+
 ---Runs a shell command and returns the output as a list of strings.
 ---@param cmd string|string[]
 ---@return string[]
@@ -212,7 +227,7 @@ end
 ---Runs a shell command asynchronously.
 ---@param cmd string|string[]
 ---@param callback function|nil
-function M.shellAsync(cmd, callback)
+function M.shell_async(cmd, callback)
   vim.fn.jobstart(cmd, {
     on_exit = callback,
   })

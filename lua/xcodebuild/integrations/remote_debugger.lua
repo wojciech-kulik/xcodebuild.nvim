@@ -79,13 +79,11 @@ local function setup_connection_listeners()
   local processLaunched = false
   local buffer = ""
 
-  listeners.event_continued[PLUGIN_ID] = function()
-    listeners.event_continued[PLUGIN_ID] = nil
-    notifications.send("Remote debugger connected")
-  end
-
   listeners.event_output[PLUGIN_ID] = function(_, body)
-    if not processLaunched and string.find(body.output, "Launched process") then
+    if
+      not processLaunched
+      and (string.find(body.output, "Launched process") or string.find(body.output, "Process %d+ launched"))
+    then
       processLaunched = true
       return
     end
@@ -117,7 +115,7 @@ local function setup_connection_listeners()
   end
 end
 
----Starts `nvim-dap` debug session. It connects to `codelldb`.
+---Starts `nvim-dap` debug session. It connects to `lldb`.
 ---@param opts {attach: boolean}|nil
 local function start_dap(opts)
   opts = opts or {}
@@ -135,69 +133,11 @@ local function start_dap(opts)
   notifications.send("Connecting to device...")
   setup_connection_listeners()
 
-  local appdata = require("xcodebuild.project.appdata")
+  local debugger = require("xcodebuild.platform.debugger")
+  local request = opts.attach and "attach" or "launch"
+  local dapConfig = debugger.get_remote_device_configuration(request)
 
-  dap.run({
-    env = appdata.read_env_vars(),
-    args = appdata.read_run_args(),
-    name = "iOS Remote Debugger",
-    type = "codelldb",
-    request = "launch",
-    cwd = "${workspaceFolder}",
-    stopOnEntry = false,
-    waitFor = true,
-    initCommands = {
-      "platform select remote-ios",
-    },
-    targetCreateCommands = {
-      function()
-        return "target create '" .. projectConfig.settings.appPath .. "'"
-      end,
-    },
-    processCreateCommands = {
-      function()
-        local appPath =
-          deviceProxy.find_app_path(projectConfig.settings.destination, projectConfig.settings.bundleId)
-
-        if not appPath then
-          notifications.send_error("Failed to find the app path on the device.")
-          return "platform status"
-        end
-
-        update_console({ "App path: " .. appPath })
-
-        return "script lldb.target.module[0].SetPlatformFileSpec(lldb.SBFileSpec('" .. appPath .. "'))"
-      end,
-
-      function()
-        if M.mode == M.LEGACY_MODE then
-          return M.connection_string
-        else
-          return deviceProxy.start_secure_server(projectConfig.settings.destination, M.rsd_param)
-        end
-      end,
-
-      function()
-        if opts.attach then
-          local pid = deviceProxy.find_app_pid(projectConfig.settings.productName)
-          if not pid or pid == "" then
-            notifications.send_error("Failed to find the app PID on the device.")
-            return "platform status"
-          end
-          update_console({ "App PID: " .. pid })
-
-          return "process attach --pid " .. pid
-        else
-          return "process launch"
-        end
-      end,
-
-      function()
-        update_console({ "" })
-        return opts.attach and "continue" or "process status"
-      end,
-    },
-  })
+  dap.run(dapConfig)
 end
 
 ---Sets the service for secured mode.
