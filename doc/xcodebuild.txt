@@ -27,6 +27,7 @@ Project Assets Manager ····························�
 Device ············································ |xcodebuild.platform.device|
 Device Proxy ································ |xcodebuild.platform.device_proxy|
 macOS Platform Integration ························· |xcodebuild.platform.macos|
+Debugger ········································ |xcodebuild.platform.debugger|
 Autocommand Events ···························· |xcodebuild.broadcasting.events|
 Notifications ·························· |xcodebuild.broadcasting.notifications|
 Test Diagnostics ································ |xcodebuild.tests.diagnostics|
@@ -40,6 +41,8 @@ Xcresult File Parser ························ |xcodebuil
 Code Coverage ······························ |xcodebuild.code_coverage.coverage|
 Code Coverage Report ························· |xcodebuild.code_coverage.report|
 DAP Integration ·································· |xcodebuild.integrations.dap|
+DAP Configurations - lldb ······················· |xcodebuild.integrations.lldb|
+DAP Configurations - codelldb ··············· |xcodebuild.integrations.codelldb|
 DAP Symbolicate ······················ |xcodebuild.integrations.dap-symbolicate|
 Remote Debugger Integration ·········· |xcodebuild.integrations.remote_debugger|
 LSP Integration ·································· |xcodebuild.integrations.lsp|
@@ -234,6 +237,15 @@ M.setup({options})                                            *xcodebuild.setup*
           fzf_opts = {},  -- fzf options
           win_opts = {},  -- window options
         },
+        codelldb = {
+          enabled = false, -- enable codelldb dap adapter for Swift debugging
+          port = 13000, -- port used by codelldb adapter
+          codelldb_path = nil, -- path to codelldb adapter, REQUIRED
+          lldb_lib_path = "/Applications/Xcode.app/Contents/SharedFrameworks/LLDB.framework/Versions/A/LLDB", -- path to lldb library
+        },
+        lldb = {
+          port = 13000, -- port used by lldb-dap
+        },
       },
       highlights = {
         -- you can override here any highlight group used by this plugin
@@ -319,7 +331,6 @@ External tools
  - `pymobiledevice3` to debug on physical devices and/or run apps on devices below iOS 17.
  - `jq` to get some information from `pymobiledevice3`.
  - `xcode-build-server` to make LSP work properly with xcodeproj/xcworkspace.
- - `codelldb` to debug applications.
  - `ripgrep` to find matching test files while using Swift Testing framework.
  - `Xcode` to build, run, and test apps. Make sure that `xcodebuild` and `xcrun simctl` work correctly. Tested with Xcode 15.
 
@@ -2708,7 +2719,7 @@ M.start_secure_server({destination}, {rsd})
   Starts the secure server.
   It is used on devices with iOS 17 and above.
 
-  Returns the command to connect to the device using `codelldb`.
+  Returns the command to connect to the device using `lldb`.
 
   Parameters: ~
     {destination}  (string) # device id
@@ -2724,7 +2735,7 @@ M.start_server({destination}, {port}, {callback})
   It is used on devices with iOS below 17.
 
   The callback returns {connection_string} that can be used to connect
-  to the device using `codelldb`.
+  to the device using `lldb`.
 
   This process must be alive during the debugging session.
   Later, it can be closed with `vim.fn.jobstop({job_id})`.
@@ -2787,15 +2798,39 @@ M.launch_app({appPath}, {callback})       *xcodebuild.platform.macos.launch_app*
 
 
                                     *xcodebuild.platform.macos.launch_and_debug*
-M.launch_and_debug({appPath}, {callback})
+M.launch_and_debug({callback})
   Starts the application on macOS and starts the debugger.
 
   Parameters: ~
-    {appPath}   (string)
     {callback}  (function|nil)
 
   Returns: ~
     (number|nil)   job id
+
+
+==============================================================================
+Debugger                                          *xcodebuild.platform.debugger*
+
+This module is responsible for providing the interface to get DAP configurations based
+on the debugger integration used (like lldb, codelldb, etc.).
+
+                              *xcodebuild.platform.debugger.DebuggerIntegration*
+DebuggerIntegration
+
+  Fields: ~
+    {get_macos_configuration}          (fun():table)
+    {get_ios_configuration}            (fun():table)
+    {get_remote_device_configuration}  (fun(request:string):table)
+    {get_adapter_name}                 (fun():string)
+    {get_adapter}                      (fun():table)
+
+
+                               *xcodebuild.platform.debugger.set_implementation*
+M.set_implementation({impl})
+  Sets the implementation for the debugger integration.
+
+  Parameters: ~
+    {impl}  (DebuggerIntegration)
 
 
 ==============================================================================
@@ -3704,9 +3739,11 @@ It provides functions to start the debugger and to manage its state.
 
 To configure `nvim-dap` for development:
 
-  1. Download `codelldb` VS Code plugin from: https://github.com/vadimcn/codelldb/releases
-     For macOS use darwin version. Just unzip vsix file and set paths below.
-  2. Install also `nvim-dap-ui` for a nice GUI to debug.
+  1. [Only for Xcode versions below 16]
+     - Download `codelldb` VS Code plugin from: https://github.com/vadimcn/codelldb/releases
+     - For macOS use Darwin version and unzip `vsix` file.
+     - Update `codelldb` integration config (node: `integrations.codelldb`).
+  2. Install `nvim-dap-ui` for a nice GUI to debug.
   3. Make sure to enable console window from `nvim-dap-ui` to see simulator logs.
 
 Sample `nvim-dap` configuration:
@@ -3717,11 +3754,7 @@ Sample `nvim-dap` configuration:
         "wojciech-kulik/xcodebuild.nvim"
       },
       config = function()
-        local xcodebuild = require("xcodebuild.integrations.dap")
-        -- SAMPLE PATH, change it to your local codelldb path
-        local codelldbPath = "/YOUR_PATH/codelldb-aarch64-darwin/extension/adapter/codelldb"
-
-        xcodebuild.setup(codelldbPath)
+        require("xcodebuild.integrations.dap").setup()
 
         vim.keymap.set("n", "<leader>dd", xcodebuild.build_and_debug, { desc = "Build & Debug" })
         vim.keymap.set("n", "<leader>dr", xcodebuild.debug_without_build, { desc = "Debug Without Building" })
@@ -3812,21 +3845,6 @@ M.debug_failing_tests()
   Starts the debugger and re-runs the failing tests.
 
 
-                                  *xcodebuild.integrations.dap.get_program_path*
-M.get_program_path()
-  Returns path to the built application.
-
-  Returns: ~
-    (string)
-
-
-M.wait_for_pid()                      *xcodebuild.integrations.dap.wait_for_pid*
-  Waits for the application to start and returns its PID.
-
-  Returns: ~
-    (thread|nil)   coroutine with pid
-
-
                                      *xcodebuild.integrations.dap.clear_console*
 M.clear_console({validate})
   Clears the DAP console buffer.
@@ -3845,42 +3863,6 @@ M.update_console({output}, {append})
   Parameters: ~
     {output}  (string[])
     {append}  (boolean|nil) # if true, appends the output to the last line
-
-
-                           *xcodebuild.integrations.dap.get_swift_configuration*
-M.get_swift_configuration()
-  Returns the `coodelldb` configuration for `nvim-dap`.
-
-  Returns: ~
-    (table[])
-
-  Usage: ~
->lua
-    require("dap").configurations.swift = require("xcodebuild.integrations.dap").get_swift_configuration()
-<
-
-
-                              *xcodebuild.integrations.dap.get_codelldb_adapter*
-M.get_codelldb_adapter({codelldbPath}, {lldbPath}, {port})
-  Returns the `codelldb` adapter for `nvim-dap`.
-
-  Examples:
-    {codelldbPath} - `/your/path/to/codelldb-aarch64-darwin/extension/adapter/codelldb`
-    {lldbPath} - (default) `/Applications/Xcode.app/Contents/SharedFrameworks/LLDB.framework/Versions/A/LLDB`
-
-  Parameters: ~
-    {codelldbPath}  (string)
-    {lldbPath}      (string|nil)
-    {port}          (number|nil)
-
-  Returns: ~
-    (table)
-
-  Usage: ~
->lua
-    require("dap").adapters.codelldb = require("xcodebuild.integrations.dap")
-      .get_codelldb_adapter("path/to/codelldb")
-<
 
 
                                   *xcodebuild.integrations.dap.save_breakpoints*
@@ -3928,20 +3910,109 @@ M.register_user_commands()
     - `XcodebuildDebug` - installs and runs the project with the debugger.
 
 
-                                             *xcodebuild.integrations.dap.setup*
-M.setup({codelldbPath}, {loadBreakpoints}, {lldbPath})
+M.setup({loadBreakpoints})                   *xcodebuild.integrations.dap.setup*
   Sets up the adapter and configuration for the `nvim-dap` plugin.
-  {codelldbPath} - path to the `codelldb` binary.
-
-  Sample {codelldbPath} - `/your/path/to/codelldb-aarch64-darwin/extension/adapter/codelldb`
   {loadBreakpoints} - if true or nil, sets up an autocmd to load breakpoints when a Swift file is opened.
-  {lldbPath} - default: `/Applications/Xcode.app/Contents/SharedFrameworks/LLDB.framework/Versions/A/LLDB`
-  Provide {lldbPath} if your Xcode installation is not in the default location.
 
   Parameters: ~
-    {codelldbPath}     (string)
     {loadBreakpoints}  (boolean|nil) default: true
-    {lldbPath}         (string|nil)
+
+
+==============================================================================
+DAP Configurations - lldb                         *xcodebuild.integrations.lldb*
+
+                                                               *xcodebuild.lldb*
+This module contains DAP configurations for `lldb-dap` provided by `xcrun lldb-dap`.
+
+                            *xcodebuild.integrations.lldb.get_ios_configuration*
+M.get_ios_configuration()
+  Returns iOS configuration for `nvim-dap`.
+
+  Returns: ~
+    (table)
+
+
+                          *xcodebuild.integrations.lldb.get_macos_configuration*
+M.get_macos_configuration()
+  Returns macOS configuration for `nvim-dap`.
+
+  Returns: ~
+    (table)
+
+
+                  *xcodebuild.integrations.lldb.get_remote_device_configuration*
+M.get_remote_device_configuration({request})
+  Returns remote debugging configuration for `nvim-dap`.
+
+  Parameters: ~
+    {request}  (string) "launch"|"attach"
+
+  Returns: ~
+    (table)
+
+
+                                 *xcodebuild.integrations.lldb.get_adapter_name*
+M.get_adapter_name()
+  Returns the name of the adapter.
+
+  Returns: ~
+    (string)
+
+
+M.get_adapter()                       *xcodebuild.integrations.lldb.get_adapter*
+  Returns the `lldb` adapter configuration for `nvim-dap`.
+
+  Returns: ~
+    (table)
+
+
+==============================================================================
+DAP Configurations - codelldb                 *xcodebuild.integrations.codelldb*
+
+                                                           *xcodebuild.codelldb*
+This module contains DAP configurations for `codelldb` DAP server.
+
+                        *xcodebuild.integrations.codelldb.get_ios_configuration*
+M.get_ios_configuration()
+  Returns iOS configuration for `nvim-dap`.
+
+  Returns: ~
+    (table)
+
+
+                      *xcodebuild.integrations.codelldb.get_macos_configuration*
+M.get_macos_configuration()
+  Returns macOS configuration for `nvim-dap`.
+
+  Returns: ~
+    (table)
+
+
+              *xcodebuild.integrations.codelldb.get_remote_device_configuration*
+M.get_remote_device_configuration({request})
+  Returns remote debugging configuration for `nvim-dap`.
+
+  Parameters: ~
+    {request}  (string) "launch"|"attach"
+
+  Returns: ~
+    (table)
+
+
+                             *xcodebuild.integrations.codelldb.get_adapter_name*
+M.get_adapter_name()
+  Returns the name of the adapter.
+
+  Returns: ~
+    (string)
+
+
+                                  *xcodebuild.integrations.codelldb.get_adapter*
+M.get_adapter()
+  Returns the `codelldb` adapter configuration for `nvim-dap`.
+
+  Returns: ~
+    (table)
 
 
 ==============================================================================
@@ -5054,6 +5125,16 @@ M.get_filename({filepath})                        *xcodebuild.util.get_filename*
     (string)
 
 
+M.shell_execute({cmd})                           *xcodebuild.util.shell_execute*
+  Runs a shell command and returns exit code
+
+  Parameters: ~
+    {cmd}  (string|string[])
+
+  Returns: ~
+    (number)
+
+
 M.shell({cmd})                                           *xcodebuild.util.shell*
   Runs a shell command and returns the output as a list of strings.
 
@@ -5064,7 +5145,7 @@ M.shell({cmd})                                           *xcodebuild.util.shell*
     (string[])
 
 
-M.shellAsync({cmd}, {callback})                     *xcodebuild.util.shellAsync*
+M.shell_async({cmd}, {callback})                   *xcodebuild.util.shell_async*
   Runs a shell command asynchronously.
 
   Parameters: ~

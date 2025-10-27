@@ -123,6 +123,13 @@ local plugins = {
   },
 }
 
+---@param command string
+---@return boolean
+local function check_command(command)
+  local util = require("xcodebuild.util")
+  return util.shell_execute(command) == 0
+end
+
 ---@param binary string
 local function check_binary_installed(binary)
   return vim.fn.executable(binary) ~= 0
@@ -152,32 +159,41 @@ end
 local function check_debugger()
   local success, dap = pcall(require, "dap")
   if not success then
-    error("codelldb: cannot be checked because dap is not installed.")
+    error("lldb: cannot be checked because dap is not installed.")
     return
   end
 
-  if not dap.adapters.codelldb then
-    error("nvim-dap: codelldb adapter not configured.")
-    return
+  local isCodelldbEnabled = require("xcodebuild.core.config").options.integrations.codelldb.enabled
+  local adapter = isCodelldbEnabled and "codelldb" or "lldb-dap"
+
+  if dap.adapters[adapter] then
+    ok("nvim-dap: " .. adapter .. " adapter configured.")
   else
-    ok("nvim-dap: codelldb adapter configured.")
+    error("nvim-dap: " .. adapter .. " adapter not configured.")
   end
 
-  if not dap.configurations.swift then
-    error("nvim-dap: swift configuration not found.")
-    return
-  else
+  if dap.configurations.swift then
     ok("nvim-dap: swift configuration found.")
+  else
+    error("nvim-dap: swift configuration not found.")
   end
 
-  local path = dap.adapters.codelldb.executable.command
-
-  if check_binary_installed(path) then
-    ok("codelldb: installed")
+  if isCodelldbEnabled then
+    if check_binary_installed(dap.adapters.codelldb.executable.command) then
+      ok("lldb: codelldb installed")
+    else
+      error(
+        "lldb: codelldb not installed. Required to debug iOS and macOS apps. (https://github.com/vadimcn/codelldb)"
+      )
+    end
   else
-    error(
-      "codelldb: not installed. Required to debug iOS and macOS apps. (https://github.com/vadimcn/codelldb)"
-    )
+    if check_command("xcrun -f lldb-dap") then
+      ok("lldb: xcrun lldb-dap installed")
+    else
+      error(
+        "lldb: lldb-dap not installed. Required to debug iOS and macOS apps. (https://github.com/vadimcn/codelldb)"
+      )
+    end
   end
 end
 

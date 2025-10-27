@@ -126,7 +126,7 @@ function M.export_coverage(xcresultFilepath, callback)
     return
   end
 
-  util.shellAsync({ "rm", "-rf", appdata.coverage_report_filepath }, function()
+  util.shell_async({ "rm", "-rf", appdata.coverage_report_filepath }, function()
     xcode.export_code_coverage_report(xcresultFilepath, appdata.coverage_report_filepath, callback_if_set)
   end)
 end

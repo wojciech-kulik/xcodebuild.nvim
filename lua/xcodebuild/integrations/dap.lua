@@ -7,9 +7,11 @@
 ---
 ---To configure `nvim-dap` for development:
 ---
----  1. Download `codelldb` VS Code plugin from: https://github.com/vadimcn/codelldb/releases
----     For macOS use darwin version. Just unzip vsix file and set paths below.
----  2. Install also `nvim-dap-ui` for a nice GUI to debug.
+---  1. [Only for Xcode versions below 16]
+---     - Download `codelldb` VS Code plugin from: https://github.com/vadimcn/codelldb/releases
+---     - For macOS use Darwin version and unzip `vsix` file.
+---     - Update `codelldb` integration config (node: `integrations.codelldb`).
+---  2. Install `nvim-dap-ui` for a nice GUI to debug.
 ---  3. Make sure to enable console window from `nvim-dap-ui` to see simulator logs.
 ---
 ---Sample `nvim-dap` configuration:
@@ -20,11 +22,7 @@
 ---        "wojciech-kulik/xcodebuild.nvim"
 ---      },
 ---      config = function()
----        local xcodebuild = require("xcodebuild.integrations.dap")
----        -- SAMPLE PATH, change it to your local codelldb path
----        local codelldbPath = "/YOUR_PATH/codelldb-aarch64-darwin/extension/adapter/codelldb"
----
----        xcodebuild.setup(codelldbPath)
+---        require("xcodebuild.integrations.dap").setup()
 ---
 ---        vim.keymap.set("n", "<leader>dd", xcodebuild.build_and_debug, { desc = "Build & Debug" })
 ---        vim.keymap.set("n", "<leader>dr", xcodebuild.debug_without_build, { desc = "Debug Without Building" })
@@ -53,6 +51,9 @@ local device = require("xcodebuild.platform.device")
 local actions = require("xcodebuild.actions")
 local remoteDebugger = require("xcodebuild.integrations.remote_debugger")
 local dapSymbolicate = require("xcodebuild.integrations.dap-symbolicate")
+local debugger = require("xcodebuild.platform.debugger")
+
+local PLUGIN_ID = "xcodebuild.nvim"
 
 local M = {}
 
@@ -87,7 +88,7 @@ local function set_remote_debugger_mode()
   end
 end
 
----Starts `nvim-dap` debug session. It connects to `codelldb`.
+---Starts `nvim-dap` debug session. It connects to `lldb`.
 local function start_dap()
   local loadedDap, dap = pcall(require, "dap")
   if not loadedDap then
@@ -125,6 +126,7 @@ local function disconnect_session()
   local isDevice = constants.is_device(projectConfig.settings.platform)
   if isDevice then
     dap.repl.execute("process detach")
+    dap.disconnect()
   else
     dap.disconnect()
   end
@@ -171,8 +173,6 @@ function M.attach_and_debug(callback)
     return
   end
 
-  notifications.send("Attaching debugger...")
-
   if isDevice then
     set_remote_debugger_mode()
     remoteDebugger.start_remote_debugger({ attach = true }, callback)
@@ -218,10 +218,14 @@ function M.build_and_debug(callback)
         remoteDebugger.start_remote_debugger({}, callback)
       end)
     else
-      if isSimulator then
-        start_dap()
-      end
-      device.run_app(true, callback)
+      device.run_app(true, function()
+        -- macOS apps are launched via dap "launch" request. Otherwise, logs wouldn't be captured.
+        -- iOS simulator apps we first launch, then attach debugger.
+        if isSimulator then
+          start_dap()
+        end
+        util.call(callback)
+      end)
     end
   end)
 end
@@ -353,48 +357,6 @@ function M.debug_failing_tests()
   M.attach_debugger_for_tests()
 end
 
----Returns path to the built application.
----@return string
-function M.get_program_path()
-  return projectConfig.settings.appPath
-end
-
----Waits for the application to start and returns its PID.
----@return thread|nil # coroutine with pid
-function M.wait_for_pid()
-  local co = coroutine
-  local productName = projectConfig.settings.productName
-  local xcode = require("xcodebuild.core.xcode")
-
-  if not productName then
-    notifications.send_error("You must build the application first")
-    return
-  end
-
-  return co.create(function(dap_run_co)
-    local pid = nil
-
-    notifications.send("Attaching debugger...")
-    for _ = 1, 10 do
-      util.shell("sleep 1")
-      pid = xcode.get_app_pid(productName, projectConfig.settings.platform)
-
-      if tonumber(pid) then
-        break
-      end
-    end
-
-    if not tonumber(pid) then
-      notifications.send_error("Launching the application timed out")
-
-      ---@diagnostic disable-next-line: deprecated
-      co.close(dap_run_co)
-    end
-
-    co.resume(dap_run_co, pid)
-  end)
-end
-
 ---Clears the DAP console buffer.
 ---@param validate boolean|nil # if true, shows error if the buffer is a terminal
 function M.clear_console(validate)
@@ -482,54 +444,6 @@ function M.update_console(output, append)
 
   vim.bo[bufnr].modified = false
   vim.bo[bufnr].modifiable = false
-end
-
----Returns the `coodelldb` configuration for `nvim-dap`.
----@return table[]
----@usage lua [[
----require("dap").configurations.swift = require("xcodebuild.integrations.dap").get_swift_configuration()
----@usage ]]
-function M.get_swift_configuration()
-  return {
-    {
-      name = "iOS App Debugger",
-      type = "codelldb",
-      request = "attach",
-      program = M.get_program_path,
-      cwd = "${workspaceFolder}",
-      stopOnEntry = false,
-      waitFor = true,
-    },
-  }
-end
-
----Returns the `codelldb` adapter for `nvim-dap`.
----
----Examples:
----  {codelldbPath} - `/your/path/to/codelldb-aarch64-darwin/extension/adapter/codelldb`
----  {lldbPath} - (default) `/Applications/Xcode.app/Contents/SharedFrameworks/LLDB.framework/Versions/A/LLDB`
----@param codelldbPath string
----@param lldbPath string|nil
----@param port number|nil
----@return table
----@usage lua [[
----require("dap").adapters.codelldb = require("xcodebuild.integrations.dap")
----  .get_codelldb_adapter("path/to/codelldb")
----@usage ]]
-function M.get_codelldb_adapter(codelldbPath, lldbPath, port)
-  return {
-    type = "server",
-    port = port or "13000",
-    executable = {
-      command = codelldbPath,
-      args = {
-        "--port",
-        port or "13000",
-        "--liblldb",
-        lldbPath or "/Applications/Xcode.app/Contents/SharedFrameworks/LLDB.framework/Versions/A/LLDB",
-      },
-    },
-  }
 end
 
 ---Reads breakpoints from the `.nvim/xcodebuild/breakpoints.json` file.
@@ -653,20 +567,38 @@ function M.register_user_commands()
 end
 
 ---Sets up the adapter and configuration for the `nvim-dap` plugin.
----{codelldbPath} - path to the `codelldb` binary.
----
----Sample {codelldbPath} - `/your/path/to/codelldb-aarch64-darwin/extension/adapter/codelldb`
 ---{loadBreakpoints} - if true or nil, sets up an autocmd to load breakpoints when a Swift file is opened.
----{lldbPath} - default: `/Applications/Xcode.app/Contents/SharedFrameworks/LLDB.framework/Versions/A/LLDB`
----Provide {lldbPath} if your Xcode installation is not in the default location.
----@param codelldbPath string
 ---@param loadBreakpoints boolean|nil default: true
----@param lldbPath string|nil
-function M.setup(codelldbPath, loadBreakpoints, lldbPath)
+function M.setup(loadBreakpoints)
+  if loadBreakpoints ~= nil and type(loadBreakpoints) ~= "boolean" then
+    loadBreakpoints = true
+    notifications.send_warning(
+      "xcodebuild.nvim: invalid call to require('xcodebuild.integrations.dap').setup()\n"
+        .. "This function now supports only one optional boolean parameter: loadBreakpoints (default: true).\n\n"
+        .. "codelldb is no longer required for Xcode 16+. Please update your configuration to suppress this message.\n"
+        .. "If you still need codelldb, please configure and enable `integrations.codelldb` in your config."
+    )
+  end
+
   local dap = require("dap")
-  dap.configurations.swift = M.get_swift_configuration()
-  dap.adapters.codelldb = M.get_codelldb_adapter(codelldbPath, lldbPath)
+  local codelldbConfig = require("xcodebuild.core.config").options.integrations.codelldb
+
+  if codelldbConfig.enabled then
+    debugger.set_implementation(require("xcodebuild.integrations.codelldb"))
+  else
+    debugger.set_implementation(require("xcodebuild.integrations.lldb"))
+  end
+
+  dap.configurations.swift = { debugger.get_ios_configuration() }
+  dap.adapters[debugger.get_adapter_name()] = debugger.get_adapter()
+
   dap.defaults.fallback.exception_breakpoints = {}
+  dap.listeners.after.event_process[PLUGIN_ID] = function()
+    notifications.send("Debugger attached")
+  end
+  dap.listeners.after.event_exited[PLUGIN_ID] = function()
+    notifications.send("Debugger disconnected")
+  end
 
   M.register_user_commands()
 
