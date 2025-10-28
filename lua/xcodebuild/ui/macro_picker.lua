@@ -10,8 +10,6 @@ local util = require("xcodebuild.util")
 local notifications = require("xcodebuild.broadcasting.notifications")
 local pickers = require("xcodebuild.ui.pickers")
 
----@class MacroPickerModule
----@field show_macro_approval_picker fun(macrosToApprove: MacroError[]): nil
 local M = {}
 
 ---Shows a picker to approve Swift macros.

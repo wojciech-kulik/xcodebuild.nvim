@@ -105,10 +105,8 @@ function M.build_project(opts, callback)
     )
 
     if config.macro_picker.auto_show_on_error and util.is_not_empty(appdata.report.buildErrors) then
-      ---@type MacrosModule
       local macros = require("xcodebuild.platform.macros")
       if macros.has_unapproved_macros() then
-        ---@type MacroPickerModule
         local unapproved = macros.get_unapproved_macros()
         vim.defer_fn(function()
           local macroPicker = require("xcodebuild.ui.macro_picker")

@@ -35,10 +35,6 @@ local util = require("xcodebuild.util")
 local notifications = require("xcodebuild.broadcasting.notifications")
 local projectConfig = require("xcodebuild.project.config")
 
----@class MacrosModule
----@field has_unapproved_macros fun(): boolean
----@field get_unapproved_macros fun(): MacroError[]
----@field parse_macro_errors fun(buildErrors: table): MacroError[]
 local M = {}
 
 local MACROS_JSON_PATH = vim.fn.expand("~/Library/org.swift.swiftpm/security/macros.json")
