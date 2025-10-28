@@ -441,7 +441,29 @@ function M.get_unapproved_macros()
     )
   end
 
-  return macroErrors
+  local approvedMacros = M.read_macros_json()
+  local approvedLookup = {}
+  for _, approvedMacro in ipairs(approvedMacros) do
+    local key = approvedMacro.packageIdentity .. "/" .. approvedMacro.targetName
+    approvedLookup[key] = approvedMacro.fingerprint
+  end
+
+  local unapprovedMacros = {}
+  for _, macroError in ipairs(macroErrors) do
+    local key = macroError.packageIdentity .. "/" .. macroError.targetName
+    local approvedFingerprint = approvedLookup[key]
+
+    if approvedFingerprint then
+      local currentFingerprint = M.get_fingerprint(macroError.packageIdentity)
+
+      if not currentFingerprint or currentFingerprint ~= approvedFingerprint then
+        table.insert(unapprovedMacros, macroError)
+      end
+    else
+      table.insert(unapprovedMacros, macroError)
+    end
+  end
+  return unapprovedMacros
 end
 
 return M
