@@ -718,11 +718,7 @@ local function process_line(line)
   elseif string.find(line, "^PhaseScriptExecution") then
     buildPhaseName = string.match(line, "^PhaseScriptExecution ([^/]+) /")
     buildPhaseName = buildPhaseName and buildPhaseName:gsub("\\", "")
-  elseif
-    string.find(line, "** BUILD FAILED **")
-    and util.is_empty(buildErrors)
-    and lineType ~= BUILD_ERROR
-  then
+  elseif string.find(line, "** BUILD FAILED **") and util.is_empty(buildErrors) then
     parse_general_build_failure(line)
     flush()
   elseif string.find(line, "^%s*$") then
