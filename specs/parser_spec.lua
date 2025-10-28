@@ -355,4 +355,14 @@ describe("ENSURE parse_logs", function()
       assert.are.same(expectedResult, result)
     end)
   end)
+
+  --
+  -- Macro approval errors
+  --
+  describe("WHEN the build fails due to unapproved macros", function()
+    it("THEN should parse macro errors correctly", function()
+      local expectedResult, result = runTestCase(28)
+      assert.are.same(expectedResult, result)
+    end)
+  end)
 end)
