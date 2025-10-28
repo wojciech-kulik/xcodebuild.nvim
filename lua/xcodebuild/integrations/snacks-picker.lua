@@ -212,7 +212,7 @@ local function _show(title, items, opts, multiselect, callback)
       function()
         local selected = pickerRequest.picker:selected({ fallback = true })
         if selected and selected[1] and selected[1].item then
-          pickerRequest.picker:close()
+          -- Don't close picker - callback handles close and reopen
           opts.macro_approve_callback({ index = selected[1].idx, value = selected[1].item })
         end
       end,

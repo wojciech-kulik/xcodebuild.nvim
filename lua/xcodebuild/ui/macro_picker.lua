@@ -14,14 +14,17 @@ local M = {}
 
 ---Shows a picker to approve Swift macros.
 ---@param macrosToApprove MacroError[]
-function M.show_macro_approval_picker(macrosToApprove)
+---@param skipWarning boolean|nil
+function M.show_macro_approval_picker(macrosToApprove, skipWarning)
   if util.is_empty(macrosToApprove) then
     notifications.send("No unapproved macros found")
     return
   end
 
-  -- Show security warning
-  notifications.send_warning("⚠️  Only approve macros from trusted sources!")
+  -- Show security warning only on first call (not on reopens)
+  if not skipWarning then
+    notifications.send_warning("⚠️  Only approve macros from trusted sources!")
+  end
 
   -- Callback when user opens macro source (default action)
   local function on_open(selection)
@@ -50,6 +53,20 @@ function M.show_macro_approval_picker(macrosToApprove)
 
     if success then
       notifications.send("✓ Macro approved. Run build again to apply changes.")
+
+      -- Close current picker and reopen with fresh data
+      pickers.close()
+
+      vim.defer_fn(function()
+        local updatedMacros = macros.get_unapproved_macros()
+
+        if util.is_empty(updatedMacros) then
+          notifications.send("All macros approved!")
+        else
+          -- Reopen picker with remaining macros (skip warning on reopen)
+          M.show_macro_approval_picker(updatedMacros, true)
+        end
+      end, 100)
     else
       notifications.send_error("Failed to approve macro")
     end

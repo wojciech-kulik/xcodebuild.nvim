@@ -275,7 +275,7 @@ function M.show(title, items, opts, callback)
         vim.keymap.set({ "n", "i" }, mapping, function()
           local selection = telescopeState.get_selected_entry()
           if selection then
-            telescopeActions.close(prompt_bufnr)
+            -- Don't close picker - callback handles close and reopen
             opts.macro_approve_callback(selection)
           end
         end, { buffer = prompt_bufnr })
