@@ -4894,6 +4894,29 @@ M.get_destination_name({destination})
     (string)
 
 
+                                    *xcodebuild.ui.pickers_utils.is_macro_items*
+M.is_macro_items({items})
+  Checks if the items array contains macro items.
+
+  Parameters: ~
+    {items}  (any[])
+
+  Returns: ~
+    (boolean)
+
+
+                        *xcodebuild.ui.pickers_utils.get_macro_approval_mapping*
+M.get_macro_approval_mapping()
+  Gets the macro approval mapping from config.
+
+  Returns: ~
+    (string)  mapping
+
+
+                         *xcodebuild.ui.pickers_utils.get_macro_preview_content*
+M.get_macro_preview_content()
+
+
 ==============================================================================
 Helpers                                                     *xcodebuild.helpers*
 

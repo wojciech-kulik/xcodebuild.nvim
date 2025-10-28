@@ -178,7 +178,7 @@ local function _show(title, items, opts, multiselect, callback)
   opts = opts or {}
 
   local completed = false
-  local hasMacroItems = type(items[1]) == "table" and items[1].targetName ~= nil
+  local hasMacroItems = pickersUtils.is_macro_items(items)
 
   pickerRequest = {
     title = title,
@@ -206,10 +206,9 @@ local function _show(title, items, opts, multiselect, callback)
   end
 
   if hasMacroItems and opts.macro_approve_callback then
-    local pluginConfig = require("xcodebuild.core.config")
-    local mappings = pluginConfig.options.macro_picker.mappings
+    local mapping = pickersUtils.get_macro_approval_mapping()
 
-    keys[mappings.approve_macro] = {
+    keys[mapping] = {
       function()
         local selected = pickerRequest.picker:selected({ fallback = true })
         if selected and selected[1] and selected[1].item then
@@ -298,7 +297,7 @@ end
 ---@param items any[]
 ---@return function|nil
 local function create_macro_preview(items)
-  if type(items[1]) ~= "table" or not items[1].targetName then
+  if not pickersUtils.is_macro_items(items) then
     return nil
   end
 
@@ -322,39 +321,16 @@ local function create_macro_preview(items)
       return true
     end
 
-    local macros = require("xcodebuild.platform.macros")
-    local files = macros.find_macro_source_files(macroItem.packageIdentity, macroItem.targetName)
+    local fallbackLines, sourceFiles = pickersUtils.get_macro_preview_content(macroItem)
 
-    if not files or #files == 0 then
-      local lines = {
-        "⚠️  Macro source files not available",
-        "",
-        "Package: " .. macroItem.packageIdentity,
-        "Target: " .. macroItem.targetName,
-        "",
-        "DerivedData not found or package not checked out.",
-        "Try building the project first.",
-      }
-
-      if macroItem.message and macroItem.message ~= "" then
-        table.insert(lines, "")
-        table.insert(lines, "Error Message:")
-        table.insert(
-          lines,
-          "─────────────────────────────────────"
-        )
-        for _, line in ipairs(vim.split(macroItem.message, "\n", { plain = true })) do
-          table.insert(lines, line)
-        end
-      end
-
+    if not sourceFiles or #sourceFiles == 0 then
       ctx.preview:reset()
-      ctx.preview:set_lines(lines)
+      ctx.preview:set_lines(fallbackLines)
       return true
     end
 
     -- Read the Swift file and display it
-    local filePath = files[1]
+    local filePath = sourceFiles[1]
     local ok, fileLines = pcall(vim.fn.readfile, filePath)
 
     if not ok or not fileLines then
@@ -391,7 +367,7 @@ end
 ---@param callback fun(result: {index: number, value: any}, index: number)|nil
 function M.show(title, items, opts, callback)
   opts = opts or {}
-  local hasMacroItems = type(items[1]) == "table" and items[1].targetName ~= nil
+  local hasMacroItems = pickersUtils.is_macro_items(items)
 
   if hasMacroItems then
     local previewFn = create_macro_preview(items)

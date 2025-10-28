@@ -164,7 +164,7 @@ end
 ---@param items any[]
 ---@return function|nil
 local function create_macro_preview(items)
-  if type(items[1]) ~= "table" or not items[1].targetName then
+  if not pickersUtils.is_macro_items(items) then
     return nil
   end
 
@@ -188,38 +188,15 @@ local function create_macro_preview(items)
       return ""
     end
 
-    local macros = require("xcodebuild.platform.macros")
-    local files = macros.find_macro_source_files(macro.packageIdentity, macro.targetName)
+    local fallbackLines, sourceFiles = pickersUtils.get_macro_preview_content(macro)
 
-    if not files or #files == 0 then
-      local lines = {
-        "⚠️  Macro source files not available",
-        "",
-        "Package: " .. macro.packageIdentity,
-        "Target: " .. macro.targetName,
-        "",
-        "DerivedData not found or package not checked out.",
-        "Try building the project first.",
-      }
-
-      if macro.message and macro.message ~= "" then
-        table.insert(lines, "")
-        table.insert(lines, "Error Message:")
-        table.insert(
-          lines,
-          "─────────────────────────────────────"
-        )
-        for _, line in ipairs(vim.split(macro.message, "\n", { plain = true })) do
-          table.insert(lines, line)
-        end
-      end
-
-      return table.concat(lines, "\n")
+    if not sourceFiles or #sourceFiles == 0 then
+      return table.concat(fallbackLines, "\n")
     end
 
     -- Return a shell command to preview the file
     -- Use bat for syntax highlighting if available, otherwise use cat
-    local filePath = vim.fn.shellescape(files[1])
+    local filePath = vim.fn.shellescape(sourceFiles[1])
     if vim.fn.executable("bat") == 1 then
       return "bat --color=always --style=numbers --language=swift " .. filePath
     else
@@ -237,7 +214,7 @@ function M.show(title, items, opts, callback)
   opts = opts or {}
 
   local formattedItems = util.select(items, entry_maker)
-  local hasMacroItems = type(items[1]) == "table" and items[1].targetName ~= nil
+  local hasMacroItems = pickersUtils.is_macro_items(items)
 
   pickerRequest = {
     title = title,
@@ -260,10 +237,9 @@ function M.show(title, items, opts, callback)
   }
 
   if hasMacroItems and opts.macro_approve_callback then
-    local pluginConfig = require("xcodebuild.core.config")
-    local mappings = pluginConfig.options.macro_picker.mappings
+    local mapping = pickersUtils.get_macro_approval_mapping()
 
-    actions[map_shortcut(mappings.approve_macro)] = function(selected)
+    actions[map_shortcut(mapping)] = function(selected)
       local index = util.indexOfPredicate(formattedItems, function(item)
         return item == selected[1]
       end)

@@ -230,32 +230,12 @@ local function create_macro_previewer()
         return
       end
 
-      local macros = require("xcodebuild.platform.macros")
-      local files = macros.find_macro_source_files(entry.value.packageIdentity, entry.value.targetName)
+      local fallbackLines, sourceFiles = pickersUtils.get_macro_preview_content(entry.value)
 
-      if not files or #files == 0 then
-        local lines = {
-          "⚠️  Macro source files not available",
-          "",
-          "Package: " .. entry.value.packageIdentity,
-          "Target: " .. entry.value.targetName,
-          "",
-          "DerivedData not found or package not checked out.",
-          "Try building the project first.",
-          "",
-          "Error Message:",
-          "─────────────────────────────────────",
-        }
-
-        if entry.value.message and entry.value.message ~= "" then
-          for _, line in ipairs(vim.split(entry.value.message, "\n", { plain = true })) do
-            table.insert(lines, line)
-          end
-        end
-
-        vim.api.nvim_buf_set_lines(self.state.bufnr, 0, -1, false, lines)
+      if not sourceFiles or #sourceFiles == 0 then
+        vim.api.nvim_buf_set_lines(self.state.bufnr, 0, -1, false, fallbackLines)
       else
-        config.buffer_previewer_maker(files[1], self.state.bufnr, {
+        config.buffer_previewer_maker(sourceFiles[1], self.state.bufnr, {
           bufname = self.state.bufname,
           winid = self.state.winid,
           callback = function(bufnr)
@@ -275,7 +255,7 @@ end
 function M.show(title, items, opts, callback)
   opts = opts or {}
 
-  local hasMacroItems = type(items[1]) == "table" and items[1].targetName ~= nil
+  local hasMacroItems = pickersUtils.is_macro_items(items)
 
   activePicker = telescopePickers.new(require("telescope.themes").get_dropdown({}), {
     prompt_title = title,
@@ -290,10 +270,9 @@ function M.show(title, items, opts, callback)
       setup_bindings(prompt_bufnr, opts)
 
       if hasMacroItems and opts.macro_approve_callback then
-        local config = require("xcodebuild.core.config")
-        local mappings = config.options.macro_picker.mappings
+        local mapping = pickersUtils.get_macro_approval_mapping()
 
-        vim.keymap.set({ "n", "i" }, mappings.approve_macro, function()
+        vim.keymap.set({ "n", "i" }, mapping, function()
           local selection = telescopeState.get_selected_entry()
           if selection then
             telescopeActions.close(prompt_bufnr)
