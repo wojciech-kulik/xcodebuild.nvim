@@ -18,6 +18,7 @@
 ---@field auto_select boolean|nil # if one result, select it automatically
 ---@field close_on_select boolean|nil # close the picker after selection
 ---@field device_select_callback function|nil # callback used when selecting a device in non-add mode
+---@field macro_approve_callback function|nil # callback used when approving a macro with <C-a>
 
 local util = require("xcodebuild.util")
 local notifications = require("xcodebuild.broadcasting.notifications")

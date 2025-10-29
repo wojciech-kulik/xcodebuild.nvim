@@ -213,6 +213,12 @@ end
 ---      refresh_devices = "<C-r>", -- refresh devices list
 ---    },
 ---  },
+---  macro_picker = {
+---    auto_show_on_error = true, -- automatically show macro approval picker when build fails due to unapproved macros
+---    mappings = {
+---      approve_macro = "<C-a>", -- approve the selected macro
+---    },
+---  },
 ---  integrations = {
 ---    pymobiledevice = {
 ---      enabled = true, -- enable pymobiledevice integration (requires configuration, see: `:h xcodebuild.remote-debugger`)
@@ -390,6 +396,9 @@ function M.setup(options)
   vim.api.nvim_create_user_command("XcodebuildOpenInXcode", call(actions.open_in_xcode), { nargs = 0 })
   vim.api.nvim_create_user_command("XcodebuildQuickfixLine", call(actions.quickfix_line), { nargs = 0 })
   vim.api.nvim_create_user_command("XcodebuildCodeActions", call(actions.show_code_actions), { nargs = 0 })
+
+  -- Swift Macros
+  vim.api.nvim_create_user_command("XcodebuildApproveMacros", call(actions.approve_macros), { nargs = 0 })
 
   -- Backward compatibility
   vim.api.nvim_create_user_command("XcodebuildTestFunc", function()

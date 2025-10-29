@@ -453,6 +453,22 @@ function M.show_code_actions()
   lsp.code_actions()
 end
 
+-- Swift Macros
+
+---Shows picker to approve Swift macros.
+function M.approve_macros()
+  local macros = require("xcodebuild.platform.macros")
+  local unapproved = macros.get_unapproved_macros()
+
+  if util.is_empty(unapproved) then
+    notifications.send("No unapproved macros found in the last build")
+    return
+  end
+
+  local macroPicker = require("xcodebuild.ui.macro_picker")
+  macroPicker.show_macro_approval_picker(unapproved)
+end
+
 ---@deprecated use `run_nearest_test` instead
 function M.run_func_test()
   M.run_nearest_test()

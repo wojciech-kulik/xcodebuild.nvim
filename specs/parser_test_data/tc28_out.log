@@ -1,0 +1,23 @@
+{
+  buildErrors = { {
+      isMacroError = true,
+      macroName = "StructuredQueriesMacros",
+      message = { "Macro “StructuredQueriesMacros” from package “swift-structured-queries” must be enabled before it can be used" },
+      packageIdentity = "swift-structured-queries",
+      source = "/Users/john/Library/Developer/Xcode/DerivedData/Macros-ghxwkdysttvliqcrokpijmjgaetf/SourcePackages/checkouts/swift-structured-queries/Package.swift"
+    }, {
+      isMacroError = true,
+      macroName = "StructuredQueriesSQLiteMacros",
+      message = { "Macro “StructuredQueriesSQLiteMacros” from package “swift-structured-queries” must be enabled before it can be used" },
+      packageIdentity = "swift-structured-queries",
+      source = "/Users/john/Library/Developer/Xcode/DerivedData/Macros-ghxwkdysttvliqcrokpijmjgaetf/SourcePackages/checkouts/swift-structured-queries/Package.swift"
+    } },
+  buildWarnings = {},
+  failedTestsCount = 0,
+  output = {},
+  testErrors = {},
+  tests = {},
+  testsCount = 0,
+  usesSwiftTesting = false,
+  xcresultFilepath = "/Users/john/Developer/Macros/.nvim/xcodebuild/build.xcresult"
+}

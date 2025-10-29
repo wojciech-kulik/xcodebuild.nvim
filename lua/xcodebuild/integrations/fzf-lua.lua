@@ -35,8 +35,16 @@ local M = {
 local function entry_maker(entry)
   local name
 
-  if type(entry) == "table" and entry.id then
-    name = pickersUtils.get_destination_name(entry)
+  if type(entry) == "table" then
+    if entry.id then
+      -- Device object
+      name = pickersUtils.get_destination_name(entry)
+    elseif entry.targetName and entry.packageIdentity then
+      -- Macro object
+      name = string.format("%s (%s)", entry.targetName, entry.packageIdentity)
+    else
+      name = entry
+    end
   else
     name = entry
   end
@@ -152,6 +160,51 @@ function M.update_results(results)
   end, 10)
 end
 
+---Creates a preview function for macro objects.
+---@param items any[]
+---@return function|nil
+local function create_macro_preview(items)
+  if not pickersUtils.is_macro_items(items) then
+    return nil
+  end
+
+  return function(selected)
+    -- Handle nil case (can happen during initialization)
+    if not selected or not selected[1] then
+      return ""
+    end
+
+    local selectedLine = selected[1]
+    local macro = nil
+
+    for _, item in ipairs(items) do
+      if entry_maker(item) == selectedLine then
+        macro = item
+        break
+      end
+    end
+
+    if not macro then
+      return ""
+    end
+
+    local fallbackLines, sourceFiles = pickersUtils.get_macro_preview_content(macro)
+
+    if not sourceFiles or #sourceFiles == 0 then
+      return table.concat(fallbackLines, "\n")
+    end
+
+    -- Return a shell command to preview the file
+    -- Use bat for syntax highlighting if available, otherwise use cat
+    local filePath = vim.fn.shellescape(sourceFiles[1])
+    if vim.fn.executable("bat") == 1 then
+      return "bat --color=always --style=numbers --language=swift " .. filePath
+    else
+      return "cat " .. filePath
+    end
+  end
+end
+
 ---Shows a picker using fzf-lua.
 ---@param title string
 ---@param items any[]
@@ -161,6 +214,7 @@ function M.show(title, items, opts, callback)
   opts = opts or {}
 
   local formattedItems = util.select(items, entry_maker)
+  local hasMacroItems = pickersUtils.is_macro_items(items)
 
   pickerRequest = {
     title = title,
@@ -171,6 +225,7 @@ function M.show(title, items, opts, callback)
     callback = callback,
   }
 
+  ---@type table<string, fun(selected: string[]): nil>
   local actions = {
     ["default"] = function(selected)
       local index = util.indexOfPredicate(formattedItems, function(item)
@@ -181,16 +236,38 @@ function M.show(title, items, opts, callback)
     end,
   }
 
+  if hasMacroItems and opts.macro_approve_callback then
+    local mapping = pickersUtils.get_macro_approval_mapping()
+
+    actions[map_shortcut(mapping)] = function(selected)
+      local index = util.indexOfPredicate(formattedItems, function(item)
+        return item == selected[1]
+      end)
+
+      opts.macro_approve_callback({ index = index, value = items[index] })
+    end
+  end
+
   set_bindings(actions, opts)
 
   local winopts = config.win_opts or {}
   winopts.title = title
 
-  fzf.fzf_exec(formattedItems, {
+  local previewFn = hasMacroItems and create_macro_preview(items) or nil
+  local fzfOptions = {
     winopts = winopts,
     fzf_opts = config.fzf_opts or {},
     actions = actions,
-  })
+  }
+
+  if previewFn then
+    fzfOptions.preview = {
+      type = "cmd",
+      fn = previewFn,
+    }
+  end
+
+  fzf.fzf_exec(formattedItems, fzfOptions)
 end
 
 ---Shows a multiselect picker using fzf-lua.
@@ -223,9 +300,9 @@ function M.show_multiselect(title, items, callback)
         local result = {}
 
         for _, sel in ipairs(selected) do
-          for i, item in ipairs(formattedItems) do
+          for idx, item in ipairs(formattedItems) do
             if item == sel or item.name == sel then
-              table.insert(result, items[i])
+              table.insert(result, items[idx])
               break
             end
           end

@@ -201,6 +201,12 @@ M.setup({options})                                            *xcodebuild.setup*
           refresh_devices = "<C-r>", -- refresh devices list
         },
       },
+      macro_picker = {
+        auto_show_on_error = true, -- automatically show macro approval picker when build fails due to unapproved macros
+        mappings = {
+          approve_macro = "<C-a>", -- approve the selected macro
+        },
+      },
       integrations = {
         pymobiledevice = {
           enabled = true, -- enable pymobiledevice integration (requires configuration, see: `:h xcodebuild.remote-debugger`)
@@ -571,6 +577,12 @@ Configuration
  | `XcodebuildBootSimulator`  | Boot selected simulator             |
  | `XcodebuildInstallApp`     | Install application                 |
  | `XcodebuildUninstallApp`   | Uninstall application               |
+
+Swift Macros
+
+ | Command                  | Description                         |
+ | -------------------------| ----------------------------------- |
+ | `XcodebuildApproveMacros`  | Show picker to approve Swift macros |
 
 
 ==============================================================================
@@ -1044,6 +1056,10 @@ M.quickfix_line()                             *xcodebuild.actions.quickfix_line*
 
 M.show_code_actions()                     *xcodebuild.actions.show_code_actions*
   Shows the code actions for the current line.
+
+
+M.approve_macros()                           *xcodebuild.actions.approve_macros*
+  Shows picker to approve Swift macros.
 
 
 M.run_func_test()                             *xcodebuild.actions.run_func_test*
@@ -1748,8 +1764,11 @@ ParsedBuildError
 ParsedBuildGenericError
 
   Fields: ~
-    {source}   (string|nil)
-    {message}  (string[])
+    {source}           (string|nil)
+    {message}          (string[])
+    {isMacroError}     (boolean|nil)
+    {macroName}        (string|nil)
+    {packageIdentity}  (string|nil)
 
 
                                   *xcodebuild.xcode_logs.parser.ParsedTestError*
@@ -4601,6 +4620,13 @@ Snacks Picker Integration                *xcodebuild.integrations.snacks-picker*
 This module is responsible for showing pickers using Snacks.nvim.
 
 
+                             *xcodebuild.integrations.snacks-picker.ShowOptions*
+ShowOptions : PickerOptions
+
+  Fields: ~
+    {preview}  (function|nil)
+
+
                           *xcodebuild.integrations.snacks-picker.start_progress*
 M.start_progress()
   Starts the progress animation.
@@ -4675,6 +4701,7 @@ PickerOptions                              *xcodebuild.ui.pickers.PickerOptions*
     {auto_select}             (boolean|nil) # if one result, select it automatically
     {close_on_select}         (boolean|nil) # close the picker after selection
     {device_select_callback}  (function|nil) # callback used when selecting a device in non-add mode
+    {macro_approve_callback}  (function|nil) # callback used when approving a macro with <C-a>
 
 
 PickerIntegration                      *xcodebuild.ui.pickers.PickerIntegration*
@@ -4865,6 +4892,29 @@ M.get_destination_name({destination})
 
   Returns: ~
     (string)
+
+
+                                    *xcodebuild.ui.pickers_utils.is_macro_items*
+M.is_macro_items({items})
+  Checks if the items array contains macro items.
+
+  Parameters: ~
+    {items}  (any[])
+
+  Returns: ~
+    (boolean)
+
+
+                        *xcodebuild.ui.pickers_utils.get_macro_approval_mapping*
+M.get_macro_approval_mapping()
+  Gets the macro approval mapping from config.
+
+  Returns: ~
+    (string)  mapping
+
+
+                         *xcodebuild.ui.pickers_utils.get_macro_preview_content*
+M.get_macro_preview_content()
 
 
 ==============================================================================

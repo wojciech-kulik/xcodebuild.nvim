@@ -39,13 +39,22 @@ local progressFrames = {
 }
 
 ---Creates a picker entry.
----@param entry string|XcodeDevice
+---@param entry string|XcodeDevice|MacroError
 ---@return table
 local function entry_maker(entry)
   local name
 
-  if type(entry) == "table" and entry.id then
-    name = pickersUtils.get_destination_name(entry)
+  if type(entry) == "table" then
+    if entry.id then
+      -- Device object
+      ---@cast entry XcodeDevice
+      name = pickersUtils.get_destination_name(entry)
+    elseif entry.targetName and entry.packageIdentity then
+      -- Macro object
+      name = string.format("%s (%s)", entry.targetName, entry.packageIdentity)
+    else
+      name = entry
+    end
   else
     name = entry
   end
@@ -208,6 +217,36 @@ function M.close()
   end
 end
 
+---Creates a previewer for macro objects.
+---@return table
+local function create_macro_previewer()
+  local telescopePreviewers = require("telescope.previewers")
+  local config = require("telescope.config").values
+
+  return telescopePreviewers.new_buffer_previewer({
+    title = "Macro Source Code",
+    define_preview = function(self, entry)
+      if type(entry.value) ~= "table" or not entry.value.targetName then
+        return
+      end
+
+      local fallbackLines, sourceFiles = pickersUtils.get_macro_preview_content(entry.value)
+
+      if not sourceFiles or #sourceFiles == 0 then
+        vim.api.nvim_buf_set_lines(self.state.bufnr, 0, -1, false, fallbackLines)
+      else
+        config.buffer_previewer_maker(sourceFiles[1], self.state.bufnr, {
+          bufname = self.state.bufname,
+          winid = self.state.winid,
+          callback = function(bufnr)
+            vim.bo[bufnr].filetype = "swift"
+          end,
+        })
+      end
+    end,
+  })
+end
+
 ---Shows a picker using Telescope.nvim.
 ---@param title string
 ---@param items any[]
@@ -216,6 +255,8 @@ end
 function M.show(title, items, opts, callback)
   opts = opts or {}
 
+  local hasMacroItems = pickersUtils.is_macro_items(items)
+
   activePicker = telescopePickers.new(require("telescope.themes").get_dropdown({}), {
     prompt_title = title,
     finder = telescopeFinders.new_table({
@@ -223,9 +264,22 @@ function M.show(title, items, opts, callback)
       entry_maker = entry_maker,
     }),
     sorter = telescopeConfig.generic_sorter(),
+    previewer = hasMacroItems and create_macro_previewer() or nil,
     file_ignore_patterns = {},
     attach_mappings = function(prompt_bufnr, _)
       setup_bindings(prompt_bufnr, opts)
+
+      if hasMacroItems and opts.macro_approve_callback then
+        local mapping = pickersUtils.get_macro_approval_mapping()
+
+        vim.keymap.set({ "n", "i" }, mapping, function()
+          local selection = telescopeState.get_selected_entry()
+          if selection then
+            -- Don't close picker - callback handles close and reopen
+            opts.macro_approve_callback(selection)
+          end
+        end, { buffer = prompt_bufnr })
+      end
 
       telescopeActions.select_default:replace(function()
         local selection = telescopeState.get_selected_entry()

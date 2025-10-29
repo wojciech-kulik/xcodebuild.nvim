@@ -129,6 +129,12 @@ local defaults = {
       refresh_devices = "<C-r>", -- refresh devices list
     },
   },
+  macro_picker = {
+    auto_show_on_error = true,
+    mappings = {
+      approve_macro = "<C-a>", -- approve the selected macro
+    },
+  },
   integrations = {
     pymobiledevice = {
       enabled = true, -- enable pymobiledevice integration (requires configuration, see: `:h xcodebuild.remote-debugger`)

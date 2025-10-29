@@ -91,4 +91,51 @@ function M.get_destination_name(destination)
   return name
 end
 
+---Checks if the items array contains macro items.
+---@param items any[]
+---@return boolean
+function M.is_macro_items(items)
+  return type(items[1]) == "table" and items[1].targetName ~= nil
+end
+
+---Gets the macro approval mapping from config.
+---@return string mapping
+function M.get_macro_approval_mapping()
+  local config = require("xcodebuild.core.config")
+  return config.options.macro_picker.mappings.approve_macro
+end
+
+---Gets the macro preview content lines and file paths.
+---Returns both the fallback error lines and the actual source files if available.
+---@param macroItem MacroError
+---@return string[] fallback_lines, string[]|nil source_files
+function M.get_macro_preview_content(macroItem)
+  local macros = require("xcodebuild.platform.macros")
+  local files = macros.find_macro_source_files(macroItem.packageIdentity, macroItem.targetName)
+
+  local fallbackLines = {
+    "⚠️  Macro source files not available",
+    "",
+    "Package: " .. macroItem.packageIdentity,
+    "Target: " .. macroItem.targetName,
+    "",
+    "DerivedData not found or package not checked out.",
+    "Try building the project first.",
+  }
+
+  if macroItem.message and macroItem.message ~= "" then
+    table.insert(fallbackLines, "")
+    table.insert(fallbackLines, "Error Message:")
+    table.insert(
+      fallbackLines,
+      "─────────────────────────────────────"
+    )
+    for _, line in ipairs(vim.split(macroItem.message, "\n", { plain = true })) do
+      table.insert(fallbackLines, line)
+    end
+  end
+
+  return fallbackLines, files
+end
+
 return M

@@ -37,8 +37,16 @@ local pickerRequest = {
 local function entry_maker(entry)
   local name
 
-  if type(entry) == "table" and entry.id then
-    name = pickersUtils.get_destination_name(entry)
+  if type(entry) == "table" then
+    if entry.id then
+      -- Device object
+      name = pickersUtils.get_destination_name(entry)
+    elseif entry.targetName and entry.packageIdentity then
+      -- Macro object
+      name = string.format("%s (%s)", entry.targetName, entry.packageIdentity)
+    else
+      name = entry
+    end
   else
     name = entry
   end
@@ -158,15 +166,19 @@ local function set_bindings(keys, opts)
   end
 end
 
+---@class ShowOptions : PickerOptions
+---@field preview function|nil
+
 ---@param title string
 ---@param items any[]
----@param opts PickerOptions|nil
+---@param opts ShowOptions|PickerOptions|nil
 ---@param multiselect boolean
 ---@param callback fun(result: {index: number, value: any}, index: number)|nil
 local function _show(title, items, opts, multiselect, callback)
   opts = opts or {}
 
   local completed = false
+  local hasMacroItems = pickersUtils.is_macro_items(items)
 
   pickerRequest = {
     title = title,
@@ -192,6 +204,22 @@ local function _show(title, items, opts, multiselect, callback)
     keys["<Tab>"] = { "", mode = { "n", "i" } }
     keys["<S-Tab>"] = { "", mode = { "n", "i" } }
   end
+
+  if hasMacroItems and opts.macro_approve_callback then
+    local mapping = pickersUtils.get_macro_approval_mapping()
+
+    keys[mapping] = {
+      function()
+        local selected = pickerRequest.picker:selected({ fallback = true })
+        if selected and selected[1] and selected[1].item then
+          -- Don't close picker - callback handles close and reopen
+          opts.macro_approve_callback({ index = selected[1].idx, value = selected[1].item })
+        end
+      end,
+      mode = { "n", "i" },
+    }
+  end
+
   set_bindings(keys, opts)
 
   local layout = config.layout
@@ -202,9 +230,14 @@ local function _show(title, items, opts, multiselect, callback)
         width = 0.4,
       },
     }
-  layout.preview = false
 
-  pickerRequest.picker = snacks.picker.pick({
+  if opts.preview then
+    layout.preview = true
+  else
+    layout.preview = false
+  end
+
+  local pickerOpts = {
     title = title,
     items = finder_items,
     format = snacks.picker.format.text,
@@ -240,7 +273,13 @@ local function _show(title, items, opts, multiselect, callback)
         keys = keys,
       },
     },
-  })
+  }
+
+  if opts.preview then
+    pickerOpts.preview = opts.preview
+  end
+
+  pickerRequest.picker = snacks.picker.pick(pickerOpts)
 end
 
 ---Starts the progress animation.
@@ -252,6 +291,63 @@ function M.stop_progress() end
 ---Closes the active picker.
 function M.close()
   pickerRequest.picker:close()
+end
+
+---Creates a preview function for macro objects.
+---@param items any[]
+---@return function|nil
+local function create_macro_preview(items)
+  if not pickersUtils.is_macro_items(items) then
+    return nil
+  end
+
+  ---@param ctx snacks.picker.preview.ctx
+  return function(ctx)
+    if not ctx or not ctx.item then
+      return false
+    end
+
+    -- Handle both wrapped and direct item structures
+    local macroItem = ctx.item.item or ctx.item
+
+    -- Validate macro item has required fields
+    if type(macroItem) ~= "table" or not macroItem.packageIdentity or not macroItem.targetName then
+      ctx.preview:reset()
+      ctx.preview:set_lines({
+        "⚠️  Invalid macro item structure",
+        "",
+        "Missing packageIdentity or targetName",
+      })
+      return true
+    end
+
+    local fallbackLines, sourceFiles = pickersUtils.get_macro_preview_content(macroItem)
+
+    if not sourceFiles or #sourceFiles == 0 then
+      ctx.preview:reset()
+      ctx.preview:set_lines(fallbackLines)
+      return true
+    end
+
+    -- Read the Swift file and display it
+    local filePath = sourceFiles[1]
+    local ok, fileLines = pcall(vim.fn.readfile, filePath)
+
+    if not ok or not fileLines then
+      ctx.preview:reset()
+      ctx.preview:notify("Could not read file: " .. filePath, "error")
+      return false
+    end
+
+    ctx.preview:reset()
+    ctx.preview:set_title(vim.fn.fnamemodify(filePath, ":t"))
+
+    local buf = ctx.preview:scratch()
+    vim.api.nvim_buf_set_lines(buf, 0, -1, false, fileLines)
+    vim.bo[buf].filetype = "swift"
+
+    return true
+  end
 end
 
 ---Updates the results of the picker and stops the animation.
@@ -270,6 +366,19 @@ end
 ---@param opts PickerOptions|nil
 ---@param callback fun(result: {index: number, value: any}, index: number)|nil
 function M.show(title, items, opts, callback)
+  opts = opts or {}
+  local hasMacroItems = pickersUtils.is_macro_items(items)
+
+  if hasMacroItems then
+    local previewFn = create_macro_preview(items)
+    if previewFn then
+      ---@type ShowOptions
+      local show_opts = vim.tbl_extend("force", opts, { preview = previewFn })
+      _show(title, items, show_opts, false, callback)
+      return
+    end
+  end
+
   _show(title, items, opts, false, callback)
 end
 
