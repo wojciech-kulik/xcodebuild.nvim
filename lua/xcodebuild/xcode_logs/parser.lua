@@ -655,7 +655,7 @@ local function process_line(line)
   -- BEGIN -> TEST_START -> passed -> BEGIN
   -- BEGIN -> TEST_START -> TEST_ERROR -> (failed) -> BEGIN
 
-  if string.find(line, "◇ Test run started") then
+  if string.find(line, "[^%w]+ Test run started") then
     if not usesSwiftTesting then
       --- We need to clear Test Explorer because post processed Swift Testing tests
       --- don't match the ones produced in logs.
@@ -663,11 +663,11 @@ local function process_line(line)
       require("xcodebuild.tests.explorer").clear(false)
     end
     usesSwiftTesting = true
-  elseif string.find(line, '◇ Suite "[^"]+" started') then
-    testSuite = string.match(line, '◇ Suite "(.+)" started')
+  elseif string.find(line, '[^%w]+ Suite "[^"]+" started') then
+    testSuite = string.match(line, '[^%w]+ Suite "(.+)" started')
     testSuite = testSuite and testSuite:gsub("/", " ")
-  elseif string.find(line, "◇ Suite .+ started") then
-    testSuite = string.match(line, "◇ Suite (.+) started")
+  elseif string.find(line, "[^%w]+ Suite .+ started") then
+    testSuite = string.match(line, "[^%w]+ Suite (.+) started")
   elseif string.find(line, "^[^%w]+ Suite ") then
     testSuite = nil
   elseif string.find(line, "^Test Case.*started") or string.find(line, "^[^%w]+ Test .+ started") then
@@ -677,7 +677,7 @@ local function process_line(line)
     end
 
     parse_test_started(line)
-  elseif string.find(line, "◇ Passing") then
+  elseif string.find(line, "[^%w]+ Passing") then
     -- do nothing
     return
   elseif
