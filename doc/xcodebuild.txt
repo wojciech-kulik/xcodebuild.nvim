@@ -3773,7 +3773,8 @@ Sample `nvim-dap` configuration:
         "wojciech-kulik/xcodebuild.nvim"
       },
       config = function()
-        require("xcodebuild.integrations.dap").setup()
+        local xcodebuild = require("xcodebuild.integrations.dap")
+        xcodebuild.setup()
 
         vim.keymap.set("n", "<leader>dd", xcodebuild.build_and_debug, { desc = "Build & Debug" })
         vim.keymap.set("n", "<leader>dr", xcodebuild.debug_without_build, { desc = "Debug Without Building" })
