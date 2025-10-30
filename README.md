@@ -111,6 +111,7 @@ Big thanks to all the sponsors who support this project 🍻!
 - [Snippety](https://snippety.app) - Snippets manager for macOS & iOS
 - [FlashSpace](https://github.com/wojciech-kulik/FlashSpace) - Fast virtual workspace manager for macOS
 - [Smog Poland](https://smog-polska.pl) - Air quality monitoring app for Poland
+- [XcodeProjectCLI] - Open Source CLI tool to manage Xcode project
 
 &nbsp;
 
@@ -127,3 +128,4 @@ Big thanks to all the sponsors who support this project 🍻!
 [Swift Testing]: https://developer.apple.com/xcode/swift-testing/
 [snacks.nvim]: https://github.com/folke/snacks.nvim
 [xcodebuild-nvim-preview]: https://github.com/wojciech-kulik/xcodebuild-nvim-preview
+[XcodeProjectCLI]: https://github.com/wojciech-kulik/XcodeProjectCLI
