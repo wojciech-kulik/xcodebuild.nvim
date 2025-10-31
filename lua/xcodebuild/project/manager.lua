@@ -526,7 +526,10 @@ function M.move_or_rename_file(oldFilePath, newFilePath)
     return
   end
 
-  if vim.fs.basename(oldFilePath) ~= vim.fs.basename(newFilePath) then
+  local oldDir = vim.fn.fnamemodify(oldFilePath, ":h")
+  local newDir = vim.fn.fnamemodify(newFilePath, ":h")
+
+  if oldDir ~= newDir then
     run_move_file(oldFilePath, newFilePath)
     notifications.send("File has been moved")
   else
