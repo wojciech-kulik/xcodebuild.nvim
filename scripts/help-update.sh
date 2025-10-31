@@ -31,6 +31,7 @@ lemmy-help \
   ./lua/xcodebuild/platform/device_proxy.lua \
   ./lua/xcodebuild/platform/macos.lua \
   ./lua/xcodebuild/platform/debugger.lua \
+  ./lua/xcodebuild/platform/macros.lua \
   ./lua/xcodebuild/broadcasting/events.lua \
   ./lua/xcodebuild/broadcasting/notifications.lua \
   ./lua/xcodebuild/tests/diagnostics.lua \
