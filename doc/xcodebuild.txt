@@ -28,6 +28,7 @@ Device ····································�
 Device Proxy ································ |xcodebuild.platform.device_proxy|
 macOS Platform Integration ························· |xcodebuild.platform.macos|
 Debugger ········································ |xcodebuild.platform.debugger|
+Swift Macro Management ···························· |xcodebuild.platform.macros|
 Autocommand Events ···························· |xcodebuild.broadcasting.events|
 Notifications ·························· |xcodebuild.broadcasting.notifications|
 Test Diagnostics ································ |xcodebuild.tests.diagnostics|
@@ -2849,6 +2850,136 @@ M.set_implementation({impl})
 
   Parameters: ~
     {impl}  (DebuggerIntegration)
+
+
+==============================================================================
+Swift Macro Management                              *xcodebuild.platform.macros*
+
+This module is responsible for managing Swift macro approvals.
+
+It handles parsing macro errors from build logs, reading/writing
+the macros.json file, and resolving package fingerprints from Package.resolved.
+
+The macros.json file is located at:
+  ~/Library/org.swift.swiftpm/security/macros.json
+
+It contains an array of approved macros with their fingerprints (revision hashes or checksum):
+
+>json
+  [
+    {
+      "fingerprint": "abc123...",
+      "packageIdentity": "swift-dependencies",
+      "targetName": "DependenciesMacrosPlugin"
+    }
+  ]
+<
+
+MacroError                               *xcodebuild.platform.macros.MacroError*
+
+  Fields: ~
+    {targetName}       (string) macro target name (e.g., "StructuredQueriesMacros")
+    {packageIdentity}  (string) package identity (e.g., "swift-structured-queries")
+    {message}          (string) full error message
+
+
+ApprovedMacro                         *xcodebuild.platform.macros.ApprovedMacro*
+
+  Fields: ~
+    {fingerprint}      (string) revision hash or checksum from Package.resolved
+    {packageIdentity}  (string) package identity
+    {targetName}       (string) macro target name
+
+
+                                   *xcodebuild.platform.macros.read_macros_json*
+M.read_macros_json()
+  Reads the macros.json file.
+
+  Returns: ~
+    (ApprovedMacro[])
+
+
+                                  *xcodebuild.platform.macros.write_macros_json*
+M.write_macros_json({macros})
+  Writes the macros.json file.
+
+  Parameters: ~
+    {macros}  (ApprovedMacro[])
+
+  Returns: ~
+    (boolean)  success
+
+
+                                 *xcodebuild.platform.macros.parse_macro_errors*
+M.parse_macro_errors({buildErrors})
+  Parses macro approval errors from build errors.
+  Uses the isMacroError flag that the parser already set.
+
+  Parameters: ~
+    {buildErrors}  (ParsedBuildError[]|ParsedBuildGenericError[])
+
+  Returns: ~
+    (MacroError[])
+
+
+                                    *xcodebuild.platform.macros.get_fingerprint*
+M.get_fingerprint({packageIdentity})
+  Gets the fingerprint for a package from Package.resolved.
+  The fingerprint is the revision (SHA-1 hash) or checksum from the package's state.
+
+  Parameters: ~
+    {packageIdentity}  (string)
+
+  Returns: ~
+    (string|nil)  fingerprint
+
+
+                                     *xcodebuild.platform.macros.approve_macros*
+M.approve_macros({macrosToApprove})
+  Approves macros by adding or updating them in macros.json.
+
+  Parameters: ~
+    {macrosToApprove}  (MacroError[])
+
+  Returns: ~
+    (boolean)  success
+
+
+                            *xcodebuild.platform.macros.find_macro_source_files*
+M.find_macro_source_files({packageIdentity}, {targetName})
+  Finds the source files for a macro target.
+
+  Parameters: ~
+    {packageIdentity}  (string)
+    {targetName}       (string)
+
+  Returns: ~
+    (string[]|nil)
+
+
+                                  *xcodebuild.platform.macros.open_macro_source*
+M.open_macro_source({macroError})
+  Opens the first macro source file in the editor.
+
+  Parameters: ~
+    {macroError}  (MacroError)
+
+
+                              *xcodebuild.platform.macros.has_unapproved_macros*
+M.has_unapproved_macros()
+  Checks if the last build report contains unapproved macros.
+  This helper avoids emitting notifications, so it can be used in UI probes.
+
+  Returns: ~
+    (boolean)
+
+
+                              *xcodebuild.platform.macros.get_unapproved_macros*
+M.get_unapproved_macros()
+  Gets unapproved macros from the last build report.
+
+  Returns: ~
+    (MacroError[])
 
 
 ==============================================================================
