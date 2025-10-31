@@ -33,9 +33,9 @@ test:
 # Installs dependencies for plugin usage
 install:
 	brew update --quiet
-	brew install --quiet xcode-build-server xcbeautify ruby pipx rg jq coreutils
+	brew install --quiet xcode-build-server xcbeautify pipx rg jq coreutils
+	brew install --quiet wojciech-kulik/tap/xcp
 	pipx install pymobiledevice3 --quiet
-	gem install --quiet xcodeproj
 
 # Installs dependencies for development
 install-dev: install

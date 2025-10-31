@@ -332,8 +332,7 @@ Neovim environment
 
 External tools
  - `xcbeautify` to format Xcode logs (you can set a different tool or disable formatting in the config).
- - `Xcodeproj` to manage project files within Neovim.
- - `Ruby` to use `Xcodeproj` gem.
+ - `XcodeProjectCLI` to manage project files within Neovim.
  - `pymobiledevice3` to debug on physical devices and/or run apps on devices below iOS 17.
  - `jq` to get some information from `pymobiledevice3`.
  - `xcode-build-server` to make LSP work properly with xcodeproj/xcworkspace.
@@ -342,8 +341,8 @@ External tools
 
 Installation
 >bash
-  brew install xcode-build-server xcbeautify ruby pipx rg jq coreutils
-  gem install xcodeproj
+  brew install xcode-build-server xcbeautify pipx rg jq coreutils
+  brew install wojciech-kulik/tap/xcp
   pipx install pymobiledevice3
 <
 
@@ -2269,7 +2268,7 @@ Project Manager                                     *xcodebuild.project.manager*
                                                     *xcodebuild.project-manager*
 This module is responsible for managing the project files and groups.
 
-It uses the `xcodeproj` tool to update the Xcode project file.
+It uses the `XcodeProjectCLI` tool to update the Xcode project file.
 
 In general, all functions that take paths as arguments, they don't
 change files on disk. These without arguments are interactive and
@@ -2281,7 +2280,7 @@ Additionally, the `Project Manager` will try predicting targets for newly create
 If you prefer to select targets manually, you can always disable it in the configuration using
 `project_manager.guess_target`.
 
-See: https://github.com/CocoaPods/Xcodeproj
+See: https://github.com/wojciech-kulik/XcodeProjectCLI
 
                                     *xcodebuild.project.manager.create_new_file*
 M.create_new_file()
@@ -2330,8 +2329,8 @@ M.add_current_file()
   All groups will be added to the project if they are not already there.
 
 
-                                          *xcodebuild.project.manager.move_file*
-M.move_file({oldFilePath}, {newFilePath})
+                                *xcodebuild.project.manager.move_or_rename_file*
+M.move_or_rename_file({oldFilePath}, {newFilePath})
   Moves the file to the new path in the project.
   The group from {newFilePath} must exist in the project.
 
@@ -4164,7 +4163,7 @@ contains the project configuration (|xcodebuild.project.config|).
 
 You can always disable the integration in the |xcodebuild.config|.
 
-This feature requires `Xcodeproj` to be installed (|xcodebuild.requirements|).
+This feature requires `xcp` to be installed (|xcodebuild.requirements|).
 
 See:
   |xcodebuild.project-manager|
@@ -4191,7 +4190,7 @@ contains the project configuration (|xcodebuild.project.config|).
 
 You can always disable the integration in the |xcodebuild.config|.
 
-This feature requires `Xcodeproj` to be installed (|xcodebuild.requirements|).
+This feature requires `xcp` to be installed (|xcodebuild.requirements|).
 
 See:
   |xcodebuild.project-manager|
@@ -4218,7 +4217,7 @@ contains the project configuration (|xcodebuild.project.config|).
 
 You can always disable the integration in the |xcodebuild.config|.
 
-This feature requires `Xcodeproj` to be installed (|xcodebuild.requirements|).
+This feature requires `xcp` to be installed (|xcodebuild.requirements|).
 
 See:
   |xcodebuild.project-manager|
@@ -5345,6 +5344,21 @@ M.readfile({filepath})                                *xcodebuild.util.readfile*
 
   Parameters: ~
     {filepath}  (string) @return boolean, string[] # success: boolean, lines: string[]
+
+
+M.compare_versions({v1}, {v2})                *xcodebuild.util.compare_versions*
+  Compare two version strings (e.g. "1.10.2" vs "1.9.10")
+  Returns:
+    1  if v1 > v2
+    -1 if v1 < v2
+    0  if equal
+
+  Parameters: ~
+    {v1}  (string)
+    {v2}  (string)
+
+  Returns: ~
+    (number)
 
 
 vim:tw=78:ts=8:noet:ft=help:norl:

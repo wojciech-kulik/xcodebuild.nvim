@@ -8,7 +8,7 @@
 ---
 ---You can always disable the integration in the |xcodebuild.config|.
 ---
----This feature requires `Xcodeproj` to be installed (|xcodebuild.requirements|).
+---This feature requires `xcp` to be installed (|xcodebuild.requirements|).
 ---
 ---See:
 ---  |xcodebuild.project-manager|
@@ -145,7 +145,7 @@ function M.setup()
             elseif action.entry_type == "file" then
               local destPath = parseUrl(action.dest_url)
               if destPath then
-                projectManager.move_file(path, destPath)
+                projectManager.move_or_rename_file(path, destPath)
               end
             end
           end

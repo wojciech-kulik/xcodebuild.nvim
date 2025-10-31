@@ -422,4 +422,37 @@ function M.readfile(filepath)
   return true, lines
 end
 
+---Compare two version strings (e.g. "1.10.2" vs "1.9.10")
+---Returns:
+---  1  if v1 > v2
+---  -1 if v1 < v2
+---  0  if equal
+---@param v1 string
+---@param v2 string
+---@return number
+function M.compare_versions(v1, v2)
+  local function split_version(v)
+    local parts = {}
+    for num in string.gmatch(v, "%d+") do
+      table.insert(parts, tonumber(num))
+    end
+    return parts
+  end
+
+  local a = split_version(v1)
+  local b = split_version(v2)
+
+  local len = math.max(#a, #b)
+  for i = 1, len do
+    local x = a[i] or 0
+    local y = b[i] or 0
+    if x > y then
+      return 1
+    elseif x < y then
+      return -1
+    end
+  end
+  return 0
+end
+
 return M

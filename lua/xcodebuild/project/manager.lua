@@ -3,7 +3,7 @@
 ---@brief [[
 ---This module is responsible for managing the project files and groups.
 ---
----It uses the `xcodeproj` tool to update the Xcode project file.
+---It uses the `XcodeProjectCLI` tool to update the Xcode project file.
 ---
 ---In general, all functions that take paths as arguments, they don't
 ---change files on disk. These without arguments are interactive and
@@ -15,12 +15,11 @@
 ---If you prefer to select targets manually, you can always disable it in the configuration using
 ---`project_manager.guess_target`.
 ---
----See: https://github.com/CocoaPods/Xcodeproj
+---See: https://github.com/wojciech-kulik/XcodeProjectCLI
 ---@brief ]]
 
 local util = require("xcodebuild.util")
 local helpers = require("xcodebuild.helpers")
-local appdata = require("xcodebuild.project.appdata")
 local projectConfig = require("xcodebuild.project.config")
 local notifications = require("xcodebuild.broadcasting.notifications")
 local pickers = require("xcodebuild.ui.pickers")
@@ -28,14 +27,25 @@ local config = require("xcodebuild.core.config").options.project_manager
 
 local M = {}
 
-local helper = "ruby '" .. appdata.tool_path(appdata.PROJECT_HELPER_TOOL) .. "'"
-
----Checks if the `xcodeproj` tool is installed.
+---Checks if the `xcp` tool is installed.
 ---If not, sends an error notification.
 ---@return boolean
-local function validate_xcodeproj_tool()
-  if vim.fn.executable("xcodeproj") == 0 then
-    notifications.send_error("Xcodeproj tool not found. Please run `gem install xcodeproj` to install it.")
+local function ensure_xcp_tool()
+  if vim.fn.executable("xcp") == 0 then
+    notifications.send_error(
+      "xcp tool not found. Please run `brew install wojciech-kulik/tap/xcp`.\n\n"
+        .. "If you want to suppress this message, disable integration with your file tree plugin in the config."
+    )
+    return false
+  end
+
+  local minRequiredVersion = "0.9.3"
+  local currentVersion = util.shell({ "xcp", "--version" })[1]
+
+  if util.compare_versions(currentVersion, minRequiredVersion) == -1 then
+    notifications.send_error(
+      "xcp tool version is outdated. Please run `brew upgrade wojciech-kulik/tap/xcp` to update to the latest version."
+    )
     return false
   end
 
@@ -130,7 +140,7 @@ local function find_path_in_params(params)
   return nil
 end
 
----Runs the `xcodeproj` tool with the provided action and parameters.
+---Runs the `xcp` tool with the provided action and parameters.
 ---
 ---If the output starts with "WARN:", it sends a warning notification and
 ---returns an empty table.
@@ -146,7 +156,13 @@ local function run(action, params)
   local path = find_path_in_params(params or {})
   local customProject = path and config.project_for_path(path)
 
-  params = params or {}
+  params = util.filter(params or {}, function(param)
+    return param ~= ""
+  end)
+
+  if action ~= "list-targets" then
+    table.insert(params, "--project-only")
+  end
 
   if customProject then
     table.insert(params, 1, customProject)
@@ -159,14 +175,19 @@ local function run(action, params)
   end
 
   local errorFile = "/tmp/xcodebuild_project_manager"
-  local output = util.shell(helper .. " " .. action .. allParams .. " 2> " .. errorFile)
+  local output = util.shell("xcp " .. action .. allParams .. " 2> " .. errorFile)
 
   if output[#output] == "" then
     table.remove(output, #output)
   end
 
-  if output[1] and vim.startswith(output[1], "WARN:") then
-    vim.notify(table.concat(output, "\n"):sub(7), vim.log.levels.WARN)
+  if output[1] and vim.startswith(output[1], "Warning:") then
+    vim.notify(table.concat(output, "\n"):sub(9), vim.log.levels.WARN)
+    return {}
+  end
+
+  if output[1] and vim.startswith(output[1], "Error:") then
+    vim.notify(table.concat(output, "\n"):sub(7), vim.log.levels.ERROR)
     return {}
   end
 
@@ -180,6 +201,7 @@ local function run(action, params)
           .. "If the error is unexpected, please open an issue on GitHub.",
         vim.log.levels.ERROR
       )
+      util.shell("echo '\nCommand:\nxcp " .. action .. allParams .. "' >> " .. errorFile)
       return {}
     end
   end
@@ -190,14 +212,17 @@ end
 ---Runs the `list_targets` action and returns the output.
 ---@return string[]
 local function run_list_targets()
-  return run("list_targets")
+  return run("list-targets")
 end
 
 ---Runs the `list_targets_for_group` action and returns the output.
 ---@param groupPath string
 ---@return string[]
 local function run_list_targets_for_group(groupPath)
-  return run("list_targets_for_group", { groupPath })
+  return run("list-targets", {
+    "--group",
+    groupPath,
+  })
 end
 
 ---Gets targets and shows the picker to select them.
@@ -234,11 +259,14 @@ end
 ---@param createGroups boolean
 ---@return string[]
 local function run_add_file(filepath, targets, guessTarget, createGroups)
-  return run("add_file", {
-    table.concat(targets, ","),
+  return run("add-file", {
+    "--file",
     filepath,
-    guessTarget and "true" or "false",
-    createGroups and "true" or "false",
+    not guessTarget and "--targets" or "",
+    not guessTarget and table.concat(targets, ",") or "",
+    guessTarget and "--guess-target" or "",
+    createGroups and "--create-groups" or "",
+    "--print-targets",
   })
 end
 
@@ -247,53 +275,101 @@ end
 ---@param targets string[]
 local function run_update_file_targets(filepath, targets)
   local targetsJoined = table.concat(targets, ",")
-  run("update_file_targets", { targetsJoined, filepath })
+  run("set-target", {
+    "--file",
+    filepath,
+    "--targets",
+    targetsJoined,
+  })
 end
 
 ---Deletes the file from the project.
 ---@param filepath string
 local function run_delete_file(filepath)
-  run("delete_file", { filepath })
+  run("delete-file", {
+    "--file",
+    filepath,
+  })
 end
 
 ---Renames the file.
 ---@param oldPath string
 ---@param newPath string
 local function run_rename_file(oldPath, newPath)
-  run("rename_file", { oldPath, newPath })
+  run("rename-file", {
+    "--file",
+    oldPath,
+    "--name",
+    vim.fn.fnamemodify(newPath, ":t"),
+  })
 end
 
 ---Moves the file.
 ---@param oldPath string
 ---@param newPath string
 local function run_move_file(oldPath, newPath)
-  run("move_file", { oldPath, newPath })
+  run("move-file", {
+    "--file",
+    oldPath,
+    "--dest",
+    newPath,
+  })
 end
 
 ---Adds a new group.
 ---@param path string
 local function run_add_group(path)
-  run("add_group", { path })
+  run("add-group", {
+    "--group",
+    path,
+    "--create-groups",
+  })
 end
 
 ---Renames the group.
 ---@param oldPath string
 ---@param newPath string
 local function run_rename_group(oldPath, newPath)
-  run("rename_group", { oldPath, newPath })
+  run("rename-group", {
+    "--group",
+    oldPath,
+    "--name",
+    vim.fn.fnamemodify(newPath, ":t"),
+  })
 end
 
 ---Moves the group.
 ---@param oldPath string
 ---@param newPath string
 local function run_move_group(oldPath, newPath)
-  run("move_group", { oldPath, newPath })
+  local oldName = vim.fn.fnamemodify(oldPath, ":t")
+  local newName = vim.fn.fnamemodify(newPath, ":t")
+  local destDir = vim.fn.fnamemodify(newPath, ":h")
+
+  run("move-group", {
+    "--group",
+    oldPath,
+    "--dest",
+    destDir,
+  })
+
+  if oldName ~= newName then
+    run("rename-group", {
+      "--group",
+      destDir .. "/" .. oldName,
+      "--name",
+      newName,
+    })
+  end
 end
 
 ---Deletes the group.
 ---@param path string
 local function run_delete_group(path)
-  run("delete_group", { path })
+  run("delete-group", {
+    "--group",
+    path,
+  })
 end
 
 ---Deletes the current buffer and loads {path}.
@@ -306,7 +382,7 @@ end
 ---It asks for the file name and creates it in the current directory.
 ---It also asks the user to select targets.
 function M.create_new_file()
-  if not helpers.validate_project({ requiresXcodeproj = true }) or not validate_xcodeproj_tool() then
+  if not helpers.validate_project({ requiresXcodeproj = true }) or not ensure_xcp_tool() then
     return
   end
 
@@ -334,7 +410,7 @@ end
 ---@param filepath string
 ---@param targets string[]
 function M.add_file_to_targets(filepath, targets)
-  if not helpers.validate_project({ requiresXcodeproj = true }) or not validate_xcodeproj_tool() then
+  if not helpers.validate_project({ requiresXcodeproj = true }) or not ensure_xcp_tool() then
     return
   end
 
@@ -344,7 +420,7 @@ end
 ---Returns all project targets.
 ---@return string[]|nil
 function M.get_project_targets()
-  if not helpers.validate_project({ requiresXcodeproj = true }) or not validate_xcodeproj_tool() then
+  if not helpers.validate_project({ requiresXcodeproj = true }) or not ensure_xcp_tool() then
     return
   end
 
@@ -398,12 +474,12 @@ end
 ---@param callback function|nil
 ---@param opts { createGroups: boolean}|nil
 function M.add_file(filepath, callback, opts)
-  if not helpers.validate_project({ requiresXcodeproj = true }) or not validate_xcodeproj_tool() then
+  if not helpers.validate_project({ requiresXcodeproj = true }) or not ensure_xcp_tool() then
     return
   end
 
   opts = opts or {}
-  local filename = util.get_filename(filepath)
+  local filename = util.get_filename(filepath) or vim.fn.fnamemodify(filepath, ":t")
 
   ---@param targets string[]|nil
   local function addFileWithTargetPicker(targets)
@@ -418,13 +494,12 @@ function M.add_file(filepath, callback, opts)
   local function addFileWithGuessing()
     local output = run_add_file(filepath, {}, true, opts.createGroups)
 
-    if output[1] == "Success" then
-      table.remove(output, 1)
+    if #output == 0 or output[1] == "" then
+      local targets = run_list_targets()
+      addFileWithTargetPicker(targets)
+    else
       notifications.send('"' .. filename .. '" has been added to target(s): ' .. table.concat(output, ", "))
       util.call(callback)
-    elseif output[1] == "Failure" then
-      table.remove(output, 1)
-      addFileWithTargetPicker(output)
     end
   end
 
@@ -446,16 +521,16 @@ end
 ---The group from {newFilePath} must exist in the project.
 ---@param oldFilePath string
 ---@param newFilePath string
-function M.move_file(oldFilePath, newFilePath)
-  if not helpers.validate_project({ requiresXcodeproj = true }) or not validate_xcodeproj_tool() then
+function M.move_or_rename_file(oldFilePath, newFilePath)
+  if not helpers.validate_project({ requiresXcodeproj = true }) or not ensure_xcp_tool() then
     return
   end
 
-  run_move_file(oldFilePath, newFilePath)
-
-  if vim.fs.basename(oldFilePath) == vim.fs.basename(newFilePath) then
+  if vim.fs.basename(oldFilePath) ~= vim.fs.basename(newFilePath) then
+    run_move_file(oldFilePath, newFilePath)
     notifications.send("File has been moved")
   else
+    run_rename_file(oldFilePath, newFilePath)
     notifications.send("File has been renamed")
   end
 end
@@ -464,7 +539,7 @@ end
 ---@param oldFilePath string
 ---@param newFilePath string
 function M.rename_file(oldFilePath, newFilePath)
-  if not helpers.validate_project({ requiresXcodeproj = true }) or not validate_xcodeproj_tool() then
+  if not helpers.validate_project({ requiresXcodeproj = true }) or not ensure_xcp_tool() then
     return
   end
 
@@ -475,7 +550,7 @@ end
 ---Renames the current file in the project and on disk.
 ---Asks the user for the new file name.
 function M.rename_current_file()
-  if not helpers.validate_project({ requiresXcodeproj = true }) or not validate_xcodeproj_tool() then
+  if not helpers.validate_project({ requiresXcodeproj = true }) or not ensure_xcp_tool() then
     return
   end
 
@@ -497,7 +572,7 @@ end
 ---Deletes the file from the project.
 ---@param filepath string
 function M.delete_file(filepath)
-  if not helpers.validate_project({ requiresXcodeproj = true }) or not validate_xcodeproj_tool() then
+  if not helpers.validate_project({ requiresXcodeproj = true }) or not ensure_xcp_tool() then
     return
   end
 
@@ -508,7 +583,7 @@ end
 ---Deletes the current file from the project and disk.
 ---Asks the user for confirmation.
 function M.delete_current_file()
-  if not helpers.validate_project({ requiresXcodeproj = true }) or not validate_xcodeproj_tool() then
+  if not helpers.validate_project({ requiresXcodeproj = true }) or not ensure_xcp_tool() then
     return
   end
 
@@ -527,7 +602,7 @@ end
 ---Creates a new group in the project and on disk.
 ---Asks the user for the group name.
 function M.create_new_group()
-  if not helpers.validate_project({ requiresXcodeproj = true }) or not validate_xcodeproj_tool() then
+  if not helpers.validate_project({ requiresXcodeproj = true }) or not ensure_xcp_tool() then
     return
   end
 
@@ -548,7 +623,7 @@ end
 ---Adds the group to the project.
 ---@param path string
 function M.add_group(path)
-  if not helpers.validate_project({ requiresXcodeproj = true }) or not validate_xcodeproj_tool() then
+  if not helpers.validate_project({ requiresXcodeproj = true }) or not ensure_xcp_tool() then
     return
   end
 
@@ -565,7 +640,7 @@ end
 ---@param oldGroupPath string
 ---@param newGroupPath string
 function M.rename_group(oldGroupPath, newGroupPath)
-  if not helpers.validate_project({ requiresXcodeproj = true }) or not validate_xcodeproj_tool() then
+  if not helpers.validate_project({ requiresXcodeproj = true }) or not ensure_xcp_tool() then
     return
   end
 
@@ -576,7 +651,7 @@ end
 ---Renames the current group in the project and on disk.
 ---Asks the user for the new group name.
 function M.rename_current_group()
-  if not helpers.validate_project({ requiresXcodeproj = true }) or not validate_xcodeproj_tool() then
+  if not helpers.validate_project({ requiresXcodeproj = true }) or not ensure_xcp_tool() then
     return
   end
 
@@ -605,7 +680,7 @@ end
 ---@param oldGroupPath string
 ---@param newGroupPath string
 function M.move_or_rename_group(oldGroupPath, newGroupPath)
-  if not helpers.validate_project({ requiresXcodeproj = true }) or not validate_xcodeproj_tool() then
+  if not helpers.validate_project({ requiresXcodeproj = true }) or not ensure_xcp_tool() then
     return
   end
 
@@ -623,7 +698,7 @@ end
 
 ---Deletes the group from the project.
 function M.delete_group(groupPath)
-  if not helpers.validate_project({ requiresXcodeproj = true }) or not validate_xcodeproj_tool() then
+  if not helpers.validate_project({ requiresXcodeproj = true }) or not ensure_xcp_tool() then
     return
   end
 
@@ -634,7 +709,7 @@ end
 ---Deletes the current group from the project and disk.
 ---Asks the user for confirmation.
 function M.delete_current_group()
-  if not helpers.validate_project({ requiresXcodeproj = true }) or not validate_xcodeproj_tool() then
+  if not helpers.validate_project({ requiresXcodeproj = true }) or not ensure_xcp_tool() then
     return
   end
 
@@ -653,12 +728,12 @@ end
 ---Updates the file targets in the project.
 ---Asks the user to select the targets.
 function M.update_current_file_targets()
-  if not helpers.validate_project({ requiresXcodeproj = true }) or not validate_xcodeproj_tool() then
+  if not helpers.validate_project({ requiresXcodeproj = true }) or not ensure_xcp_tool() then
     return
   end
 
   local filepath = vim.fn.expand("%:p")
-  local filename = util.get_filename(filepath)
+  local filename = util.get_filename(filepath) or vim.fn.fnamemodify(filepath, ":t")
 
   run_select_targets("Select Target(s) for " .. filename, nil, function(targets)
     run_update_file_targets(filepath, targets)
@@ -676,7 +751,7 @@ end
 ---@param groupPath string
 ---@return string[]|nil
 function M.guess_target(groupPath)
-  if not helpers.validate_project({ requiresXcodeproj = true }) or not validate_xcodeproj_tool() then
+  if not helpers.validate_project({ requiresXcodeproj = true }) or not ensure_xcp_tool() then
     return
   end
 
@@ -686,19 +761,22 @@ end
 ---Finds the targets for the current file.
 ---@return string[]
 function M.get_current_file_targets()
-  if not helpers.validate_project({ requiresXcodeproj = true }) or not validate_xcodeproj_tool() then
+  if not helpers.validate_project({ requiresXcodeproj = true }) or not ensure_xcp_tool() then
     return {}
   end
 
   local filepath = vim.fn.expand("%:p")
-  local targets = run("list_targets_for_file", { filepath })
+  local targets = run("list-targets", {
+    "--file",
+    filepath,
+  })
 
   return targets
 end
 
 ---Shows the targets for the current file.
 function M.show_current_file_targets()
-  if not helpers.validate_project({ requiresXcodeproj = true }) or not validate_xcodeproj_tool() then
+  if not helpers.validate_project({ requiresXcodeproj = true }) or not ensure_xcp_tool() then
     return
   end
 
@@ -709,7 +787,7 @@ end
 
 ---Shows the action picker with all available actions.
 function M.show_action_picker()
-  if not helpers.validate_project({ requiresXcodeproj = true }) or not validate_xcodeproj_tool() then
+  if not helpers.validate_project({ requiresXcodeproj = true }) or not ensure_xcp_tool() then
     return
   end
 

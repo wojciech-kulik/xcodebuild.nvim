@@ -6,6 +6,10 @@ local util = require("xcodebuild.util")
 local cwd = vim.fn.getcwd()
 local recordSnapshots = false
 
+local busted = require("plenary.busted")
+local it = busted.it
+local describe = busted.describe
+
 local mockSwiftFiles = function()
   local filetree = vim.fn.readfile(cwd .. "/specs/parser_test_data/file_tree.txt")
 
@@ -81,10 +85,12 @@ local mockLSP = function()
   end
   vim.lsp.buf_request_all = function(_, _, params, callback)
     if not filetreeMap[params.query] then
+      ---@diagnostic disable-next-line: missing-parameter, param-type-mismatch
       callback(nil)
       return
     end
 
+    ---@diagnostic disable-next-line: missing-parameter, param-type-mismatch
     callback({
       {
         result = {

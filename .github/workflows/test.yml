@@ -29,6 +29,10 @@ jobs:
           neovim: true
           version: ${{ matrix.nvim-version }}
 
+      - name: Install dependencies
+        run: |
+          brew install --quiet wojciech-kulik/tap/xcp
+
       - name: Run tests
         run: |
           nvim --version

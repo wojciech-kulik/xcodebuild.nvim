@@ -13,8 +13,7 @@
 ---
 ---External tools
 --- - `xcbeautify` to format Xcode logs (you can set a different tool or disable formatting in the config).
---- - `Xcodeproj` to manage project files within Neovim.
---- - `Ruby` to use `Xcodeproj` gem.
+--- - `XcodeProjectCLI` to manage project files within Neovim.
 --- - `pymobiledevice3` to debug on physical devices and/or run apps on devices below iOS 17.
 --- - `jq` to get some information from `pymobiledevice3`.
 --- - `xcode-build-server` to make LSP work properly with xcodeproj/xcworkspace.
@@ -23,8 +22,8 @@
 ---
 ---Installation
 --->bash
----  brew install xcode-build-server xcbeautify ruby pipx rg jq coreutils
----  gem install xcodeproj
+---  brew install xcode-build-server xcbeautify pipx rg jq coreutils
+---  brew install wojciech-kulik/tap/xcp
 ---  pipx install pymobiledevice3
 ---<
 ---

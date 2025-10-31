@@ -11,14 +11,14 @@ local error = health.error or health.report_error
 
 local optional_dependencies = {
   {
+    binary = "xcp",
+    url = "https://github.com/wojciech-kulik/XcodeProjectCLI",
+    message = "Required to automatically update Xcode project when you add, delete, or move your files.",
+  },
+  {
     binary = "pymobiledevice3",
     url = "https://github.com/doronz88/pymobiledevice3",
     message = "Required for debugging on physical devices and/or running apps on devices below iOS 17.",
-  },
-  {
-    binary = "xcodeproj",
-    url = "https://github.com/CocoaPods/Xcodeproj",
-    message = "Required if you want your xcodeproj to be updated when you add, rename, or delete files.",
   },
   {
     binary = "xcbeautify",
@@ -267,40 +267,6 @@ local function check_xcodebuild_version()
   end
 end
 
-local function check_ruby_version()
-  local util = require("xcodebuild.util")
-  local response = util.shell("ruby --version")
-  local major, minor, patch = response[1]:match("(%d+)%.(%d+)%.(%d+)")
-
-  if major and minor then
-    if tonumber(major .. minor) < 27 then
-      error(
-        "ruby: version "
-          .. major
-          .. "."
-          .. minor
-          .. "."
-          .. patch
-          .. " is not supported. Use version 2.7 or higher. Required by `xcodeproj`."
-      )
-    elseif tonumber(major .. minor) < 30 then
-      warn(
-        "ruby: "
-          .. major
-          .. "."
-          .. minor
-          .. "."
-          .. patch
-          .. " - you are using an old version. Please consider update. Required by `xcodeproj`."
-      )
-    else
-      ok("ruby: version " .. major .. "." .. minor .. "." .. patch)
-    end
-  else
-    error("ruby: could not determine version.")
-  end
-end
-
 local function check_os()
   local util = require("xcodebuild.util")
   local os = vim.loop.os_uname()
@@ -463,9 +429,6 @@ M.check = function()
 
   start("Checking optional dependencies")
   check_tools(optional_dependencies, true)
-  if check_binary_installed("xcodeproj") then
-    check_ruby_version()
-  end
 
   start("Checking debugger")
   check_debugger()
