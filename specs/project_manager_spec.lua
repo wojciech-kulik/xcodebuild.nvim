@@ -1,20 +1,5 @@
 ---@diagnostic disable: duplicate-set-field
 
--- Mocks 3rd party dependencies
-package.loaded["telescope.pickers"] = {}
-package.loaded["telescope.finders"] = {}
-package.loaded["telescope.actions"] = {}
-package.loaded["telescope.config"] = {}
-package.loaded["telescope.actions.state"] = {}
-package.loaded["telescope.actions.utils"] = {}
-package.loaded["telescope.themes"] = {}
-package.loaded["fzf-lua"] = {}
-
-Snacks = {}
-Snacks.picker = {
-  pick = function() end,
-}
-
 local assert = require("luassert")
 local manager = require("xcodebuild.project.manager")
 local util = require("xcodebuild.util")
@@ -23,6 +8,12 @@ local pickerReceivedItems = nil
 local pickerShown = false
 local projectRoot = cwd .. "/specs/tmp/XcodebuildNvimApp/"
 
+local busted = require("plenary.busted")
+local before_each = busted.before_each
+local after_each = busted.after_each
+local it = busted.it
+local describe = busted.describe
+
 ---@param filepath string
 local function setFilePath(filepath)
   vim.fn.expand = function(param)
@@ -30,6 +21,8 @@ local function setFilePath(filepath)
       return vim.fn.fnamemodify(filepath, ":h:h")
     elseif string.find(param, ":h") then
       return vim.fn.fnamemodify(filepath, ":h")
+    elseif string.find(param, ":p") then
+      return vim.fn.fnamemodify(filepath, ":p")
     else
       return filepath
     end
@@ -130,11 +123,11 @@ describe("ensure", function()
     it("THEN returns all targets", function()
       local targets = manager.get_project_targets()
       assert.are.same(targets, {
+        "EmptyTarget",
+        "Helpers",
         "XcodebuildNvimApp",
         "XcodebuildNvimAppTests",
         "XcodebuildNvimAppUITests",
-        "Helpers",
-        "EmptyTarget",
       })
     end)
   end)
@@ -183,7 +176,7 @@ describe("ensure", function()
       end)
     end)
 
-    describe("WHEN the group does not exist", function()
+    describe("WHEN the group does not contain Swift files", function()
       local targets
 
       before_each(function()
@@ -192,11 +185,31 @@ describe("ensure", function()
           projectRoot .. "XcodebuildNvimApp/Modules/Main/ContentView.swift",
           { "XcodebuildNvimApp", "XcodebuildNvimAppTests" }
         )
-        targets = manager.guess_target(projectRoot .. "XcodebuildNvimApp/Modules/SomeNewGroup")
       end)
 
-      it("THEN returns targets for a file from the common existing group", function()
-        assert.are_same({ "XcodebuildNvimApp", "XcodebuildNvimAppTests" }, targets)
+      describe("WHEN the first path component does not match any target", function()
+        before_each(function()
+          manager.add_group(projectRoot .. "XcodebuildNvimAppNEW/Modules/Main/SomeNewGroup/SomeNewGroup2")
+          targets = manager.guess_target(
+            projectRoot .. "XcodebuildNvimAppNEW/Modules/Main/SomeNewGroup/SomeNewGroup2"
+          )
+        end)
+
+        it("THEN returns empty list", function()
+          assert.are_same(0, #targets)
+        end)
+      end)
+
+      describe("WHEN the first path component matches a target", function()
+        before_each(function()
+          manager.add_group(projectRoot .. "XcodebuildNvimApp/Modules/Main/SomeNewGroup/SomeNewGroup2")
+          targets =
+            manager.guess_target(projectRoot .. "XcodebuildNvimApp/Modules/Main/SomeNewGroup/SomeNewGroup2")
+        end)
+
+        it("THEN returns target based on the first relative path component", function()
+          assert.are_same({ "XcodebuildNvimApp" }, targets)
+        end)
       end)
     end)
 
@@ -248,8 +261,8 @@ describe("ensure", function()
         targets = manager.guess_target(projectRoot .. "EmptyTarget")
       end)
 
-      it("THEN returns empty list", function()
-        assert.are_equal(0, #targets)
+      it("THEN returns target based on folder name", function()
+        assert.are_same({ "EmptyTarget" }, targets)
       end)
     end)
   end)
@@ -281,7 +294,7 @@ describe("ensure", function()
       end)
 
       describe("AND guessing is not possible", function()
-        local newFilePath = projectRoot .. "EmptyTarget/NewModule/new_file2.swift"
+        local newFilePath = projectRoot .. "XYZ/NewModule/new_file2.swift"
         local callbackCalled = false
 
         before_each(function()
@@ -294,13 +307,13 @@ describe("ensure", function()
           assert.is_true(callbackCalled)
           assert.is_true(pickerShown)
           assert.are_same({
+            "EmptyTarget",
+            "Helpers",
             "XcodebuildNvimApp",
             "XcodebuildNvimAppTests",
             "XcodebuildNvimAppUITests",
-            "Helpers",
-            "EmptyTarget",
           }, pickerReceivedItems)
-          assertFileInProject(newFilePath, { "XcodebuildNvimApp" })
+          assertFileInProject(newFilePath, { "EmptyTarget" })
           assertGroupInProject("NewModule")
         end)
       end)
@@ -312,9 +325,20 @@ describe("ensure", function()
       local originalShell = util.shell
 
       before_each(function()
-        util.shell = function(_)
-          util.shell = originalShell
-          return { "Failure", "Helpers" }
+        local counter = 0
+        local output = {
+          "0.9.3",
+          "",
+          "Helpers",
+        }
+        util.shell = function(...)
+          counter = counter + 1
+          if counter <= 3 then
+            return { output[counter] or "" }
+          elseif counter == 4 then
+            util.shell = originalShell
+            return originalShell(...)
+          end
         end
         manager.add_file(newFilePath, function()
           callbackCalled = true
@@ -345,13 +369,13 @@ describe("ensure", function()
         assert.is_true(pickerShown)
         assert.is_true(callbackCalled)
         assert.are_same({
+          "EmptyTarget",
+          "Helpers",
           "XcodebuildNvimApp",
           "XcodebuildNvimAppTests",
           "XcodebuildNvimAppUITests",
-          "Helpers",
-          "EmptyTarget",
         }, pickerReceivedItems)
-        assertFileInProject(newFilePath, { "XcodebuildNvimApp" })
+        assertFileInProject(newFilePath, { "EmptyTarget" })
         assertGroupInProject("NewModule")
       end)
     end)
@@ -370,7 +394,7 @@ describe("ensure", function()
       end)
 
       it("THEN adds file to targets", function()
-        assertFileInProject(newFilePath, { "XcodebuildNvimApp", "XcodebuildNvimAppTests", "Helpers" })
+        assertFileInProject(newFilePath, { "Helpers", "XcodebuildNvimApp", "XcodebuildNvimAppTests" })
       end)
     end)
 
@@ -438,18 +462,18 @@ describe("ensure", function()
   describe("WHEN file exists in project", function()
     local filepath = projectRoot .. "XcodebuildNvimApp/Modules/Main/MainViewModel.swift"
 
-    describe("move_file", function()
+    describe("move_or_rename_file", function()
       local movedGroupPath = projectRoot .. "XcodebuildNvimApp/Modules/MovedModule"
       local movedFilePath = projectRoot .. "XcodebuildNvimApp/Modules/MovedModule/moved_file.swift"
 
       before_each(function()
         manager.add_file_to_targets(filepath, { "XcodebuildNvimApp", "Helpers" })
         manager.add_group(movedGroupPath)
-        manager.move_file(filepath, movedFilePath)
+        manager.move_or_rename_file(filepath, movedFilePath)
       end)
 
       it("THEN updates xcodeproj and keeps original targets", function()
-        assertFileInProject(movedFilePath, { "XcodebuildNvimApp", "Helpers" })
+        assertFileInProject(movedFilePath, { "Helpers", "XcodebuildNvimApp" })
       end)
     end)
 
@@ -457,12 +481,12 @@ describe("ensure", function()
       local changedFilePath = vim.fn.fnamemodify(filepath, ":h") .. "/HomeViewModel_changed.swift"
 
       before_each(function()
-        manager.add_file_to_targets(filepath, { "XcodebuildNvimApp", "Helpers" })
+        manager.add_file_to_targets(filepath, { "Helpers", "XcodebuildNvimApp" })
         manager.rename_file(filepath, changedFilePath)
       end)
 
       it("THEN updates xcodeproj and keeps original targets", function()
-        assertFileInProject(changedFilePath, { "XcodebuildNvimApp", "Helpers" })
+        assertFileInProject(changedFilePath, { "Helpers", "XcodebuildNvimApp" })
       end)
     end)
 
@@ -474,7 +498,7 @@ describe("ensure", function()
           return "HomeViewModel_changed.swift"
         end
         setFilePath(filepath)
-        manager.add_file_to_targets(filepath, { "XcodebuildNvimApp", "Helpers" })
+        manager.add_file_to_targets(filepath, { "Helpers", "XcodebuildNvimApp" })
         manager.rename_current_file()
       end)
 
@@ -484,7 +508,7 @@ describe("ensure", function()
       end)
 
       it("THEN updates xcodeproj and keeps original targets", function()
-        assertFileInProject(changedFilePath, { "XcodebuildNvimApp", "Helpers" })
+        assertFileInProject(changedFilePath, { "Helpers", "XcodebuildNvimApp" })
       end)
     end)
 
@@ -604,8 +628,8 @@ describe("ensure", function()
       end)
 
       it("THEN updates xcodeproj", function()
-        assertGroupInProject("Modules")
         assertGroupInProject("NewPath")
+        assertGroupInProject("Modules")
         assertGroupInProject("MainChanged")
       end)
     end)

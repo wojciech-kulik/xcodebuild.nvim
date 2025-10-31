@@ -5,6 +5,11 @@ local quick = require("xcodebuild.integrations.quick")
 local cwd = vim.fn.getcwd()
 local recordSnapshot = false
 
+local busted = require("plenary.busted")
+local before_each = busted.before_each
+local it = busted.it
+local describe = busted.describe
+
 local originalGetNode = vim.treesitter.get_node_text
 local originalQueryParse = vim.treesitter.query.parse
 

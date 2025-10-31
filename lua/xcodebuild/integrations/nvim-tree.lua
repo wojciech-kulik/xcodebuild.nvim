@@ -8,7 +8,7 @@
 ---
 ---You can always disable the integration in the |xcodebuild.config|.
 ---
----This feature requires `Xcodeproj` to be installed (|xcodebuild.requirements|).
+---This feature requires `xcp` to be installed (|xcodebuild.requirements|).
 ---
 ---See:
 ---  |xcodebuild.project-manager|
@@ -54,7 +54,7 @@ function M.setup()
       if isDir then
         projectManager.move_or_rename_group(data.old_name, data.new_name)
       else
-        projectManager.move_file(data.old_name, data.new_name)
+        projectManager.move_or_rename_file(data.old_name, data.new_name)
       end
     end
   end)

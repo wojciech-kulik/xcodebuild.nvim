@@ -66,7 +66,6 @@ M.build_xcresult_filepath = M.appdir .. "/build.xcresult"
 M.test_xcresult_filepath = M.appdir .. "/test.xcresult"
 
 M.GETSNAPSHOTS_TOOL = "getsnapshots"
-M.PROJECT_HELPER_TOOL = "project_helper.rb"
 
 ---Returns the path to the tool with the given {name}.
 ---@param name string
