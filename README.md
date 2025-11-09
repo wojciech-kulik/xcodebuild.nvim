@@ -92,6 +92,7 @@ Big thanks to all the sponsors who support this project 🍻!
 <a href="https://github.com/humblehacker"><img src="https://avatars.githubusercontent.com/u/117582" width="40" height="40" alt="@humblehacker" title="humblehacker"></a>
 <a href="https://github.com/jwcross"><img src="https://avatars.githubusercontent.com/u/2405246" width="40" height="40" alt="@jwcross" title="jwcross"></a>
 <a href="https://github.com/TimPapler"><img src="https://avatars.githubusercontent.com/u/5990580" width="40" height="40" alt="@TimPapler" title="TimPapler"></a>
+<a href="https://github.com/dosboxd"><img src="https://avatars.githubusercontent.com/u/16291547" width="40" height="40" alt="@dosboxd" title="dosboxd"></a>
 
 ### One Time Sponsors
 
