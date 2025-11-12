@@ -65,6 +65,7 @@ local util = require("xcodebuild.util")
 
 local M = {}
 local CANCELLED_CODE = 143
+local fileWatcherHandle = nil
 
 local function check_if_snacks_installed()
   local success, snacks = pcall(require, "snacks")
@@ -144,6 +145,33 @@ local function stop_preview_timer()
   if previewTimer then
     vim.fn.timer_stop(previewTimer)
     previewTimer = nil
+  end
+end
+
+local function stop_filewatcher()
+  if fileWatcherHandle ~= nil then
+    fileWatcherHandle:stop()
+    fileWatcherHandle:close()
+    fileWatcherHandle = nil
+  end
+end
+
+local function start_filewatcher()
+  stop_filewatcher()
+
+  fileWatcherHandle = vim.uv.new_fs_event()
+
+  if fileWatcherHandle then
+    fileWatcherHandle:start("/tmp/xcodebuild.nvim/", {
+      recursive = false,
+      stat = true,
+      watch_entry = true,
+      persistent = true,
+    }, function(_, _, _)
+      vim.schedule(function()
+        vim.cmd.checktime()
+      end)
+    end)
   end
 end
 
@@ -229,6 +257,7 @@ end
 function M.cancel()
   stop_preview_timer()
   stop_clear_cache_timer()
+  stop_filewatcher()
 end
 
 ---Shows the preview image in a new window.
@@ -247,15 +276,7 @@ function M.show_preview()
     vim.cmd(string.format(config.open_command, get_path()))
   end
 
-  vim.defer_fn(function()
-    local newWinid = vim.fn.bufwinid(get_path())
-    if newWinid == -1 then
-      return
-    end
-
-    vim.api.nvim_set_current_win(newWinid)
-    vim.cmd("edit! | wincmd p")
-  end, 500)
+  vim.cmd.checktime()
 end
 
 ---Hides the preview window.
@@ -313,6 +334,7 @@ function M.generate_preview(hotReload, callback)
 
   if hotReload then
     clearCacheTimer = vim.fn.timer_start(1000, clear_cache, { ["repeat"] = -1 })
+    start_filewatcher()
   end
 
   if projectSettings.platform == constants.Platform.MACOS then
