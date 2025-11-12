@@ -103,12 +103,14 @@ local function get_path()
   return string.format("%s/%s.png", previewPath, productName)
 end
 
----Clears the snacks image cache.
-local function clear_cache()
+---Clears the snacks image cache and checks for file changes in Neovim.
+local function clear_cache_and_reload()
   local success, snacks = pcall(require, "snacks.image.image")
   if success and snacks.clear ~= nil then
     snacks.clear()
   end
+
+  vim.cmd("silent! checktime")
 end
 
 ---Shows notifications with the progress message.
@@ -307,12 +309,12 @@ function M.generate_preview(hotReload, callback)
 
   local success, snacks = pcall(require, "snacks")
   if success and snacks.image.config.cache and snacks.image.config.cache ~= "" then
-    clear_cache()
+    clear_cache_and_reload()
     vim.fn.delete(snacks.image.config.cache, "rf")
   end
 
   if hotReload then
-    clearCacheTimer = vim.fn.timer_start(1000, clear_cache, { ["repeat"] = -1 })
+    clearCacheTimer = vim.fn.timer_start(1000, clear_cache_and_reload, { ["repeat"] = -1 })
   end
 
   if projectSettings.platform == constants.Platform.MACOS then
