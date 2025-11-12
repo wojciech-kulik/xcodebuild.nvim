@@ -455,7 +455,7 @@ function M.get_testplans(projectFile, scheme, callback)
 
         if foundTestPlans and trimmedLine == "" then
           break
-        elseif foundTestPlans then
+        elseif foundTestPlans and string.find(line, "^%s+%w") == 1 then
           table.insert(result, trimmedLine)
         elseif string.find(trimmedLine, "Test plans") then
           foundTestPlans = true
