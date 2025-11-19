@@ -293,29 +293,16 @@ local function find_project_derived_data()
     end
   end
 
-  local derivedDataDir = vim.fn.expand("~/Library/Developer/Xcode/DerivedData")
-  if not util.dir_exists(derivedDataDir) then
-    return nil
+  local scheme = projectConfig.settings.scheme
+  if scheme and workingDirectory then
+    local xcode = require("xcodebuild.core.xcode")
+    local derivedDataPath = xcode.find_derived_data_path(scheme, workingDirectory)
+    if derivedDataPath then
+      return derivedDataPath
+    end
   end
 
-  local projectFile = projectConfig.settings.projectFile or projectConfig.settings.swiftPackage
-  if not projectFile then
-    return nil
-  end
-
-  local projectName = vim.fn.fnamemodify(projectFile, ":t:r")
-  local pattern = derivedDataDir .. "/" .. projectName .. "-*"
-  local dirs = vim.fn.glob(pattern, false, true)
-
-  if #dirs == 0 then
-    return nil
-  end
-
-  table.sort(dirs, function(a, b)
-    return vim.fn.getftime(a) > vim.fn.getftime(b)
-  end)
-
-  return dirs[1]
+  return nil
 end
 
 ---Finds the package checkout directory in DerivedData.
