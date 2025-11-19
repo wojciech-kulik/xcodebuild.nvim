@@ -31,7 +31,8 @@ jobs:
 
       - name: Install dependencies
         run: |
-          brew install --quiet wojciech-kulik/tap/xcp
+          brew update
+          brew install --quiet xcp
 
       - name: Run tests
         run: |
