@@ -33,7 +33,7 @@ local M = {}
 local function ensure_xcp_tool()
   if vim.fn.executable("xcp") == 0 then
     notifications.send_error(
-      "xcp tool not found. Please run `brew install wojciech-kulik/tap/xcp`.\n\n"
+      "xcp tool not found. Please run `brew install xcp`.\n\n"
         .. "If you want to suppress this message, disable integration with your file tree plugin in the config."
     )
     return false
@@ -44,7 +44,7 @@ local function ensure_xcp_tool()
 
   if util.compare_versions(currentVersion, minRequiredVersion) == -1 then
     notifications.send_error(
-      "xcp tool version is outdated. Please run `brew upgrade wojciech-kulik/tap/xcp` to update to the latest version."
+      "xcp tool version is outdated. Please run `brew upgrade xcp` to update to the latest version."
     )
     return false
   end
