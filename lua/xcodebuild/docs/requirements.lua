@@ -22,8 +22,7 @@
 ---
 ---Installation
 --->bash
----  brew install xcode-build-server xcbeautify pipx rg jq coreutils
----  brew install wojciech-kulik/tap/xcp
+---  brew install xcp xcode-build-server xcbeautify pipx rg jq coreutils
 ---  pipx install pymobiledevice3
 ---<
 ---
