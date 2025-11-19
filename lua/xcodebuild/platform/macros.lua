@@ -114,6 +114,10 @@ local function get_package_info(packageIdentity)
   local workingDir = projectConfig.settings.workingDirectory or vim.fn.getcwd()
   local packageResolved = workingDir .. "/Package.resolved"
 
+  -- Normalize package identity to lowercase for case-insensitive matching
+  -- Package.resolved stores identities in lowercase, but error messages may have original case
+  local normalizedIdentity = packageIdentity:lower()
+
   -- For Xcode projects, also check inside the .xcodeproj
   if not util.file_exists(packageResolved) and projectConfig.settings.projectFile then
     packageResolved = projectConfig.settings.projectFile
@@ -138,7 +142,7 @@ local function get_package_info(packageIdentity)
     end
 
     for _, dep in ipairs(data.object.dependencies) do
-      if dep.packageRef and dep.packageRef.identity == packageIdentity then
+      if dep.packageRef and dep.packageRef.identity == normalizedIdentity then
         if dep.state then
           return {
             version = dep.state.version,
@@ -164,7 +168,7 @@ local function get_package_info(packageIdentity)
   end
 
   for _, pin in ipairs(data.pins) do
-    if pin.identity == packageIdentity then
+    if pin.identity == normalizedIdentity then
       if pin.state then
         return {
           version = pin.state.version,
@@ -225,9 +229,11 @@ function M.approve_macros(macrosToApprove)
     else
       -- Check if macro already exists
       local found = false
+      local normalizedErrorIdentity = macroError.packageIdentity:lower()
       for i, macro in ipairs(currentMacros) do
         if
-          macro.packageIdentity == macroError.packageIdentity and macro.targetName == macroError.targetName
+          macro.packageIdentity:lower() == normalizedErrorIdentity
+          and macro.targetName == macroError.targetName
         then
           -- Update existing fingerprint if it changed
           if macro.fingerprint ~= fingerprint then
@@ -239,11 +245,11 @@ function M.approve_macros(macrosToApprove)
         end
       end
 
-      -- Add new macro if not found
+      -- Add new macro if not found (with normalized packageIdentity)
       if not found then
         table.insert(currentMacros, {
           fingerprint = fingerprint,
-          packageIdentity = macroError.packageIdentity,
+          packageIdentity = normalizedErrorIdentity,
           targetName = macroError.targetName,
         })
         updatedCount = updatedCount + 1
@@ -287,29 +293,16 @@ local function find_project_derived_data()
     end
   end
 
-  local derivedDataDir = vim.fn.expand("~/Library/Developer/Xcode/DerivedData")
-  if not util.dir_exists(derivedDataDir) then
-    return nil
+  local scheme = projectConfig.settings.scheme
+  if scheme and workingDirectory then
+    local xcode = require("xcodebuild.core.xcode")
+    local derivedDataPath = xcode.find_derived_data_path(scheme, workingDirectory)
+    if derivedDataPath then
+      return derivedDataPath
+    end
   end
 
-  local projectFile = projectConfig.settings.projectFile or projectConfig.settings.swiftPackage
-  if not projectFile then
-    return nil
-  end
-
-  local projectName = vim.fn.fnamemodify(projectFile, ":t:r")
-  local pattern = derivedDataDir .. "/" .. projectName .. "-*"
-  local dirs = vim.fn.glob(pattern, false, true)
-
-  if #dirs == 0 then
-    return nil
-  end
-
-  table.sort(dirs, function(a, b)
-    return vim.fn.getftime(a) > vim.fn.getftime(b)
-  end)
-
-  return dirs[1]
+  return nil
 end
 
 ---Finds the package checkout directory in DerivedData.
@@ -444,13 +437,15 @@ function M.get_unapproved_macros()
   local approvedMacros = M.read_macros_json()
   local approvedLookup = {}
   for _, approvedMacro in ipairs(approvedMacros) do
-    local key = approvedMacro.packageIdentity .. "/" .. approvedMacro.targetName
+    -- Use lowercase for case-insensitive lookup
+    local key = approvedMacro.packageIdentity:lower() .. "/" .. approvedMacro.targetName
     approvedLookup[key] = approvedMacro.fingerprint
   end
 
   local unapprovedMacros = {}
   for _, macroError in ipairs(macroErrors) do
-    local key = macroError.packageIdentity .. "/" .. macroError.targetName
+    -- Use lowercase for case-insensitive lookup
+    local key = macroError.packageIdentity:lower() .. "/" .. macroError.targetName
     local approvedFingerprint = approvedLookup[key]
 
     if approvedFingerprint then
