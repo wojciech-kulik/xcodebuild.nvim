@@ -44,7 +44,7 @@ function M.setup()
     vim.loop.fs_stat(M.root(".tests/site/pack/deps/start/nvim-treesitter/parser/swift.so"))
 
   ---@diagnostic disable-next-line: missing-fields
-  require("nvim-treesitter.configs").setup({})
+  require("nvim-treesitter").setup({})
 
   if not parserFileExists then
     print("Installing Swift parser")
