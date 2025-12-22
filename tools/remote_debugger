@@ -4,8 +4,15 @@ set -e
 if [ "$1" = "kill" ]; then
   ps ax -o pid,command | grep "[p]ymobiledevice3 lockdown start-tunnel" | awk '{print$1}' | xargs kill -9
   ps ax -o pid,command | grep "[p]ymobiledevice3 remote start-tunnel" | awk '{print$1}' | xargs kill -9
+  ps ax -o pid,command | grep "[p]ymobiledevice3 --no-color lockdown start-tunnel" | awk '{print$1}' | xargs kill -9
+  ps ax -o pid,command | grep "[p]ymobiledevice3 --no-color remote start-tunnel" | awk '{print$1}' | xargs kill -9
 elif [ "$1" = "start" ]; then
-  pymobiledevice3 $2 start-tunnel --no-color --udid $3
+  VERSION=$(pymobiledevice3 version | awk -F. '{print $1}')
+  if [ "$VERSION" -ge 7 ]; then
+    pymobiledevice3 --no-color $2 start-tunnel --udid $3
+  else
+    pymobiledevice3 $2 start-tunnel --no-color --udid $3
+  fi
 fi
 
-# @version: 2
+# @version: 3

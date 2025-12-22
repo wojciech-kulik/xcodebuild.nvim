@@ -65,11 +65,47 @@ local function is_up_to_date(path)
   for _, line in ipairs(lines) do
     if string.find(line, "@version:") then
       local version = string.match(line, "@version: (%d+)")
-      return version and tonumber(version) >= 2
+      return version and tonumber(version) >= 3
     end
   end
 
   return false
+end
+
+---Checks the version of the installed `pymobiledevice3` tool.
+---Returns major, minor, patch version.
+---@return number|nil, number|nil, number|nil
+local function check_version()
+  local response = util.shell("pymobiledevice3 version")
+  if not response[1] then
+    return nil, nil, nil
+  end
+
+  local major, minor, patch = response[1]:match("(%d+)%.(%d+).(%d+)")
+  return major, minor, patch
+end
+
+---Checks if the installed `pymobiledevice3` tool is a legacy version (below 7).
+---Below version 7, the tool requires `--no-color` to be the first argument.
+---@return boolean
+local function is_legacy()
+  local major, _, _ = check_version()
+
+  if major and tonumber(major) < 7 then
+    return true
+  else
+    return false
+  end
+end
+
+---Inserts the `--no-color` argument.
+---@param args string[]
+local function insert_nocolor_arg(args)
+  if is_legacy() then
+    table.insert(args, "--no-color")
+  else
+    table.insert(args, 2, "--no-color")
+  end
 end
 
 ---Returns RSD parameter from the output of the `remote_debugger` tool.
@@ -392,8 +428,8 @@ function M.get_connected_devices(callback)
     "usbmux",
     "list",
     "--usb",
-    "--no-color",
   }
+  insert_nocolor_arg(cmd)
 
   return vim.fn.jobstart(cmd, {
     stdout_buffered = true,
@@ -427,14 +463,16 @@ end
 ---@param bundleId string
 ---@return string|nil # app path
 function M.find_app_path(destination, bundleId)
-  local apps = util.shell({
+  local cmd = {
     "pymobiledevice3",
     "apps",
     "list",
-    "--no-color",
     "--udid",
     destination,
-  })
+  }
+  insert_nocolor_arg(cmd)
+  local apps = util.shell(cmd)
+
   local json = vim.fn.json_decode(apps)
   local app = json[bundleId]
 
@@ -475,10 +513,11 @@ function M.start_secure_server(destination, rsd)
   }
   command = util.merge_array(command, rsdParams)
   command = util.merge_array(command, {
-    "--no-color",
     "--udid",
     destination,
   })
+
+  insert_nocolor_arg(command)
   local instruction = util.shell(command)
 
   for _, line in ipairs(instruction) do
@@ -513,8 +552,8 @@ function M.start_server(destination, port, callback)
     port,
     "--udid",
     destination,
-    "--no-color",
   }
+  insert_nocolor_arg(cmd)
 
   return vim.fn.jobstart(cmd, {
     stdout_buffered = false,
