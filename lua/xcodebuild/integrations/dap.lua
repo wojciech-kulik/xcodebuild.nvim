@@ -362,16 +362,16 @@ function M.debug_failing_tests()
   M.attach_debugger_for_tests()
 end
 
----Clears the DAP console buffer.
+----Clears the DAP console buffer.
 ---@param validate boolean|nil # if true, shows error if the buffer is a terminal
 function M.clear_console(validate)
   local success, dapui = pcall(require, "dapui")
-  if not success then
-    return
+  if not success or not dapui or not dapui.elements or not dapui.elements.console then
+    return  -- dapui not ready or elements not initialized yet
   end
 
   local bufnr = dapui.elements.console.buffer()
-  if not bufnr then
+  if not bufnr or not vim.api.nvim_buf_is_valid(bufnr) then
     return
   end
 
@@ -402,12 +402,12 @@ end
 ---@param append boolean|nil # if true, appends the output to the last line
 function M.update_console(output, append)
   local success, dapui = pcall(require, "dapui")
-  if not success then
-    return
+  if not success or not dapui or not dapui.elements or not dapui.elements.console then
+    return  -- dapui not ready
   end
 
   local bufnr = dapui.elements.console.buffer()
-  if not bufnr then
+  if not bufnr or not vim.api.nvim_buf_is_valid(bufnr) then
     return
   end
 
@@ -446,10 +446,6 @@ function M.update_console(output, append)
       vim.cmd("normal! G")
     end)
   end
-
-  vim.bo[bufnr].modified = false
-  vim.bo[bufnr].modifiable = false
-end
 
 ---Reads breakpoints from the `.nvim/xcodebuild/breakpoints.json` file.
 ---Returns breakpoints or nil if the file is missing.
