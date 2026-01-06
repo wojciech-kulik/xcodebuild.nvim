@@ -89,6 +89,18 @@ local function set_remote_debugger_mode()
   end
 end
 
+---Gets dapui module if ready
+---@return table|nil
+local function get_dapui()
+  local success, dapui = pcall(require, "dapui")
+
+  if not success or not dapui or not dapui.elements or not dapui.elements.console then
+    return nil
+  end
+
+  return dapui
+end
+
 ---Starts `nvim-dap` debug session. It connects to `lldb`.
 local function start_dap()
   local loadedDap, dap = pcall(require, "dap")
@@ -365,9 +377,9 @@ end
 ---Clears the DAP console buffer.
 ---@param validate boolean|nil # if true, shows error if the buffer is a terminal
 function M.clear_console(validate)
-  local success, dapui = pcall(require, "dapui")
-  if not success or not dapui or not dapui.elements or not dapui.elements.console then
-    return  -- dapui not ready or elements not initialized yet
+  local dapui = get_dapui()
+  if not dapui then
+    return
   end
 
   local bufnr = dapui.elements.console.buffer()
@@ -401,9 +413,9 @@ end
 ---@param output string[]
 ---@param append boolean|nil # if true, appends the output to the last line
 function M.update_console(output, append)
-  local success, dapui = pcall(require, "dapui")
-  if not success or not dapui or not dapui.elements or not dapui.elements.console then
-    return  -- dapui not ready
+  local dapui = get_dapui()
+  if not dapui then
+    return
   end
 
   local bufnr = dapui.elements.console.buffer()
