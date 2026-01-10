@@ -63,7 +63,11 @@ function M.restart_sourcekit_lsp()
     return
   end
 
-  vim.cmd("LspRestart " .. clientId)
+  if vim.fn.has("nvim-0.12") == 1 then
+    vim.cmd("lsp restart " .. clientId)
+  else
+    vim.cmd("LspRestart " .. clientId)
+  end
 end
 
 return M
