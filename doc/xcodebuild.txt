@@ -5491,4 +5491,14 @@ M.compare_versions({v1}, {v2})                *xcodebuild.util.compare_versions*
     (number)
 
 
+M.exclude_hidden_paths({paths})           *xcodebuild.util.exclude_hidden_paths*
+  Excludes hidden paths from {paths}. Checks only the relative part of the path.
+
+  Parameters: ~
+    {paths}  (table)
+
+  Returns: ~
+    (table)
+
+
 vim:tw=78:ts=8:noet:ft=help:norl:
