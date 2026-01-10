@@ -58,6 +58,10 @@ local function get_picker_titles_values(command)
   local paths = util.shell(command)
   sort_paths(paths)
 
+  if not util.is_fd_installed() then
+    paths = util.exclude_hidden_paths(paths)
+  end
+
   for _, path in ipairs(paths) do
     if util.trim(path) ~= "" then
       local trimmedPath = path:gsub("/+$", "")
@@ -156,8 +160,6 @@ function M.select_xcodeproj(callback, opts)
     "find",
     vim.fn.getcwd(),
     "-type", "d",
-    "-path", "*/.*", "-prune",
-    "-o",
     "-maxdepth", tostring(maxdepth),
     "-iname", "*.xcodeproj",
     "-print",
@@ -196,7 +198,7 @@ function M.select_project(callback, opts)
     "find",
     vim.fn.getcwd(),
     "-type", "d",
-    "(", "-path", "*/.*", "-o", "-path", "*xcodeproj/project.xcworkspace", ")",
+    "-path", "*xcodeproj/project.xcworkspace",
     "-prune",
     "-o",
     "(", "-iname", "*.xcodeproj", "-o", "-iname", "*.xcworkspace", "-o", "-iname", "package.swift", ")",

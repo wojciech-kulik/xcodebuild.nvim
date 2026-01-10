@@ -132,14 +132,11 @@ function M.find_all_swift_files()
     allFiles = util.shell({
       "find",
       vim.fn.getcwd(),
-      "-type", "d",
-      "-path", "*/.*",
-      "-prune",
-      "-o",
       "-type", "f",
       "-iname", "*.swift",
       "-print",
     })
+    allFiles = util.exclude_hidden_paths(allFiles)
   end
 
   local map = {}

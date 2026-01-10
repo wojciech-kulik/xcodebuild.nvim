@@ -455,4 +455,21 @@ function M.compare_versions(v1, v2)
   return 0
 end
 
+---Excludes hidden paths from {paths}. Checks only the relative part of the path.
+---@param paths table
+---@return table
+function M.exclude_hidden_paths(paths)
+  local result = {}
+
+  for _, path in ipairs(paths) do
+    local relativePath = vim.fn.fnamemodify(path, ":.")
+
+    if not string.match(relativePath, "%/%.") and not string.match(relativePath, "^%.") then
+      table.insert(result, path)
+    end
+  end
+
+  return result
+end
+
 return M
