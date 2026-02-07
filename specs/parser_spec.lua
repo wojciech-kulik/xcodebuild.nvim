@@ -255,6 +255,13 @@ describe("ENSURE parse_logs", function()
         assert.are.same(expectedResult, result)
       end)
     end)
+
+    describe("because of concise formatter output", function()
+      it("THEN should set build errors", function()
+        local expectedResult, result = runTestCase(29)
+        assert.are.same(expectedResult, result)
+      end)
+    end)
   end)
 
   --

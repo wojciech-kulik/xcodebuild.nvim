@@ -1,0 +1,22 @@
+{
+  buildErrors = { {
+      columnNumber = 34,
+      filename = "Sample",
+      filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppEventCode/Sources/Sample.swift",
+      lineNumber = 12,
+      message = { "missing argument for parameter 'onClose' in call" }
+    } },
+  buildWarnings = { {
+      columnNumber = 5,
+      filename = "Sample",
+      filepath = "/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppEventCode/Sources/Sample.swift",
+      lineNumber = 10,
+      message = { "value 'tmp' was never used" }
+    } },
+  failedTestsCount = 0,
+  output = {},
+  testErrors = {},
+  tests = {},
+  testsCount = 0,
+  usesSwiftTesting = false
+}

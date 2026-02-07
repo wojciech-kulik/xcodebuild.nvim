@@ -280,6 +280,8 @@ local function flush_warning(message)
       and item.lineNumber == lineData.lineNumber
       and item.message[1] == lineData.message[1]
     then
+      lineType = BEGIN
+      lineData = {}
       return
     end
   end
@@ -408,6 +410,24 @@ local function parse_build_error(line)
           message = { message },
         }
       end
+    end
+  end
+
+  -- Fallback for concise formatter output, e.g.:
+  -- [x] /path/File.swift:12:34: missing argument for parameter ...
+  if not lineData.message then
+    local filepath, lineNumber, colNumber, message =
+      match_any(line, "^%s*%[[xX]%]%s+(" .. filePattern .. "):(%d+):(%d+):%s*(.*)", allExtensions)
+
+    if filepath and message then
+      lineType = BUILD_ERROR
+      lineData = {
+        filename = util.get_filename(filepath),
+        filepath = filepath,
+        lineNumber = tonumber(lineNumber),
+        columnNumber = tonumber(colNumber) or 0,
+        message = { message },
+      }
     end
   end
 
@@ -691,7 +711,11 @@ local function process_line(line)
     flush() -- flush if there is anything
     line = line:gsub("on '[^']*'", "") -- remove simulator name (it appears while parallel testing)
     parse_test_finished(line)
-  elseif string.find(line, "error:") or string.find(line, "recorded an issue") then
+  elseif
+    string.find(line, "error:")
+    or string.find(line, "recorded an issue")
+    or string.find(line, "^%s*%[[xX]%]")
+  then
     flush()
 
     -- found another failure within the same test
@@ -718,9 +742,13 @@ local function process_line(line)
   elseif string.find(line, "^PhaseScriptExecution") then
     buildPhaseName = string.match(line, "^PhaseScriptExecution ([^/]+) /")
     buildPhaseName = buildPhaseName and buildPhaseName:gsub("\\", "")
-  elseif string.find(line, "** BUILD FAILED **") and util.is_empty(buildErrors) then
-    parse_general_build_failure(line)
+  elseif string.find(line, "** BUILD FAILED **") then
     flush()
+
+    if util.is_empty(buildErrors) then
+      parse_general_build_failure(line)
+      flush()
+    end
   elseif string.find(line, "^%s*$") then
     -- test errors can contain multiple lines with empty lines
     -- we'll flush when we encounter finished test line.

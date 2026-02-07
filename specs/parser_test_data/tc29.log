@@ -1,0 +1,6 @@
+/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppEventCode/Sources/Sample.swift:10:5: warning: value 'tmp' was never used
+
+/Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppEventCode/Sources/Sample.swift:10:5: warning: value 'tmp' was never used
+
+[x] /Users/john/repositories/calendar-app-ios/CalendarAppSDK/Features/CalendarAppEventCode/Sources/Sample.swift:12:34: missing argument for parameter 'onClose' in call
+** BUILD FAILED **
