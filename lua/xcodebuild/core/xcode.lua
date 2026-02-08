@@ -875,7 +875,9 @@ function M.get_app_pid(productName, platform)
   end
 
   local pid = util.shell(
-    "ps aux | grep '" .. productName .. ".app' | grep -v grep | grep -v 'Contents/MacOS' | awk '{ print$2 }'"
+    "ps aux | grep '"
+      .. productName
+      .. ".app' | grep -v grep | grep -v 'Contents/MacOS' | grep -v 'PlugIns' | awk '{ print$2 }'"
   )
 
   return tonumber(pid and pid[1] or nil)
