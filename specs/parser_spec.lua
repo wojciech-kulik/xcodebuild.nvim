@@ -80,6 +80,14 @@ local mockLSP = function()
   vim.lsp.get_clients = function(_)
     return { { id = 1 } }
   end
+  vim.lsp.get_client_by_id = function(_)
+    return {
+      id = 1,
+      attached_buffers = {
+        [0] = true,
+      },
+    }
+  end
   vim.lsp.get_buffers_by_client_id = function(_)
     return { 0 }
   end
