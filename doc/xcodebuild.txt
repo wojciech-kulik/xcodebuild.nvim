@@ -1632,6 +1632,12 @@ M.run_tests({opts})                            *xcodebuild.core.xcode.run_tests*
     (number)   job id
 
 
+M.get_xcode_version()                  *xcodebuild.core.xcode.get_xcode_version*
+   Gets the Xcode version installed on the system.
+   It returns the major and minor version as numbers.
+  @return number?, number?
+
+
 ==============================================================================
 UI Previews                                           *xcodebuild.core.previews*
 

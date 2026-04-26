@@ -202,6 +202,24 @@ end
 ---Returns the `lldb` adapter configuration for `nvim-dap`.
 ---@return table
 function M.get_adapter()
+  local xcode = require("xcodebuild.core.xcode")
+  local major, minor = xcode.get_xcode_version()
+
+  if major and minor and ((major == 26 and minor >= 4) or (major > 26)) then
+    return {
+      type = "server",
+      port = config.port,
+      executable = {
+        command = "xcrun",
+        args = {
+          "lldb-dap",
+          "--connection",
+          "listen://127.0.0.1:" .. tostring(config.port),
+        },
+      },
+    }
+  end
+
   return {
     type = "server",
     port = config.port,

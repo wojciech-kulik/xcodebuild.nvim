@@ -246,12 +246,11 @@ local function check_xcodebuild_settings()
 end
 
 local function check_xcodebuild_version()
-  local util = require("xcodebuild.util")
-  local response = util.shell("xcodebuild -version")
-  local majorVersion, minorVersion = response[1]:match("Xcode (%d+)%.(%d+)")
+  local xcode = require("xcodebuild.core.xcode")
+  local majorVersion, minorVersion = xcode.get_xcode_version()
 
   if majorVersion then
-    if tonumber(majorVersion) < 15 then
+    if majorVersion < 15 then
       warn(
         "xcodebuild: version "
           .. majorVersion

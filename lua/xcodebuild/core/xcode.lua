@@ -89,7 +89,11 @@ end
 ---@param output string[]
 local function show_stderr_output(_, output)
   if output and (#output > 1 or output[1] ~= "") then
-    notifications.send_error(table.concat(output, "\n"))
+    local message = table.concat(output, "\n")
+    -- Annoying error that does not affect the installation but is printed in the stderr output.
+    if not message:find("Code=1002") then
+      notifications.send_error(message)
+    end
   end
 end
 
@@ -1044,6 +1048,15 @@ function M.run_tests(opts)
     on_stderr = opts.on_stderr,
     on_exit = opts.on_exit,
   })
+end
+
+--- Gets the Xcode version installed on the system.
+--- It returns the major and minor version as numbers.
+---@return number?, number?
+function M.get_xcode_version()
+  local response = util.shell("xcodebuild -version")
+  local majorVersion, minorVersion = response[1]:match("Xcode (%d+)%.(%d+)")
+  return tonumber(majorVersion), tonumber(minorVersion)
 end
 
 return M
