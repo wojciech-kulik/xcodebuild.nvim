@@ -103,6 +103,7 @@ end
 ---  auto_save = true, -- save all buffers before running build or tests (command: silent wa!)
 ---  show_build_progress_bar = true, -- shows [ ...    ] progress bar during build, based on the last duration
 ---  prepare_snapshot_test_previews = true, -- prepares a list with failing snapshot tests
+---  use_relative_appdir = true, -- configures appdir relative to current working directory. Otherwise, Uses nvim data relative
 ---  test_search = {
 ---    file_matching = "filename_lsp", -- one of: filename, lsp, lsp_filename, filename_lsp. Check out README for details
 ---    target_matching = true, -- checks if the test file target matches the one from logs. Try disabling it in case of not showing test results
@@ -278,6 +279,7 @@ function M.setup(options)
 
   require("xcodebuild.core.config").setup(options)
 
+  local appdata = require("xcodebuild.project.appdata")
   local autocmd = require("xcodebuild.core.autocmd")
   local actions = require("xcodebuild.actions")
   local projectConfig = require("xcodebuild.project.config")
@@ -291,6 +293,7 @@ function M.setup(options)
   local xcodeBuildServer = require("xcodebuild.integrations.xcode-build-server")
   local pickers = require("xcodebuild.ui.pickers")
 
+  appdata.setup()
   autocmd.setup()
   projectConfig.load_settings()
   projectConfig.load_device_cache()

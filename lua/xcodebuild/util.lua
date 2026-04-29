@@ -472,4 +472,19 @@ function M.exclude_hidden_paths(paths)
   return result
 end
 
+---Simple hash value
+---@param value string
+---@return string
+function M.hash(value)
+  return vim.fn.sha256(value)
+end
+
+---Returns the filepath for a filename under `{appdir}`
+---@paranm filename string
+---@return string
+function M.get_appdir_filepath(filename)
+  local appdata = require("xcodebuild.project.appdata")
+  return appdata.appdir .. "/" .. filename
+end
+
 return M

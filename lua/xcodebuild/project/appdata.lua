@@ -1,19 +1,20 @@
 ---@mod xcodebuild.project.appdata App Data
 ---@brief [[
 ---This module provides functionality to manage the project
----data stored in `.nvim/xcodebuild` folder, such as logs,
+---data stored in `{appdir}` folder, such as logs,
 ---reports, snapshots, coverage, and settings.
 ---
 ---It also provides paths to the tools used by the plugin.
 ---
----All data is stored in the current working directory in
----the `.nvim/xcodebuild` folder. That's why it's important
----to always run the plugin from the root of the project.
+---All data is stored in a path that depends on the current
+---working directory (`{appdir}`). That's why it's
+---important to always run the plugin from the root of the
+---project.
 ---@brief ]]
 
 ---@class AppData
 ---@field report ParsedReport|table # The last test report (can be empty).
----@field appdir string # The path to the `.nvim/xcodebuild` folder.
+---@field appdir string # The path to the `{appdir}` folder.
 ---@field app_logs_filename string # The name of the app logs file.
 ---@field app_logs_filepath string # The path to the app logs file.
 ---@field original_logs_filename string # The name of the original logs file.
@@ -35,37 +36,50 @@ local util = require("xcodebuild.util")
 
 local M = {}
 
-M.report = {
-  output = {},
-  tests = {},
-  buildErrors = {},
-  buildWarnings = {},
-  testsCount = 0,
-  testErrors = {},
-  failedTestsCount = 0,
-  xcresultFilepath = nil,
-}
-M.appdir = vim.fn.getcwd() .. "/.nvim/xcodebuild"
-M.app_logs_filename = "app_logs.log"
-M.app_logs_filepath = M.appdir .. "/" .. M.app_logs_filename
-M.original_logs_filename = "original_logs.log"
-M.original_logs_filepath = M.appdir .. "/" .. M.original_logs_filename
-M.build_logs_filename = "xcodebuild.log"
-M.build_logs_filepath = M.appdir .. "/" .. M.build_logs_filename
-M.report_filename = "report.json"
-M.report_filepath = M.appdir .. "/" .. M.report_filename
-M.tests_filename = "tests.json"
-M.tests_filepath = M.appdir .. "/" .. M.tests_filename
-M.snapshots_dir = M.appdir .. "/failing-snapshots"
-M.coverage_report_filepath = M.appdir .. "/coverage.json"
-M.test_explorer_filepath = M.appdir .. "/test-explorer.json"
-M.breakpoints_filepath = M.appdir .. "/breakpoints.json"
-M.env_vars_filepath = M.appdir .. "/env.txt"
-M.run_args_filepath = M.appdir .. "/run_args.txt"
-M.build_xcresult_filepath = M.appdir .. "/build.xcresult"
-M.test_xcresult_filepath = M.appdir .. "/test.xcresult"
+function M.setup()
+  local config = require("xcodebuild.core.config").options
 
-M.GETSNAPSHOTS_TOOL = "getsnapshots"
+  local appdir = ""
+  if config.use_relative_appdir then
+    appdir = vim.fn.getcwd() .. "/.nvim/xcodebuild"
+  else
+    local data_dir = vim.fn.stdpath("data") ..  "/xcodebuild"
+    local id = util.hash(vim.fn.getcwd())
+    appdir = data_dir .. "/" .. id
+  end
+
+  M.report = {
+    output = {},
+    tests = {},
+    buildErrors = {},
+    buildWarnings = {},
+    testsCount = 0,
+    testErrors = {},
+    failedTestsCount = 0,
+    xcresultFilepath = nil,
+  }
+  M.appdir = appdir
+  M.app_logs_filename = "app_logs.log"
+  M.app_logs_filepath = M.appdir .. "/" .. M.app_logs_filename
+  M.original_logs_filename = "original_logs.log"
+  M.original_logs_filepath = M.appdir .. "/" .. M.original_logs_filename
+  M.build_logs_filename = "xcodebuild.log"
+  M.build_logs_filepath = M.appdir .. "/" .. M.build_logs_filename
+  M.report_filename = "report.json"
+  M.report_filepath = M.appdir .. "/" .. M.report_filename
+  M.tests_filename = "tests.json"
+  M.tests_filepath = M.appdir .. "/" .. M.tests_filename
+  M.snapshots_dir = M.appdir .. "/failing-snapshots"
+  M.coverage_report_filepath = M.appdir .. "/coverage.json"
+  M.test_explorer_filepath = M.appdir .. "/test-explorer.json"
+  M.breakpoints_filepath = M.appdir .. "/breakpoints.json"
+  M.env_vars_filepath = M.appdir .. "/env.txt"
+  M.run_args_filepath = M.appdir .. "/run_args.txt"
+  M.build_xcresult_filepath = M.appdir .. "/build.xcresult"
+  M.test_xcresult_filepath = M.appdir .. "/test.xcresult"
+
+  M.GETSNAPSHOTS_TOOL = "getsnapshots"
+end
 
 ---Returns the path to the tool with the given {name}.
 ---@param name string
@@ -75,12 +89,12 @@ function M.tool_path(name)
   return table.concat(pathComponents, "/", 1, #pathComponents - 4) .. "/tools/" .. name
 end
 
----Creates the `.nvim/xcodebuild` folder if it doesn't exist.
+---Creates the `{appdir}` folder if it doesn't exist.
 function M.create_app_dir()
-  util.shell({ "mkdir", "-p", ".nvim/xcodebuild" })
+  util.shell({ "mkdir", "-p", M.appdir })
 end
 
----Initializes the `.nvim/xcodebuild/env.txt` file.
+---Initializes the `{appdir}/env.txt` file.
 function M.initialize_env_vars()
   local path = M.env_vars_filepath
 
@@ -100,7 +114,7 @@ function M.initialize_env_vars()
   end
 end
 
----Initializes the `.nvim/xcodebuild/run_args.txt` file.
+---Initializes the `{appdir}/run_args.txt` file.
 function M.initialize_run_args()
   local path = M.run_args_filepath
 
