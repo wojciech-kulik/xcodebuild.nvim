@@ -37,6 +37,7 @@ function M.find_tests(opts)
 
   for _, line in ipairs(lines) do
     selectedClass = string.match(line, "^[^/]*class ([^:%s]+)%s*:?")
+      or string.match(line, "^[^/]*struct ([^:%s]+)%s*:?")
     if selectedClass then
       break
     end
@@ -71,6 +72,23 @@ function M.find_tests(opts)
           class = selectedClass,
         })
         break
+      elseif string.find(lines[i], "@Test", 1, true) then
+        test = string.match(lines[i], "func (.+)%(")
+        if test then
+          table.insert(selectedTests, {
+            name = test,
+            class = selectedClass,
+          })
+          break
+        end
+        test = string.match(lines[i + 1], "func (.+)%(")
+        if test then
+          table.insert(selectedTests, {
+            name = test,
+            class = selectedClass,
+          })
+          break
+        end
       end
     end
   elseif opts.failingTests and appdata.report.failedTestsCount > 0 then
