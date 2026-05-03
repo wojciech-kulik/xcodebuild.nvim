@@ -463,7 +463,7 @@ function M.update_console(output, append)
   vim.bo[bufnr].modifiable = false
 end
 
----Reads breakpoints from the `.nvim/xcodebuild/breakpoints.json` file.
+---Reads breakpoints from the `{appdir}/breakpoints.json` file.
 ---Returns breakpoints or nil if the file is missing.
 ---@return table|nil
 local function read_breakpoints()
@@ -477,7 +477,7 @@ local function read_breakpoints()
   return vim.fn.json_decode(content)
 end
 
----Saves breakpoints to `.nvim/xcodebuild/breakpoints.json` file.
+---Saves breakpoints to `{appdir}/breakpoints.json` file.
 function M.save_breakpoints()
   local breakpoints = read_breakpoints() or {}
   local breakpointsPerBuffer = require("dap.breakpoints").get()
@@ -495,7 +495,7 @@ function M.save_breakpoints()
   end
 end
 
----Loads breakpoints from `.nvim/xcodebuild/breakpoints.json` file and sets them
+---Loads breakpoints from `{appdir}/breakpoints.json` file and sets them
 ---in {bufnr} or in all loaded buffers if {bufnr} is nil.
 ---@param bufnr number|nil
 function M.load_breakpoints(bufnr)

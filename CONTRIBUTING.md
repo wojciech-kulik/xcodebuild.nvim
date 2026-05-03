@@ -1,6 +1,6 @@
 # Contributing To Xcodebuild.nvim
 
-Thank you for your interest in contributing 🍻!  
+Thank you for your interest in contributing 🍻!
 Below you will find some essential information on how to start.
 
 ## Confirming Your Ideas
@@ -69,12 +69,12 @@ To start development on the plugin you should do the following steps:
 
 The following are used when running CI checks and are strongly recommended during the local development.
 
-Lint: [luacheck](https://github.com/lunarmodules/luacheck/)  
-Style: [StyLua](https://github.com/JohnnyMorganz/StyLua)  
-LSP: [LuaLS](https://github.com/LuaLS/lua-language-server)  
+Lint: [luacheck](https://github.com/lunarmodules/luacheck/)
+Style: [StyLua](https://github.com/JohnnyMorganz/StyLua)
+LSP: [LuaLS](https://github.com/LuaLS/lua-language-server)
 Docs: [lemmy-help](https://github.com/numToStr/lemmy-help)
 
-You can install them via `homebrew`.  
+You can install them via `homebrew`.
 You can also run `make install-dev` to install them all together including dependencies required by the plugin itself.
 
 ## Quality Assurance
@@ -255,7 +255,7 @@ functionality assuming that you want to add a new action to the commands picker 
 
 - `xcodebuild.core.config` to access the plugin's options
 - `xcodebuild.project.config` to access the current project configuration
-- `xcodebuild.project.appdata` to access files and tools stored in `.nvim/xcodebuild` folder
+- `xcodebuild.project.appdata` to access files and tools stored in `{appdir}` folder
 - `xcodebuild.project.builder` to build the app
 - `xcodebuild.tests.runner` to run tests
 - `xcodebuild.platform.device` to interact with a device or simulator

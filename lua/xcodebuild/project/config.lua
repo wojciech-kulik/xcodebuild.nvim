@@ -2,7 +2,7 @@
 ---@brief [[
 ---This module is responsible for managing the project settings.
 ---
----Settings are saved in a JSON file located at `.nvim/xcodebuild/settings.json`.
+---Settings are saved in a JSON file located at `{appdir}/settings.json`.
 ---This way each project can have its own settings.
 ---It's important to open Neovim in the root directory of the project,
 ---so the settings can be loaded.
@@ -45,12 +45,12 @@ M.device_cache = nil
 ---@type PlatformId|nil
 local last_platform = nil
 
-local device_cache_filepath = vim.fn.getcwd() .. "/.nvim/xcodebuild/devices.json"
+local function get_settings_filepath()
+  return require("xcodebuild.project.appdata").settings_filepath
+end
 
----Returns the filepath of the settings JSON file based on the
----current working directory.
-local function get_filepath()
-  return vim.fn.getcwd() .. "/.nvim/xcodebuild/settings.json"
+local function get_devices_filepath()
+  return require("xcodebuild.project.appdata").devices_filepath
 end
 
 ---Updates the global variables with the current settings.
@@ -64,11 +64,11 @@ local function update_global_variables()
   ---@diagnostic enable: inject-field
 end
 
----Loads the settings from the JSON file at `.nvim/xcodebuild/settings.json`.
+---Loads the settings from the JSON file at `{appdir}/settings.json`.
 ---It also updates the global variables with the current settings.
 function M.load_settings()
   local util = require("xcodebuild.util")
-  local success, content = util.readfile(get_filepath())
+  local success, content = util.readfile(get_settings_filepath())
 
   if success then
     M.settings = vim.fn.json_decode(content)
@@ -77,11 +77,11 @@ function M.load_settings()
   end
 end
 
----Saves the settings to the JSON file at `.nvim/xcodebuild/settings.json`.
+---Saves the settings to the JSON file at `{appdir}/settings.json`.
 ---It also updates the global variables with the current settings.
 function M.save_settings()
   local json = vim.split(vim.fn.json_encode(M.settings), "\n", { plain = true })
-  vim.fn.writefile(json, get_filepath())
+  vim.fn.writefile(json, get_settings_filepath())
   update_global_variables()
 end
 
@@ -120,16 +120,16 @@ function M.update_device_cache(devices)
   M.save_device_cache()
 end
 
----Saves the device cache to the JSON file at `.nvim/xcodebuild/devices.json`.
+---Saves the device cache to the JSON file at `{appdir}/devices.json`.
 function M.save_device_cache()
   local json = vim.split(vim.fn.json_encode(M.device_cache), "\n", { plain = true })
-  vim.fn.writefile(json, device_cache_filepath)
+  vim.fn.writefile(json, get_devices_filepath())
 end
 
----Loads the device cache from the JSON file at `.nvim/xcodebuild/devices.json`.
+---Loads the device cache from the JSON file at `{appdir}/devices.json`.
 function M.load_device_cache()
   local util = require("xcodebuild.util")
-  local success, content = util.readfile(device_cache_filepath)
+  local success, content = util.readfile(get_devices_filepath())
   if success then
     M.device_cache = vim.fn.json_decode(content)
   end

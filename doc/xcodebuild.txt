@@ -90,6 +90,7 @@ M.setup({options})                                            *xcodebuild.setup*
     require("xcodebuild").setup({
       restore_on_start = true, -- logs, diagnostics, and marks will be loaded on VimEnter (may affect performance)
       auto_save = true, -- save all buffers before running build or tests (command: silent wa!)
+      store_config_in_project_dir = true, -- if true, the configuration directory is stored in the project directory. If false, it's stored in a global nvim data directory
       show_build_progress_bar = true, -- shows [ ...    ] progress bar during build, based on the last duration
       prepare_snapshot_test_previews = true, -- prepares a list with failing snapshot tests
       test_search = {
@@ -1913,7 +1914,7 @@ Project Configuration                                *xcodebuild.project.config*
 
 This module is responsible for managing the project settings.
 
-Settings are saved in a JSON file located at `.nvim/xcodebuild/settings.json`.
+Settings are saved in a JSON file located at `{appdir}/settings.json`.
 This way each project can have its own settings.
 It's important to open Neovim in the root directory of the project,
 so the settings can be loaded.
@@ -1963,12 +1964,12 @@ M.device_cache                          *xcodebuild.project.config.device_cache*
 
 
 M.load_settings()                      *xcodebuild.project.config.load_settings*
-  Loads the settings from the JSON file at `.nvim/xcodebuild/settings.json`.
+  Loads the settings from the JSON file at `{appdir}/settings.json`.
   It also updates the global variables with the current settings.
 
 
 M.save_settings()                      *xcodebuild.project.config.save_settings*
-  Saves the settings to the JSON file at `.nvim/xcodebuild/settings.json`.
+  Saves the settings to the JSON file at `{appdir}/settings.json`.
   It also updates the global variables with the current settings.
 
 
@@ -1990,12 +1991,12 @@ M.update_device_cache({devices})
 
                                    *xcodebuild.project.config.save_device_cache*
 M.save_device_cache()
-  Saves the device cache to the JSON file at `.nvim/xcodebuild/devices.json`.
+  Saves the device cache to the JSON file at `{appdir}/devices.json`.
 
 
                                    *xcodebuild.project.config.load_device_cache*
 M.load_device_cache()
-  Loads the device cache from the JSON file at `.nvim/xcodebuild/devices.json`.
+  Loads the device cache from the JSON file at `{appdir}/devices.json`.
 
 
                                    *xcodebuild.project.config.is_spm_configured*
@@ -2058,20 +2059,23 @@ M.configure_project()
 App Data                                            *xcodebuild.project.appdata*
 
 This module provides functionality to manage the project
-data stored in `.nvim/xcodebuild` folder, such as logs,
+data stored in `{appdir}` folder, such as logs,
 reports, snapshots, coverage, and settings.
 
 It also provides paths to the tools used by the plugin.
 
-All data is stored in the current working directory in
-the `.nvim/xcodebuild` folder. That's why it's important
-to always run the plugin from the root of the project.
+All data is stored in a path that depends on the current
+working directory (`{appdir}`). That's why it's
+important to always run the plugin from the root of the
+project.
 
 AppData                                     *xcodebuild.project.appdata.AppData*
 
   Fields: ~
     {report}                    (ParsedReport|table) # The last test report (can be empty).
-    {appdir}                    (string) # The path to the `.nvim/xcodebuild` folder.
+    {appdir}                    (string) # The path to the `{appdir}` folder.
+    {settings_filepath}         (string) # The path to settings file.
+    {devices_filepath}          (string) # The path to devices cache file.
     {app_logs_filename}         (string) # The name of the app logs file.
     {app_logs_filepath}         (string) # The path to the app logs file.
     {original_logs_filename}    (string) # The name of the original logs file.
@@ -2090,6 +2094,9 @@ AppData                                     *xcodebuild.project.appdata.AppData*
     {PROJECT_HELPER_TOOL}       (string) # The name of the project helper tool.
 
 
+M.setup()                                     *xcodebuild.project.appdata.setup*
+
+
 M.tool_path({name})                       *xcodebuild.project.appdata.tool_path*
   Returns the path to the tool with the given {name}.
 
@@ -2102,17 +2109,17 @@ M.tool_path({name})                       *xcodebuild.project.appdata.tool_path*
 
                                      *xcodebuild.project.appdata.create_app_dir*
 M.create_app_dir()
-  Creates the `.nvim/xcodebuild` folder if it doesn't exist.
+  Creates the `{appdir}` folder if it doesn't exist.
 
 
                                 *xcodebuild.project.appdata.initialize_env_vars*
 M.initialize_env_vars()
-  Initializes the `.nvim/xcodebuild/env.txt` file.
+  Initializes the `{appdir}/env.txt` file.
 
 
                                 *xcodebuild.project.appdata.initialize_run_args*
 M.initialize_run_args()
-  Initializes the `.nvim/xcodebuild/run_args.txt` file.
+  Initializes the `{appdir}/run_args.txt` file.
 
 
 M.read_run_args()                     *xcodebuild.project.appdata.read_run_args*
@@ -4022,12 +4029,12 @@ M.update_console({output}, {append})
 
                                   *xcodebuild.integrations.dap.save_breakpoints*
 M.save_breakpoints()
-  Saves breakpoints to `.nvim/xcodebuild/breakpoints.json` file.
+  Saves breakpoints to `{appdir}/breakpoints.json` file.
 
 
                                   *xcodebuild.integrations.dap.load_breakpoints*
 M.load_breakpoints({bufnr})
-  Loads breakpoints from `.nvim/xcodebuild/breakpoints.json` file and sets them
+  Loads breakpoints from `{appdir}/breakpoints.json` file and sets them
   in {bufnr} or in all loaded buffers if {bufnr} is nil.
 
   Parameters: ~
@@ -5505,6 +5512,16 @@ M.exclude_hidden_paths({paths})           *xcodebuild.util.exclude_hidden_paths*
 
   Returns: ~
     (table)
+
+
+M.hash({value})                                           *xcodebuild.util.hash*
+  Simple hash value
+
+  Parameters: ~
+    {value}  (string)
+
+  Returns: ~
+    (string)
 
 
 vim:tw=78:ts=8:noet:ft=help:norl:

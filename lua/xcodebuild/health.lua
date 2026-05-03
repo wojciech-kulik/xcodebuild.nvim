@@ -225,21 +225,33 @@ local function check_build_server()
 end
 
 local function check_xcodebuild_settings()
+  local config = require("xcodebuild.core.config").options
+  local appData = require("xcodebuild.project.appdata")
   local util = require("xcodebuild.util")
-  if util.dir_exists(".nvim/xcodebuild") then
-    ok(".nvim/xcodebuild: found")
 
-    if util.file_exists(".nvim/xcodebuild/settings.json") then
-      ok(".nvim/xcodebuild/settings.json: found")
+  if config.store_config_in_project_dir then
+    ok("Storing config in the project directory")
+    ok("{appdir} = .nvim/xcodebuild")
+  else
+    ok("Storing config in the global nvim data directory")
+    ok("{appdir} = " .. appData.appdir)
+  end
+
+  if util.dir_exists(appData.appdir) then
+    ok("{appdir}: found")
+
+    local settings_path = appData.settings_filepath
+    if util.file_exists(settings_path) then
+      ok(settings_path .. ": found")
     else
       warn("file not found. It keeps project settings.")
-      warn("checked path: " .. vim.fn.getcwd() .. "/.nvim/xcodebuild/settings.json")
+      warn("checked path: " .. "{appdir}/settings.json")
       warn("did you run checkhealth from the root of your project?")
       warn("run `:XcodebuildSetup` to configure the project.")
     end
   else
     warn("directory not found")
-    warn("checked path: " .. vim.fn.getcwd() .. "/.nvim/xcodebuild")
+    warn("checked path: " .. appData.appdir)
     warn("did you run checkhealth from the root of your project?")
     warn("run `:XcodebuildSetup` to configure the project.")
   end
@@ -435,7 +447,7 @@ M.check = function()
   start("Checking buildServer.json")
   check_build_server()
 
-  start("Checking .nvim/xcodebuild/settings.json")
+  start("Checking {appdir}/settings.json")
   check_xcodebuild_settings()
 
   check_remote_debugger()

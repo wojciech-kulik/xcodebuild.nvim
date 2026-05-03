@@ -472,4 +472,11 @@ function M.exclude_hidden_paths(paths)
   return result
 end
 
+---Simple hash value
+---@param value string
+---@return string
+function M.hash(value)
+  return vim.fn.sha256(value)
+end
+
 return M
