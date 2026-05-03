@@ -40,7 +40,7 @@ function M.setup()
   local config = require("xcodebuild.core.config").options
 
   local appdir
-  if config.use_relative_appdir then
+  if config.store_config_in_project_dir then
     appdir = vim.fn.getcwd() .. "/.nvim/xcodebuild"
   else
     local data_dir = vim.fn.stdpath("data") .. "/xcodebuild"

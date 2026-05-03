@@ -229,11 +229,11 @@ local function check_xcodebuild_settings()
   local appdata = require("xcodebuild.project.appdata")
   local util = require("xcodebuild.util")
 
-  if config.use_relative_appdir then
-    ok("Using project relative appdir")
+  if config.store_config_in_project_dir then
+    ok("Storing config in the project directory")
     ok("{appdir} = .nvim/xcodebuild")
   else
-    ok("Using nvim data relative appdir")
+    ok("Storing config in the global nvim data directory")
     ok("{appdir} = " .. appdata.appdir)
   end
 
