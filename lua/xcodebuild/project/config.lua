@@ -45,6 +45,14 @@ M.device_cache = nil
 ---@type PlatformId|nil
 local last_platform = nil
 
+local function get_settings_filepath()
+  return require("xcodebuild.project.appdata").settings_filepath
+end
+
+local function get_devices_filepath()
+  return require("xcodebuild.project.appdata").devices_filepath
+end
+
 ---Updates the global variables with the current settings.
 local function update_global_variables()
   ---@diagnostic disable: inject-field
@@ -60,8 +68,7 @@ end
 ---It also updates the global variables with the current settings.
 function M.load_settings()
   local util = require("xcodebuild.util")
-  local appData = require("xcodebuild.project.appdata")
-  local success, content = util.readfile(appData.settings_filepath)
+  local success, content = util.readfile(get_settings_filepath())
 
   if success then
     M.settings = vim.fn.json_decode(content)
@@ -74,8 +81,7 @@ end
 ---It also updates the global variables with the current settings.
 function M.save_settings()
   local json = vim.split(vim.fn.json_encode(M.settings), "\n", { plain = true })
-  local appData = require("xcodebuild.project.appdata")
-  vim.fn.writefile(json, appData.settings_filepath)
+  vim.fn.writefile(json, get_settings_filepath())
   update_global_variables()
 end
 
@@ -117,15 +123,13 @@ end
 ---Saves the device cache to the JSON file at `{appdir}/devices.json`.
 function M.save_device_cache()
   local json = vim.split(vim.fn.json_encode(M.device_cache), "\n", { plain = true })
-  local appData = require("xcodebuild.project.appdata")
-  vim.fn.writefile(json, appData.devices_filepath)
+  vim.fn.writefile(json, get_devices_filepath())
 end
 
 ---Loads the device cache from the JSON file at `{appdir}/devices.json`.
 function M.load_device_cache()
   local util = require("xcodebuild.util")
-  local appData = require("xcodebuild.project.appdata")
-  local success, content = util.readfile(appData.devices_filepath)
+  local success, content = util.readfile(get_devices_filepath())
   if success then
     M.device_cache = vim.fn.json_decode(content)
   end
