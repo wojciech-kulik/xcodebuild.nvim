@@ -40,7 +40,7 @@ local function setupHighlights()
   end
 end
 
---- Checks if the user is using a deprecated configuration.
+---Checks if the user is using a deprecated configuration.
 ---@param options table|nil
 local function validate_options(options)
   if not options then
@@ -103,6 +103,7 @@ end
 ---  auto_save = true, -- save all buffers before running build or tests (command: silent wa!)
 ---  store_config_in_project_dir = true, -- if true, the configuration directory is stored in the project directory. If false, it's stored in a global nvim data directory
 ---  search_config_in_parent_dirs = false, -- search for configuration in parent directories
+---  detect_cwd_changes = false, -- detect when the current working directory changes and update the configuration accordingly
 ---  show_build_progress_bar = true, -- shows [ ...    ] progress bar during build, based on the last duration
 ---  prepare_snapshot_test_previews = true, -- prepares a list with failing snapshot tests
 ---  test_search = {
@@ -277,38 +278,17 @@ end
 ---@usage ]]
 function M.setup(options)
   validate_options(options)
-
   require("xcodebuild.core.config").setup(options)
 
-  local appdata = require("xcodebuild.project.appdata")
-  local autocmd = require("xcodebuild.core.autocmd")
-  local actions = require("xcodebuild.actions")
-  local projectConfig = require("xcodebuild.project.config")
-  local coverage = require("xcodebuild.code_coverage.coverage")
-  local coverageReport = require("xcodebuild.code_coverage.report")
-  local testExplorer = require("xcodebuild.tests.explorer")
-  local diagnostics = require("xcodebuild.tests.diagnostics")
-  local nvimTree = require("xcodebuild.integrations.nvim-tree")
-  local oilNvim = require("xcodebuild.integrations.oil-nvim")
-  local neoTree = require("xcodebuild.integrations.neo-tree")
-  local xcodeBuildServer = require("xcodebuild.integrations.xcode-build-server")
-  local pickers = require("xcodebuild.ui.pickers")
-
-  appdata.setup()
-  autocmd.setup()
-  projectConfig.load_settings()
-  projectConfig.load_device_cache()
-  diagnostics.setup()
-  coverage.setup()
-  coverageReport.setup()
-  testExplorer.setup()
-  nvimTree.setup()
-  oilNvim.setup()
-  neoTree.setup()
-  xcodeBuildServer.setup()
-  pickers.setup()
+  M.setup_modules()
+  M.setup_commands()
   setupHighlights()
   warnAboutOldConfig()
+end
+
+---Sets up user commands for xcodebuild.nvim
+function M.setup_commands()
+  local actions = require("xcodebuild.actions")
 
   -- Build
   vim.api.nvim_create_user_command("XcodebuildBuild", call(actions.build), { nargs = 0 })
@@ -408,6 +388,48 @@ function M.setup(options)
   vim.api.nvim_create_user_command("XcodebuildTestFunc", function()
     print("xcodebuild.nvim: Use `XcodebuildTestNearest` instead of `XcodebuildTestFunc`")
   end, { nargs = 0 })
+end
+
+---Sets up all modules of xcodebuild.nvim
+function M.setup_modules()
+  local appdata = require("xcodebuild.project.appdata")
+  local autocmd = require("xcodebuild.core.autocmd")
+  local projectConfig = require("xcodebuild.project.config")
+  local coverage = require("xcodebuild.code_coverage.coverage")
+  local coverageReport = require("xcodebuild.code_coverage.report")
+  local testExplorer = require("xcodebuild.tests.explorer")
+  local diagnostics = require("xcodebuild.tests.diagnostics")
+  local nvimTree = require("xcodebuild.integrations.nvim-tree")
+  local oilNvim = require("xcodebuild.integrations.oil-nvim")
+  local neoTree = require("xcodebuild.integrations.neo-tree")
+  local xcodeBuildServer = require("xcodebuild.integrations.xcode-build-server")
+  local pickers = require("xcodebuild.ui.pickers")
+
+  appdata.setup()
+  autocmd.setup()
+  projectConfig.setup()
+  diagnostics.setup()
+  coverage.setup()
+  coverageReport.setup()
+  testExplorer.setup()
+  nvimTree.setup()
+  oilNvim.setup()
+  neoTree.setup()
+  xcodeBuildServer.setup()
+  pickers.setup()
+end
+
+---Refreshes the plugin to use the correct `{appdir}` based on the current working directory.
+function M.update_cwd()
+  local appdata = require("xcodebuild.project.appdata")
+  local projectConfig = require("xcodebuild.project.config")
+  local events = require("xcodebuild.broadcasting.events")
+
+  appdata.setup()
+  projectConfig.setup()
+  appdata.load_last_report()
+
+  events.cwd_changed()
 end
 
 return M

@@ -105,10 +105,10 @@ local function find_xcodeproj_path(path)
   return nil
 end
 
---- Iterates over the provided parameters, checking if any parameter is a path.
---- If a path is found, it searches for an `.xcodeproj` file starting from that parameter's path.
---- Upon finding a `.xcodeproj` file, it inserts the path at the first position of the parameters
---- list and returns `true`. If no `.xcodeproj` is found, returns `false`.
+---Iterates over the provided parameters, checking if any parameter is a path.
+---If a path is found, it searches for an `.xcodeproj` file starting from that parameter's path.
+---Upon finding a `.xcodeproj` file, it inserts the path at the first position of the parameters
+---list and returns `true`. If no `.xcodeproj` is found, returns `false`.
 ---
 ---@param table table # The table into which the `.xcodeproj` path is injected.
 ---@param params string[] # The list of parameters to search through.

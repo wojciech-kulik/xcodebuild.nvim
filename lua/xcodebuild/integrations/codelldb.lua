@@ -41,7 +41,9 @@ function M.get_ios_configuration()
     name = "iOS App Debugger",
     type = M.get_adapter_name(),
     request = "attach",
-    cwd = vim.fn.getcwd(),
+    cwd = function()
+      return vim.fn.getcwd()
+    end,
     stopOnEntry = false,
     waitFor = true,
     program = get_program_path,
@@ -57,7 +59,9 @@ function M.get_macos_configuration()
     args = appdata.read_run_args(),
     env = appdata.read_env_vars(),
     request = "launch",
-    cwd = vim.fn.getcwd(),
+    cwd = function()
+      return vim.fn.getcwd()
+    end,
     stopOnEntry = false,
     waitFor = true,
     program = get_program_path,
@@ -76,7 +80,9 @@ function M.get_remote_device_configuration(request)
     env = appdata.read_env_vars(),
     args = appdata.read_run_args(),
     request = request,
-    cwd = vim.fn.getcwd(),
+    cwd = function()
+      return vim.fn.getcwd()
+    end,
     stopOnEntry = false,
     waitFor = true,
     program = get_program_path,

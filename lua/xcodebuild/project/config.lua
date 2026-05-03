@@ -74,6 +74,9 @@ function M.load_settings()
     M.settings = vim.fn.json_decode(content)
     last_platform = M.settings.platform
     update_global_variables()
+  else
+    M.settings = {}
+    last_platform = nil
   end
 end
 
@@ -132,6 +135,8 @@ function M.load_device_cache()
   local success, content = util.readfile(get_devices_filepath())
   if success then
     M.device_cache = vim.fn.json_decode(content)
+  else
+    M.device_cache = nil
   end
 end
 
@@ -287,6 +292,12 @@ function M.configure_project()
       end, { auto_select = true }) -- scheme
     end)
   end)
+end
+
+---Initializes the project configuration by loading the settings and device cache.
+function M.setup()
+  M.load_settings()
+  M.load_device_cache()
 end
 
 return M
