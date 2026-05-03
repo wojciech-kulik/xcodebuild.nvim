@@ -14,6 +14,7 @@ local defaults = {
   restore_on_start = true, -- logs, diagnostics, and marks will be loaded on VimEnter (may affect performance)
   auto_save = true, -- save all buffers before running build or tests (command: silent wa!)
   store_config_in_project_dir = true, -- if true, the configuration directory is stored in the project directory. If false, it's stored in a global nvim data directory
+  search_config_in_parent_dirs = false, -- search for configuration in parent directories
   show_build_progress_bar = true, -- shows [ ...    ] progress bar during build, based on the last duration
   prepare_snapshot_test_previews = true, -- prepares a list with failing snapshot tests
   test_search = {

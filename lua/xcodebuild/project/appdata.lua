@@ -38,17 +38,40 @@ local util = require("xcodebuild.util")
 
 local M = {}
 
+-- Returns the path to the `{appdir}` folder based on the current working directory (`cwd`) and the configuration options.
+--- @param cwd string current working directory
+--- @return string path to the `{appdir}` folder
+local function get_appdir_for(cwd)
+  local config = require("xcodebuild.core.config").options
+
+  if config.store_config_in_project_dir then
+    return cwd .. "/.nvim/xcodebuild"
+  else
+    local data_dir = vim.fn.stdpath("data") .. "/xcodebuild"
+    local id = util.hash(cwd)
+    local dirName = vim.fn.fnamemodify(cwd, ":t")
+    return data_dir .. "/" .. dirName .. "-" .. id
+  end
+end
+
 function M.setup()
   local config = require("xcodebuild.core.config").options
 
   local appdir
-  if config.store_config_in_project_dir then
-    appdir = vim.fn.getcwd() .. "/.nvim/xcodebuild"
-  else
-    local data_dir = vim.fn.stdpath("data") .. "/xcodebuild"
-    local id = util.hash(vim.fn.getcwd())
-    local dirName = vim.fn.fnamemodify(vim.fn.getcwd(), ":t")
-    appdir = data_dir .. "/" .. dirName .. "-" .. id
+  local cwd = vim.fn.getcwd()
+  local parentDir = cwd
+
+  repeat
+    cwd = parentDir
+    appdir = get_appdir_for(cwd)
+    parentDir = vim.fn.fnamemodify(cwd, ":h")
+  until not config.search_config_in_parent_dirs
+    or parentDir == cwd -- reached the root
+    or util.file_exists(appdir .. "/settings.json")
+
+  -- if we reached the root and we didn't find any config, we use the appdir for the original cwd
+  if parentDir == cwd then
+    appdir = get_appdir_for(vim.fn.getcwd())
   end
 
   M.report = {
