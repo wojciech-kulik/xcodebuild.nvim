@@ -45,7 +45,8 @@ function M.setup()
   else
     local data_dir = vim.fn.stdpath("data") .. "/xcodebuild"
     local id = util.hash(vim.fn.getcwd())
-    appdir = data_dir .. "/" .. id
+    local dirName = vim.fn.fnamemodify(vim.fn.getcwd(), ":t")
+    appdir = data_dir .. "/" .. dirName .. "-" .. id
   end
 
   M.report = {
