@@ -2074,6 +2074,8 @@ AppData                                     *xcodebuild.project.appdata.AppData*
   Fields: ~
     {report}                    (ParsedReport|table) # The last test report (can be empty).
     {appdir}                    (string) # The path to the `{appdir}` folder.
+    {settings_filepath}         (string) # The path to settings file.
+    {devices_filepath}          (string) # The path to devices cache file.
     {app_logs_filename}         (string) # The name of the app logs file.
     {app_logs_filepath}         (string) # The path to the app logs file.
     {original_logs_filename}    (string) # The name of the original logs file.
@@ -5517,14 +5519,6 @@ M.hash({value})                                           *xcodebuild.util.hash*
 
   Parameters: ~
     {value}  (string)
-
-  Returns: ~
-    (string)
-
-
-M.get_appdir_filepath()                    *xcodebuild.util.get_appdir_filepath*
-  Returns the filepath for a filename under `{appdir}`
-  @paranm filename string
 
   Returns: ~
     (string)

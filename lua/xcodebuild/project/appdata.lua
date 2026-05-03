@@ -15,6 +15,8 @@
 ---@class AppData
 ---@field report ParsedReport|table # The last test report (can be empty).
 ---@field appdir string # The path to the `{appdir}` folder.
+---@field settings_filepath string # The path to settings file.
+---@field devices_filepath string # The path to devices cache file.
 ---@field app_logs_filename string # The name of the app logs file.
 ---@field app_logs_filepath string # The path to the app logs file.
 ---@field original_logs_filename string # The name of the original logs file.
@@ -60,6 +62,8 @@ function M.setup()
     xcresultFilepath = nil,
   }
   M.appdir = appdir
+  M.settings_filepath = M.appdir .. "/settings.json"
+  M.devices_filepath = M.appdir .. "/devices.json"
   M.app_logs_filename = "app_logs.log"
   M.app_logs_filepath = M.appdir .. "/" .. M.app_logs_filename
   M.original_logs_filename = "original_logs.log"

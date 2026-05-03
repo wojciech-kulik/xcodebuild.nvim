@@ -45,18 +45,6 @@ M.device_cache = nil
 ---@type PlatformId|nil
 local last_platform = nil
 
-local function device_cache_filepath()
-  local util = require("xcodebuild.util")
-  return util.get_appdir_filepath("devices.json")
-end
-
----Returns the filepath of the settings JSON file based on the
----current working directory.
-local function get_filepath()
-  local util = require("xcodebuild.util")
-  return util.get_appdir_filepath("settings.json")
-end
-
 ---Updates the global variables with the current settings.
 local function update_global_variables()
   ---@diagnostic disable: inject-field
@@ -72,7 +60,8 @@ end
 ---It also updates the global variables with the current settings.
 function M.load_settings()
   local util = require("xcodebuild.util")
-  local success, content = util.readfile(get_filepath())
+  local appData = require("xcodebuild.project.appdata")
+  local success, content = util.readfile(appData.settings_filepath)
 
   if success then
     M.settings = vim.fn.json_decode(content)
@@ -85,7 +74,8 @@ end
 ---It also updates the global variables with the current settings.
 function M.save_settings()
   local json = vim.split(vim.fn.json_encode(M.settings), "\n", { plain = true })
-  vim.fn.writefile(json, get_filepath())
+  local appData = require("xcodebuild.project.appdata")
+  vim.fn.writefile(json, appData.settings_filepath)
   update_global_variables()
 end
 
@@ -127,13 +117,15 @@ end
 ---Saves the device cache to the JSON file at `{appdir}/devices.json`.
 function M.save_device_cache()
   local json = vim.split(vim.fn.json_encode(M.device_cache), "\n", { plain = true })
-  vim.fn.writefile(json, device_cache_filepath())
+  local appData = require("xcodebuild.project.appdata")
+  vim.fn.writefile(json, appData.devices_filepath)
 end
 
 ---Loads the device cache from the JSON file at `{appdir}/devices.json`.
 function M.load_device_cache()
   local util = require("xcodebuild.util")
-  local success, content = util.readfile(device_cache_filepath())
+  local appData = require("xcodebuild.project.appdata")
+  local success, content = util.readfile(appData.devices_filepath)
   if success then
     M.device_cache = vim.fn.json_decode(content)
   end

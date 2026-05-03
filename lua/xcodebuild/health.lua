@@ -226,7 +226,7 @@ end
 
 local function check_xcodebuild_settings()
   local config = require("xcodebuild.core.config").options
-  local appdata = require("xcodebuild.project.appdata")
+  local appData = require("xcodebuild.project.appdata")
   local util = require("xcodebuild.util")
 
   if config.store_config_in_project_dir then
@@ -234,13 +234,13 @@ local function check_xcodebuild_settings()
     ok("{appdir} = .nvim/xcodebuild")
   else
     ok("Storing config in the global nvim data directory")
-    ok("{appdir} = " .. appdata.appdir)
+    ok("{appdir} = " .. appData.appdir)
   end
 
-  if util.dir_exists(appdata.appdir) then
+  if util.dir_exists(appData.appdir) then
     ok("{appdir}: found")
 
-    local settings_path = util.get_appdir_filepath("settings.json")
+    local settings_path = appData.settings_filepath
     if util.file_exists(settings_path) then
       ok(settings_path .. ": found")
     else
@@ -251,7 +251,7 @@ local function check_xcodebuild_settings()
     end
   else
     warn("directory not found")
-    warn("checked path: " .. appdata.appdir)
+    warn("checked path: " .. appData.appdir)
     warn("did you run checkhealth from the root of your project?")
     warn("run `:XcodebuildSetup` to configure the project.")
   end
