@@ -86,27 +86,39 @@ Big thanks to all the sponsors who support this project 🍻!
 
 ### Monthly Sponsors
 
-<a href="https://github.com/kg8m"><img src="https://avatars.githubusercontent.com/u/694547" width="40" height="40" alt="@kg8m" title="kg8m"></a>
-<a href="https://github.com/m-housh"><img src="https://avatars.githubusercontent.com/u/9305678" width="40" height="40" alt="@m-housh" title="m-housh"></a>
-<a href="https://github.com/soundsmitten"><img src="https://avatars.githubusercontent.com/u/852801" width="40" height="40" alt="@soundsmitten" title="soundsmitten"></a>
-<a href="https://github.com/humblehacker"><img src="https://avatars.githubusercontent.com/u/117582" width="40" height="40" alt="@humblehacker" title="humblehacker"></a>
-<a href="https://github.com/jwcross"><img src="https://avatars.githubusercontent.com/u/2405246" width="40" height="40" alt="@jwcross" title="jwcross"></a>
-<a href="https://github.com/TimPapler"><img src="https://avatars.githubusercontent.com/u/5990580" width="40" height="40" alt="@TimPapler" title="TimPapler"></a>
-<a href="https://github.com/dosboxd"><img src="https://avatars.githubusercontent.com/u/16291547" width="40" height="40" alt="@dosboxd" title="dosboxd"></a>
+<table>
+  <tr>
+    <td><a href="https://github.com/kg8m"><img src="https://avatars.githubusercontent.com/u/694547" width="40" height="40" alt="@kg8m" title="kg8m"></a></td>
+    <td><a href="https://github.com/m-housh"><img src="https://avatars.githubusercontent.com/u/9305678" width="40" height="40" alt="@m-housh" title="m-housh"></a></td>
+    <td><a href="https://github.com/soundsmitten"><img src="https://avatars.githubusercontent.com/u/852801" width="40" height="40" alt="@soundsmitten" title="soundsmitten"></a></td>
+    <td><a href="https://github.com/humblehacker"><img src="https://avatars.githubusercontent.com/u/117582" width="40" height="40" alt="@humblehacker" title="humblehacker"></a></td>
+    <td><a href="https://github.com/jwcross"><img src="https://avatars.githubusercontent.com/u/2405246" width="40" height="40" alt="@jwcross" title="jwcross"></a></td>
+    <td><a href="https://github.com/TimPapler"><img src="https://avatars.githubusercontent.com/u/5990580" width="40" height="40" alt="@TimPapler" title="TimPapler"></a></td>
+    <td><a href="https://github.com/dosboxd"><img src="https://avatars.githubusercontent.com/u/16291547" width="40" height="40" alt="@dosboxd" title="dosboxd"></a></td>
+  </tr>
+</table>
 
 ### One Time Sponsors
 
-<a href="https://github.com/kujohn"><img src="https://avatars.githubusercontent.com/u/1356936" width="40" height="40" alt="@kujohn" title="kujohn"></a>
-<a href="https://github.com/iMostfa"><img src="https://avatars.githubusercontent.com/u/2325884" width="40" height="40" alt="@iMostfa" title="iMostfa"></a>
-<a href="https://github.com/bainfu"><img src="https://avatars.githubusercontent.com/u/221679" width="40" height="40" alt="@bainfu" title="bainfu"></a>
-<a href="https://github.com/emrearmagan"><img src="https://avatars.githubusercontent.com/u/45041965" width="40" height="40" alt="@emrearmagan" title="emrearmagan"></a>
-<a href="https://github.com/RomanVolkov"><img src="https://avatars.githubusercontent.com/u/2831223" width="40" height="40" alt="@RomanVolkov" title="RomanVolkov"></a>
+<table>
+  <tr>
+    <td><a href="https://github.com/kujohn"><img src="https://avatars.githubusercontent.com/u/1356936" width="40" height="40" alt="@kujohn" title="kujohn"></a></td>
+    <td><a href="https://github.com/iMostfa"><img src="https://avatars.githubusercontent.com/u/2325884" width="40" height="40" alt="@iMostfa" title="iMostfa"></a></td>
+    <td><a href="https://github.com/bainfu"><img src="https://avatars.githubusercontent.com/u/221679" width="40" height="40" alt="@bainfu" title="bainfu"></a></td>
+    <td><a href="https://github.com/emrearmagan"><img src="https://avatars.githubusercontent.com/u/45041965" width="40" height="40" alt="@emrearmagan" title="emrearmagan"></a></td>
+    <td><a href="https://github.com/RomanVolkov"><img src="https://avatars.githubusercontent.com/u/2831223" width="40" height="40" alt="@RomanVolkov" title="RomanVolkov"></a></td>
+  </tr>
+</table>
 
 ### Past Monthly Sponsors
 
-<a href="https://github.com/Almaz5200"><img src="https://avatars.githubusercontent.com/u/21291840" width="40" height="40" alt="@Almaz5200" title="Almaz5200"></a>
-<a href="https://github.com/stephenhuh"><img src="https://avatars.githubusercontent.com/u/6165538" width="40" height="40" alt="@stephenhuh" title="stephenhuh"></a>
-<a href="https://github.com/joeldrotleff"><img src="https://avatars.githubusercontent.com/u/2484624" width="40" height="40" alt="@joeldrotleff" title="joeldrotleff"></a>
+<table>
+  <tr>
+    <td><a href="https://github.com/Almaz5200"><img src="https://avatars.githubusercontent.com/u/21291840" width="40" height="40" alt="@Almaz5200" title="Almaz5200"></a></td>
+    <td><a href="https://github.com/stephenhuh"><img src="https://avatars.githubusercontent.com/u/6165538" width="40" height="40" alt="@stephenhuh" title="stephenhuh"></a></td>
+    <td><a href="https://github.com/joeldrotleff"><img src="https://avatars.githubusercontent.com/u/2484624" width="40" height="40" alt="@joeldrotleff" title="joeldrotleff"></a></td>
+  </tr>
+</table>
 
 ## 🤓 My Other Projects
 

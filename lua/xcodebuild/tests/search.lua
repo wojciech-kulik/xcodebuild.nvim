@@ -59,7 +59,13 @@ local function lsp_search(targetName, className)
 
   if vim.bo.filetype ~= "swift" then
     local sourcekitId = sourcekitClients[1].id
-    bufnr = vim.lsp.get_buffers_by_client_id(sourcekitId)[1] or 0
+    if vim.fn.has("nvim-0.13") == 1 then
+      local bufId, _ = next(vim.lsp.get_client_by_id(sourcekitId).attached_buffers)
+      bufnr = bufId or 0
+    else
+      ---@diagnostic disable-next-line: deprecated
+      bufnr = vim.lsp.get_buffers_by_client_id(sourcekitId)[1] or 0
+    end
   end
 
   vim.lsp.buf_request_all(bufnr, "workspace/symbol", { query = className }, function(result)
