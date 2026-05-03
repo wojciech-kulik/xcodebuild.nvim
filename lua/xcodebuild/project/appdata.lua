@@ -38,9 +38,9 @@ local util = require("xcodebuild.util")
 
 local M = {}
 
--- Returns the path to the `{appdir}` folder based on the current working directory (`cwd`) and the configuration options.
---- @param cwd string current working directory
---- @return string path to the `{appdir}` folder
+---Returns the path to the `{appdir}` folder based on the current working directory (`cwd`) and the configuration options.
+---@param cwd string current working directory
+---@return string path to the `{appdir}` folder
 local function get_appdir_for(cwd)
   local config = require("xcodebuild.core.config").options
 

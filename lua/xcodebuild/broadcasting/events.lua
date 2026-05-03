@@ -37,6 +37,7 @@
 --- | `XcodebuildCoverageToggled`        |
 --- | `XcodebuildCoverageReportToggled`  |
 --- | `XcodebuildLogsToggled`            |
+--- | `XcodebuildCwdChanged`             |
 ---
 ---For payload details of each event, see the respective function.
 ---
@@ -217,6 +218,13 @@ function M.toggled_logs(visible, bufnr, winnr)
   vim.api.nvim_exec_autocmds("User", {
     pattern = "XcodebuildLogsToggled",
     data = { visible = visible, bufnr = bufnr, winnr = winnr },
+  })
+end
+
+---Notifies that the current working directory has been changed and the project has been reloaded.
+function M.cwd_changed()
+  vim.api.nvim_exec_autocmds("User", {
+    pattern = "XcodebuildCwdChanged",
   })
 end
 

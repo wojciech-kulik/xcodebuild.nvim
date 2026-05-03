@@ -1050,8 +1050,8 @@ function M.run_tests(opts)
   })
 end
 
---- Gets the Xcode version installed on the system.
---- It returns the major and minor version as numbers.
+---Gets the Xcode version installed on the system.
+---It returns the major and minor version as numbers.
 ---@return number?, number?
 function M.get_xcode_version()
   local response = util.shell("xcodebuild -version")

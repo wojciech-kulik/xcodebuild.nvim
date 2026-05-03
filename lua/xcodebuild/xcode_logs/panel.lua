@@ -56,7 +56,7 @@ local function get_buf_and_win_of_logs(returnNotLoaded)
 end
 
 ---Formats Xcode logs ({lines}) using `config.logs_formatter`.
--- Calls {callback} with the result.
+---Calls {callback} with the result.
 ---@param lines string[]
 ---@param callback fun(prettyOutput: string[])
 local function format_logs(lines, callback)

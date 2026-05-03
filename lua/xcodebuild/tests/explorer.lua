@@ -100,12 +100,12 @@ local line_to_test = {}
 ---@type IdToTestNode[]
 local id_to_test = {}
 
---- @param buffer integer
---- @param ns_id integer
---- @param hl_group string
---- @param line integer
---- @param col_start integer
---- @param col_end integer
+---@param buffer integer
+---@param ns_id integer
+---@param hl_group string
+---@param line integer
+---@param col_start integer
+---@param col_end integer
 local function nvim_buf_add_highlight(buffer, ns_id, hl_group, line, col_start, col_end)
   if vim.fn.has("nvim-0.10") == 1 then
     vim.hl.range(

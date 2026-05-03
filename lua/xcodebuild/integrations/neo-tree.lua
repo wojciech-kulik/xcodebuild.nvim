@@ -36,9 +36,9 @@ function M.setup()
   local projectManagerConfig = require("xcodebuild.core.config").options.project_manager
   local projectManager = require("xcodebuild.project.manager")
   local projectConfig = require("xcodebuild.project.config")
-  local cwd = vim.fn.getcwd()
 
   local function isProjectFile(path)
+    local cwd = vim.fn.getcwd()
     return (projectConfig.is_app_configured() or projectConfig.is_library_configured())
       and vim.startswith(path, cwd)
   end

@@ -390,7 +390,7 @@ function M.show_multiselect(title, items, callback)
   _show(title, items, {}, true, callback)
 end
 
---- Shows a file picker for failing snapshots with image preview.
+---Shows a file picker for failing snapshots with image preview.
 ---@param callback fun(result: {index: number, value: any}, index: number)|nil
 function M.show_snapshot_picker(callback)
   local appData = require("xcodebuild.project.appdata")

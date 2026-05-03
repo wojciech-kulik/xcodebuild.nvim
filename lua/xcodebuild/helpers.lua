@@ -187,10 +187,10 @@ end
 ---@return any
 function M.buf_get_option(bufnr, name)
   if vim.fn.has("nvim-0.10") == 1 then
-    vim.api.nvim_get_option_value(name, { buf = bufnr })
+    return vim.api.nvim_get_option_value(name, { buf = bufnr })
   else
     ---@diagnostic disable-next-line: deprecated
-    vim.api.nvim_buf_get_option(bufnr, name)
+    return vim.api.nvim_buf_get_option(bufnr, name)
   end
 end
 

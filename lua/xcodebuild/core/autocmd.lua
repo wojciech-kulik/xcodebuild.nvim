@@ -30,6 +30,14 @@ function M.setup()
     })
   end
 
+  if config.detect_cwd_changes then
+    vim.api.nvim_create_autocmd({ "DirChanged" }, {
+      group = autogroup,
+      pattern = "*",
+      callback = require("xcodebuild").update_cwd,
+    })
+  end
+
   vim.api.nvim_create_autocmd({ "BufReadPost" }, {
     group = autogroup,
     pattern = "*" .. appdata.build_logs_filename,
