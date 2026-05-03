@@ -13,11 +13,13 @@ local M = {}
 local defaults = {
   restore_on_start = true, -- logs, diagnostics, and marks will be loaded on VimEnter (may affect performance)
   auto_save = true, -- save all buffers before running build or tests (command: silent wa!)
-  store_config_in_project_dir = true, -- if true, the configuration directory is stored in the project directory. If false, it's stored in a global nvim data directory
-  search_config_in_parent_dirs = false, -- search for configuration in parent directories
-  detect_cwd_changes = false, -- detect when the current working directory changes and update the configuration accordingly
   show_build_progress_bar = true, -- shows [ ...    ] progress bar during build, based on the last duration
   prepare_snapshot_test_previews = true, -- prepares a list with failing snapshot tests
+  project_config = {
+    store_in_project_dir = true, -- if true, the configuration directory is stored in the project directory. If false, it's stored in a global nvim data directory
+    search_in_parent_dirs = false, -- search for configuration in parent directories
+    reload_on_cwd_change = false, -- detect when the current working directory changes and update the configuration accordingly
+  },
   test_search = {
     file_matching = "filename_lsp", -- one of: filename, lsp, lsp_filename, filename_lsp. Check out README for details
     target_matching = true, -- checks if the test file target matches the one from logs. Try disabling it in case of not showing test results

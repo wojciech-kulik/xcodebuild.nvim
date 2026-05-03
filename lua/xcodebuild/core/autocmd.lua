@@ -30,7 +30,7 @@ function M.setup()
     })
   end
 
-  if config.detect_cwd_changes then
+  if config.project_config.reload_on_cwd_change then
     vim.api.nvim_create_autocmd({ "DirChanged" }, {
       group = autogroup,
       pattern = "*",

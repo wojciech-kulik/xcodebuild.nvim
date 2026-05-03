@@ -44,7 +44,7 @@ local M = {}
 local function get_appdir_for(cwd)
   local config = require("xcodebuild.core.config").options
 
-  if config.store_config_in_project_dir then
+  if config.project_config.store_in_project_dir then
     return cwd .. "/.nvim/xcodebuild"
   else
     local data_dir = vim.fn.stdpath("data") .. "/xcodebuild"
@@ -65,7 +65,7 @@ function M.setup()
     cwd = parentDir
     appdir = get_appdir_for(cwd)
     parentDir = vim.fn.fnamemodify(cwd, ":h")
-  until not config.search_config_in_parent_dirs
+  until not config.project_config.search_in_parent_dirs
     or parentDir == cwd -- reached the root
     or util.file_exists(appdir .. "/settings.json")
 
