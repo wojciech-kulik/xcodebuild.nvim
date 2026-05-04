@@ -479,4 +479,19 @@ function M.hash(value)
   return vim.fn.sha256(value)
 end
 
+---Returns the root directory of the git repository if it exists, otherwise returns nil.
+---@return string|nil
+function M.get_git_root()
+  local gitRoot = M.shell("git rev-parse --show-toplevel")[1]
+  return gitRoot and gitRoot ~= "" and gitRoot or nil
+end
+
+---Returns the root directory for searching project files.
+---It tries to find the git root directory first, and if it fails,
+---it uses the current working directory.
+---@return string
+function M.get_project_root()
+  return M.get_git_root() or vim.fn.getcwd()
+end
+
 return M

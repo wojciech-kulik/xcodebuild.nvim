@@ -124,14 +124,14 @@ function M.find_all_swift_files()
       "fd",
       "-I",
       ".*\\.swift$",
-      vim.fn.getcwd(),
+      util.get_project_root(),
       "--type", "f",
     })
   else
     -- stylua: ignore
     allFiles = util.shell({
       "find",
-      vim.fn.getcwd(),
+      util.get_project_root(),
       "-type", "f",
       "-iname", "*.swift",
       "-print",
