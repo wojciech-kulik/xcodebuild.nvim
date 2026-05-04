@@ -40,16 +40,16 @@ describe("xcodebuild.tests.provider.find_tests", function()
   describe("WHEN selecting current test in an XCTest file", function()
     before_each(function()
       mock_buffer = [[
-			class MyTests: XCTestCase {
-				func testOne() {
-				    XCTAssert(true)
-				}
+        class MyTests: XCTestCase {
+          func testOne() {
+              XCTAssert(true)
+          }
 
-				func testTwo() {
-					XCTAssert(false)
-				}
-			}			
-		]]
+          func testTwo() {
+            XCTAssert(false)
+          }
+        }
+      ]]
     end)
 
     it("THEN the first test can be identified", function()
