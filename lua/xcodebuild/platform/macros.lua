@@ -111,7 +111,7 @@ end
 ---@param packageIdentity string
 ---@return {version: string|nil, revision: string|nil, checksum: string|nil}|nil
 local function get_package_info(packageIdentity)
-  local workingDir = projectConfig.settings.workingDirectory or vim.fn.getcwd()
+  local workingDir = projectConfig.settings.workingDirectory or util.get_project_root()
   local packageResolved = workingDir .. "/Package.resolved"
 
   -- Normalize package identity to lowercase for case-insensitive matching

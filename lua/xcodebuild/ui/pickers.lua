@@ -35,14 +35,6 @@ local M = {}
 local integration = nil
 local currentJobId = nil
 
----Returns the root directory for searching project files.
----It tries to find the git root directory first, and if it fails,
----it uses the current working directory.
----@return string
-local function get_root_dir()
-  return util.get_git_root() or vim.fn.getcwd()
-end
-
 ---Sorts paths by length and then by name.
 ---@param paths string[]
 local function sort_paths(paths)
@@ -163,7 +155,7 @@ end
 ---@param callback fun(xcodeproj: string)|nil
 ---@param opts PickerOptions|nil
 function M.select_xcodeproj(callback, opts)
-  local rootDir = get_root_dir()
+  local rootDir = util.get_project_root()
   local maxdepth = config.commands.project_search_max_depth
 
   -- stylua: ignore
@@ -204,7 +196,7 @@ end
 ---@param opts PickerOptions|nil
 function M.select_project(callback, opts)
   local maxdepth = config.commands.project_search_max_depth
-  local rootDir = get_root_dir()
+  local rootDir = util.get_project_root()
 
   -- stylua: ignore
   local cmd = {

@@ -74,7 +74,7 @@ local function find_filepath_using_ripgrep(suiteName)
     "--files-with-matches",
     "--fixed-strings",
     '@Suite("' .. suiteName .. '"',
-    vim.fn.getcwd(),
+    util.get_project_root(),
   })
 
   if not paths then
