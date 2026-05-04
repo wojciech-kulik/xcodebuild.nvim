@@ -5550,4 +5550,11 @@ M.hash({value})                                           *xcodebuild.util.hash*
     (string)
 
 
+M.get_git_root()                                  *xcodebuild.util.get_git_root*
+  Returns the root directory of the git repository if it exists, otherwise returns nil.
+
+  Returns: ~
+    (string|nil)
+
+
 vim:tw=78:ts=8:noet:ft=help:norl:
