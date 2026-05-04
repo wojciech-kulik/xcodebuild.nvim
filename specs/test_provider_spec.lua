@@ -41,13 +41,13 @@ describe("xcodebuild.tests.provider.find_tests", function()
     before_each(function()
       mock_buffer = [[
         class MyTests: XCTestCase {
-          func testOne() {
-              XCTAssert(true)
-          }
+            func testOne() {
+                 XCTAssert(true)
+            }
 
-          func testTwo() {
-            XCTAssert(false)
-          }
+            func testTwo() {
+                 XCTAssert(false)
+            }
         }
       ]]
     end)
@@ -72,17 +72,17 @@ describe("xcodebuild.tests.provider.find_tests", function()
   describe("WHEN selecting current test in a Swift Testing file", function()
     before_each(function()
       mock_buffer = [[
-				struct TestSuite {
-					@Test func itPasses() {
-						#expect(true)
-					}
+        struct TestSuite {
+            @Test func itPasses() {
+                #expect(true)
+            }
 
-					@Test 
-					func itFails() {
-						#expect(false)
-					}
-				}
-			]]
+            @Test
+            func itFails() {
+                #expect(false)
+            }
+        }
+      ]]
     end)
 
     it("THEN tests are identified when @Test annotation is on same line", function()
