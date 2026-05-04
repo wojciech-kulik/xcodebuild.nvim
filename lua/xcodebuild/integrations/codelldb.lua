@@ -27,6 +27,7 @@ local appdata = require("xcodebuild.project.appdata")
 local projectConfig = require("xcodebuild.project.config")
 local config = require("xcodebuild.core.config").options.integrations.codelldb
 local notifications = require("xcodebuild.broadcasting.notifications")
+local util = require("xcodebuild.util")
 
 ---Returns path to the built application.
 ---@return string
@@ -42,7 +43,7 @@ function M.get_ios_configuration()
     type = M.get_adapter_name(),
     request = "attach",
     cwd = function()
-      return vim.fn.getcwd()
+      return util.get_project_root()
     end,
     stopOnEntry = false,
     waitFor = true,
@@ -60,7 +61,7 @@ function M.get_macos_configuration()
     env = appdata.read_env_vars(),
     request = "launch",
     cwd = function()
-      return vim.fn.getcwd()
+      return util.get_project_root()
     end,
     stopOnEntry = false,
     waitFor = true,
@@ -81,7 +82,7 @@ function M.get_remote_device_configuration(request)
     args = appdata.read_run_args(),
     request = request,
     cwd = function()
-      return vim.fn.getcwd()
+      return util.get_project_root()
     end,
     stopOnEntry = false,
     waitFor = true,

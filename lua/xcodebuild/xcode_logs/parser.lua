@@ -525,7 +525,7 @@ local function parse_warning(line)
   local filepath, lineNumber, columnNumber, message =
     match_any(line, "(" .. filePattern .. "):(%d+):(%d*):? %w*%s*warning: (.*)", allExtensions)
 
-  if filepath and message and util.has_prefix(filepath, vim.fn.getcwd()) then
+  if filepath and message and util.has_prefix(filepath, util.get_project_root()) then
     lineType = BUILD_WARNING
     lineData.filepath = filepath
     lineData.filename = util.get_filename(filepath)

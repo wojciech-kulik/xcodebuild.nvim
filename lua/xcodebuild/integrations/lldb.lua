@@ -86,7 +86,7 @@ function M.get_ios_configuration()
     type = M.get_adapter_name(),
     request = "attach",
     cwd = function()
-      return vim.fn.getcwd()
+      return util.get_project_root()
     end,
     stopOnEntry = false,
     waitFor = true,
@@ -105,7 +105,7 @@ function M.get_macos_configuration()
     env = appdata.read_env_vars(),
     request = "launch",
     cwd = function()
-      return vim.fn.getcwd()
+      return util.get_project_root()
     end,
     stopOnEntry = false,
     waitFor = true,
@@ -124,7 +124,7 @@ function M.get_remote_device_configuration(request)
     type = M.get_adapter_name(),
     request = request,
     cwd = function()
-      return vim.fn.getcwd()
+      return util.get_project_root()
     end,
     stopOnEntry = false,
     waitFor = true,
