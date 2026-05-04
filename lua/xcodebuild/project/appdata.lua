@@ -287,6 +287,17 @@ function M.load_last_report()
       quickfix.set(M.report)
       diagnostics.refresh_all_test_buffers(M.report)
     end, vim.startswith(config.test_search.file_matching, "lsp") and 1000 or 500)
+  else
+    M.report = {
+      output = {},
+      tests = {},
+      buildErrors = {},
+      buildWarnings = {},
+      testsCount = 0,
+      testErrors = {},
+      failedTestsCount = 0,
+      xcresultFilepath = nil,
+    }
   end
 end
 

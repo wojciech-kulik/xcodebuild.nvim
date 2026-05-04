@@ -35,6 +35,14 @@ local M = {}
 local integration = nil
 local currentJobId = nil
 
+---Returns the root directory for searching project files.
+---It tries to find the git root directory first, and if it fails,
+---it uses the current working directory.
+---@return string
+local function get_root_dir()
+  return util.get_git_root() or vim.fn.getcwd()
+end
+
 ---Sorts paths by length and then by name.
 ---@param paths string[]
 local function sort_paths(paths)
@@ -51,8 +59,9 @@ end
 
 ---Prepares the picker titles and values for paths from the command output.
 ---@param command string|string[]
+---@param rootDir string
 ---@return string[], string[]
-local function get_picker_titles_values(command)
+local function get_picker_titles_values(command, rootDir)
   local pickerTitles = {}
   local pickerValues = {}
   local paths = util.shell(command)
@@ -67,7 +76,7 @@ local function get_picker_titles_values(command)
       local trimmedPath = path:gsub("/+$", "")
       table.insert(pickerValues, trimmedPath)
 
-      local escapedCwd = vim.fn.getcwd():gsub("(%W)", "%%%1")
+      local escapedCwd = rootDir:gsub("(%W)", "%%%1")
       local relativePath = path:gsub(escapedCwd, ""):gsub("^/+", ""):gsub("/+$", "")
       table.insert(pickerTitles, relativePath)
     end
@@ -154,11 +163,13 @@ end
 ---@param callback fun(xcodeproj: string)|nil
 ---@param opts PickerOptions|nil
 function M.select_xcodeproj(callback, opts)
+  local rootDir = get_root_dir()
   local maxdepth = config.commands.project_search_max_depth
+
   -- stylua: ignore
   local cmd = {
     "find",
-    vim.fn.getcwd(),
+    rootDir,
     "-type", "d",
     "-maxdepth", tostring(maxdepth),
     "-iname", "*.xcodeproj",
@@ -171,13 +182,13 @@ function M.select_xcodeproj(callback, opts)
       "fd",
       "-I",
       ".*\\.xcodeproj$",
-      vim.fn.getcwd(),
+      rootDir,
       "--max-depth", tostring(maxdepth),
       "--type", "d",
     }
   end
 
-  local pickerTitles, pickerValues = get_picker_titles_values(cmd)
+  local pickerTitles, pickerValues = get_picker_titles_values(cmd, rootDir)
 
   M.show("Select Project", pickerTitles, function(_, index)
     local selectedFile = pickerValues[index]
@@ -193,10 +204,12 @@ end
 ---@param opts PickerOptions|nil
 function M.select_project(callback, opts)
   local maxdepth = config.commands.project_search_max_depth
+  local rootDir = get_root_dir()
+
   -- stylua: ignore
   local cmd = {
     "find",
-    vim.fn.getcwd(),
+    rootDir,
     "-type", "d",
     "-path", "*xcodeproj/project.xcworkspace",
     "-prune",
@@ -212,13 +225,13 @@ function M.select_project(callback, opts)
       "fd",
       "-I",
       "(.*\\.xcodeproj$|.*\\.xcworkspace$|^Package\\.swift$)",
-      vim.fn.getcwd(),
+      rootDir,
       "--max-depth", tostring(maxdepth),
       "-E", "**/*xcodeproj/project.xcworkspace/"
     }
   end
 
-  local pickerTitles, pickerValues = get_picker_titles_values(cmd)
+  local pickerTitles, pickerValues = get_picker_titles_values(cmd, rootDir)
 
   M.show("Select Main Project File", pickerTitles, function(_, index)
     local projectFile = pickerValues[index]
