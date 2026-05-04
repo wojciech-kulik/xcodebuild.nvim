@@ -81,6 +81,7 @@ function M.find_tests(opts)
           })
           break
         end
+
         test = string.match(lines[i + 1], "func (.+)%(")
         if test then
           table.insert(selectedTests, {
