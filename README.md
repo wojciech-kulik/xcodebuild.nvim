@@ -89,7 +89,6 @@ Big thanks to all the sponsors who support this project 🍻!
 <table>
   <tr>
     <td><a href="https://github.com/kg8m"><img src="https://avatars.githubusercontent.com/u/694547" width="40" height="40" alt="@kg8m" title="kg8m"></a></td>
-    <td><a href="https://github.com/m-housh"><img src="https://avatars.githubusercontent.com/u/9305678" width="40" height="40" alt="@m-housh" title="m-housh"></a></td>
     <td><a href="https://github.com/soundsmitten"><img src="https://avatars.githubusercontent.com/u/852801" width="40" height="40" alt="@soundsmitten" title="soundsmitten"></a></td>
     <td><a href="https://github.com/humblehacker"><img src="https://avatars.githubusercontent.com/u/117582" width="40" height="40" alt="@humblehacker" title="humblehacker"></a></td>
     <td><a href="https://github.com/jwcross"><img src="https://avatars.githubusercontent.com/u/2405246" width="40" height="40" alt="@jwcross" title="jwcross"></a></td>
@@ -114,6 +113,7 @@ Big thanks to all the sponsors who support this project 🍻!
 
 <table>
   <tr>
+    <td><a href="https://github.com/m-housh"><img src="https://avatars.githubusercontent.com/u/9305678" width="40" height="40" alt="@m-housh" title="m-housh"></a></td>
     <td><a href="https://github.com/Almaz5200"><img src="https://avatars.githubusercontent.com/u/21291840" width="40" height="40" alt="@Almaz5200" title="Almaz5200"></a></td>
     <td><a href="https://github.com/stephenhuh"><img src="https://avatars.githubusercontent.com/u/6165538" width="40" height="40" alt="@stephenhuh" title="stephenhuh"></a></td>
     <td><a href="https://github.com/joeldrotleff"><img src="https://avatars.githubusercontent.com/u/2484624" width="40" height="40" alt="@joeldrotleff" title="joeldrotleff"></a></td>
