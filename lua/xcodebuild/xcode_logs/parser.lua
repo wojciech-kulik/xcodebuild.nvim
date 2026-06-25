@@ -99,6 +99,7 @@ local lastTest = nil
 local lastErrorTest = {}
 local testSuite = nil
 local buildPhaseName = nil
+local projectRoot = nil
 
 -- report fields
 local testsCount = 0
@@ -134,6 +135,14 @@ local function debug_print(name, value)
   if DEBUG then
     print(name .. ":", vim.inspect(value))
   end
+end
+
+local function get_project_root()
+  if not projectRoot then
+    projectRoot = util.get_project_root()
+  end
+
+  return projectRoot
 end
 
 ---Tries to match the string against a list of patterns created by substituting
@@ -525,7 +534,7 @@ local function parse_warning(line)
   local filepath, lineNumber, columnNumber, message =
     match_any(line, "(" .. filePattern .. "):(%d+):(%d*):? %w*%s*warning: (.*)", allExtensions)
 
-  if filepath and message and util.has_prefix(filepath, util.get_project_root()) then
+  if filepath and message and util.has_prefix(filepath, get_project_root()) then
     lineType = BUILD_WARNING
     lineData.filepath = filepath
     lineData.filename = util.get_filename(filepath)
@@ -741,6 +750,7 @@ function M.clear()
   lastTest = nil
   lastErrorTest = nil
   testSuite = nil
+  projectRoot = nil
   lineData = {}
   lineType = BEGIN
 
