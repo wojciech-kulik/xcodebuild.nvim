@@ -98,11 +98,15 @@ end
 ---Returns macOS configuration for `nvim-dap`.
 ---@return table
 function M.get_macos_configuration()
+  -- disables `default.profraw` file creation, which is used for code coverage and profiling.
+  local env = appdata.read_env_vars() or {}
+  env["LLVM_PROFILE_FILE"] = "/dev/null"
+
   return {
     name = "macOS App Debugger",
     type = M.get_adapter_name(),
     args = appdata.read_run_args(),
-    env = appdata.read_env_vars(),
+    env = env,
     request = "launch",
     cwd = function()
       return util.get_project_root()
