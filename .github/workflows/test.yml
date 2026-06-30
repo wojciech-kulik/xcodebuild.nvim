@@ -31,7 +31,6 @@ jobs:
 
       - name: Install dependencies
         run: |
-          brew update
           brew install --quiet xcp
 
       - name: Run tests
