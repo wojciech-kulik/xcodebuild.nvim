@@ -273,7 +273,10 @@ function M.get_destinations(projectFile, scheme, workingDirectory, callback)
           if destination.platform and destination.id and destination.name then
             table.insert(result, destination)
           end
-        elseif string.find(trimmedLine, "Available destinations") then
+        elseif
+          string.find(trimmedLine, "Available destinations", 1, true)
+          or string.find(trimmedLine, "Destinations compatible with", 1, true)
+        then
           foundDestinations = true
         end
       end
@@ -704,6 +707,26 @@ function M.launch_app_on_device(destination, bundleId, callback)
   })
 end
 
+---Opens the simulator UI bundled with the selected Xcode.
+---@param destination string
+local function open_simulator_app(destination)
+  local output = util.shell("xcode-select -p")
+  if not util.is_not_empty(output) or util.trim(output[1]) == "" then
+    return
+  end
+
+  local developerDirectory = util.trim(output[1])
+  local appPath = vim.fn.fnamemodify(developerDirectory, ":h") .. "/Applications/DeviceHub.app"
+  local command = { "open", "-a", appPath }
+  if util.dir_exists(appPath) then
+    table.insert(command, "devices://device/open?id=" .. destination)
+  else
+    command[3] = developerDirectory .. "/Applications/Simulator.app"
+  end
+
+  util.shell(command)
+end
+
 ---Launches the application on simulator.
 ---It also streams logs to file and DAP console.
 ---@param destination string
@@ -753,7 +776,7 @@ function M.launch_app_on_simulator(destination, bundleId, waitForDebugger, callb
   util.call(callback)
 
   if require("xcodebuild.core.config").options.commands.focus_simulator_on_app_launch then
-    util.shell("open -a Simulator")
+    open_simulator_app(destination)
   end
 
   return vim.fn.jobstart(command, {
@@ -801,14 +824,7 @@ function M.boot_simulator(destination, callback)
     stdout_buffered = true,
     on_exit = function(_, code, _)
       if code == 0 then
-        local output = util.shell("xcode-select -p")
-
-        if util.is_not_empty(output) then
-          vim.fn.jobstart(output[1] .. "/Applications/Simulator.app/Contents/MacOS/Simulator", {
-            detach = true,
-            on_exit = function() end,
-          })
-        end
+        open_simulator_app(destination)
 
         util.call(callback, true)
       else
