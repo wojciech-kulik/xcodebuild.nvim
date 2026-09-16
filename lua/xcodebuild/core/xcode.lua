@@ -887,11 +887,17 @@ end
 ---@return number|nil # pid
 function M.get_app_pid(productName, platform)
   if platform == constants.Platform.MACOS then
-    local pid = util.shell(
-      "ps aux | grep '" .. productName .. ".app/Contents/MacOS' | grep -v grep | awk '{ print$2 }'"
-    )
+    local processes = util.shell({ "ps", "-axww", "-o", "pid=,comm=" })
+    for _, process in ipairs(processes) do
+      local pid, executable = process:match("^%s*(%d+)%s+(.+)$")
+      local appName = executable
+        and executable:match("^/.-/Build/Products/[^/]+/([^/]+)%.app/Contents/MacOS/[^/]+$")
+      if appName == productName then
+        return tonumber(pid)
+      end
+    end
 
-    return tonumber(pid and pid[1] or nil)
+    return nil
   end
 
   local pid = util.shell(
